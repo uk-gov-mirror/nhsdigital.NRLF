@@ -45,31 +45,35 @@ def _list_s3_keys(file_key_prefix: str) -> list[str]:
     return keys
 
 
-def _get_perms_from_s3(file_key: str) -> list[str]:
+def _get_perms_from_s3(file_key: str) -> str | None:
     s3 = _get_s3_client()
 
-    item = s3.get_object(Bucket=nrl_auth_bucket_name, Key=file_key)
+    try:
+        item = s3.get_object(Bucket=nrl_auth_bucket_name, Key=file_key)
+    except s3.exceptions.NoSuchKey:
+        print(f"Permissions file {file_key} does not exist in the bucket.")
+        return None
 
-    if not item:
-        print(f"No permissions found for {file_key}.")
-        return []
+    if "Body" not in item:
+        print(f"No body found for permissions file {file_key}.")
+        return None
 
     return item["Body"].read().decode("utf-8")
 
 
-def list_apps() -> set[str]:
+def list_apps() -> list[str]:
     keys = _list_s3_keys("")
-    apps = set([key.split("/")[0] for key in keys])
+    apps = [key.split("/")[0] for key in keys]
 
     if not apps:
         print("No applications found in the bucket.")
-        return set()
+        return []
 
     print(f"Listing all {len(apps)} apps in bucket...")
     return apps
 
 
-def list_orgs(app_id: str) -> set[str]:
+def list_orgs(app_id: str) -> list[str]:
     keys = _list_s3_keys(f"{app_id}/")
     orgs = [
         key.split("/", maxsplit=2)[1].removesuffix(".json")
@@ -79,13 +83,13 @@ def list_orgs(app_id: str) -> set[str]:
 
     if not orgs:
         print(f"No organizations found for app {app_id}.")
-        return set()
+        return []
 
     print(f"Listing {len(orgs)} organizations for {app_id}...")
     return orgs
 
 
-def get_perms(app_id: str, org_ods: str) -> list[str]:
+def get(app_id: str, org_ods: str) -> list[str]:
     perms = _get_perms_from_s3(f"{app_id}/{org_ods}.json")
 
     if not perms:
@@ -112,10 +116,39 @@ def get_perms(app_id: str, org_ods: str) -> list[str]:
     return types
 
 
-def set_perms(app_id: str, org_ods: str, pointer_types: list[str]) -> list[str]:
-    # This function would contain the logic to set permissions
-    print(f"Setting permissions for {app_id}/{org_ods} to {pointer_types}...")
-    return []
+def set(app_id: str, org_ods: str, *pointer_types: str) -> list[str]:
+    if not pointer_types:
+        print(
+            "No pointer types provided. Please specify at least one pointer type or use clear_perms command."
+        )
+        return []
+
+    unknown_types = [pt for pt in pointer_types if pt not in TYPE_ATTRIBUTES]
+    if unknown_types:
+        print(f"Warning: Unknown pointer types provided: {', '.join(unknown_types)}")
+        print()
+
+    permissions_content = json.dumps(pointer_types, indent=4)
+    s3 = _get_s3_client()
+    s3.put_object(
+        Bucket=nrl_auth_bucket_name,
+        Key=f"{app_id}/{org_ods}.json",
+        Body=permissions_content,
+        ContentType="application/json",
+    )
+
+    return get(app_id, org_ods)
+
+
+def clear(app_id: str, org_ods: str) -> None:
+    s3 = _get_s3_client()
+    s3.put_object(
+        Bucket=nrl_auth_bucket_name,
+        Key=f"{app_id}/{org_ods}.json",
+        Body="[]",
+        ContentType="application/json",
+    )
+    print(f"Cleared permissions for {app_id}/{org_ods}.")
 
 
 if __name__ == "__main__":
