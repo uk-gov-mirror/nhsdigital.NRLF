@@ -25,33 +25,6 @@ module "consumer__readDocumentReference" {
   retention              = var.log_retention_period
 }
 
-module "consumer__countDocumentReference" {
-  source                 = "./modules/lambda"
-  parent_path            = "api/consumer"
-  name                   = "countDocumentReference"
-  region                 = local.region
-  prefix                 = local.prefix
-  layers                 = [module.nrlf.layer_arn, module.third_party.layer_arn, module.nrlf_permissions.layer_arn]
-  api_gateway_source_arn = ["arn:aws:execute-api:${local.region}:${local.aws_account_id}:${module.consumer__gateway.api_gateway_id}/*/GET/DocumentReference/_count"]
-  kms_key_id             = module.kms__cloudwatch.kms_arn
-  environment_variables = {
-    PREFIX               = "${local.prefix}--"
-    ENVIRONMENT          = local.environment
-    AUTH_STORE           = local.auth_store_id
-    POWERTOOLS_LOG_LEVEL = local.log_level
-    SPLUNK_INDEX         = module.firehose__processor.splunk.index
-    TABLE_NAME           = local.pointers_table_name
-  }
-  additional_policies = [
-    local.pointers_table_read_policy_arn,
-    local.pointers_kms_read_write_arn,
-    local.auth_store_read_policy_arn
-  ]
-  firehose_subscriptions = local.firehose_lambda_subscriptions
-  handler                = "count_document_reference.handler"
-  retention              = var.log_retention_period
-}
-
 module "consumer__searchDocumentReference" {
   source                 = "./modules/lambda"
   parent_path            = "api/consumer"
