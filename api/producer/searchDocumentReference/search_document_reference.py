@@ -86,6 +86,24 @@ def handler(
         categories=params.category.root.split(",") if params.category else [],
     )
 
+    if params.field_summary and params.field_summary.root == "count":
+        logger.log(LogReference.PROSEARCH006)
+        bundle = {"resourceType": "Bundle", "type": "searchset", "total": 0}
+        total = sum(
+            1
+            for _ in repository.search(
+                custodian=metadata.ods_code,
+                custodian_suffix=metadata.ods_code_extension,
+                nhs_number=params.nhs_number,
+                pointer_types=pointer_types,
+                categories=categories,
+            )
+        )
+        bundle["total"] = total
+        response = Response.from_resource(Bundle.model_validate(bundle))
+        logger.log(LogReference.PROSEARCH999)
+        return response
+
     for result in repository.search(
         custodian=metadata.ods_code,
         custodian_suffix=metadata.ods_code_extension,

@@ -2091,6 +2091,8 @@ components:
           $ref: "#/components/schemas/RequestQueryType"
         category:
           $ref: "#/components/schemas/RequestQueryCategory"
+        _summary:
+          $ref: "#/components/schemas/RequestQuerySummary"
         next-page-token:
           $ref: "#/components/schemas/NextPageToken"
     RequestQuerySubject:
@@ -2103,6 +2105,9 @@ components:
     RequestQueryCategory:
       type: string
       example: "http://snomed.info/sct|103693007"
+    RequestQuerySummary:
+      type: string
+      example: "count"
     NextPageToken:
       type: string
     RequestHeaderOdsCode:
@@ -2224,6 +2229,18 @@ components:
         invalid:
           summary: Unknown
           value: http://snomed.info/sct|410970009
+    _summary:
+      name: summary
+      in: query
+      schema:
+        $ref: "#/components/schemas/RequestQuerySummary"
+      examples:
+        none:
+          summary: None
+          value: ""
+        SNOMED_CODES_CARE_PLAN:
+          summary: Search only, just returns a count of the matching resources, without returning the actual matches
+          value: count
     nextPageToken:
       name: next-page-token
       in: query
