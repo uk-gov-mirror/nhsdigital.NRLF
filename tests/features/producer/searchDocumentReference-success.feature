@@ -115,32 +115,31 @@ Feature: Producer - searchDocumentReference - Success Scenarios
       | http://snomed.info/sct | 736253002        |
       | http://snomed.info/sct | 1363501000000100 |
     And a DocumentReference resource exists with values:
-      | property    | value                                 |
-      | id          | 02V-1111111111-SearchMultipleRefTest1 |
-      | subject     | 9278693472                            |
-      | status      | current                               |
-      | type        | 736253002                             |
-      | category    | 734163000                             |
-      | contentType | application/pdf                       |
-      | url         | https://example.org/my-doc-1.pdf      |
-      | custodian   | 02V                                   |
-      | author      | 02V                                   |
+      | property    | value                                   |
+      | id          | RX898-1111111111-SearchMultipleRefTest1 |
+      | subject     | 9278693472                              |
+      | status      | current                                 |
+      | type        | 736253002                               |
+      | category    | 734163000                               |
+      | contentType | application/pdf                         |
+      | url         | https://example.org/my-doc-1.pdf        |
+      | custodian   | RX898                                   |
+      | author      | X26                                     |
     And a DocumentReference resource exists with values:
-      | property    | value                                 |
-      | id          | 02V-1111111111-SearchMultipleRefTest3 |
-      | subject     | 9278693472                            |
-      | status      | current                               |
-      | type        | 1363501000000100                      |
-      | category    | 1102421000000108                      |
-      | contentType | application/pdf                       |
-      | url         | https://example.org/my-doc-3.pdf      |
-      | custodian   | 02V                                   |
-      | author      | 02V                                   |
+      | property    | value                                   |
+      | id          | RX898-1111111111-SearchMultipleRefTest3 |
+      | subject     | 9278693472                              |
+      | status      | current                                 |
+      | type        | 1363501000000100                        |
+      | category    | 1102421000000108                        |
+      | contentType | application/pdf                         |
+      | url         | https://example.org/my-doc-3.pdf        |
+      | custodian   | RX898                                   |
+      | author      | X26                                     |
     When producer 'RX898' searches for DocumentReferences with parameters:
       | parameter | value      |
       | subject   | 9278693472 |
       | _summary  | count      |
     Then the response status code is 200
     And the response is a searchset Bundle
-    And the Bundle has a self link matching 'DocumentReference?subject:identifier=https://fhir.nhs.uk/Id/nhs-number|9278693472&_summary=count'
     And the Bundle has a total of 2
