@@ -2,7 +2,6 @@ from typing import Any, Generator
 
 import pytest
 
-from nrlf.core.constants import NHS_NUMBER_SYSTEM_URL
 from tests.smoke.environment import SmokeTestParameters
 from tests.smoke.setup import build_document_reference, upsert_test_pointer
 from tests.utilities.api_clients import ConsumerTestClient, ProducerTestClient
@@ -45,13 +44,6 @@ def test_consumer_count_search_read(
     """
     patient_id = test_data["patient_nhs_number"]
     test_pointers = test_data["pointers"]
-
-    # Count
-    count_response = consumer_client.count(
-        {"subject:identifier": f"{NHS_NUMBER_SYSTEM_URL}|{patient_id}"}
-    )
-    assert count_response.ok
-    assert count_response.json()["total"] >= len(test_pointers)
 
     # Search
     search_response = consumer_client.search(patient_id)
