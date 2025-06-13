@@ -262,9 +262,9 @@ class NRLFormatCode(Coding):
     ]
     code: Annotated[
         Literal[
-            "Contact details (HTTP Unsecured)",
-            "Unstructured Document",
-            "Structured Document",
+            "urn:nhs-ic:record-contact",
+            "urn:nhs-ic:unstructured",
+            "urn:nhs-ic:structured",
         ],
         Field(description="The code representing the format of the document."),
     ]
