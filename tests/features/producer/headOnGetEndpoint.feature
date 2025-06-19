@@ -12,4 +12,4 @@ Feature: Producer - HEAD Requests
     When producer 'RX898' sends HEAD request to 'DocumentReference/random-id' endpoint
     Then the response status code is 405
     And the response has an empty body
-    And the Allow header is 'GET,DELETE'
+    And the Allow header is 'GET,PUT,DELETE'

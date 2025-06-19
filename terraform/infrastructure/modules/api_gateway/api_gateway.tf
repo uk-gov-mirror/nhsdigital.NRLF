@@ -50,9 +50,11 @@ resource "aws_api_gateway_deployment" "api_gateway_deployment" {
   rest_api_id = aws_api_gateway_rest_api.api_gateway_rest_api.id
 
   triggers = {
-    redeployment    = sha1(jsonencode(aws_api_gateway_rest_api.api_gateway_rest_api.body))
-    resource_change = "${md5(file("${path.module}/api_gateway.tf"))}"
-    capabilities    = sha1(var.capability_statement_content)
+    redeployment              = sha1(jsonencode(aws_api_gateway_rest_api.api_gateway_rest_api.body))
+    resource_change           = "${md5(file("${path.module}/api_gateway.tf"))}"
+    capabilities              = sha1(var.capability_statement_content)
+    method_responses_change   = md5(file("${path.module}/method_responses.tf"))
+    parent_api_gateway_change = md5(file("${path.module}/../../api_gateway.tf"))
   }
 
   lifecycle {

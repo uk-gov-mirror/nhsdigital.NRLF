@@ -41,7 +41,7 @@ module "producer__gateway" {
   }
   endpoint_allowed_methods = {
     "/DocumentReference"      = "GET,POST",
-    "/DocumentReference/{id}" = "GET,DELETE"
+    "/DocumentReference/{id}" = "GET,PUT,DELETE"
   }
   kms_key_id                   = module.kms__cloudwatch.kms_arn
   domain                       = local.apis.domain
