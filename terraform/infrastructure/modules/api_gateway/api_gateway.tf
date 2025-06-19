@@ -60,7 +60,8 @@ resource "aws_api_gateway_deployment" "api_gateway_deployment" {
   }
 
   depends_on = [
-    aws_api_gateway_rest_api.api_gateway_rest_api
+    aws_api_gateway_rest_api.api_gateway_rest_api,
+    aws_api_gateway_integration_response.head_integration_response
   ]
 }
 

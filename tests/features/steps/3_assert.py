@@ -51,6 +51,20 @@ def assert_bundle_step(context: Context, bundle_type: str):
     context.bundle = Bundle.model_validate(body)
 
 
+@then("the response has an empty body")
+def assert_empty_body_step(context: Context):
+    """
+    Asserts that the response body is empty.
+    """
+    assert context.response.text == "", format_error(
+        "Response body is not empty",
+        "empty",
+        context.response.text,
+        context.response.text,
+    )
+    context.bundle = None
+
+
 @then("the Bundle has a total of {total}")
 def assert_bundle_total_step(context: Context, total: str):
     assert (
