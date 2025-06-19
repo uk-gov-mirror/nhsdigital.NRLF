@@ -76,27 +76,6 @@ def consumer_read_document_reference_step(
     context.response = client.read(doc_ref_id)
 
 
-@when("consumer '{ods_code}' sends HEAD request to {endpoint} endpoint")
-def consumer_head_request_step(context: Context, ods_code: str, endpoint: str):
-    client = consumer_client_from_context(context, ods_code)
-    context.response = client.head(endpoint)
-
-
-@when(
-    "consumer '{ods_code}' sends HEAD request to '{endpoint}' endpoint with parameters"
-)
-def consumer_head_request_step_with_parameters(
-    context: Context, ods_code: str, endpoint: str
-):
-    if not context.table:
-        raise ValueError("No search query table provided")
-
-    items = {row["parameter"]: row["value"] for row in context.table}
-
-    client = consumer_client_from_context(context, ods_code)
-    context.response = client.head(endpoint, items)
-
-
 @when("producer '{ods_code}' creates a DocumentReference with values")
 def create_post_document_reference_step(context: Context, ods_code: str):
     client = producer_client_from_context(context, ods_code)
@@ -268,3 +247,32 @@ def producer_search_document_reference_step(context: Context, ods_code: str):
         pointer_type=pointer_type,
         extra_params=items,
     )
+
+
+@when("{consumer_or_producer} '{ods_code}' sends HEAD request to '{endpoint}' endpoint")
+def consumer_head_request_step(
+    context: Context, consumer_or_producer: str, ods_code: str, endpoint: str
+):
+    if consumer_or_producer == "producer":
+        client = producer_client_from_context(context, ods_code)
+    elif consumer_or_producer == "consumer":
+        client = consumer_client_from_context(context, ods_code)
+    context.response = client.head(endpoint)
+
+
+@when(
+    "{consumer_or_producer} '{ods_code}' sends HEAD request to '{endpoint}' endpoint with parameters"
+)
+def consumer_head_request_step_with_parameters(
+    context: Context, consumer_or_producer: str, ods_code: str, endpoint: str
+):
+    if not context.table:
+        raise ValueError("No search query table provided")
+
+    items = {row["parameter"]: row["value"] for row in context.table}
+
+    if consumer_or_producer == "producer":
+        client = producer_client_from_context(context, ods_code)
+    elif consumer_or_producer == "consumer":
+        client = consumer_client_from_context(context, ods_code)
+    context.response = client.head(endpoint, items)

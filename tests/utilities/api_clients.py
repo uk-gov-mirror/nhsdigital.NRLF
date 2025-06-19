@@ -376,3 +376,19 @@ class ProducerTestClient:
             headers=self.request_headers,
             cert=self.config.client_cert,
         )
+
+    @retry_if([502])
+    def head(
+        self,
+        endpoint: str,
+        extra_params: dict[str, str] | None = None,
+    ) -> Response:
+        params = {**(extra_params or {})}
+        url = f"{self.api_url}/{endpoint}"
+        headers = {**self.request_headers, "Content-Type": "application/json"}
+        return requests.head(
+            url,
+            params=params,
+            headers=headers,
+            cert=self.config.client_cert,
+        )

@@ -1,14 +1,6 @@
 # Define a reusable map of allowed methods for each path
-locals {
-  endpoint_allowed_methods = {
-    "/DocumentReference" = "GET,POST,PUT"
-    # "/DocumentReference/_search" = "POST"
-    # "/DocumentReference/{id}" = "GET"
-  }
-}
-
 data "aws_api_gateway_resource" "resource" {
-  for_each    = local.endpoint_allowed_methods
+  for_each    = var.endpoint_allowed_methods
   rest_api_id = aws_api_gateway_rest_api.api_gateway_rest_api.id
   path        = each.key
 
@@ -17,7 +9,7 @@ data "aws_api_gateway_resource" "resource" {
 
 # Add HEAD method to each resource with 405 response
 resource "aws_api_gateway_method" "head_method" {
-  for_each = local.endpoint_allowed_methods
+  for_each = var.endpoint_allowed_methods
 
   rest_api_id   = aws_api_gateway_rest_api.api_gateway_rest_api.id
   resource_id   = data.aws_api_gateway_resource.resource[each.key].id
@@ -26,7 +18,7 @@ resource "aws_api_gateway_method" "head_method" {
 }
 
 resource "aws_api_gateway_integration" "head_integration" {
-  for_each = local.endpoint_allowed_methods
+  for_each = var.endpoint_allowed_methods
 
   rest_api_id = aws_api_gateway_rest_api.api_gateway_rest_api.id
   resource_id = data.aws_api_gateway_resource.resource[each.key].id
@@ -49,7 +41,7 @@ resource "aws_api_gateway_integration" "head_integration" {
 }
 
 resource "aws_api_gateway_method_response" "head_method_response" {
-  for_each = local.endpoint_allowed_methods
+  for_each = var.endpoint_allowed_methods
 
   rest_api_id = aws_api_gateway_rest_api.api_gateway_rest_api.id
   resource_id = data.aws_api_gateway_resource.resource[each.key].id
@@ -62,7 +54,7 @@ resource "aws_api_gateway_method_response" "head_method_response" {
 }
 
 resource "aws_api_gateway_integration_response" "head_integration_response" {
-  for_each = local.endpoint_allowed_methods
+  for_each = var.endpoint_allowed_methods
 
   rest_api_id       = aws_api_gateway_rest_api.api_gateway_rest_api.id
   resource_id       = data.aws_api_gateway_resource.resource[each.key].id

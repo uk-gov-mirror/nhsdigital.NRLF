@@ -10,6 +10,10 @@ module "consumer__gateway" {
     method_readDocumentReference       = "arn:aws:apigateway:eu-west-2:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-2:${local.aws_account_id}:function:${substr("${local.prefix}--api--consumer--readDocumentReference", 0, 64)}/invocations"
     method_status                      = "arn:aws:apigateway:eu-west-2:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-2:${local.aws_account_id}:function:${substr("${local.prefix}--api--consumer--status", 0, 64)}/invocations"
   }
+  endpoint_allowed_methods = {
+    "/DocumentReference"      = "GET",
+    "/DocumentReference/{id}" = "GET"
+  }
   kms_key_id                   = module.kms__cloudwatch.kms_arn
   domain                       = local.apis.domain
   path                         = local.apis.consumer.path
@@ -35,7 +39,10 @@ module "producer__gateway" {
     method_deleteDocumentReference     = "arn:aws:apigateway:eu-west-2:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-2:${local.aws_account_id}:function:${substr("${local.prefix}--api--producer--deleteDocumentReference", 0, 64)}/invocations"
     method_status                      = "arn:aws:apigateway:eu-west-2:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-2:${local.aws_account_id}:function:${substr("${local.prefix}--api--producer--status", 0, 64)}/invocations"
   }
-
+  endpoint_allowed_methods = {
+    "/DocumentReference"      = "GET,POST",
+    "/DocumentReference/{id}" = "GET,DELETE"
+  }
   kms_key_id                   = module.kms__cloudwatch.kms_arn
   domain                       = local.apis.domain
   path                         = local.apis.producer.path
