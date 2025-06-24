@@ -15,7 +15,6 @@ WITH
    , event_correlation_id
    , event_xray_trace_id
    , event_pointer_types
-   , '' event_custodian
    , COALESCE("event_headers_nhsd-end-user-organisation-ods", event_metadata_ods_code) user_ods
    FROM
      consumer_countdocumentreference
@@ -35,7 +34,6 @@ WITH
    , event_correlation_id
    , event_xray_trace_id
    , event_pointer_types
-   , event_custodian
    , COALESCE("event_headers_nhsd-end-user-organisation-ods", event_metadata_ods_code) user_ods
    FROM
      consumer_readdocumentreference
@@ -55,7 +53,6 @@ WITH
    , event_correlation_id
    , event_xray_trace_id
    , event_pointer_types
-   , event_custodian
    , COALESCE("event_headers_nhsd-end-user-organisation-ods", event_metadata_ods_code) user_ods
    FROM
      consumer_searchdocumentreference
@@ -75,7 +72,6 @@ WITH
    , event_correlation_id
    , event_xray_trace_id
    , event_pointer_types
-   , event_custodian
    , COALESCE("event_headers_nhsd-end-user-organisation-ods", event_metadata_ods_code) user_ods
    FROM
      consumer_searchpostdocumentreference
@@ -116,7 +112,6 @@ SELECT
 , b.event_correlation_id
 , b.event_xray_trace_id
 , event_pointer_types
-, COALESCE(COALESCE(event_custodian, LAG(event_custodian) IGNORE NULLS OVER (PARTITION BY b.event_xray_trace_id ORDER BY event_timestamp ASC)), COALESCE(event_custodian, LEAD(event_custodian) IGNORE NULLS OVER (PARTITION BY b.event_xray_trace_id ORDER BY event_timestamp ASC))) event_custodian
 , oc.user_ods
 FROM
   (base b
