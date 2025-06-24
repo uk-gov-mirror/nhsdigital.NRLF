@@ -7,6 +7,11 @@ resource "aws_instance" "powerbi_gw" {
   subnet_id                   = var.subnet_id
   vpc_security_group_ids      = var.security_groups
 
+  root_block_device {
+    volume_size = 40
+    volume_type = "gp2"
+  }
+
   user_data = file("${path.module}/scripts/user_data.tpl")
 
   tags = {
