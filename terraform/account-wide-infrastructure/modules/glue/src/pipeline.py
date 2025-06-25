@@ -73,7 +73,12 @@ class LogPipeline:
             if last_runtime:
                 data[name] = self.glue_context.create_dynamic_frame.from_options(
                     connection_type="s3",
-                    connection_options={"paths": [self.source_path], "recurse": True},
+                    connection_options={
+                        "paths": [self.source_path],
+                        "recurse": True,
+                        "groupFiles": "inPartition",
+                        "groupSize": "104857600",
+                    },
                     format="json",
                 ).filter(
                     f=lambda x, n=name: (x["host"].endswith(n))
@@ -83,7 +88,12 @@ class LogPipeline:
             else:
                 data[name] = self.glue_context.create_dynamic_frame.from_options(
                     connection_type="s3",
-                    connection_options={"paths": [self.source_path], "recurse": True},
+                    connection_options={
+                        "paths": [self.source_path],
+                        "recurse": True,
+                        "groupFiles": "inPartition",
+                        "groupSize": "104857600",
+                    },
                     format="json",
                 ).filter(f=lambda x, n=name: x["host"].endswith(n))
 
@@ -109,7 +119,7 @@ class LogPipeline:
                 self.logger.info(
                     f"Attempting to load dataframe {name} into {self.target_path}{name}"
                 )
-                dataframe.coalesce(1).write.mode("append").partitionBy(
+                dataframe.write.mode("append").partitionBy(
                     *self.partition_cols
                 ).parquet(f"{self.target_path}{name}")
             except:
