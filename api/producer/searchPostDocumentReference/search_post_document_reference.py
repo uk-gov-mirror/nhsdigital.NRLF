@@ -79,22 +79,6 @@ def handler(
         pointer_types=pointer_types,
         categories=categories,
     )
-    if body.field_summary and body.field_summary.root == "count":
-        logger.log(LogReference.PROPOSTSEARCH006)
-        total = sum(
-            1
-            for _ in repository.search(
-                custodian=metadata.ods_code,
-                custodian_suffix=metadata.ods_code_extension,
-                nhs_number=body.nhs_number,
-                pointer_types=pointer_types,
-                categories=categories,
-            )
-        )
-        bundle["total"] = total
-        response = Response.from_resource(Bundle.model_validate(bundle))
-        logger.log(LogReference.PROPOSTSEARCH999)
-        return response
 
     for result in repository.search(
         custodian=metadata.ods_code,

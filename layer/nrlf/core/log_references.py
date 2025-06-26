@@ -184,9 +184,12 @@ class LogReference(Enum):
     CONSEARCH004 = _Reference(
         "DEBUG", "Parsed DocumentReference and added to search results"
     )
-    CONSEARCH006 = _Reference("DEBUG", "Search with summary count parameter enabled")
     CONSEARCH005 = _Reference(
         "EXCEPTION", "The DocumentReference resource could not be parsed"
+    )
+    CONSEARCH006 = _Reference("DEBUG", "Search with summary count parameter enabled")
+    CONSEARCH007 = _Reference(
+        "INFO", "Search with summary count parameter returned total results"
     )
     CONSEARCH999 = _Reference(
         "INFO", "Successfully completed consumer searchDocumentReference"
@@ -209,11 +212,14 @@ class LogReference(Enum):
     CONPOSTSEARCH004 = _Reference(
         "DEBUG", "Parsed DocumentReference and added to search results"
     )
+    CONPOSTSEARCH005 = _Reference(
+        "EXCEPTION", "The DocumentReference resource could not be parsed"
+    )
     CONPOSTSEARCH006 = _Reference(
         "DEBUG", "Search with summary count parameter enabled"
     )
-    CONPOSTSEARCH005 = _Reference(
-        "EXCEPTION", "The DocumentReference resource could not be parsed"
+    CONPOSTSEARCH007 = _Reference(
+        "INFO", "Search with summary count parameter returned total results"
     )
     CONPOSTSEARCH999 = _Reference(
         "INFO", "Successfully completed consumer searchPostDocumentReference"

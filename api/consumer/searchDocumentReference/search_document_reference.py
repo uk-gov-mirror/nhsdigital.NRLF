@@ -113,16 +113,13 @@ def handler(
             "total": 0,
         }
         logger.log(LogReference.CONSEARCH006)
-        total = sum(
-            1
-            for _ in repository.search(
-                nhs_number=params.nhs_number,
-                custodian=custodian_id,
-                pointer_types=pointer_types,
-                categories=categories,
-            )
+
+        total = repository.count_by_nhs_number(
+            nhs_number=params.nhs_number,
+            pointer_types=pointer_types,
         )
         bundle["total"] = total
+        logger.log(LogReference.CONSEARCH007, total=total)
         response = Response.from_resource(Bundle.model_validate(bundle))
         logger.log(LogReference.CONSEARCH999)
         return response

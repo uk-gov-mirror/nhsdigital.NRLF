@@ -34,6 +34,22 @@ function checkResponse(res) {
   }
 }
 
+export function countDocumentReference() {
+  const choice = Math.floor(Math.random() * NHS_NUMBERS.length);
+  const nhsNumber = NHS_NUMBERS[choice];
+
+  const identifier = encodeURIComponent(
+    `https://fhir.nhs.uk/Id/nhs-number|${nhsNumber}`
+  );
+  const res = http.get(
+    `https://${__ENV.HOST}/consumer/DocumentReference?_summary=count&subject:identifier=${identifier}`,
+    {
+      headers: getHeaders(),
+    }
+  );
+  checkResponse(res);
+}
+
 export function readDocumentReference() {
   const choice = Math.floor(Math.random() * POINTER_IDS.length);
   const id = POINTER_IDS[choice];
@@ -119,6 +135,23 @@ export function searchPostDocumentReferenceByCategory() {
 
   const res = http.post(
     `https://${__ENV.HOST}/consumer/DocumentReference/_search`,
+    body,
+    {
+      headers: getHeaders(),
+    }
+  );
+  checkResponse(res);
+}
+
+export function countPostDocumentReference() {
+  const choice = Math.floor(Math.random() * NHS_NUMBERS.length);
+  const nhsNumber = NHS_NUMBERS[choice];
+
+  const body = JSON.stringify({
+    "subject:identifier": `https://fhir.nhs.uk/Id/nhs-number|${nhsNumber}`,
+  });
+  const res = http.post(
+    `https://${__ENV.HOST}/consumer/DocumentReference/_search?_summary=count`,
     body,
     {
       headers: getHeaders(),

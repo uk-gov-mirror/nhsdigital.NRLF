@@ -8,6 +8,28 @@ export const options = {
     },
   ],
   scenarios: {
+    countDocumentReference: {
+      exec: "countDocumentReference",
+      executor: "ramping-arrival-rate",
+      startRate: 1,
+      timeUnit: "1s",
+      preAllocatedVUs: 5,
+      stages: [
+        { target: 5, duration: "30s" },
+        { target: 5, duration: "1m" },
+      ],
+    },
+    countPostDocumentReference: {
+      exec: "countPostDocumentReference",
+      executor: "ramping-arrival-rate",
+      startRate: 1,
+      timeUnit: "1s",
+      preAllocatedVUs: 5,
+      stages: [
+        { target: 5, duration: "30s" },
+        { target: 5, duration: "1m" },
+      ],
+    },
     readDocumentReference: {
       exec: "readDocumentReference",
       executor: "ramping-arrival-rate",
