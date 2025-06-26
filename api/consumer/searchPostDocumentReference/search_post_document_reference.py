@@ -112,19 +112,16 @@ def handler(
             "link": [{"relation": "self", "url": self_link}],
             "total": 0,
         }
-        logger.log(LogReference.CONSEARCH006)
-        total = sum(
-            1
-            for _ in repository.search(
-                nhs_number=body.nhs_number,
-                custodian=custodian_id,
-                pointer_types=pointer_types,
-                categories=categories,
-            )
+        logger.log(LogReference.CONPOSTSEARCH006)
+
+        total = repository.count_by_nhs_number(
+            nhs_number=body.nhs_number,
+            pointer_types=pointer_types,
         )
         bundle["total"] = total
+        logger.log(LogReference.CONPOSTSEARCH007, total=total)
         response = Response.from_resource(Bundle.model_validate(bundle))
-        logger.log(LogReference.CONSEARCH999)
+        logger.log(LogReference.CONPOSTSEARCH999)
         return response
 
     for result in repository.search(

@@ -8,6 +8,24 @@ export const options = {
     },
   ],
   scenarios: {
+    countDocumentReference: {
+      exec: "countDocumentReference",
+      executor: "ramping-vus",
+      startVUs: 1,
+      stages: [
+        { target: 10, duration: "30s" },
+        { target: 10, duration: "1m" },
+      ],
+    },
+    countPostDocumentReference: {
+      exec: "countPostDocumentReference",
+      executor: "ramping-vus",
+      startVUs: 1,
+      stages: [
+        { target: 10, duration: "30s" },
+        { target: 10, duration: "1m" },
+      ],
+    },
     readDocumentReference: {
       exec: "readDocumentReference",
       executor: "ramping-vus",
