@@ -77,7 +77,7 @@ class LogPipeline:
                         "paths": [self.source_path],
                         "recurse": True,
                         "groupFiles": "inPartition",
-                        "groupSize": "104857600",
+                        "groupSize": "134217728",
                     },
                     format="json",
                 ).filter(
@@ -92,7 +92,7 @@ class LogPipeline:
                         "paths": [self.source_path],
                         "recurse": True,
                         "groupFiles": "inPartition",
-                        "groupSize": "104857600",
+                        "groupSize": "134217728",
                     },
                     format="json",
                 ).filter(f=lambda x, n=name: x["host"].endswith(n))
