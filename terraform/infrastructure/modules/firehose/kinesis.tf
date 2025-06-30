@@ -65,7 +65,7 @@ resource "aws_kinesis_firehose_delivery_stream" "reporting_stream" {
     role_arn           = aws_iam_role.firehose.arn
     bucket_arn         = var.reporting_bucket_arn
     buffering_size     = 64
-    buffering_interval = 60
+    buffering_interval = 600
 
     processing_configuration {
       enabled = true
