@@ -499,9 +499,9 @@ The process to create a new release is as follows:
 
 Once your new release has been created, you can then deploy this release through the NRLF environments using the "Persistent Environment Deploy" Github Action.
 
-If the Consumer API has changed, or the documentation for that API has changed, you will also need to release (NRL Consumer API)[https://github.com/NHSDigital/nrl-consumer-api].
+If the Consumer API has changed, or the documentation for that API has changed, you will also need to release [NRL Consumer API](https://github.com/NHSDigital/nrl-consumer-api).
 
-If the Producer API has changed, or the documentation for that API has changed, you will also need to release (NRL Producer API)[https://github.com/NHSDigital/nrl-producer-api].
+If the Producer API has changed, or the documentation for that API has changed, you will also need to release [NRL Producer API](https://github.com/NHSDigital/nrl-producer-api).
 
 ### Deploying releases
 
