@@ -53,7 +53,7 @@ resource "aws_api_gateway_deployment" "api_gateway_deployment" {
     redeployment              = sha1(jsonencode(aws_api_gateway_rest_api.api_gateway_rest_api.body))
     resource_change           = "${md5(file("${path.module}/api_gateway.tf"))}"
     capabilities              = sha1(var.capability_statement_content)
-    method_responses_change   = md5(file("${path.module}/method_responses.tf"))
+    head_responses_change     = md5(file("${path.module}/head_responses.tf"))
     parent_api_gateway_change = md5(file("${path.module}/../../api_gateway.tf"))
   }
 

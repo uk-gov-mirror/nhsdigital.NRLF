@@ -196,11 +196,12 @@ class ConsumerTestClient:
     def head(
         self,
         endpoint: str,
+        headers: dict[str, str] | None = None,
         extra_params: dict[str, str] | None = None,
     ) -> Response:
+        headers = {**(headers or {}), **self.request_headers}
         params = {**(extra_params or {})}
         url = f"{self.api_url}/{endpoint}"
-        headers = {**self.request_headers, "Content-Type": "application/json"}
         return requests.head(
             url,
             params=params,
@@ -381,11 +382,12 @@ class ProducerTestClient:
     def head(
         self,
         endpoint: str,
+        headers: dict[str, str] | None = None,
         extra_params: dict[str, str] | None = None,
     ) -> Response:
+        headers = {**(headers or {}), **self.request_headers}
         params = {**(extra_params or {})}
         url = f"{self.api_url}/{endpoint}"
-        headers = {**self.request_headers, "Content-Type": "application/json"}
         return requests.head(
             url,
             params=params,

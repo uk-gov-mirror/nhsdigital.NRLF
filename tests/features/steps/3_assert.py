@@ -347,6 +347,17 @@ def assert_location_header(context: Context, header_name: str):
     context.pointer_id = generated_id
 
 
+@then("the {header_name} header is not present")
+def assert_header_not_present(context: Context, header_name: str):
+    header_value = context.response.headers.get(header_name)
+    assert header_value is None, format_error(
+        f"Header {header_name} should not be present",
+        "not present",
+        header_value,
+        context.response.text,
+    )
+
+
 @then("the {header_name} header starts with '{starts_with}'")
 def assert_header_starts_with(context: Context, header_name: str, starts_with: str):
     header_value = context.response.headers.get(header_name)

@@ -1,15 +1,63 @@
 Feature: Producer - HEAD Requests
 
-  Scenario: DocumentReference with HEAD fails
+  Scenario Outline: DocumentReference with HEAD fails (Content-Type: <content_type>)
     Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
-    When producer 'RX898' sends HEAD request to 'DocumentReference' endpoint
+    When producer 'RX898' sends HEAD request to 'DocumentReference' endpoint with headers:
+      | header       | value          |
+      | Content-Type | <content_type> |
     Then the response status code is 405
     And the response has an empty body
     And the Allow header is 'GET,POST'
 
-  Scenario: DocumentReference/{id} with HEAD fails
+    Examples:
+      | content_type          |
+      | application/json      |
+      | application/json+fhir |
+      | application/fhir+json |
+
+  Scenario Outline: DocumentReference/{id} with HEAD fails (Content-Type: <content_type>)
     Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
-    When producer 'RX898' sends HEAD request to 'DocumentReference/random-id' endpoint
+    When producer 'RX898' sends HEAD request to 'DocumentReference/random-id' endpoint with headers:
+      | header       | value          |
+      | Content-Type | <content_type> |
     Then the response status code is 405
     And the response has an empty body
     And the Allow header is 'GET,PUT,DELETE'
+
+    Examples:
+      | content_type          |
+      | application/json      |
+      | application/json+fhir |
+      | application/fhir+json |
+
+  Scenario Outline: DocumentReference with HEAD fails with 415 with unsupported (Content-Type: <content_type>)
+    Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
+    When producer 'RX898' sends HEAD request to 'DocumentReference' endpoint with headers:
+      | header       | value          |
+      | Content-Type | <content_type> |
+    Then the response status code is 415
+    And the Content-Type header is 'application/json'
+    And the response has an empty body
+    And the Allow header is not present
+
+    Examples:
+      | content_type             |
+      | application/notsupported |
+      | application/helloworld   |
+      | application/harold       |
+
+  Scenario Outline: DocumentReference/{id} with HEAD fails with 415 with unsupported (Content-Type: <content_type>)
+    Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
+    When producer 'RX898' sends HEAD request to 'DocumentReference/random-id' endpoint with headers:
+      | header       | value          |
+      | Content-Type | <content_type> |
+    Then the response status code is 415
+    And the Content-Type header is 'application/json'
+    And the response has an empty body
+    And the Allow header is not present
+
+    Examples:
+      | content_type             |
+      | application/notsupported |
+      | application/helloworld   |
+      | application/harold       |

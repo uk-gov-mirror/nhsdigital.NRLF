@@ -20,12 +20,11 @@ resource "aws_api_gateway_method" "head_method" {
 resource "aws_api_gateway_integration" "head_integration" {
   for_each = var.endpoint_allowed_methods
 
-  rest_api_id = aws_api_gateway_rest_api.api_gateway_rest_api.id
-  resource_id = data.aws_api_gateway_resource.resource[each.key].id
-  http_method = aws_api_gateway_method.head_method[each.key].http_method
-  type        = "MOCK"
-  # passthrough_behavior = "WHEN_NO_TEMPLATES"
-  passthrough_behavior = "WHEN_NO_MATCH"
+  rest_api_id          = aws_api_gateway_rest_api.api_gateway_rest_api.id
+  resource_id          = data.aws_api_gateway_resource.resource[each.key].id
+  http_method          = aws_api_gateway_method.head_method[each.key].http_method
+  type                 = "MOCK"
+  passthrough_behavior = "WHEN_NO_TEMPLATES"
 
   request_templates = {
     "application/json"      = <<-EOF
