@@ -23,7 +23,13 @@ This project uses the `Makefile` to build, test and deploy. This will ensure tha
 Before you start using this repository, you will need to:
 
 - Follow the instructions on the [Developer Onboarding Guide](https://nhsd-confluence.digital.nhs.uk/pages/viewpage.action?spaceKey=CLP&title=NRLF+-+Developer+Onboarding) in confluence
-- Install `asdf` using https://asdf-vm.com/guide/getting-started.html.
+- Install `asdf` using https://asdf-vm.com/guide/getting-started.html
+
+Confirm `asdf` is installed and is working with:
+
+```
+asdf --version
+```
 
 Then install all the dependency packages with:
 
