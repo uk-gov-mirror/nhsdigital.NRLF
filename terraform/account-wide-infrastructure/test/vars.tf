@@ -74,7 +74,7 @@ variable "enable_powerbi_auto_push" {
 variable "powerbi_gw_instance_type" {
   type        = string
   description = "Type for PowerBI GW EC2 Instance"
-  default     = "t2.micro"
+  default     = "t2.medium"
 }
 
 variable "use_powerbi_gw_custom_ami" {
