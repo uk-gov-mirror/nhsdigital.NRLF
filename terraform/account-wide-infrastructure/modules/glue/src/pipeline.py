@@ -1,13 +1,14 @@
 import time
 
 import boto3
-from instances import GlueContextSingleton, LoggerSingleton
 
 
 class LogPipeline:
     def __init__(
         self,
-        spark_context,
+        glue_context,
+        spark,
+        logger,
         source_path,
         target_path,
         host_prefixes,
@@ -16,9 +17,9 @@ class LogPipeline:
         transformations=[],
     ):
         """Initialize Glue context, Spark session, logger, and paths"""
-        self.glue_context = GlueContextSingleton(spark_context).context
-        self.spark = GlueContextSingleton(spark_context).spark
-        self.logger = LoggerSingleton().logger
+        self.glue_context = glue_context
+        self.spark = spark
+        self.logger = logger
         self.source_path = source_path
         self.target_path = target_path
         self.host_prefixes = host_prefixes
@@ -72,7 +73,12 @@ class LogPipeline:
             if last_runtime:
                 data[name] = self.glue_context.create_dynamic_frame.from_options(
                     connection_type="s3",
-                    connection_options={"paths": [self.source_path], "recurse": True},
+                    connection_options={
+                        "paths": [self.source_path],
+                        "recurse": True,
+                        "groupFiles": "inPartition",
+                        "groupSize": "134217728",
+                    },
                     format="json",
                 ).filter(
                     f=lambda x, n=name: (x["host"].endswith(n))
@@ -82,7 +88,12 @@ class LogPipeline:
             else:
                 data[name] = self.glue_context.create_dynamic_frame.from_options(
                     connection_type="s3",
-                    connection_options={"paths": [self.source_path], "recurse": True},
+                    connection_options={
+                        "paths": [self.source_path],
+                        "recurse": True,
+                        "groupFiles": "inPartition",
+                        "groupSize": "134217728",
+                    },
                     format="json",
                 ).filter(f=lambda x, n=name: x["host"].endswith(n))
 
@@ -96,7 +107,7 @@ class LogPipeline:
         )
         for transformation in self.transformations:
             self.logger.info(f"Applying transformation: {transformation.__name__}")
-            dataframe = transformation(dataframe)
+            dataframe = transformation(dataframe, self.logger)
         return dataframe
 
     def load(self, data):
@@ -105,7 +116,10 @@ class LogPipeline:
         for name, dataframe in data.items():
             name = name.replace("--", "_")
             try:
-                dataframe.coalesce(1).write.mode("append").partitionBy(
+                self.logger.info(
+                    f"Attempting to load dataframe {name} into {self.target_path}{name}"
+                )
+                dataframe.write.mode("append").partitionBy(
                     *self.partition_cols
                 ).parquet(f"{self.target_path}{name}")
             except:

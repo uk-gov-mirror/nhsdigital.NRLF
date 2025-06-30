@@ -134,9 +134,11 @@ If deploying the EC2 set up to a new environment, these steps need to be followe
 aws ssm start-session --target <AMI> --document-name AWS-StartPortForwardingSession --parameters "localPortNumber=13389,portNumber=3389"
 ```
 
-2. Install Athena ODBC driver and Power BI personal on premises gateway
-3. Configure ODBC driver to connect to relevant Athena instance and log in to the gateway using NHS email
-4. Log into power bi and test the refresh on the relevant data sources
+2. Install Athena ODBC driver and Power BI standard on premises gateway
+3. Configure ODBC driver to connect to relevant Athena instance
+4. Log in to the gateway using NHS email, name the cluster to nhsd-nrlf-{env}--reporting-gw
+5. Log on to power bi, navigate to Manage Connections and Gateways in settings and set up Athena connector with authentication method: Anonymous and privacy level: Private
+6. Set dataset to point to this gateway, define schedule as needed
 
 ## Tear down account wide resources
 

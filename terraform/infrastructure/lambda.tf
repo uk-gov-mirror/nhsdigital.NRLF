@@ -11,7 +11,7 @@ module "consumer__readDocumentReference" {
     PREFIX               = "${local.prefix}--"
     ENVIRONMENT          = local.environment
     POWERTOOLS_LOG_LEVEL = local.log_level
-    SPLUNK_INDEX         = module.firehose__processor.splunk.index
+    SPLUNK_INDEX         = local.splunk_index
     AUTH_STORE           = local.auth_store_id
     TABLE_NAME           = local.pointers_table_name
   }
@@ -39,7 +39,7 @@ module "consumer__countDocumentReference" {
     ENVIRONMENT          = local.environment
     AUTH_STORE           = local.auth_store_id
     POWERTOOLS_LOG_LEVEL = local.log_level
-    SPLUNK_INDEX         = module.firehose__processor.splunk.index
+    SPLUNK_INDEX         = local.splunk_index
     TABLE_NAME           = local.pointers_table_name
   }
   additional_policies = [
@@ -66,7 +66,7 @@ module "consumer__searchDocumentReference" {
     ENVIRONMENT          = local.environment
     AUTH_STORE           = local.auth_store_id
     POWERTOOLS_LOG_LEVEL = local.log_level
-    SPLUNK_INDEX         = module.firehose__processor.splunk.index
+    SPLUNK_INDEX         = local.splunk_index
     TABLE_NAME           = local.pointers_table_name
   }
   additional_policies = [
@@ -93,7 +93,7 @@ module "consumer__searchPostDocumentReference" {
     ENVIRONMENT          = local.environment
     AUTH_STORE           = local.auth_store_id
     POWERTOOLS_LOG_LEVEL = local.log_level
-    SPLUNK_INDEX         = module.firehose__processor.splunk.index
+    SPLUNK_INDEX         = local.splunk_index
     TABLE_NAME           = local.pointers_table_name
   }
   additional_policies = [
@@ -119,7 +119,7 @@ module "producer__createDocumentReference" {
     PREFIX               = "${local.prefix}--"
     ENVIRONMENT          = local.environment
     AUTH_STORE           = local.auth_store_id
-    SPLUNK_INDEX         = module.firehose__processor.splunk.index
+    SPLUNK_INDEX         = local.splunk_index
     POWERTOOLS_LOG_LEVEL = local.log_level
     TABLE_NAME           = local.pointers_table_name
   }
@@ -148,7 +148,7 @@ module "producer__deleteDocumentReference" {
     ENVIRONMENT          = local.environment
     AUTH_STORE           = local.auth_store_id
     POWERTOOLS_LOG_LEVEL = local.log_level
-    SPLUNK_INDEX         = module.firehose__processor.splunk.index
+    SPLUNK_INDEX         = local.splunk_index
     TABLE_NAME           = local.pointers_table_name
   }
   additional_policies = [
@@ -176,7 +176,7 @@ module "producer__readDocumentReference" {
     ENVIRONMENT          = local.environment
     AUTH_STORE           = local.auth_store_id
     POWERTOOLS_LOG_LEVEL = local.log_level
-    SPLUNK_INDEX         = module.firehose__processor.splunk.index
+    SPLUNK_INDEX         = local.splunk_index
     TABLE_NAME           = local.pointers_table_name
   }
   additional_policies = [
@@ -203,7 +203,7 @@ module "producer__searchDocumentReference" {
     ENVIRONMENT          = local.environment
     AUTH_STORE           = local.auth_store_id
     POWERTOOLS_LOG_LEVEL = local.log_level
-    SPLUNK_INDEX         = module.firehose__processor.splunk.index
+    SPLUNK_INDEX         = local.splunk_index
     TABLE_NAME           = local.pointers_table_name
   }
   additional_policies = [
@@ -230,7 +230,7 @@ module "producer__searchPostDocumentReference" {
     ENVIRONMENT          = local.environment
     AUTH_STORE           = local.auth_store_id
     POWERTOOLS_LOG_LEVEL = local.log_level
-    SPLUNK_INDEX         = module.firehose__processor.splunk.index
+    SPLUNK_INDEX         = local.splunk_index
     TABLE_NAME           = local.pointers_table_name
   }
   additional_policies = [
@@ -257,7 +257,7 @@ module "producer__updateDocumentReference" {
     ENVIRONMENT          = local.environment
     AUTH_STORE           = local.auth_store_id
     POWERTOOLS_LOG_LEVEL = local.log_level
-    SPLUNK_INDEX         = module.firehose__processor.splunk.index
+    SPLUNK_INDEX         = local.splunk_index
     TABLE_NAME           = local.pointers_table_name
   }
   additional_policies = [
@@ -285,7 +285,7 @@ module "producer__upsertDocumentReference" {
     ENVIRONMENT          = local.environment
     AUTH_STORE           = local.auth_store_id
     POWERTOOLS_LOG_LEVEL = local.log_level
-    SPLUNK_INDEX         = module.firehose__processor.splunk.index
+    SPLUNK_INDEX         = local.splunk_index
     TABLE_NAME           = local.pointers_table_name
   }
   additional_policies = [
@@ -313,7 +313,7 @@ module "consumer__status" {
     ENVIRONMENT          = local.environment
     AUTH_STORE           = local.auth_store_id
     POWERTOOLS_LOG_LEVEL = local.log_level
-    SPLUNK_INDEX         = module.firehose__processor.splunk.index
+    SPLUNK_INDEX         = local.splunk_index
     DYNAMODB_TIMEOUT     = local.dynamodb_timeout_seconds
     TABLE_NAME           = local.pointers_table_name
   }
@@ -342,7 +342,7 @@ module "producer__status" {
     ENVIRONMENT          = local.environment
     AUTH_STORE           = local.auth_store_id
     POWERTOOLS_LOG_LEVEL = local.log_level
-    SPLUNK_INDEX         = module.firehose__processor.splunk.index
+    SPLUNK_INDEX         = local.splunk_index
     DYNAMODB_TIMEOUT     = local.dynamodb_timeout_seconds
     TABLE_NAME           = local.pointers_table_name
   }

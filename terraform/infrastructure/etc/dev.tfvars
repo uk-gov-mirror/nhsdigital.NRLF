@@ -1,6 +1,8 @@
-account_name = "dev"
+account_name     = "dev"
+aws_account_name = "dev"
 
 domain                = "api.record-locator.dev.national.nhs.uk"
 public_domain         = "internal-dev.api.service.nhs.uk"
 public_sandbox_domain = "internal-dev-sandbox.api.service.nhs.uk"
 log_retention_period  = 90
+enable_reporting      = true

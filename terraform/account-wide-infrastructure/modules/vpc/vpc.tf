@@ -55,7 +55,6 @@ resource "aws_route_table" "private_rt" {
 }
 
 resource "aws_eip" "natgw-ip" {
-  domain = "vpc"
 }
 
 resource "aws_nat_gateway" "nat" {

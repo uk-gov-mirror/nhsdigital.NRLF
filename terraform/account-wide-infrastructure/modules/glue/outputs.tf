@@ -21,3 +21,7 @@ output "aws_kms_key_arn" {
 output "glue_crawler_name" {
   value = "s3//${aws_s3_bucket.source-data-bucket.id}/"
 }
+
+output "glue_database" {
+  value = var.is_enabled ? aws_glue_catalog_database.log_database[0].name : ""
+}

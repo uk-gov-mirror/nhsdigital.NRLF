@@ -1,5 +1,12 @@
 variable "account_name" {
-  type = string
+  type        = string
+  description = "The name of the AWS environment in the account, e.g. dev, qa, int, prod"
+}
+
+variable "aws_account_name" {
+  type        = string
+  description = "The name of the AWS account, e.g. dev, test, prod"
+  default     = "dev"
 }
 
 variable "assume_role_arn" {
@@ -47,4 +54,10 @@ variable "use_shared_resources" {
 variable "log_retention_period" {
   default = 90
   type    = number
+}
+
+variable "enable_reporting" {
+  type        = bool
+  description = "Enable reporting for this environment"
+  default     = false
 }

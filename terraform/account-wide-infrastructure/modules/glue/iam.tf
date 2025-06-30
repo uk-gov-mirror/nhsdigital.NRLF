@@ -98,7 +98,8 @@ data "aws_iam_policy_document" "glue_service" {
     ]
     effect = "Allow"
     resources = [
-      "arn:aws:iam::*:role/AWSGlueServiceRole*"
+      "arn:aws:iam::*:role/AWSGlueServiceRole*",
+      aws_iam_role.glue_service_role.arn,
     ]
   }
 }

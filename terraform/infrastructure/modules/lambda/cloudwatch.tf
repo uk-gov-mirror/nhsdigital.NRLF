@@ -5,11 +5,11 @@ resource "aws_cloudwatch_log_group" "lambda_cloudwatch_log_group" {
 }
 
 resource "aws_cloudwatch_log_subscription_filter" "lambda_log_filter" {
-  name           = "${aws_lambda_function.lambda_function.function_name}_filter"
-  log_group_name = aws_cloudwatch_log_group.lambda_cloudwatch_log_group.name
+  for_each = var.firehose_subscriptions
 
-  count           = length(var.firehose_subscriptions)
-  role_arn        = var.firehose_subscriptions[count.index].role.arn
-  destination_arn = var.firehose_subscriptions[count.index].destination.arn
-  filter_pattern  = var.firehose_subscriptions[count.index].filter.pattern
+  name            = "${aws_lambda_function.lambda_function.function_name}_${each.key}_filter"
+  log_group_name  = aws_cloudwatch_log_group.lambda_cloudwatch_log_group.name
+  role_arn        = each.value.role.arn
+  destination_arn = each.value.destination.arn
+  filter_pattern  = each.value.filter.pattern
 }
