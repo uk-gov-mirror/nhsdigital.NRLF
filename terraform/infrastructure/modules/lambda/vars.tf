@@ -23,7 +23,9 @@ variable "additional_policies" {
 variable "handler" {}
 
 variable "firehose_subscriptions" {
-  default = []
+  description = "The firehose subscriptions to attach to the lambda logs"
+  type        = map(any)
+  default     = {}
 }
 
 variable "vpc" {

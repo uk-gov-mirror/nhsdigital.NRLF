@@ -1,8 +1,3 @@
-variable "database" {
-  description = "What the db will be called"
-  default     = "nrl_reporting"
-}
-
 variable "name_prefix" {
   type        = string
   description = "The prefix to apply to all resources in the module."
@@ -10,4 +5,9 @@ variable "name_prefix" {
 
 variable "target_bucket_name" {
   type = string
+}
+
+variable "glue_database" {
+  type        = string
+  description = "The Glue database in use"
 }

@@ -7,10 +7,6 @@ resource "aws_secretsmanager_secret" "backup_destination_parameters" {
   description = "Parameters used to configure the backup destination"
 }
 
-resource "aws_secretsmanager_secret" "notification_email_addresses" {
-  name = "${local.prefix}-dev-notification-email-addresses"
-}
-
 resource "aws_secretsmanager_secret" "dev_smoke_test_apigee_app" {
   name        = "${local.prefix}--dev--apigee-app--smoke-test"
   description = "APIGEE App used to run Smoke Tests against the DEV environment"

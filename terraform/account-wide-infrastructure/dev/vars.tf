@@ -14,6 +14,12 @@ variable "devsandbox_api_domain_name" {
   default     = "dev-sandbox.api.record-locator.dev.national.nhs.uk"
 }
 
+variable "enable_reporting" {
+  type        = bool
+  description = "Enable account-wide reporting processes in the dev account"
+  default     = true
+}
+
 variable "aws_azs" {
   type        = string
   description = "AWS Availability Zones"
@@ -44,14 +50,20 @@ variable "vpc_private_subnets_cidr_block" {
   default     = "10.0.1.0/24"
 }
 
-variable "instance_type" {
+variable "enable_powerbi_auto_push" {
+  type        = bool
+  description = "Enable automatic pushing of info into PowerBI"
+  default     = true
+}
+
+variable "powerbi_gw_instance_type" {
   type        = string
-  description = "Type for EC2 Instance"
+  description = "Type for PowerBI GW EC2 Instance"
   default     = "t2.micro"
 }
 
-variable "use_custom_ami" {
+variable "use_powerbi_gw_custom_ami" {
   type        = bool
-  description = "Use custom image"
-  default     = false
+  description = "Use custom image for PowerBI GW instance"
+  default     = true
 }

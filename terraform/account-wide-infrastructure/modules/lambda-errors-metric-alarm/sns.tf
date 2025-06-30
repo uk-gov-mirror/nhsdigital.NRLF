@@ -4,8 +4,8 @@ resource "aws_sns_topic" "sns_topic" {
 }
 
 resource "aws_sns_topic_subscription" "sns_subscription" {
-  for_each  = var.notification_emails
+  count     = length(var.notification_emails)
   topic_arn = aws_sns_topic.sns_topic.arn
   protocol  = "email"
-  endpoint  = sensitive(each.value)
+  endpoint  = var.notification_emails[count.index]
 }

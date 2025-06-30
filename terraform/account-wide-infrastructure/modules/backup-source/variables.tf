@@ -10,7 +10,8 @@ variable "environment_name" {
 
 variable "notification_target_email_addresses" {
   description = "The email addresses to which backup notifications will be sent via SNS."
-  type        = set(string)
+  type        = list(string)
+  sensitive   = true
   default     = []
 }
 

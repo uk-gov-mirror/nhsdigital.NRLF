@@ -56,7 +56,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "source-data-bucket-lifecycle" 
 
 
   rule {
-    id     = "bucket-versioning-rule"
+    id     = "object-auto-delete-rule"
     status = "Enabled"
 
     expiration {
@@ -68,7 +68,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "source-data-bucket-lifecycle" 
 resource "aws_s3_bucket_versioning" "source-data-bucket-versioning" {
   bucket = aws_s3_bucket.source-data-bucket.id
   versioning_configuration {
-    status = "Enabled"
+    status = "Disabled"
   }
 }
 
@@ -180,10 +180,10 @@ resource "aws_s3_bucket_public_access_block" "code-bucket-public-access-block" {
 }
 
 resource "aws_s3_object" "script" {
-  bucket = aws_s3_bucket.code-bucket.bucket
-  key    = "main.py"
-  source = "${path.module}/src/main.py"
-  etag   = filemd5("${path.module}/src/main.py")
+  bucket      = aws_s3_bucket.code-bucket.bucket
+  key         = "main.py"
+  source      = "${path.module}/src/main.py"
+  source_hash = filemd5("${path.module}/src/main.py")
 }
 
 data "archive_file" "python" {
@@ -194,8 +194,8 @@ data "archive_file" "python" {
 }
 
 resource "aws_s3_object" "zip" {
-  bucket = aws_s3_bucket.code-bucket.bucket
-  key    = "src.zip"
-  source = data.archive_file.python.output_path
-  etag   = filemd5(data.archive_file.python.output_path)
+  bucket      = aws_s3_bucket.code-bucket.bucket
+  key         = "src.zip"
+  source      = data.archive_file.python.output_path
+  source_hash = filemd5(data.archive_file.python.output_path)
 }

@@ -22,3 +22,9 @@ variable "code_bucket" {
   description = "S3 bucket for Glue job scripts"
   default     = "code-bucket"
 }
+
+variable "is_enabled" {
+  type        = bool
+  description = "Flag to enable or disable the Glue module"
+  default     = true
+}

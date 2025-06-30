@@ -6,7 +6,7 @@ module "vpc" {
   vpc_public_subnets_cidr_block  = var.vpc_public_subnets_cidr_block
   vpc_private_subnets_cidr_block = var.vpc_private_subnets_cidr_block
   aws_azs                        = var.aws_azs
-  name_prefix                    = "nhsd-nrlf--dev"
+  name_prefix                    = "nhsd-nrlf--test"
 }
 
 module "powerbi_gw_instance" {
@@ -14,11 +14,11 @@ module "powerbi_gw_instance" {
   source             = "../modules/powerbi-gw-ec2"
   use_custom_ami     = var.use_powerbi_gw_custom_ami
   instance_type      = var.powerbi_gw_instance_type
-  name_prefix        = "nhsd-nrlf--dev-powerbi-gw"
-  target_bucket_arn  = module.dev-glue.target_bucket_arn
-  glue_kms_key_arn   = module.dev-glue.aws_kms_key_arn
-  athena_kms_key_arn = module.dev-athena[0].kms_key_arn
-  athena_bucket_arn  = module.dev-athena[0].bucket_arn
+  name_prefix        = "nhsd-nrlf--test-powerbi-gw"
+  target_bucket_arn  = module.test-glue.target_bucket_arn
+  glue_kms_key_arn   = module.test-glue.aws_kms_key_arn
+  athena_kms_key_arn = module.test-athena[0].kms_key_arn
+  athena_bucket_arn  = module.test-athena[0].bucket_arn
 
   subnet_id       = module.vpc[0].private_subnet_id
   security_groups = [module.vpc[0].powerbi_gw_security_group_id]

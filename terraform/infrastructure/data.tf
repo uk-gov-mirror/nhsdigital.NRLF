@@ -43,11 +43,9 @@ data "external" "current-info" {
 }
 
 data "aws_s3_bucket" "source-data-bucket" {
-  count  = local.is_dev_env && !local.is_sandbox_env ? 1 : 0
-  bucket = "${local.shared_prefix}-source-data-bucket"
+  bucket = "${local.account_prefix}-source-data-bucket"
 }
 
 data "aws_kms_key" "glue" {
-  count  = local.is_dev_env && !local.is_sandbox_env ? 1 : 0
-  key_id = "alias/${local.shared_prefix}-glue"
+  key_id = "alias/${local.account_prefix}-glue"
 }

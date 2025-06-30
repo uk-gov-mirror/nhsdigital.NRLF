@@ -1,17 +1,27 @@
+import logging
 import sys
 
+from awsglue.context import GlueContext
 from awsglue.utils import getResolvedOptions
 from pipeline import LogPipeline
-from pyspark.context import SparkContext
+from pyspark.sql import SparkSession
 from transformations import dtype_conversion, rename_cols, resolve_dupes
+
+# Spark and Glue Context initialization
+spark = SparkSession.builder.config("spark.sql.caseSensitive", "true").getOrCreate()
+glue_context = GlueContext(spark.sparkContext)
+
+# Logger setup
+MSG_FORMAT = "%(asctime)s %(levelname)s %(name)s: %(message)s"
+DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+logging.basicConfig(format=MSG_FORMAT, datefmt=DATETIME_FORMAT)
+logger = logging.getLogger("ETLLogger")
+logger.setLevel(logging.INFO)
 
 # Get arguments from AWS Glue job
 args = getResolvedOptions(
     sys.argv, ["job_name", "source_path", "target_path", "partition_cols"]
 )
-
-# Start Glue context
-sc = SparkContext()
 
 partition_cols = args["partition_cols"].split(",") if "partition_cols" in args else []
 
@@ -31,7 +41,9 @@ host_prefixes = [
 
 # Initialize ETL process
 etl_job = LogPipeline(
-    spark_context=sc,
+    glue_context=glue_context,
+    spark=spark,
+    logger=logger,
     source_path=args["source_path"],
     target_path=args["target_path"],
     host_prefixes=host_prefixes,
