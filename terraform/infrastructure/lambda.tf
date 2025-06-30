@@ -322,7 +322,7 @@ module "consumer__status" {
     local.pointers_kms_read_write_arn,
     local.auth_store_read_policy_arn
   ]
-  firehose_subscriptions = local.firehose_lambda_splunk_subscription
+  firehose_subscriptions = local.firehost_lambda_splunk_only_subscription
   handler                = "status.handler"
   retention              = var.log_retention_period
 }
@@ -351,7 +351,7 @@ module "producer__status" {
     local.pointers_kms_read_write_arn,
     local.auth_store_read_policy_arn
   ]
-  firehose_subscriptions = local.firehose_lambda_splunk_subscription
+  firehose_subscriptions = local.firehost_lambda_splunk_only_subscription
   handler                = "status.handler"
   retention              = var.log_retention_period
 }

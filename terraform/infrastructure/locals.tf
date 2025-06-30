@@ -36,7 +36,7 @@ locals {
     "splunk_subscription" : module.firehose__processor[0].firehose_subscription,
     "reports_subscription" : module.firehose__processor[0].firehose_reporting_subscription
   } : {}
-  firehose_lambda_splunk_subscription = var.use_shared_resources ? {
+  firehost_lambda_splunk_only_subscription = var.use_shared_resources ? {
     "splunk_subscription" : module.firehose__processor[0].firehose_subscription
   } : {}
   splunk_environment = local.is_sandbox_env ? "${var.account_name}sandbox" : var.account_name
