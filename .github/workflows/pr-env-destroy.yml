@@ -77,7 +77,7 @@ jobs:
           terraform -chdir=terraform/infrastructure workspace select ${{ needs.set-environment-id.outputs.environment_id }}
 
       - name: Build artifacts
-        run: cd terraform/infrastructure && make build-artifacts
+        run: make build get-s3-perms
 
       - name: Terraform Destroy
         run: |
