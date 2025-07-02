@@ -16,7 +16,7 @@ def test_data(
     test_ods_code = smoke_test_parameters.ods_code
     test_pointers = [
         upsert_test_pointer(
-            f"{test_ods_code}-smoketest_consumer_count_search_read_pointer_{n}",
+            f"{test_ods_code}-smoketest_consumer_search_read_pointer_{n}",
             docref=build_document_reference(
                 nhs_number=test_nhs_numbers[0], custodian=test_ods_code
             ),
@@ -36,11 +36,9 @@ def test_data(
         producer_client.delete(test_pointer.id)
 
 
-def test_consumer_count_search_read(
-    consumer_client: ConsumerTestClient, test_data: dict
-):
+def test_consumer_search_read(consumer_client: ConsumerTestClient, test_data: dict):
     """
-    Smoke test scenario for a consumer count, search and read behaviour
+    Smoke test scenario for a consumer search and read behaviour
     """
     patient_id = test_data["patient_nhs_number"]
     test_pointers = test_data["pointers"]
