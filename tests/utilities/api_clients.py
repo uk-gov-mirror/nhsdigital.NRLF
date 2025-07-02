@@ -101,15 +101,6 @@ class ConsumerTestClient:
         )
 
     @retry_if([502])
-    def count(self, params: dict[str, str]) -> Response:
-        return requests.get(
-            f"{self.api_url}/DocumentReference/_count",
-            params=params,
-            headers=self.request_headers,
-            cert=self.config.client_cert,
-        )
-
-    @retry_if([502])
     def search(
         self,
         nhs_number: str | None = None,
