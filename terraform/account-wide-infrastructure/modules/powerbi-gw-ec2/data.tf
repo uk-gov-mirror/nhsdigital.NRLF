@@ -8,6 +8,7 @@ data "aws_ami" "windows-2019" {
 }
 
 data "aws_ami" "PowerBI_Gateway" {
+  count       = var.use_custom_ami ? 1 : 0
   most_recent = true
   owners      = ["self"]
   filter {

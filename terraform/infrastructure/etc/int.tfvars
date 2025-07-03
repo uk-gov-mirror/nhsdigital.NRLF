@@ -7,4 +7,4 @@ deletion_protection = true
 public_domain         = "int.api.service.nhs.uk"
 public_sandbox_domain = "sandbox.api.service.nhs.uk"
 log_retention_period  = 90
-enable_reporting      = false
+enable_reporting      = true
