@@ -54,7 +54,7 @@ variable "instance_type" {
 variable "enable_powerbi_auto_push" {
   type        = bool
   description = "Enable automatic pushing of info into PowerBI"
-  default     = false
+  default     = true
 }
 
 variable "powerbi_gw_instance_type" {
@@ -66,5 +66,5 @@ variable "powerbi_gw_instance_type" {
 variable "use_powerbi_gw_custom_ami" {
   type        = bool
   description = "Use custom image for PowerBI GW instance"
-  default     = false
+  default     = true
 }

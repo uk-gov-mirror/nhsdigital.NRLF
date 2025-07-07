@@ -12,7 +12,7 @@ module "vpc" {
 module "powerbi_gw_instance" {
   count              = var.enable_reporting && var.enable_powerbi_auto_push ? 1 : 0
   source             = "../modules/powerbi-gw-ec2"
-  use_custom_ami     = false
+  use_custom_ami     = var.use_powerbi_gw_custom_ami
   instance_type      = var.powerbi_gw_instance_type
   name_prefix        = "nhsd-nrlf--prod-powerbi-gw"
   target_bucket_arn  = module.prod-glue.target_bucket_arn
