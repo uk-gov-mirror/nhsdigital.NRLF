@@ -32,7 +32,7 @@ variable "ref_api_domain_name" {
 variable "enable_reporting" {
   type        = bool
   description = "Enable account-wide reporting processes in the test account"
-  default     = false
+  default     = true
 }
 
 variable "aws_azs" {
@@ -68,7 +68,7 @@ variable "vpc_private_subnets_cidr_block" {
 variable "enable_powerbi_auto_push" {
   type        = bool
   description = "Enable automatic pushing of info into PowerBI"
-  default     = false
+  default     = true
 }
 
 variable "powerbi_gw_instance_type" {

@@ -136,34 +136,19 @@ To disable reporting resources for the account, do the following:
 1. Set the `enable_reporting` variable to `true` in `./ACCOUNT_NAME/vars.tf`
 2. Deploy the account-wide infrastructure to the account
 
-#### Deploying the PowerBI Gateway
+#### Deploy the PowerBI Gateway
 
-The first time you deploy the PowerBI Gateway set up to a new account, these steps need to be followed:
+The first time you deploy the PowerBI Gateway to an AWS account you need to create, install and configure a gateway image. Instruction on how to do this can be found in [KOP-NRLF-012](https://nhsd-confluence.digital.nhs.uk/x/8BXXQg).
+
+To enable the PowerBI Gateway in the account:
 
 1. Set the `enable_powerbi_auto_push` variable to `true` in `./ACCOUNT_NAME/vars.tf`
-2. Set the `use_powerbi_gw_custom_ami` variable to `false` in `./ACCOUNT_NAME/vars.tf`
-3. Deploy the account-wide infrastructure for the account
-4. Run the below CLI command, and RDP into the newly created EC2 instance (localhost:13389)
+2. Deploy the account-wide infrastructure to the account
+3. Access the EC2 Serial Console for the instance and run this command to start the PowerBI Gateway:
 
 ```
-aws ssm start-session --target <AMI> --document-name AWS-StartPortForwardingSession --parameters "localPortNumber=13389,portNumber=3389"
+Start-Service -Name "PBIEgwService"
 ```
-
-5. Install Athena ODBC driver and Power BI standard on premises gateway
-6. Configure ODBC driver to connect to relevant Athena instance
-7. Log in to the gateway using NHS email, name the cluster to nhsd-nrlf-{env}--reporting-gw
-8. Log on to power bi, navigate to Manage Connections and Gateways in settings and set up Athena connector with authentication method: Anonymous and privacy level: Private
-9. Set dataset to point to this gateway, define schedule as needed
-10. In the AWS Console, create an AMI from the instance called `PowerBI_GW`
-11. Set the `use_powerbi_gw_custom_ami` variable to `true`
-12. Deploy the account-wide infrastructure for the account
-13. Run the below CLI command, and RDP into the newly created EC2 instance (localhost:13389)
-
-```
-aws ssm start-session --target <AMI> --document-name AWS-StartPortForwardingSession --parameters "localPortNumber=13389,portNumber=3389"
-```
-
-14. Start the PowerBI Gateway service on the instance
 
 To disable the PowerBI Gateway from the account:
 

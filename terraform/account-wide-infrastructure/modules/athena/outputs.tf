@@ -1,5 +1,5 @@
-output "workgroup" {
-  value = aws_athena_workgroup.athena
+output "workgroup_name" {
+  value = aws_athena_workgroup.athena.name
 }
 
 output "bucket" {

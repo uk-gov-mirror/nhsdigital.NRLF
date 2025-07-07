@@ -103,3 +103,16 @@ resource "aws_secretsmanager_secret" "ref_environment_configuration" {
   name        = "${local.project}--ref--env-config"
   description = "The environment configuration for the Ref environment"
 }
+
+#
+# PowerBI secrets
+#
+resource "aws_secretsmanager_secret" "powerbi_gw_instance_admin_pwd" {
+  count       = var.enable_reporting && var.enable_powerbi_auto_push ? 1 : 0
+  name        = "${local.project}--test-powerbi-gw-instance-admin-pwd"
+  description = "Admin password for the PowerBI Gateway EC2 instance"
+}
+resource "aws_secretsmanager_secret" "powerbi_gw_recovery_key" {
+  name        = "${local.project}--test-powerbi-gw-recovery-key"
+  description = "Recovery key for the PowerBI Gateway EC2 instance"
+}

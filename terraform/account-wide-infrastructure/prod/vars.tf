@@ -24,7 +24,7 @@ variable "enable_dns_hostnames" {
 variable "enable_reporting" {
   type        = bool
   description = "Enable account-wide reporting processes in the prod account"
-  default     = false
+  default     = true
 }
 
 variable "vpc_cidr_block" {
@@ -66,5 +66,5 @@ variable "powerbi_gw_instance_type" {
 variable "use_powerbi_gw_custom_ami" {
   type        = bool
   description = "Use custom image for PowerBI GW instance"
-  default     = true
+  default     = false
 }
