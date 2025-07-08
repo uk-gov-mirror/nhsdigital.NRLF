@@ -107,7 +107,8 @@ variable "backup_plan_config_dynamodb" {
         cold_storage_after = optional(number)
       })
       copy_action = optional(object({
-        delete_after = optional(number)
+        delete_after       = optional(number)
+        cold_storage_after = optional(number)
       }))
     })))
   })

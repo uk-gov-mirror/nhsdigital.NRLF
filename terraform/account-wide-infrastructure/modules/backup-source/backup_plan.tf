@@ -20,7 +20,8 @@ resource "aws_backup_plan" "default" {
         for_each = rule.value.copy_action != null ? rule.value.copy_action : {}
         content {
           lifecycle {
-            delete_after = copy_action.value
+            delete_after       = copy_action.value.lifecycle.delete_after
+            cold_storage_after = copy_action.value.lifecycle.cold_storage_after
           }
           destination_vault_arn = var.backup_copy_vault_arn
         }
@@ -51,7 +52,8 @@ resource "aws_backup_plan" "dynamodb" {
         for_each = rule.value.copy_action != null ? rule.value.copy_action : {}
         content {
           lifecycle {
-            delete_after = copy_action.value
+            delete_after       = copy_action.value.delete_after
+            cold_storage_after = copy_action.value.cold_storage_after
           }
           destination_vault_arn = var.backup_copy_vault_arn
         }
