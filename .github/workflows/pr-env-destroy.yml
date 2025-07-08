@@ -4,6 +4,7 @@ run-name: "Destroy PR Environment - #${{ github.event.pull_request.number }} (${
 on:
   pull_request:
     types: [closed]
+  workflow_dispatch:
 
 concurrency:
   group: environment-${{ github.event.pull_request.number }}
@@ -73,8 +74,10 @@ jobs:
       - name: Terraform Init
         run: |
           terraform -chdir=terraform/infrastructure init
-          terraform -chdir=terraform/infrastructure workspace new ${{ needs.set-environment-id.outputs.environment_id }} || \
           terraform -chdir=terraform/infrastructure workspace select ${{ needs.set-environment-id.outputs.environment_id }}
+
+      - name: Build artifacts
+        run: make build get-s3-perms
 
       - name: Terraform Destroy
         run: |
