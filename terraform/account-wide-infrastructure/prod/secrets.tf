@@ -23,7 +23,6 @@ resource "aws_secretsmanager_secret" "prod_environment_configuration" {
 }
 
 resource "aws_secretsmanager_secret" "powerbi_gw_instance_admin_pwd" {
-  count       = var.enable_reporting && var.enable_powerbi_auto_push ? 1 : 0
   name        = "${local.project}--prod-powerbi-gw-instance-admin-pwd"
   description = "Admin password for the PowerBI Gateway EC2 instance"
 }
