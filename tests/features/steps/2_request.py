@@ -247,3 +247,21 @@ def producer_search_document_reference_step(context: Context, ods_code: str):
         pointer_type=pointer_type,
         extra_params=items,
     )
+
+
+@when(
+    "{consumer_or_producer} '{ods_code}' sends HEAD request to '{endpoint}' endpoint with headers"
+)
+def consumer_head_request_step(
+    context: Context, consumer_or_producer: str, ods_code: str, endpoint: str
+):
+    if not context.table:
+        raise ValueError("No headers table provided")
+
+    headers = {row["header"]: row["value"] for row in context.table}
+
+    if consumer_or_producer == "producer":
+        client = producer_client_from_context(context, ods_code)
+    elif consumer_or_producer == "consumer":
+        client = consumer_client_from_context(context, ods_code)
+    context.response = client.head(endpoint, headers=headers)
