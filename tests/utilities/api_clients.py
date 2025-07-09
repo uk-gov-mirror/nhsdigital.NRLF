@@ -193,6 +193,23 @@ class ConsumerTestClient:
         )
 
     @retry_if([502])
+    def head(
+        self,
+        endpoint: str,
+        headers: dict[str, str] | None = None,
+        extra_params: dict[str, str] | None = None,
+    ) -> Response:
+        headers = {**(headers or {}), **self.request_headers}
+        params = {**(extra_params or {})}
+        url = f"{self.api_url}/{endpoint}"
+        return requests.head(
+            url,
+            params=params,
+            headers=headers,
+            cert=self.config.client_cert,
+        )
+
+    @retry_if([502])
     def read_capability_statement(self) -> Response:
         return requests.get(
             f"{self.api_url}/metadata",
@@ -358,5 +375,22 @@ class ProducerTestClient:
         return requests.get(
             f"{self.api_url}/metadata",
             headers=self.request_headers,
+            cert=self.config.client_cert,
+        )
+
+    @retry_if([502])
+    def head(
+        self,
+        endpoint: str,
+        headers: dict[str, str] | None = None,
+        extra_params: dict[str, str] | None = None,
+    ) -> Response:
+        headers = {**(headers or {}), **self.request_headers}
+        params = {**(extra_params or {})}
+        url = f"{self.api_url}/{endpoint}"
+        return requests.head(
+            url,
+            params=params,
+            headers=headers,
             cert=self.config.client_cert,
         )
