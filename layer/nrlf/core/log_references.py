@@ -7,6 +7,14 @@ class _Reference:
     level: str
     message: str
 
+    # WARNING: This makes all _Reference objects unequal unless they are the same instance.
+    # It's fine for our use case, but be cautious if you compare _Reference objects.
+    def __eq__(self, other):
+        return self is other
+
+    def __hash__(self):
+        return id(self)
+
 
 class LogReference(Enum):
     # Request Handler Logs

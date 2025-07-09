@@ -1,4 +1,5 @@
 import json
+from unittest.mock import patch
 
 from moto import mock_aws
 
@@ -720,7 +721,10 @@ def test_search_document_reference_invalid_category(
 
 @mock_aws
 @mock_repository
-def test_search_document_reference_invalid_json(repository: DocumentPointerRepository):
+@patch("api.consumer.searchDocumentReference.search_document_reference.logger")
+def test_search_document_reference_invalid_json(
+    mock_logger, repository: DocumentPointerRepository
+):
     doc_ref = load_document_reference("Y05868-736253002-Valid")
     doc_pointer = DocumentPointer.from_document_reference(doc_ref)
     repository.create(doc_pointer)
@@ -783,3 +787,7 @@ def test_search_document_reference_invalid_json(repository: DocumentPointerRepos
             {"resource": expected_operation_outcome},
         ],
     }
+
+    assert any(
+        call[0][0].name == "CONSEARCH005" for call in mock_logger.log.call_args_list
+    )

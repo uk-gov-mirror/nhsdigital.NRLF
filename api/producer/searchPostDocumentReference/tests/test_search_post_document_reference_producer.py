@@ -1,4 +1,5 @@
 import json
+from unittest.mock import patch
 
 from moto import mock_aws
 
@@ -474,7 +475,9 @@ def test_search_document_reference_filters_by_pointer_types(
 
 @mock_aws
 @mock_repository
+@patch("api.producer.searchPostDocumentReference.search_post_document_reference.logger")
 def test_search_post_document_reference_invalid_json_adds_operation_outcome(
+    mock_logger,
     repository: DocumentPointerRepository,
 ):
     doc_ref = load_document_reference("Y05868-736253002-Valid")
@@ -535,3 +538,7 @@ def test_search_post_document_reference_invalid_json_adds_operation_outcome(
             {"resource": expected_operation_outcome},
         ],
     }
+
+    assert any(
+        call[0][0].name == "PROPOSTSEARCH005" for call in mock_logger.log.call_args_list
+    )
