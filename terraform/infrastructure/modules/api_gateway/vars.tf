@@ -22,3 +22,7 @@ variable "retention" {
   default = 90
   type    = number
 }
+
+variable "endpoint_allowed_methods" {
+  type = map(string)
+}
