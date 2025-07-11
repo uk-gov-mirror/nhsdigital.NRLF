@@ -17,12 +17,8 @@ def get_pointer_types(
 
     app_id = connection_metadata.nrl_app_id
     ods_code = connection_metadata.ods_code
-    ods_code_extension = connection_metadata.ods_code_extension
 
-    if ods_code_extension:
-        key = f"{app_id}/{ods_code}.{ods_code_extension}.json"
-    else:
-        key = f"{app_id}/{ods_code}.json"
+    key = f"{app_id}/{ods_code}.json"
 
     logger.log(LogReference.S3PERMISSIONS001, bucket=config.AUTH_STORE, key=key)
     s3_client = get_s3_client()
@@ -63,12 +59,8 @@ def parse_permissions_file(
 
     app_id = connection_metadata.nrl_app_id
     ods_code = connection_metadata.ods_code
-    ods_code_extension = connection_metadata.ods_code_extension
 
-    if ods_code_extension:
-        key = f"{app_id}/{ods_code}.{ods_code_extension}.json"
-    else:
-        key = f"{app_id}/{ods_code}.json"
+    key = f"{app_id}/{ods_code}.json"
 
     file_path = f"/opt/python/nrlf_permissions/{key}"
 

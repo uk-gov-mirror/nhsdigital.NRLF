@@ -62,14 +62,11 @@ def _check_permissions(
     """
     Check the requester has permissions to create the DocumentReference
     """
-    custodian_parts = tuple(
-        filter(None, (core_model.custodian, core_model.custodian_suffix))
-    )
-    if metadata.ods_code_parts != custodian_parts:
+    if metadata.ods_code != core_model.custodian:
         logger.log(
             LogReference.PROUPSERT004,
-            ods_code_parts=metadata.ods_code_parts,
-            custodian_parts=custodian_parts,
+            ods_code=metadata.ods_code,
+            custodian=core_model.custodian,
         )
         return SpineErrorResponse.UNPROCESSABLE_ENTITY(
             diagnostics="The custodian of the provided DocumentReference does not match the expected ODS code for this organisation",
@@ -141,11 +138,11 @@ def _validate_producer_id(identifier, metadata, idx):
     Validate that there is an ODS code in the relatesTo target identifier
     """
     producer_id = identifier.split("-", 1)[0]
-    if metadata.ods_code_parts != tuple(producer_id.split("|")):
+    if metadata.ods_code != tuple(producer_id.split("|")):
         logger.log(
             LogReference.PROUPSERT007b,
             related_identifier=identifier,
-            ods_code_parts=metadata.ods_code_parts,
+            ods_code=metadata.ods_code,
         )
         _raise_operation_outcome_error(
             "The relatesTo target identifier value does not include the expected ODS code for this organisation",
@@ -233,10 +230,10 @@ def handler(
 
     core_model = _create_core_model(result.resource, metadata)
 
-    if metadata.ods_code_parts != tuple(core_model.producer_id.split("|")):
+    if metadata.ods_code != tuple(core_model.producer_id.split("|")):
         logger.log(
             LogReference.PROUPSERT003,
-            ods_code_parts=metadata.ods_code_parts,
+            ods_code=metadata.ods_code,
             producer_id=core_model.producer_id,
         )
         return SpineErrorResponse.UNPROCESSABLE_ENTITY(

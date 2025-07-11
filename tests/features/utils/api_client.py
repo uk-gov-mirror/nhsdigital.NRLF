@@ -9,10 +9,6 @@ from tests.utilities.api_clients import (
 
 
 def _config_from_context(context: Context, ods_code: str):
-    ods_code_parts = ods_code.split(".", 1)
-    ods_code_extension = None
-    if len(ods_code_parts) == 2:
-        ods_code_extension = ods_code_parts[1]
 
     feature_test_headers = {
         "X-Request-Id": context.request_id,
@@ -25,8 +21,7 @@ def _config_from_context(context: Context, ods_code: str):
         client_cert=context.client_cert,
         connection_metadata=ConnectionMetadata.model_validate(
             {
-                "nrl.ods-code": ods_code_parts[0],
-                "nrl.ods-code-extension": ods_code_extension,
+                "nrl.ods-code": ods_code,
                 "nrl.permissions": [],
                 "nrl.app-id": context.application.app_id,
                 "client_rp_details": {

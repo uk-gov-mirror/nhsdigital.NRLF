@@ -14,7 +14,6 @@ def test_connection_metadata():
         {
             "nrl.pointer-types": ["test"],
             "nrl.ods-code": "test",
-            "nrl.ods-code-extension": "test",
             "nrl.permissions": ["test"],
             "nrl.app-id": "test-nrl",
             "client_rp_details": {
@@ -28,7 +27,6 @@ def test_connection_metadata():
 
     assert metadata.pointer_types == ["test"]
     assert metadata.ods_code == "test"
-    assert metadata.ods_code_extension == "test"
     assert metadata.nrl_permissions == ["test"]
     assert metadata.nrl_app_id == "test-nrl"
     assert metadata.client_rp_details.developer_app_name == "test"

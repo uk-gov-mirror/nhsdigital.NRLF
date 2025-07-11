@@ -260,7 +260,6 @@ paths:
         - $ref: "#/components/parameters/category"
         - $ref: "#/components/parameters/nextPageToken"
         - $ref: "#/components/parameters/odsCode"
-        - $ref: "#/components/parameters/odsCodeExtension"
         - $ref: "#/components/parameters/requestId"
         - $ref: "#/components/parameters/correlationId"
       responses:
@@ -516,7 +515,6 @@ paths:
       parameters:
         - $ref: "#/components/parameters/id"
         - $ref: "#/components/parameters/odsCode"
-        - $ref: "#/components/parameters/odsCodeExtension"
         - $ref: "#/components/parameters/requestId"
         - $ref: "#/components/parameters/correlationId"
       responses:
@@ -620,7 +618,6 @@ paths:
       parameters:
         - $ref: "#/components/parameters/subject"
         - $ref: "#/components/parameters/odsCode"
-        - $ref: "#/components/parameters/odsCodeExtension"
         - $ref: "#/components/parameters/requestId"
         - $ref: "#/components/parameters/correlationId"
       responses:
@@ -1660,12 +1657,6 @@ components:
         invalid:
           summary: Unknown
           value: XYZ
-    odsCodeExtension:
-      name: NHSD-End-User-Organisation
-      description: Organisation extension code
-      in: header
-      schema:
-        $ref: "#/components/schemas/RequestHeaderOrganisationExtensionCode"
     requestId:
       name: X-Request-ID
       description: |
