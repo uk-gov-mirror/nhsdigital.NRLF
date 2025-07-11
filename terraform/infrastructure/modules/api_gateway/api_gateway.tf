@@ -16,6 +16,8 @@ resource "aws_api_gateway_method" "capability" {
   resource_id   = aws_api_gateway_resource.capability.id
   http_method   = "GET"
   authorization = "NONE"
+
+  depends_on = [aws_api_gateway_resource.capability]
 }
 
 resource "aws_api_gateway_integration" "capability" {
@@ -63,6 +65,11 @@ resource "aws_api_gateway_deployment" "api_gateway_deployment" {
 
   depends_on = [
     aws_api_gateway_rest_api.api_gateway_rest_api,
+    aws_api_gateway_resource.capability,
+    aws_api_gateway_method.capability,
+    aws_api_gateway_integration.capability,
+    aws_api_gateway_method_response.capability_200,
+    aws_api_gateway_integration_response.capability,
     aws_api_gateway_integration_response.head_integration_response
   ]
 }

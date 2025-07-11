@@ -609,38 +609,6 @@ paths:
       description: |
         Read a single document pointer by specifying the `DocumentReference.id`.  Note that you will only be able to
         retrieve document pointers that have the `type` that was agreed during the [onboarding](#api-description__onboarding) process.
-  /DocumentReference/_count:
-    get:
-      tags:
-        - DocumentReference
-      summary: Count document pointers
-      operationId: countDocumentReference
-      parameters:
-        - $ref: "#/components/parameters/subject"
-        - $ref: "#/components/parameters/odsCode"
-        - $ref: "#/components/parameters/requestId"
-        - $ref: "#/components/parameters/correlationId"
-      responses:
-        "200":
-          description: Count DocumentReference operation successful
-          headers:
-            X-Correlation-Id:
-              $ref: "#/components/headers/CorrelationId"
-            X-Request-Id:
-              $ref: "#/components/headers/RequestId"
-          content:
-            application/fhir+json:
-              schema:
-                $ref: "#/components/schemas/Bundle"
-      x-amazon-apigateway-integration:
-        type: aws_proxy
-        httpMethod: POST
-        uri: ${method_countDocumentReference}
-        responses:
-          default:
-            statusCode: "200"
-        passthroughBehavior: when_no_match
-        contentHandling: CONVERT_TO_TEXT
   /_status:
     get:
       tags:
@@ -1472,6 +1440,8 @@ components:
           $ref: "#/components/schemas/RequestQueryType"
         category:
           $ref: "#/components/schemas/RequestQueryCategory"
+        _summary:
+          $ref: "#/components/schemas/RequestQuerySummary"
         next-page-token:
           $ref: "#/components/schemas/NextPageToken"
       required:
@@ -1497,6 +1467,9 @@ components:
     RequestQueryCategory:
       type: string
       example: "http://snomed.info/sct|103693007"
+    RequestQuerySummary:
+      type: string
+      example: "count"
     NextPageToken:
       type: string
     RequestHeaderOdsCode:
@@ -1634,6 +1607,18 @@ components:
         invalid:
           summary: Unknown
           value: http://snomed.info/sct|410970009
+    _summary:
+      name: summary
+      in: query
+      schema:
+        $ref: "#/components/schemas/RequestQuerySummary"
+      examples:
+        none:
+          summary: None
+          value: ""
+        SNOMED_CODES_CARE_PLAN:
+          summary: Search only, just returns a count of the matching resources, without returning the actual matches
+          value: count
     nextPageToken:
       name: next-page-token
       description: |
