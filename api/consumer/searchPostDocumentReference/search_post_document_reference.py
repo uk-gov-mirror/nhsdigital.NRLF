@@ -87,6 +87,9 @@ def handler(
     if body.category:
         self_link += f"&category={body.category.root}"
 
+    if body.field_summary:
+        self_link += f"&_summary={body.field_summary.root}"
+
     bundle = {
         "resourceType": "Bundle",
         "type": "searchset",
@@ -101,6 +104,25 @@ def handler(
         custodian_id=custodian_id,
         pointer_types=pointer_types,
     )
+
+    if body.field_summary and body.field_summary.root == "count":
+        bundle = {
+            "resourceType": "Bundle",
+            "type": "searchset",
+            "link": [{"relation": "self", "url": self_link}],
+            "total": 0,
+        }
+        logger.log(LogReference.CONPOSTSEARCH006)
+
+        total = repository.count_by_nhs_number(
+            nhs_number=body.nhs_number,
+            pointer_types=pointer_types,
+        )
+        bundle["total"] = total
+        logger.log(LogReference.CONPOSTSEARCH007, total=total)
+        response = Response.from_resource(Bundle.model_validate(bundle))
+        logger.log(LogReference.CONPOSTSEARCH999)
+        return response
 
     for result in repository.search(
         nhs_number=body.nhs_number,
