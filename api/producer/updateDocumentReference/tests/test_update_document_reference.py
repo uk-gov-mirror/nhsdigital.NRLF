@@ -30,7 +30,6 @@ def test_update_document_reference_happy_path(repository: DocumentPointerReposit
 
     existing_doc_pointer = repository.get_by_id("Y05868-99999-99999-999999")
     assert existing_doc_pointer is not None
-
     existing_doc_ref = DocumentReference.model_validate_json(
         existing_doc_pointer.document
     )

@@ -61,7 +61,7 @@ def handler(
 
     core_model = DocumentPointer.from_document_reference(document_reference)
 
-    if metadata.ods_code != tuple(core_model.producer_id.split("|")):
+    if metadata.ods_code != core_model.producer_id:
         logger.log(
             LogReference.PROUPDATE004,
             metadata_ods_code=metadata.ods_code,

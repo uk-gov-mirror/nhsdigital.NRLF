@@ -135,7 +135,7 @@ def _validate_producer_id(identifier, metadata, idx):
     Validate that there is an ODS code in the relatesTo target identifier
     """
     producer_id = identifier.split("-", 1)[0]
-    if metadata.ods_code != tuple(producer_id.split("|")):
+    if metadata.ods_code != producer_id:
         logger.log(
             LogReference.PROCREATE007b,
             related_identifier=identifier,
@@ -226,8 +226,7 @@ def handler(
     logger.log(LogReference.PROCREATE000)
     logger.log(LogReference.PROCREATE001, resource=body)
 
-    id_prefix = f"|{metadata.ods_code}"
-    body.id = f"{id_prefix}-{uuid4()}"
+    body.id = f"{metadata.ods_code}-{uuid4()}"
 
     validator = DocumentReferenceValidator()
     result = validator.validate(body)

@@ -38,7 +38,7 @@ def handler(
     parsed_id = urllib.parse.unquote(path.id)
 
     producer_id = parsed_id.split("-", maxsplit=1)[0]
-    if metadata.ods_code != tuple(producer_id.split(".")):
+    if metadata.ods_code != producer_id:
         logger.log(
             LogReference.PROREAD001,
             ods_code=metadata.ods_code,

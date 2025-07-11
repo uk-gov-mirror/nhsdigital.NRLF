@@ -138,7 +138,7 @@ def _validate_producer_id(identifier, metadata, idx):
     Validate that there is an ODS code in the relatesTo target identifier
     """
     producer_id = identifier.split("-", 1)[0]
-    if metadata.ods_code != tuple(producer_id.split("|")):
+    if metadata.ods_code != producer_id:
         logger.log(
             LogReference.PROUPSERT007b,
             related_identifier=identifier,
@@ -230,7 +230,7 @@ def handler(
 
     core_model = _create_core_model(result.resource, metadata)
 
-    if metadata.ods_code != tuple(core_model.producer_id.split("|")):
+    if metadata.ods_code != core_model.producer_id:
         logger.log(
             LogReference.PROUPSERT003,
             ods_code=metadata.ods_code,

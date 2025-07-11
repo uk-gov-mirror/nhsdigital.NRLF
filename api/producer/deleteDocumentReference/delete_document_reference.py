@@ -28,7 +28,7 @@ def handler(
     pointer_id = urllib.parse.unquote(path.id)
     producer_id, _ = pointer_id.split("-", 1)
 
-    if metadata.ods_code != tuple(producer_id.split(".")):
+    if metadata.ods_code != producer_id:
         logger.log(
             LogReference.PRODELETE001,
             ods_code=metadata.ods_code,

@@ -31,7 +31,6 @@ def test_connection_metadata():
     assert metadata.nrl_app_id == "test-nrl"
     assert metadata.client_rp_details.developer_app_name == "test"
     assert metadata.client_rp_details.developer_app_id == "test"
-    assert metadata.ods_code_parts == ("test", "test")
 
 
 def test_producer_request_params():
