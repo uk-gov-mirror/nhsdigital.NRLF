@@ -15,7 +15,43 @@ from pyspark.sql.functions import (
 from pyspark.sql.types import NullType
 
 
-def resolve_dupes(df, logger):
+def format_ssp(df, logger, name):
+    if name != "s2c":
+        logger.info(f"Not SSP logs, returning df: {name}")
+        return df
+
+    logger.info(f"Processing SSP logs")
+    noODSCode = df.filter(col("logReference") != "SSP0001")
+    ODSCode = df.filter(col("logReference") == "SSP0001")
+
+    noODSCode = noODSCode.select(
+        "time",
+        "host",
+        "internalID",
+        "logReference",
+        "interaction",
+        "responseCode",
+        "responseErrorMessage",
+        "totalDuration",
+    )
+    ODSCode = ODSCode.select(
+        "sspFrom",
+        "fromOrgName",
+        "fromOdsCode",
+        "fromPostCode",
+        "sspTo",
+        "toOrgName",
+        "toOdsCode",
+        "toPostCode",
+        "internalID",
+    )
+
+    df = noODSCode.join(ODSCode, on="internalID", how="left")
+
+    return df
+
+
+def resolve_dupes(df, logger, name):
     column_groups = defaultdict(list)
     for column_name in df.columns:
         normalised_name = column_name.lower().rstrip("_")
@@ -27,7 +63,9 @@ def resolve_dupes(df, logger):
         if len(original_names) == 1:
             final_select_exprs.append(col(original_names[0]).alias(lower_name))
         else:
-            logger.info(f"Resolving duplicate group '{lower_name}': {original_names}")
+            logger.info(
+                f"Resolving duplicate group '{lower_name}': {original_names} for df: {name}"
+            )
 
             merge_logic = lambda col1, col2: when(
                 col1.isNull() | col2.isNull(), coalesce(col1, col2)
@@ -40,34 +78,43 @@ def resolve_dupes(df, logger):
     return df.select(*final_select_exprs)
 
 
-def rename_cols(df, logger):
-    logger.info("Replacing '.' with '_'")
+def rename_cols(df, logger, name):
+    logger.info(f"Replacing '.' with '_' for df: {name}")
     for col_name in df.columns:
         df = df.withColumnRenamed(col_name, col_name.replace(".", "_"))
     return df
 
 
-def dtype_conversion(df, logger):
+def dtype_conversion(df, logger, name):
     try:
-        logger.info("Formatting event_timestamp")
-        df = (
-            df.withColumn(
+        logger.info(f"Formatting event_timestamp, time and date columns for df: {name}")
+        if "event_timestamp" in df.columns:
+            df = df.withColumn(
                 "event_timestamp_cleaned",
                 regexp_replace(col("event_timestamp"), ",", "."),
-            )
-            .withColumn(
+            ).withColumn(
                 "event_timestamp",
                 to_timestamp(
                     col("event_timestamp_cleaned"), "yyyy-MM-dd HH:mm:ss.SSSZ"
                 ),
             )
-            .withColumn("time", from_unixtime(col("time")).cast("timestamp"))
-            .withColumn("date", to_date(col("time")))
-        )
 
-        df = df.drop("event_timestamp_cleaned")
+            df = df.drop("event_timestamp_cleaned")
+
+        if "time" in df.columns:
+            df = df.withColumn(
+                "time", from_unixtime(col("time")).cast("timestamp")
+            ).withColumn("date", to_date(col("time")))
+
+        if "_time" in df.columns:
+            df = df.withColumn(
+                "time", to_timestamp(col("_time"), "yyyy-MM-dd HH:mm:ss.SSSZ")
+            ).withColumn("date", to_date(col("time")))
+
+            df = df.drop("_time")
+
     except Exception as e:
-        logger.info(f"Failed formatting of timestamp column with error: {e}")
+        logger.info(f"Failed formatting of timestamp columns with error: {e}")
 
     logger.info("Handling Null Type columns")
     select_exprs = []
