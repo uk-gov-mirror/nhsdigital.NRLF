@@ -118,6 +118,10 @@ class LogPipeline:
             if name == "s2c":
                 name = "ssp"
             try:
+                if dataframe.rdd.isEmpty():
+                    self.logger.info(f"{name} dataframe has no rows. Skipping.")
+                    continue
+
                 self.logger.info(
                     f"Attempting to load dataframe {name} into {self.target_path}{name}"
                 )
