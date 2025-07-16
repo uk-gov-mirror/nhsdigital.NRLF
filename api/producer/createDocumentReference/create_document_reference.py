@@ -66,7 +66,7 @@ def _check_permissions(
     """
     if metadata.ods_code != core_model.custodian:
         logger.log(
-            LogReference.PROUPSERT004,
+            LogReference.PROCREATE004,
             ods_code=metadata.ods_code,
             custodian=core_model.custodian,
         )

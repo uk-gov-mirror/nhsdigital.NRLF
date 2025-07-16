@@ -289,7 +289,7 @@ class LogReference(Enum):
     )
     PROUPSERT004 = _Reference(
         "WARN",
-        "ODS code in headers does not match ODWS code in resource custodian for upsert",
+        "ODS code in headers does not match ODS code in resource custodian for upsert",
     )
     PROUPSERT005 = _Reference(
         "WARN", "Organisation is not allowed to upsert pointer type for upsert"
