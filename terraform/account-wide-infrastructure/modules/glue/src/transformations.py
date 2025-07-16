@@ -20,6 +20,10 @@ def format_ssp(df, logger, name):
         logger.info(f"Not SSP logs, returning df: {name}")
         return df
 
+    if df.rdd.isEmpty():
+        logger.info(f"{name} dataframe has no rows. Skipping format_ssp.")
+        return df
+
     logger.info(f"Processing SSP logs")
     noODSCode = df.filter(col("logReference") != "SSP0001")
     ODSCode = df.filter(col("logReference") == "SSP0001")
@@ -52,6 +56,10 @@ def format_ssp(df, logger, name):
 
 
 def resolve_dupes(df, logger, name):
+    if df.rdd.isEmpty():
+        logger.info(f"{name} dataframe has no rows. Skipping resolve_dupes.")
+        return df
+
     column_groups = defaultdict(list)
     for column_name in df.columns:
         normalised_name = column_name.lower().rstrip("_")
@@ -79,6 +87,10 @@ def resolve_dupes(df, logger, name):
 
 
 def rename_cols(df, logger, name):
+    if df.rdd.isEmpty():
+        logger.info(f"{name} dataframe has no rows. Skipping rename_cols.")
+        return df
+
     logger.info(f"Replacing '.' with '_' for df: {name}")
     for col_name in df.columns:
         df = df.withColumnRenamed(col_name, col_name.replace(".", "_"))
@@ -86,6 +98,9 @@ def rename_cols(df, logger, name):
 
 
 def dtype_conversion(df, logger, name):
+    if df.rdd.isEmpty():
+        logger.info(f"{name} dataframe has no rows. Skipping dtype_conversion.")
+        return df
     try:
         logger.info(f"Formatting event_timestamp, time and date columns for df: {name}")
         if "event_timestamp" in df.columns:
