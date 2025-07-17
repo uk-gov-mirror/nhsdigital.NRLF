@@ -25,10 +25,10 @@ def format_ssp(df, logger, name):
         return df
 
     logger.info("Processing SSP logs")
-    noOdsCode = df.filter(col("logReference") != "SSP0001")
-    odsCode = df.filter(col("logReference") == "SSP0001")
+    no_ods_code = df.filter(col("logReference") != "SSP0001")
+    ods_code = df.filter(col("logReference") == "SSP0001")
 
-    noOdsCode = noOdsCode.select(
+    no_ods_code = no_ods_code.select(
         "time",
         "host",
         "internalID",
@@ -38,7 +38,7 @@ def format_ssp(df, logger, name):
         "responseErrorMessage",
         "totalDuration",
     )
-    odsCode = odsCode.select(
+    ods_code = ods_code.select(
         "sspFrom",
         "fromOrgName",
         "fromOdsCode",
@@ -50,7 +50,7 @@ def format_ssp(df, logger, name):
         "internalID",
     )
 
-    df = noOdsCode.join(odsCode, on="internalID", how="left")
+    df = no_ods_code.join(ods_code, on="internalID", how="left")
 
     return df
 
