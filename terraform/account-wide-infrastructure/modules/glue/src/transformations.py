@@ -24,11 +24,11 @@ def format_ssp(df, logger, name):
         logger.info(f"{name} dataframe has no rows. Skipping format_ssp.")
         return df
 
-    logger.info(f"Processing SSP logs")
-    noODSCode = df.filter(col("logReference") != "SSP0001")
-    ODSCode = df.filter(col("logReference") == "SSP0001")
+    logger.info("Processing SSP logs")
+    noodsCode = df.filter(col("logReference") != "SSP0001")
+    odsCode = df.filter(col("logReference") == "SSP0001")
 
-    noODSCode = noODSCode.select(
+    noodsCode = noodsCode.select(
         "time",
         "host",
         "internalID",
@@ -38,7 +38,7 @@ def format_ssp(df, logger, name):
         "responseErrorMessage",
         "totalDuration",
     )
-    ODSCode = ODSCode.select(
+    odsCode = odsCode.select(
         "sspFrom",
         "fromOrgName",
         "fromOdsCode",
@@ -50,7 +50,7 @@ def format_ssp(df, logger, name):
         "internalID",
     )
 
-    df = noODSCode.join(ODSCode, on="internalID", how="left")
+    df = noodsCode.join(odsCode, on="internalID", how="left")
 
     return df
 
