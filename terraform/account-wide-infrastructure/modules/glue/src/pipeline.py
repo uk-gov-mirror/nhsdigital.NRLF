@@ -116,7 +116,7 @@ class LogPipeline:
         for name, dataframe in data.items():
             name = name.replace("--", "_")
             if name == "s2c":
-                name = "ssp"
+                name = "spine_sspDocumentRetrieval"
             try:
                 if dataframe.rdd.isEmpty():
                     self.logger.info(f"{name} dataframe has no rows. Skipping.")
