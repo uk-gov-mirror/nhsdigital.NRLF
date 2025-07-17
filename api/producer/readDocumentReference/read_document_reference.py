@@ -38,10 +38,10 @@ def handler(
     parsed_id = urllib.parse.unquote(path.id)
 
     producer_id = parsed_id.split("-", maxsplit=1)[0]
-    if metadata.ods_code_parts != tuple(producer_id.split(".")):
+    if metadata.ods_code != producer_id:
         logger.log(
             LogReference.PROREAD001,
-            ods_code_parts=metadata.ods_code_parts,
+            ods_code=metadata.ods_code,
             producer_id=producer_id,
         )
         return SpineErrorResponse.AUTHOR_CREDENTIALS_ERROR(
