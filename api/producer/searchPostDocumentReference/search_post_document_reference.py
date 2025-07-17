@@ -74,7 +74,6 @@ def handler(
     logger.log(
         LogReference.PROPOSTSEARCH003,
         custodian=metadata.ods_code,
-        custodian_suffix=metadata.ods_code_extension,
         nhs_number=body.nhs_number,
         pointer_types=pointer_types,
         categories=categories,
@@ -82,7 +81,6 @@ def handler(
 
     for result in repository.search(
         custodian=metadata.ods_code,
-        custodian_suffix=metadata.ods_code_extension,
         nhs_number=body.nhs_number,
         pointer_types=pointer_types,
         categories=categories,

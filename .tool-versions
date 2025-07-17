@@ -1,6 +1,5 @@
 allure 2.34.0
 awscli 2.27.20
-java zulu-jre-24.28.83
 jq 1.7.1
 k6 1.0.0
 poetry 1.8.5
