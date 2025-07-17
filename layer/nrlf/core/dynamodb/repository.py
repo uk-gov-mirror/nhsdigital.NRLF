@@ -216,7 +216,6 @@ class DocumentPointerRepository(Repository[DocumentPointer]):
         self,
         nhs_number: str,
         custodian: Optional[str] = None,
-        custodian_suffix: Optional[str] = None,
         pointer_types: Optional[List[str]] = [],
         categories: Optional[List[str]] = [],
     ) -> Iterator[DocumentPointer]:
@@ -273,15 +272,6 @@ class DocumentPointerRepository(Repository[DocumentPointer]):
             )
             filter_expressions.append("custodian = :custodian")
             expression_values[":custodian"] = custodian
-
-        if custodian_suffix:
-            logger.log(
-                LogReference.REPOSITORY016,
-                expression="custodian_suffix = :custodian_suffix",
-                values=["custodian_suffix"],
-            )
-            filter_expressions.append("custodian_suffix = :custodian_suffix")
-            expression_values[":custodian_suffix"] = custodian_suffix
 
         query = {
             "IndexName": "patient_gsi",

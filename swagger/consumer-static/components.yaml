@@ -57,12 +57,6 @@ components:
       schema:
         $ref: "#/components/schemas/RequestHeaderOdsCode"
       required: true
-    odsCodeExtension:
-      name: NHSD-End-User-Organisation
-      description: Organisation extension code
-      in: header
-      schema:
-        $ref: "#/components/schemas/RequestHeaderOrganisationExtensionCode"
     requestId:
       name: X-Request-ID
       description: |

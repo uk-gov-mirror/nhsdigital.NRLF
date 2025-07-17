@@ -267,7 +267,6 @@ paths:
         $ref: "#/components/requestBodies/DocumentReference"
       parameters:
         - $ref: "#/components/parameters/odsCode"
-        - $ref: "#/components/parameters/odsCodeExtension"
         - $ref: "#/components/parameters/requestId"
         - $ref: "#/components/parameters/correlationId"
       x-amazon-apigateway-integration:
@@ -408,7 +407,6 @@ paths:
         - $ref: "#/components/parameters/category"
         - $ref: "#/components/parameters/nextPageToken"
         - $ref: "#/components/parameters/odsCode"
-        - $ref: "#/components/parameters/odsCodeExtension"
         - $ref: "#/components/parameters/requestId"
         - $ref: "#/components/parameters/correlationId"
       responses:
@@ -610,7 +608,6 @@ paths:
       operationId: upsertDocumentReference
       parameters:
         - $ref: "#/components/parameters/odsCode"
-        - $ref: "#/components/parameters/odsCodeExtension"
         - $ref: "#/components/parameters/requestId"
         - $ref: "#/components/parameters/correlationId"
       responses:
@@ -687,7 +684,6 @@ paths:
       operationId: searchPostDocumentReference
       parameters:
         - $ref: "#/components/parameters/odsCode"
-        - $ref: "#/components/parameters/odsCodeExtension"
         - $ref: "#/components/parameters/requestId"
         - $ref: "#/components/parameters/correlationId"
       requestBody:
@@ -902,7 +898,6 @@ paths:
       parameters:
         - $ref: "#/components/parameters/id"
         - $ref: "#/components/parameters/odsCode"
-        - $ref: "#/components/parameters/odsCodeExtension"
         - $ref: "#/components/parameters/requestId"
         - $ref: "#/components/parameters/correlationId"
       responses:
@@ -1005,7 +1000,6 @@ paths:
       parameters:
         - $ref: "#/components/parameters/id"
         - $ref: "#/components/parameters/odsCode"
-        - $ref: "#/components/parameters/odsCodeExtension"
         - $ref: "#/components/parameters/requestId"
         - $ref: "#/components/parameters/correlationId"
       responses:
@@ -1084,7 +1078,6 @@ paths:
       parameters:
         - $ref: "#/components/parameters/id"
         - $ref: "#/components/parameters/odsCode"
-        - $ref: "#/components/parameters/odsCodeExtension"
         - $ref: "#/components/parameters/requestId"
         - $ref: "#/components/parameters/correlationId"
       responses:
@@ -2247,12 +2240,6 @@ components:
         invalid:
           summary: Unknown
           value: XYZ
-    odsCodeExtension:
-      name: NHSD-End-User-Organisation
-      description: Organisation extension code
-      in: header
-      schema:
-        $ref: "#/components/schemas/RequestHeaderOrganisationExtensionCode"
     requestId:
       name: X-Request-ID
       description: |

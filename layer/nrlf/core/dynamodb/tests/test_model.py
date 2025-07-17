@@ -55,7 +55,6 @@ def test_document_pointer_init():
         "id": "X26-999999-999999-99999999",
         "nhs_number": "9999999999",
         "custodian": "X26",
-        "custodian_suffix": None,
         "author": "X26",
         "producer_id": "X26",
         "type": "http://snomed.info/sct|123456789",
@@ -88,7 +87,6 @@ def test_document_pointer_from_document_reference_valid():
     assert model_data == {
         "created_on": "2024-01-01T00:00:00.000Z",
         "custodian": "Y05868",
-        "custodian_suffix": None,
         "author": "Y05868",
         "id": "Y05868-99999-99999-999999",
         "master_identifier": None,
@@ -123,7 +121,6 @@ def test_document_pointer_from_document_reference_valid_with_created_on():
     assert model_data == {
         "created_on": "2024-02-02T12:34:56.000Z",
         "custodian": "Y05868",
-        "custodian_suffix": None,
         "author": "Y05868",
         "id": "Y05868-99999-99999-999999",
         "master_identifier": None,
@@ -156,42 +153,6 @@ def test_document_pointer_from_document_reference_invalid():
         DocumentPointer.from_document_reference(doc_ref)
 
     assert str(error.value) == "'NoneType' object has no attribute 'coding'"
-
-
-def test_document_pointer_extract_custodian_suffix_no_suffix():
-    values = {"custodian": "X26", "custodian_suffix": None}
-
-    assert DocumentPointer.extract_custodian_suffix(values) == {
-        "custodian": "X26",
-        "custodian_suffix": None,
-    }
-
-
-def test_document_pointer_extract_custodian_suffix_suffix():
-    values = {"custodian": "X26.001", "custodian_suffix": None}
-
-    assert DocumentPointer.extract_custodian_suffix(values) == {
-        "custodian": "X26",
-        "custodian_suffix": "001",
-    }
-
-
-def test_document_pointer_extract_custodian_suffix_existing_suffix():
-    values = {"custodian": "X26", "custodian_suffix": "001"}
-
-    assert DocumentPointer.extract_custodian_suffix(values) == {
-        "custodian": "X26",
-        "custodian_suffix": "001",
-    }
-
-
-def test_document_pointer_extract_custodian_suffix_multiple_suffix():
-    values = {"custodian": "X26.001.002", "custodian_suffix": None}
-
-    assert DocumentPointer.extract_custodian_suffix(values) == {
-        "custodian": "X26.001.002",
-        "custodian_suffix": None,
-    }
 
 
 def test_document_pointer_inject_producer_id():

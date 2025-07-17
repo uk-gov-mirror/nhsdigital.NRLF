@@ -80,7 +80,6 @@ def handler(
     logger.log(
         LogReference.PROSEARCH003,
         custodian=metadata.ods_code,
-        custodian_suffix=metadata.ods_code_extension,
         nhs_number=params.nhs_number,
         pointer_types=pointer_types,
         categories=params.category.root.split(",") if params.category else [],
@@ -88,7 +87,6 @@ def handler(
 
     for result in repository.search(
         custodian=metadata.ods_code,
-        custodian_suffix=metadata.ods_code_extension,
         nhs_number=params.nhs_number,
         pointer_types=pointer_types,
         categories=params.category.root.split(",") if params.category else [],
