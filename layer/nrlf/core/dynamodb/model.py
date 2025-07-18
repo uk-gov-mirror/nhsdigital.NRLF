@@ -58,7 +58,6 @@ class DocumentPointer(DynamoDBModel):
     id: str
     nhs_number: str
     custodian: str
-    custodian_suffix: Optional[str] = None
     producer_id: str
     category_id: str
     category: str
@@ -161,36 +160,6 @@ class DocumentPointer(DynamoDBModel):
 
     @model_validator(mode="before")
     @classmethod
-    def extract_custodian_suffix(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Extract the custodian suffix if it is not provided and the custodian
-        is in the format <custodian>.<custodian_suffix>
-        """
-        logger.log(LogReference.DOCPOINTER001)
-
-        custodian = values.get("custodian")
-        custodian_suffix = values.get("custodian_suffix")
-
-        if custodian and not custodian_suffix:
-            split_custodian = custodian.split(".")
-
-            if len(split_custodian) == 2:
-                custodian, custodian_suffix = split_custodian
-                values["custodian"] = custodian
-
-        if custodian_suffix is not None:
-            values["custodian_suffix"] = custodian_suffix
-
-        logger.log(
-            LogReference.DOCPOINTER002,
-            custodian=values["custodian"],
-            custodian_suffix=values.get("custodian_suffix"),
-        )
-
-        return values
-
-    @model_validator(mode="before")
-    @classmethod
     def inject_producer_id(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         """
         Inject the producer_id into the DocumentPointer if it is not provided
@@ -242,16 +211,8 @@ class DocumentPointer(DynamoDBModel):
 
         id_ = values.get("id")
         custodian = values.get("custodian_id")
-        custodian_suffix = values.get("custodian_suffix")
 
-        if custodian and custodian_suffix:
-            if tuple(producer_id.split(".")) != (custodian, custodian_suffix):
-                raise ValueError(
-                    f"Producer ID {producer_id} (extracted from '{id_}') is not correctly formed. "
-                    "It is expected to be composed in the form '<custodian_id>.<custodian_suffix>'"
-                )
-
-        elif custodian and producer_id != custodian:
+        if custodian and producer_id != custodian:
             raise ValueError(
                 f"Producer ID {producer_id} (extracted from '{id_}')"
                 " does not match the Custodian ID."

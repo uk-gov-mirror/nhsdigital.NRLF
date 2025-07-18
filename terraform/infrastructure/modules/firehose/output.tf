@@ -11,12 +11,6 @@ output "delivery_stream" {
   }
 }
 
-output "splunk" {
-  value = {
-    index = var.splunk_index
-  }
-}
-
 output "firehose_subscription" {
   value = {
     destination = {
@@ -33,7 +27,7 @@ output "firehose_subscription" {
 }
 
 output "firehose_reporting_subscription" {
-  value = var.reporting_infra_toggle ? {
+  value = {
     destination = {
       arn = local.iam_subscriptions.firehose_reporting_stream_arn
     }
@@ -44,5 +38,5 @@ output "firehose_reporting_subscription" {
       # At least two items, and the first not any of INIT_START, START, END, REPORT
       pattern = "[first_item_on_this_log_line != \"INIT_START\" && first_item_on_this_log_line != \"START\" && first_item_on_this_log_line != \"END\" && first_item_on_this_log_line != \"REPORT\", everything_else_on_this_log_line]"
     }
-  } : null
+  }
 }

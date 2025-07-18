@@ -27,7 +27,8 @@ variable "kms_deletion_window_in_days" {
 }
 
 variable "notification_emails" {
-  type        = set(string)
+  type        = list(string)
+  sensitive   = true
   description = "The email addresses to which notifications will be sent."
   default     = []
 }

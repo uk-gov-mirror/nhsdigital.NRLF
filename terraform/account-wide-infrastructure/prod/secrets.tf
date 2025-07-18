@@ -21,3 +21,12 @@ resource "aws_secretsmanager_secret" "prod_environment_configuration" {
   name        = "${local.project}--prod--env-config"
   description = "The environment configuration for the Prod environment"
 }
+
+resource "aws_secretsmanager_secret" "powerbi_gw_instance_admin_pwd" {
+  name        = "${local.project}--prod-powerbi-gw-instance-admin-pwd"
+  description = "Admin password for the PowerBI Gateway EC2 instance"
+}
+resource "aws_secretsmanager_secret" "powerbi_gw_recovery_key" {
+  name        = "${local.project}--prod-powerbi-gw-recovery-key"
+  description = "Recovery key for the PowerBI Gateway EC2 instance"
+}

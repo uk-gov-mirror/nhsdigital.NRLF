@@ -840,7 +840,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
             }
             ]
         },
-        "diagnostics": "Invalid contentType: application/invalid. Must be 'application/pdf' or 'text/html'",
+        "diagnostics": "Invalid contentType: application/invalid. Must be 'application/pdf', 'text/html' or 'application/fhir+json'",
         "expression": [
             "content[0].attachment.contentType"
         ]

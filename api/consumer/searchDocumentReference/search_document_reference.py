@@ -1,11 +1,15 @@
 from pydantic import ValidationError
 
-from nrlf.consumer.fhir.r4.model import Bundle, DocumentReference
+from nrlf.consumer.fhir.r4.model import (
+    Bundle,
+    DocumentReference,
+    OperationOutcome,
+    OperationOutcomeIssue,
+)
 from nrlf.core.codes import SpineErrorConcept
 from nrlf.core.config import Config
 from nrlf.core.decorators import request_handler
 from nrlf.core.dynamodb.repository import DocumentPointerRepository
-from nrlf.core.errors import OperationOutcomeError
 from nrlf.core.logger import LogReference, logger
 from nrlf.core.model import ConnectionMetadata, ConsumerRequestParams
 from nrlf.core.response import Response, SpineErrorResponse
@@ -83,6 +87,9 @@ def handler(
     if params.category:
         self_link += f"&category={params.category.root}"
 
+    if params.field_summary:
+        self_link += f"&_summary={params.field_summary.root}"
+
     bundle = {
         "resourceType": "Bundle",
         "type": "searchset",
@@ -97,6 +104,25 @@ def handler(
         custodian=custodian_id,
         pointer_types=pointer_types,
     )
+
+    if params.field_summary and params.field_summary.root == "count":
+        bundle = {
+            "resourceType": "Bundle",
+            "type": "searchset",
+            "link": [{"relation": "self", "url": self_link}],
+            "total": 0,
+        }
+        logger.log(LogReference.CONSEARCH006)
+
+        total = repository.count_by_nhs_number(
+            nhs_number=params.nhs_number,
+            pointer_types=pointer_types,
+        )
+        bundle["total"] = total
+        logger.log(LogReference.CONSEARCH007, total=total)
+        response = Response.from_resource(Bundle.model_validate(bundle))
+        logger.log(LogReference.CONSEARCH999)
+        return response
 
     for result in repository.search(
         nhs_number=params.nhs_number,
@@ -120,13 +146,21 @@ def handler(
             logger.log(
                 LogReference.CONSEARCH005, error=str(exc), document=result.document
             )
-            raise OperationOutcomeError(
-                status_code="500",
-                severity="error",
-                code="exception",
-                details=SpineErrorConcept.from_code("INTERNAL_SERVER_ERROR"),
-                diagnostics="An error occurred whilst parsing the document reference search results",
-            ) from exc
+            operation_outcome = OperationOutcome(
+                resourceType="OperationOutcome",
+                issue=[
+                    OperationOutcomeIssue(
+                        severity="error",
+                        code="exception",
+                        details=SpineErrorConcept.from_code("INTERNAL_SERVER_ERROR"),
+                        diagnostics="An error occurred whilst parsing the document reference search results",
+                    )
+                ],
+            )
+            bundle["total"] += 1
+            bundle["entry"].append(
+                {"resource": operation_outcome.model_dump(exclude_none=True)}
+            )
 
     response = Response.from_resource(Bundle.model_validate(bundle))
     logger.log(LogReference.CONSEARCH999)

@@ -7,6 +7,14 @@ class _Reference:
     level: str
     message: str
 
+    # WARNING: This makes all _Reference objects unequal unless they are the same instance.
+    # It's fine for our use case, but be cautious if you compare _Reference objects.
+    def __eq__(self, other):
+        return self is other
+
+    def __hash__(self):
+        return id(self)
+
 
 class LogReference(Enum):
     # Request Handler Logs
@@ -187,6 +195,10 @@ class LogReference(Enum):
     CONSEARCH005 = _Reference(
         "EXCEPTION", "The DocumentReference resource could not be parsed"
     )
+    CONSEARCH006 = _Reference("DEBUG", "Search with summary count parameter enabled")
+    CONSEARCH007 = _Reference(
+        "INFO", "Search with summary count parameter returned total results"
+    )
     CONSEARCH999 = _Reference(
         "INFO", "Successfully completed consumer searchDocumentReference"
     )
@@ -210,6 +222,12 @@ class LogReference(Enum):
     )
     CONPOSTSEARCH005 = _Reference(
         "EXCEPTION", "The DocumentReference resource could not be parsed"
+    )
+    CONPOSTSEARCH006 = _Reference(
+        "DEBUG", "Search with summary count parameter enabled"
+    )
+    CONPOSTSEARCH007 = _Reference(
+        "INFO", "Search with summary count parameter returned total results"
     )
     CONPOSTSEARCH999 = _Reference(
         "INFO", "Successfully completed consumer searchPostDocumentReference"
@@ -271,7 +289,7 @@ class LogReference(Enum):
     )
     PROUPSERT004 = _Reference(
         "WARN",
-        "ODS code in headers does not match ODWS code in resource custodian for upsert",
+        "ODS code in headers does not match ODS code in resource custodian for upsert",
     )
     PROUPSERT005 = _Reference(
         "WARN", "Organisation is not allowed to upsert pointer type for upsert"
@@ -364,6 +382,7 @@ class LogReference(Enum):
     PROSEARCH005 = _Reference(
         "EXCEPTION", "The DocumentReference resource could not be parsed"
     )
+    PROSEARCH006 = _Reference("DEBUG", "Search with summary count parameter enabled")
     PROSEARCH999 = _Reference(
         "INFO", "Successfully completed producer searchDocumentReference"
     )
@@ -387,6 +406,9 @@ class LogReference(Enum):
     )
     PROPOSTSEARCH005 = _Reference(
         "EXCEPTION", "The DocumentReference resource could not be parsed"
+    )
+    PROPOSTSEARCH006 = _Reference(
+        "DEBUG", "Search with summary count parameter enabled"
     )
     PROPOSTSEARCH999 = _Reference(
         "INFO", "Successfully completed producer searchDocumentReference"

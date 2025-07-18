@@ -1,9 +1,8 @@
-awscli 2.15.11
-poetry 1.8.2
+allure 2.34.0
+awscli 2.27.20
 jq 1.7.1
-python 3.12.2
+k6 1.0.0
+poetry 1.8.5
+python 3.12.10
 terraform 1.9.8
-java zulu-jre-17.42.19
-yq 4.35.2
-allure 2.27.0
-k6 0.50.0
+yq 4.45.4

@@ -1,4 +1,5 @@
 import json
+from unittest.mock import patch
 
 from moto import mock_aws
 
@@ -240,6 +241,168 @@ def test_search_document_reference_happy_path_with_category(
             {
                 "relation": "self",
                 "url": "https://pytest.api.service.nhs.uk/record-locator/consumer/FHIR/R4/DocumentReference?subject:identifier=https://fhir.nhs.uk/Id/nhs-number|6700028191&category=http://snomed.info/sct|734163000",
+            }
+        ],
+        "total": 1,
+        "entry": [{"resource": doc_ref.model_dump(exclude_none=True)}],
+    }
+
+
+@mock_aws
+@mock_repository
+def test_search_document_reference_happy_path_with_category_and_type(
+    repository: DocumentPointerRepository,
+):
+    doc_ref = load_document_reference("Y05868-736253002-Valid")
+    doc_pointer = DocumentPointer.from_document_reference(doc_ref)
+    repository.create(doc_pointer)
+
+    # Second pointer different category
+    doc_ref2 = load_document_reference("Y05868-736253002-Valid")
+    doc_ref2.id = "Y05868-736253002-Valid2"
+    doc_ref2.type.coding[0].code = PointerTypes.NEWS2_CHART.coding_value()
+    doc_ref2.type.coding[0].display = TYPE_ATTRIBUTES.get(
+        PointerTypes.NEWS2_CHART.value
+    ).get("display")
+    doc_ref2.category[0].coding[0].code = Categories.OBSERVATIONS.coding_value()
+    doc_ref2.category[0].coding[0].display = CATEGORY_ATTRIBUTES.get(
+        Categories.OBSERVATIONS.value
+    ).get("display")
+    repository.create(DocumentPointer.from_document_reference(doc_ref2))
+
+    event = create_test_api_gateway_event(
+        headers=create_headers(),
+        query_string_parameters={
+            "subject:identifier": "https://fhir.nhs.uk/Id/nhs-number|6700028191",
+            "category": "http://snomed.info/sct|734163000",
+            "type": "http://snomed.info/sct|736253002",
+        },
+    )
+
+    result = handler(event, create_mock_context())
+    body = result.pop("body")
+
+    assert result == {
+        "statusCode": "200",
+        "headers": default_response_headers(),
+        "isBase64Encoded": False,
+    }
+    parsed_body = json.loads(body)
+    assert parsed_body == {
+        "resourceType": "Bundle",
+        "type": "searchset",
+        "link": [
+            {
+                "relation": "self",
+                "url": "https://pytest.api.service.nhs.uk/record-locator/consumer/FHIR/R4/DocumentReference?subject:identifier=https://fhir.nhs.uk/Id/nhs-number|6700028191&type=http://snomed.info/sct|736253002&category=http://snomed.info/sct|734163000",
+            }
+        ],
+        "total": 1,
+        "entry": [{"resource": doc_ref.model_dump(exclude_none=True)}],
+    }
+
+
+@mock_aws
+@mock_repository
+def test_search_document_reference_happy_path_with_category_and_type_no_results(
+    repository: DocumentPointerRepository,
+):
+    doc_ref = load_document_reference("Y05868-736253002-Valid")
+    doc_pointer = DocumentPointer.from_document_reference(doc_ref)
+    repository.create(doc_pointer)
+
+    # Second pointer different category
+    doc_ref2 = load_document_reference("Y05868-736253002-Valid")
+    doc_ref2.id = "Y05868-736253002-Valid2"
+    doc_ref2.type.coding[0].code = PointerTypes.NEWS2_CHART.coding_value()
+    doc_ref2.type.coding[0].display = TYPE_ATTRIBUTES.get(
+        PointerTypes.NEWS2_CHART.value
+    ).get("display")
+    doc_ref2.category[0].coding[0].code = Categories.OBSERVATIONS.coding_value()
+    doc_ref2.category[0].coding[0].display = CATEGORY_ATTRIBUTES.get(
+        Categories.OBSERVATIONS.value
+    ).get("display")
+    repository.create(DocumentPointer.from_document_reference(doc_ref2))
+
+    event = create_test_api_gateway_event(
+        headers=create_headers(),
+        query_string_parameters={
+            "subject:identifier": "https://fhir.nhs.uk/Id/nhs-number|6700028191",
+            "category": "http://snomed.info/sct|1102421000000108",
+            "type": "http://snomed.info/sct|736253002",
+        },
+    )
+
+    result = handler(event, create_mock_context())
+    body = result.pop("body")
+
+    assert result == {
+        "statusCode": "200",
+        "headers": default_response_headers(),
+        "isBase64Encoded": False,
+    }
+    parsed_body = json.loads(body)
+    assert parsed_body == {
+        "resourceType": "Bundle",
+        "type": "searchset",
+        "link": [
+            {
+                "relation": "self",
+                "url": "https://pytest.api.service.nhs.uk/record-locator/consumer/FHIR/R4/DocumentReference?subject:identifier=https://fhir.nhs.uk/Id/nhs-number|6700028191&type=http://snomed.info/sct|736253002&category=http://snomed.info/sct|1102421000000108",
+            }
+        ],
+        "total": 0,
+        "entry": [],
+    }
+
+
+@mock_aws
+@mock_repository
+def test_search_document_reference_happy_path_with_multiple_categories_and_type(
+    repository: DocumentPointerRepository,
+):
+    doc_ref = load_document_reference("Y05868-736253002-Valid")
+    doc_pointer = DocumentPointer.from_document_reference(doc_ref)
+    repository.create(doc_pointer)
+
+    # Second pointer different category
+    doc_ref2 = load_document_reference("Y05868-736253002-Valid")
+    doc_ref2.id = "Y05868-736253002-Valid2"
+    doc_ref2.type.coding[0].code = PointerTypes.NEWS2_CHART.coding_value()
+    doc_ref2.type.coding[0].display = TYPE_ATTRIBUTES.get(
+        PointerTypes.NEWS2_CHART.value
+    ).get("display")
+    doc_ref2.category[0].coding[0].code = Categories.OBSERVATIONS.coding_value()
+    doc_ref2.category[0].coding[0].display = CATEGORY_ATTRIBUTES.get(
+        Categories.OBSERVATIONS.value
+    ).get("display")
+    repository.create(DocumentPointer.from_document_reference(doc_ref2))
+
+    event = create_test_api_gateway_event(
+        headers=create_headers(),
+        query_string_parameters={
+            "subject:identifier": "https://fhir.nhs.uk/Id/nhs-number|6700028191",
+            "category": "http://snomed.info/sct|734163000,http://snomed.info/sct|1102421000000108",
+            "type": "http://snomed.info/sct|736253002",
+        },
+    )
+
+    result = handler(event, create_mock_context())
+    body = result.pop("body")
+
+    assert result == {
+        "statusCode": "200",
+        "headers": default_response_headers(),
+        "isBase64Encoded": False,
+    }
+    parsed_body = json.loads(body)
+    assert parsed_body == {
+        "resourceType": "Bundle",
+        "type": "searchset",
+        "link": [
+            {
+                "relation": "self",
+                "url": "https://pytest.api.service.nhs.uk/record-locator/consumer/FHIR/R4/DocumentReference?subject:identifier=https://fhir.nhs.uk/Id/nhs-number|6700028191&type=http://snomed.info/sct|736253002&category=http://snomed.info/sct|734163000,http://snomed.info/sct|1102421000000108",
             }
         ],
         "total": 1,
@@ -558,13 +721,59 @@ def test_search_document_reference_invalid_category(
 
 @mock_aws
 @mock_repository
-def test_search_document_reference_invalid_json(repository: DocumentPointerRepository):
+def test_search_document_reference_filters_by_summary_count(
+    repository: DocumentPointerRepository,
+):
     doc_ref = load_document_reference("Y05868-736253002-Valid")
     doc_pointer = DocumentPointer.from_document_reference(doc_ref)
-    doc_pointer.document = "invalid json"
-
     repository.create(doc_pointer)
 
+    event = create_test_api_gateway_event(
+        headers=create_headers(),
+        query_string_parameters={
+            "subject:identifier": "https://fhir.nhs.uk/Id/nhs-number|6700028191",
+            "_summary": "count",
+        },
+    )
+
+    result = handler(event, create_mock_context())
+    body = result.pop("body")
+
+    assert result == {
+        "statusCode": "200",
+        "headers": default_response_headers(),
+        "isBase64Encoded": False,
+    }
+
+    parsed_body = json.loads(body)
+    assert parsed_body == {
+        "resourceType": "Bundle",
+        "type": "searchset",
+        "total": 1,
+        "link": [
+            {
+                "relation": "self",
+                "url": "https://pytest.api.service.nhs.uk/record-locator/consumer/FHIR/R4/DocumentReference?subject:identifier=https://fhir.nhs.uk/Id/nhs-number|6700028191&_summary=count",
+            }
+        ],
+    }
+
+
+@mock_aws
+@mock_repository
+@patch("api.consumer.searchDocumentReference.search_document_reference.logger")
+def test_search_document_reference_invalid_json(
+    mock_logger, repository: DocumentPointerRepository
+):
+    doc_ref = load_document_reference("Y05868-736253002-Valid")
+    doc_pointer = DocumentPointer.from_document_reference(doc_ref)
+    repository.create(doc_pointer)
+
+    doc_pointer_invalid = DocumentPointer.from_document_reference(doc_ref)
+    doc_pointer_invalid.id = "Y05868-11111-99999-999992"
+    doc_pointer_invalid.document = "invalid json"
+
+    repository.create(doc_pointer_invalid)
     event = create_test_api_gateway_event(
         headers=create_headers(),
         query_string_parameters={
@@ -576,13 +785,14 @@ def test_search_document_reference_invalid_json(repository: DocumentPointerRepos
     body = result.pop("body")
 
     assert result == {
-        "statusCode": "500",
+        "statusCode": "200",
         "headers": default_response_headers(),
         "isBase64Encoded": False,
     }
 
     parsed_body = json.loads(body)
-    assert parsed_body == {
+
+    expected_operation_outcome = {
         "resourceType": "OperationOutcome",
         "issue": [
             {
@@ -601,3 +811,23 @@ def test_search_document_reference_invalid_json(repository: DocumentPointerRepos
             }
         ],
     }
+
+    assert parsed_body == {
+        "resourceType": "Bundle",
+        "type": "searchset",
+        "link": [
+            {
+                "relation": "self",
+                "url": "https://pytest.api.service.nhs.uk/record-locator/consumer/FHIR/R4/DocumentReference?subject:identifier=https://fhir.nhs.uk/Id/nhs-number|6700028191",
+            }
+        ],
+        "total": 2,
+        "entry": [
+            {"resource": doc_ref.model_dump(exclude_none=True)},
+            {"resource": expected_operation_outcome},
+        ],
+    }
+
+    assert any(
+        call[0][0].name == "CONSEARCH005" for call in mock_logger.log.call_args_list
+    )

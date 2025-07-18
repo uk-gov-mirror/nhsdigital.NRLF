@@ -16,6 +16,8 @@ resource "aws_api_gateway_method" "capability" {
   resource_id   = aws_api_gateway_resource.capability.id
   http_method   = "GET"
   authorization = "NONE"
+
+  depends_on = [aws_api_gateway_resource.capability]
 }
 
 resource "aws_api_gateway_integration" "capability" {
@@ -50,9 +52,11 @@ resource "aws_api_gateway_deployment" "api_gateway_deployment" {
   rest_api_id = aws_api_gateway_rest_api.api_gateway_rest_api.id
 
   triggers = {
-    redeployment    = sha1(jsonencode(aws_api_gateway_rest_api.api_gateway_rest_api.body))
-    resource_change = "${md5(file("${path.module}/api_gateway.tf"))}"
-    capabilities    = sha1(var.capability_statement_content)
+    redeployment              = sha1(jsonencode(aws_api_gateway_rest_api.api_gateway_rest_api.body))
+    resource_change           = "${md5(file("${path.module}/api_gateway.tf"))}"
+    capabilities              = sha1(var.capability_statement_content)
+    head_responses_change     = md5(file("${path.module}/head_responses.tf"))
+    parent_api_gateway_change = md5(file("${path.module}/../../api_gateway.tf"))
   }
 
   lifecycle {
@@ -60,7 +64,13 @@ resource "aws_api_gateway_deployment" "api_gateway_deployment" {
   }
 
   depends_on = [
-    aws_api_gateway_rest_api.api_gateway_rest_api
+    aws_api_gateway_rest_api.api_gateway_rest_api,
+    aws_api_gateway_resource.capability,
+    aws_api_gateway_method.capability,
+    aws_api_gateway_integration.capability,
+    aws_api_gateway_method_response.capability_200,
+    aws_api_gateway_integration_response.capability,
+    aws_api_gateway_integration_response.head_integration_response
   ]
 }
 
@@ -112,6 +122,7 @@ resource "aws_api_gateway_method_settings" "api_gateway_method_settings" {
 
 resource "aws_api_gateway_gateway_response" "api_access_denied" {
   rest_api_id   = aws_api_gateway_rest_api.api_gateway_rest_api.id
+  status_code   = "403"
   response_type = "ACCESS_DENIED"
   response_templates = {
     "application/json" = jsonencode({

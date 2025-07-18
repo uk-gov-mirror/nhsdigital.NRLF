@@ -1,0 +1,9 @@
+variable "name_prefix" {}
+variable "instance_type" {}
+variable "security_groups" {}
+variable "subnet_id" {}
+variable "glue_kms_key_arn" {}
+variable "athena_kms_key_arn" {}
+variable "target_bucket_arn" {}
+variable "athena_bucket_arn" {}
+variable "use_custom_ami" {}

@@ -7,10 +7,6 @@ resource "aws_secretsmanager_secret" "backup_destination_parameters" {
   description = "Parameters used to configure the backup destination"
 }
 
-resource "aws_secretsmanager_secret" "notification_email_addresses" {
-  name = "${local.prefix}-dev-notification-email-addresses"
-}
-
 resource "aws_secretsmanager_secret" "dev_smoke_test_apigee_app" {
   name        = "${local.prefix}--dev--apigee-app--smoke-test"
   description = "APIGEE App used to run Smoke Tests against the DEV environment"
@@ -44,4 +40,13 @@ resource "aws_secretsmanager_secret" "dev_environment_configuration" {
 resource "aws_secretsmanager_secret" "devsandbox_environment_configuration" {
   name        = "${local.project}--dev-sandbox--env-config"
   description = "The environment configuration for the Dev Sandbox environment"
+}
+
+resource "aws_secretsmanager_secret" "powerbi_gw_instance_admin_pwd" {
+  name        = "${local.project}--dev-powerbi-gw-instance-admin-pwd"
+  description = "Admin password for the PowerBI Gateway EC2 instance"
+}
+resource "aws_secretsmanager_secret" "powerbi_gw_recovery_key" {
+  name        = "${local.project}--dev-powerbi-gw-recovery-key"
+  description = "Recovery key for the PowerBI Gateway EC2 instance"
 }

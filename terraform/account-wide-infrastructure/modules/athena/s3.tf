@@ -26,6 +26,23 @@ resource "aws_s3_bucket_policy" "athena" {
           }
         }
       },
+      {
+        Sid : "AllowAthenaAccess",
+        Effect : "Allow",
+        Principal : {
+          Service : "athena.amazonaws.com"
+        },
+        Action : [
+          "s3:PutObject",
+          "s3:GetBucketLocation",
+          "s3:GetObject",
+          "s3:ListBucket"
+        ],
+        Resource : [
+          aws_s3_bucket.athena.arn,
+          "${aws_s3_bucket.athena.arn}/*",
+        ]
+      },
     ]
   })
 }

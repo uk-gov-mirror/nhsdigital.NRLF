@@ -11,7 +11,7 @@ module "consumer__readDocumentReference" {
     PREFIX               = "${local.prefix}--"
     ENVIRONMENT          = local.environment
     POWERTOOLS_LOG_LEVEL = local.log_level
-    SPLUNK_INDEX         = module.firehose__processor.splunk.index
+    SPLUNK_INDEX         = local.splunk_index
     AUTH_STORE           = local.auth_store_id
     TABLE_NAME           = local.pointers_table_name
   }
@@ -22,33 +22,6 @@ module "consumer__readDocumentReference" {
   ]
   firehose_subscriptions = local.firehose_lambda_subscriptions
   handler                = "read_document_reference.handler"
-  retention              = var.log_retention_period
-}
-
-module "consumer__countDocumentReference" {
-  source                 = "./modules/lambda"
-  parent_path            = "api/consumer"
-  name                   = "countDocumentReference"
-  region                 = local.region
-  prefix                 = local.prefix
-  layers                 = [module.nrlf.layer_arn, module.third_party.layer_arn, module.nrlf_permissions.layer_arn]
-  api_gateway_source_arn = ["arn:aws:execute-api:${local.region}:${local.aws_account_id}:${module.consumer__gateway.api_gateway_id}/*/GET/DocumentReference/_count"]
-  kms_key_id             = module.kms__cloudwatch.kms_arn
-  environment_variables = {
-    PREFIX               = "${local.prefix}--"
-    ENVIRONMENT          = local.environment
-    AUTH_STORE           = local.auth_store_id
-    POWERTOOLS_LOG_LEVEL = local.log_level
-    SPLUNK_INDEX         = module.firehose__processor.splunk.index
-    TABLE_NAME           = local.pointers_table_name
-  }
-  additional_policies = [
-    local.pointers_table_read_policy_arn,
-    local.pointers_kms_read_write_arn,
-    local.auth_store_read_policy_arn
-  ]
-  firehose_subscriptions = local.firehose_lambda_subscriptions
-  handler                = "count_document_reference.handler"
   retention              = var.log_retention_period
 }
 
@@ -66,7 +39,7 @@ module "consumer__searchDocumentReference" {
     ENVIRONMENT          = local.environment
     AUTH_STORE           = local.auth_store_id
     POWERTOOLS_LOG_LEVEL = local.log_level
-    SPLUNK_INDEX         = module.firehose__processor.splunk.index
+    SPLUNK_INDEX         = local.splunk_index
     TABLE_NAME           = local.pointers_table_name
   }
   additional_policies = [
@@ -93,7 +66,7 @@ module "consumer__searchPostDocumentReference" {
     ENVIRONMENT          = local.environment
     AUTH_STORE           = local.auth_store_id
     POWERTOOLS_LOG_LEVEL = local.log_level
-    SPLUNK_INDEX         = module.firehose__processor.splunk.index
+    SPLUNK_INDEX         = local.splunk_index
     TABLE_NAME           = local.pointers_table_name
   }
   additional_policies = [
@@ -119,7 +92,7 @@ module "producer__createDocumentReference" {
     PREFIX               = "${local.prefix}--"
     ENVIRONMENT          = local.environment
     AUTH_STORE           = local.auth_store_id
-    SPLUNK_INDEX         = module.firehose__processor.splunk.index
+    SPLUNK_INDEX         = local.splunk_index
     POWERTOOLS_LOG_LEVEL = local.log_level
     TABLE_NAME           = local.pointers_table_name
   }
@@ -148,7 +121,7 @@ module "producer__deleteDocumentReference" {
     ENVIRONMENT          = local.environment
     AUTH_STORE           = local.auth_store_id
     POWERTOOLS_LOG_LEVEL = local.log_level
-    SPLUNK_INDEX         = module.firehose__processor.splunk.index
+    SPLUNK_INDEX         = local.splunk_index
     TABLE_NAME           = local.pointers_table_name
   }
   additional_policies = [
@@ -176,7 +149,7 @@ module "producer__readDocumentReference" {
     ENVIRONMENT          = local.environment
     AUTH_STORE           = local.auth_store_id
     POWERTOOLS_LOG_LEVEL = local.log_level
-    SPLUNK_INDEX         = module.firehose__processor.splunk.index
+    SPLUNK_INDEX         = local.splunk_index
     TABLE_NAME           = local.pointers_table_name
   }
   additional_policies = [
@@ -203,7 +176,7 @@ module "producer__searchDocumentReference" {
     ENVIRONMENT          = local.environment
     AUTH_STORE           = local.auth_store_id
     POWERTOOLS_LOG_LEVEL = local.log_level
-    SPLUNK_INDEX         = module.firehose__processor.splunk.index
+    SPLUNK_INDEX         = local.splunk_index
     TABLE_NAME           = local.pointers_table_name
   }
   additional_policies = [
@@ -230,7 +203,7 @@ module "producer__searchPostDocumentReference" {
     ENVIRONMENT          = local.environment
     AUTH_STORE           = local.auth_store_id
     POWERTOOLS_LOG_LEVEL = local.log_level
-    SPLUNK_INDEX         = module.firehose__processor.splunk.index
+    SPLUNK_INDEX         = local.splunk_index
     TABLE_NAME           = local.pointers_table_name
   }
   additional_policies = [
@@ -257,7 +230,7 @@ module "producer__updateDocumentReference" {
     ENVIRONMENT          = local.environment
     AUTH_STORE           = local.auth_store_id
     POWERTOOLS_LOG_LEVEL = local.log_level
-    SPLUNK_INDEX         = module.firehose__processor.splunk.index
+    SPLUNK_INDEX         = local.splunk_index
     TABLE_NAME           = local.pointers_table_name
   }
   additional_policies = [
@@ -285,7 +258,7 @@ module "producer__upsertDocumentReference" {
     ENVIRONMENT          = local.environment
     AUTH_STORE           = local.auth_store_id
     POWERTOOLS_LOG_LEVEL = local.log_level
-    SPLUNK_INDEX         = module.firehose__processor.splunk.index
+    SPLUNK_INDEX         = local.splunk_index
     TABLE_NAME           = local.pointers_table_name
   }
   additional_policies = [
@@ -313,7 +286,7 @@ module "consumer__status" {
     ENVIRONMENT          = local.environment
     AUTH_STORE           = local.auth_store_id
     POWERTOOLS_LOG_LEVEL = local.log_level
-    SPLUNK_INDEX         = module.firehose__processor.splunk.index
+    SPLUNK_INDEX         = local.splunk_index
     DYNAMODB_TIMEOUT     = local.dynamodb_timeout_seconds
     TABLE_NAME           = local.pointers_table_name
   }
@@ -322,7 +295,7 @@ module "consumer__status" {
     local.pointers_kms_read_write_arn,
     local.auth_store_read_policy_arn
   ]
-  firehose_subscriptions = local.firehose_lambda_subscriptions
+  firehose_subscriptions = local.firehost_lambda_splunk_only_subscription
   handler                = "status.handler"
   retention              = var.log_retention_period
 }
@@ -342,7 +315,7 @@ module "producer__status" {
     ENVIRONMENT          = local.environment
     AUTH_STORE           = local.auth_store_id
     POWERTOOLS_LOG_LEVEL = local.log_level
-    SPLUNK_INDEX         = module.firehose__processor.splunk.index
+    SPLUNK_INDEX         = local.splunk_index
     DYNAMODB_TIMEOUT     = local.dynamodb_timeout_seconds
     TABLE_NAME           = local.pointers_table_name
   }
@@ -351,7 +324,7 @@ module "producer__status" {
     local.pointers_kms_read_write_arn,
     local.auth_store_read_policy_arn
   ]
-  firehose_subscriptions = local.firehose_lambda_subscriptions
+  firehose_subscriptions = local.firehost_lambda_splunk_only_subscription
   handler                = "status.handler"
   retention              = var.log_retention_period
 }

@@ -124,6 +124,37 @@ $ terraform apply \
 
 Replacing AWS_ACCOUNT_ID with the AWS account number of your account.
 
+### Reporting Resources
+
+To enable reporting resources for the account, do the following:
+
+1. Set the `enable_reporting` variable to `true` in `./ACCOUNT_NAME/vars.tf`
+2. Deploy the account-wide infrastructure to the account
+
+To disable reporting resources for the account, do the following:
+
+1. Set the `enable_reporting` variable to `true` in `./ACCOUNT_NAME/vars.tf`
+2. Deploy the account-wide infrastructure to the account
+
+#### Deploy the PowerBI Gateway
+
+The first time you deploy the PowerBI Gateway to an AWS account you need to create, install and configure a gateway image. Instruction on how to do this can be found in [KOP-NRLF-012](https://nhsd-confluence.digital.nhs.uk/x/8BXXQg).
+
+To enable the PowerBI Gateway in the account:
+
+1. Set the `enable_powerbi_auto_push` variable to `true` in `./ACCOUNT_NAME/vars.tf`
+2. Deploy the account-wide infrastructure to the account
+3. Access the EC2 Serial Console for the instance and run this command to start the PowerBI Gateway:
+
+```
+Start-Service -Name "PBIEgwService"
+```
+
+To disable the PowerBI Gateway from the account:
+
+1. Set the `enable_powerbi_auto_push` variable to `false` in `./ACCOUNT_NAME/vars.tf`
+2. Deploy the account-wide infrastructure to the account
+
 ## Tear down account wide resources
 
 WARNING - This action will destroy all account-wide resources from the AWS account. This should

@@ -8,7 +8,7 @@ This project uses the `Makefile` to build, test and deploy. This will ensure tha
 
 ## Table of Contents
 
-- [Setup](#setup)
+- [Before You Begin](#before-you-begin)
 - [Getting Started](#getting-started)
 - [Deploying](#deploying)
 - [Feature Tests](#feature-tests)
@@ -16,239 +16,51 @@ This project uses the `Makefile` to build, test and deploy. This will ensure tha
 - [Route53 & Hosted Zones](#route53--hosted-zones)
 - [Sandbox](#sandbox)
 - [Releases](#releases)
+- [Reports](#reports)
 
-## Setup
+## Before You Begin
 
-Before you tackle this guide, there are some more instructions here on the [Developer onboarding guide](https://nhsd-confluence.digital.nhs.uk/pages/viewpage.action?spaceKey=CLP&title=NRLF+-+Developer+Onboarding) in confluence
+Before you start using this repository, you will need to:
 
-### 1. Prerequisites
+- Follow the instructions on the [Developer Onboarding Guide](https://nhsd-confluence.digital.nhs.uk/pages/viewpage.action?spaceKey=CLP&title=NRLF+-+Developer+Onboarding) in confluence
+- Install `asdf` using https://asdf-vm.com/guide/getting-started.html
 
-#### 1. ASDF Tool Manager
+Confirm `asdf` is installed and is working with:
 
-For an easy way to make sure your local system matches the requirements needed you can use `asdf tool manager`. This tool fetches the required versions of the libraries needed and sets the directory to use that version instead of your system's default version. To get it up and running,
-
-- Install `asdf` using the instructions given here. https://asdf-vm.com/guide/getting-started.html. You can check it installed properly by using the command `asdf --version`
-- Install the dependencies using: `$ make asdf-install`
-- You should be good to go.
-
-#### 2. If you prefer to get your local machine running manually the requirements are...
-
-- [poetry](https://python-poetry.org/docs/) (this repository uses poetry ^1.5.1)
-- [pyenv](https://github.com/pyenv/pyenv) (this repository uses python ^3.9.15)
-- jq
-- terraform
-- [tfenv](https://github.com/tfutils/tfenv)
-- coreutils
-
-Swagger generation requirements.
-
-- curl
-- java runtime environment (jre) - https://www.oracle.com/java/technologies/downloads/#jdk19-mac
-- yq v4
-
-### 2. WSL and PowerShell installation
-
-If you are using Linux machine, please skip this section and go to [Linux set up](#3-linux-set-up)
-
-This section will provide guidance on how to install the latest version of PowerShell and set up the Windows Subsystem for Linux (WSL) on your Windows machine.
-
-PowerShell is a powerful command-line shell and scripting language, while WSL allows you to run a Linux distribution alongside your Windows installation.
-
-If you wish to use the official guidance, links are below:
-
-- PowerShell - https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell?view=powershell-7.3
-- WSL - https://learn.microsoft.com/en-us/windows/wsl/install
-
-#### Step 1: Install PowerShell
-
-1. Open a web browser and go to the official PowerShell GitHub releases page: https://github.com/PowerShell/PowerShell/releases.
-
-2. Scroll down to the "Assets" section and find the latest stable release for your system architecture (usually x64 for 64-bit systems). Download the installer package with the "msi" extension.
-
-3. Run the downloaded MSI installer file.
-
-4. Follow the on-screen instructions to install PowerShell. Make sure to select the "Add to PATH" option during installation so that you can easily access PowerShell from the command line.
-
-5. Once the installation is complete, open a new Command Prompt or PowerShell window to verify that PowerShell is installed. You can do this by typing `powershell` and pressing Enter.
-
-#### Step 2: Install Windows Subsystem for Linux (WSL)
-
-1. Open PowerShell as an administrator. To do this, search for "PowerShell" in the Windows Start menu, right-click on "Windows PowerShell," and select "Run as administrator."
-
-2. Run the following command to enable the WSL feature:
-   ```shell
-   dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
-   ```
-3. After the feature is enabled, restart your computer by running:
-   ```shell
-   Restart-Computer
-   ```
-4. After your computer restarts, open PowerShell as an administrator again and run the following command to download and install a Linux distribution of your choice (e.g., Ubuntu):
-   ```shell
-   wsl --install
-   ```
-5. During the installation process, you will be prompted to create a user and set a password for your Linux distribution.
-
-6. Once the installation is complete, you can launch your installed Linux distribution by running:
-
-   ```shell
-   wsl
-   ```
-
-   To run a specific wsl distribution from within PowerShell or Windows Command Prompt without changing your default distribution:
-
-   use the command: `wsl -d <DistributionName>` , replacing `<DistributionName>` with the name of the distribution you want to use.
-
-#### Step 3: Verify Your Installation
-
-1. To verify that PowerShell and WSL are correctly installed, open a new PowerShell window (WSL not running) and run the following commands:
-
-   Check PowerShell version
-
-   ```shell
-   $PSVersionTable.PSVersion
-   ```
-
-   Check WSL distribution list
-
-   ```shell
-   wsl --list
-   ```
-
-   These commands should display the PowerShell version and list the installed WSL distributions.
-
-### 3. Manually setting up Linux
-
-If you're on Linux/WSL and using ASDF, you can skip these steps.
-
-For those on a linux/WSL setup these are some helpful instructions:
-
-- We recommend that you use the NRLF with VSCode and WSL rather than the Spine VM
-- There is also a plugin for VSCode called `WSL` which will help you avoid some terminal issues when opening projects in WSL
-
-#### 1. Java:
-
-```shell
-sudo apt install default-jre
+```
+asdf --version
 ```
 
-#### 2. Poetry:
+Then install all the dependency packages with:
 
-```shell
-curl -sSL https://install.python-poetry.org | python3
 ```
-
-```shell
-nano ~/.bashrc
-```
-
-add to bashrc - spineVM home dir is "/home/spineii-user/"
-
-```shell
-export PATH="/$HOME/.local/bin:$PATH"
-```
-
-```shell
-source ~/.bashrc
-```
-
-```shell
-poetry --version
-```
-
-#### 3. pyenv:
-
-```shell
-sudo apt-get update; sudo apt-get install make build-essential libssl-dev zlib1g-dev \
-libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
-libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
-```
-
-```shell
-curl https://pyenv.run | bash
-```
-
-```shell
-nano ~/.bashrc
-```
-
-add to bashrc
-
-```shell
-export PATH="$HOME/.pyenv/bin:$PATH"
-eval "$(pyenv init --path)"
-eval "$(pyenv virtualenv-init -)"
-```
-
-```shell
-source ~/.bashrc
-```
-
-```shell
-pyenv --version
-```
-
-#### 4. terraform
-
-```shell
-wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg
-```
-
-```shell
-echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-```
-
-```shell
-sudo apt update && sudo apt install terraform
-```
-
-#### 5. yq:
-
-```shell
-sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq && sudo chmod +rx /usr/bin/yq
-```
-
-### 4. Install python dependencies
-
-At the root of the repo, run:
-
-```shell
-poetry install
-poetry shell
 make configure
 ```
-
-NOTE
-
-- You will know if you are correctly in the shell when you see the following before your command line prompt `(nrlf-api-py3.11)` (the version may change based on the version of python)
-- If it says (.venv) then you are not using the correct virtual environment
-- As mentioned above you at least need Python 3.9 installed globally to run the project, Poetry will handle the rest
-- The terraform version can be found in the .terraform-version file at the root
 
 ## Getting Started
 
 To build packages:
 
 ```
-$ make
+make
 ```
 
 To run the linters over your changes:
 
 ```
-$ make lint
+make lint
 ```
 
 To run the unit tests:
 
 ```
-$ make test
+make test
 ```
 
 To run the local feature tests:
 
 ```
-$ make test-features
+make test-features
 ```
 
 ### Troubleshooting
@@ -256,7 +68,7 @@ $ make test-features
 To check your environment:
 
 ```
-$ make check
+make check
 ```
 
 this will provide a report of the dependencies in your environment and should highlight the things that are not configured correctly or things that are missing.
@@ -268,34 +80,34 @@ For the integration tests, you need to have deployed your infrastructure (using 
 To run integration tests:
 
 ```
-$ make test-integration
+make test-integration
 ```
 
 To run the Firehose integration tests:
 
 ```
-$ make test-firehose-integration
+make test-firehose-integration
 ```
 
 To run all the feature integration tests:
 
 ```
-$ make test-features-integration
+make test-features-integration
 ```
 
 To run indivudal feature test scenario(s) using the custom tag :
 
-1. Add "@custom_tag" before each 'Scenario' that needs to be run (in each .feature file)
+1. Add `@custom_tag` before each 'Scenario' that needs to be run (in each .feature file)
 2. Run the command below:
 
 ```
-$ make integration-test-with-custom_tag
+make integration-test-with-custom_tag
 ```
 
 To run all the feature integration tests and generate an interactive Allure report therafter :
 
 ```
-$ make test-features-integration-report
+make test-features-integration-report
 ```
 
 ### Smoke testing
@@ -305,28 +117,28 @@ For smoke tests, you need to have deployed your infrastructure (using Terraform)
 Before the first run of the smoke tests, you need to set the required permissions in your deployment. You can do this by running:
 
 ```
-$ make set-smoketest-perms
+make set-smoketest-perms
 ```
 
 To run the internal smoke tests against your stack, do this:
 
 ```
-$ make test-smoke-internal
+make test-smoke-internal
 ```
 
 To run the smoke tests against the public access endpoints (via APIGEE proxies), do this:
 
 ```
-$ make test-smoke-public
+make test-smoke-public
 ```
 
 ## API Documentation
 
 If the API changes, the API documentation needs to be updated in the appropriate API repo. This is done by making changes to the API specification `.yaml` files in each repo.
 
-For Consumer API changes, update (NRL Consumer API - consumer.yaml)[https://github.com/NHSDigital/nrl-consumer-api/blob/master/specification/record-locator/consumer.yaml]
+For Consumer API changes, update [NRL Consumer API - consumer.yaml](https://github.com/NHSDigital/nrl-consumer-api/blob/master/specification/record-locator/consumer.yaml)
 
-For Producer API changes, update (NRL Producer API - producer.yaml)[https://github.com/NHSDigital/nrl-producer-api/blob/master/specification/record-locator/producer.yaml]
+For Producer API changes, update [NRL Producer API - producer.yaml](https://github.com/NHSDigital/nrl-producer-api/blob/master/specification/record-locator/producer.yaml)
 
 Changes to the files in those repos will be reflected when each one is released. See the documentation in each repo for this process.
 
@@ -391,7 +203,7 @@ Clients must provide OAuth access tokens when making requests to the NRLF APIs.
 To create an access token for the dev environment, you can do the following:
 
 ```
-$ make get-access-token
+make get-access-token
 ```
 
 To create an access token for another environment:
@@ -494,14 +306,14 @@ The process to create a new release is as follows:
 4. Press "Generate release notes" button. This will populate the description with everything that's changed since the last release.
 5. Enter the version of the release into the Release Title field, say `v3.0.1`
 6. Arrange and update the description to accuruately represent the highlights of the release.
-7. Make sure the "Set as the latest release" checkbox it set
+7. Make sure the "Set as a pre-release" checkbox it set
 8. Press the "Publish release" button to complete the release process
 
-Once your new release has been created, you can then deploy this release through the NRLF environments using the "Persistent Environment Deploy" Github Action.
+Once your new release has been created, you can then deploy this release through the NRLF environments using the "Persistent Environment Deploy" Github Action. Once your release has been deployed to prod, edit the release and set the "Set as the latest release" checkbox.
 
-If the Consumer API has changed, or the documentation for that API has changed, you will also need to release (NRL Consumer API)[https://github.com/NHSDigital/nrl-consumer-api].
+If the Consumer API has changed, or the documentation for that API has changed, you will also need to release [NRL Consumer API](https://github.com/NHSDigital/nrl-consumer-api).
 
-If the Producer API has changed, or the documentation for that API has changed, you will also need to release (NRL Producer API)[https://github.com/NHSDigital/nrl-producer-api].
+If the Producer API has changed, or the documentation for that API has changed, you will also need to release [NRL Producer API](https://github.com/NHSDigital/nrl-producer-api).
 
 ### Deploying releases
 

@@ -1,4 +1,5 @@
 import json
+from unittest.mock import patch
 
 from moto import mock_aws
 
@@ -474,19 +475,26 @@ def test_search_document_reference_filters_by_pointer_types(
 
 @mock_aws
 @mock_repository
-def test_search_post_document_reference_invalid_json(
+@patch("api.producer.searchPostDocumentReference.search_post_document_reference.logger")
+def test_search_post_document_reference_invalid_json_adds_operation_outcome(
+    mock_logger,
     repository: DocumentPointerRepository,
 ):
     doc_ref = load_document_reference("Y05868-736253002-Valid")
     doc_pointer = DocumentPointer.from_document_reference(doc_ref)
-    doc_pointer.document = "invalid json"
-
     repository.create(doc_pointer)
 
+    doc_pointer_invalid = DocumentPointer.from_document_reference(doc_ref)
+    doc_pointer_invalid.id = "Y05868-11111-99999-999992"
+    doc_pointer_invalid.document = "invalid json"
+
+    repository.create(doc_pointer_invalid)
     event = create_test_api_gateway_event(
         headers=create_headers(),
         body=json.dumps(
-            {"subject:identifier": "https://fhir.nhs.uk/Id/nhs-number|6700028191"}
+            {
+                "subject:identifier": "https://fhir.nhs.uk/Id/nhs-number|6700028191",
+            }
         ),
     )
 
@@ -494,13 +502,14 @@ def test_search_post_document_reference_invalid_json(
     body = result.pop("body")
 
     assert result == {
-        "statusCode": "500",
+        "statusCode": "200",
         "headers": default_response_headers(),
         "isBase64Encoded": False,
     }
 
     parsed_body = json.loads(body)
-    assert parsed_body == {
+
+    expected_operation_outcome = {
         "resourceType": "OperationOutcome",
         "issue": [
             {
@@ -519,3 +528,17 @@ def test_search_post_document_reference_invalid_json(
             }
         ],
     }
+
+    assert parsed_body == {
+        "resourceType": "Bundle",
+        "type": "searchset",
+        "total": 2,
+        "entry": [
+            {"resource": doc_ref.model_dump(exclude_none=True)},
+            {"resource": expected_operation_outcome},
+        ],
+    }
+
+    assert any(
+        call[0][0].name == "PROPOSTSEARCH005" for call in mock_logger.log.call_args_list
+    )

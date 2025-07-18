@@ -4,5 +4,5 @@ locals {
   environment = terraform.workspace
   prefix      = "${local.project}--${local.environment}"
 
-  notification_emails = nonsensitive(toset(tolist(jsondecode(data.aws_secretsmanager_secret_version.emails.secret_string))))
+  notification_emails = tolist(jsondecode(data.aws_secretsmanager_secret_version.emails.secret_string))
 }

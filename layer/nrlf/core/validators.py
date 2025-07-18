@@ -7,7 +7,9 @@ from pydantic import ValidationError
 from nrlf.consumer.fhir.r4.model import RequestQueryCategory
 from nrlf.core.codes import SpineErrorConcept
 from nrlf.core.constants import (
+    ATTACHMENT_CONTENT_TYPES,
     CATEGORY_ATTRIBUTES,
+    CONTENT_FORMAT_CODE_MAP,
     ODS_SYSTEM,
     PRACTICE_SETTING_VALUE_SET_URL,
     REQUIRED_CREATE_FIELDS,
@@ -483,6 +485,21 @@ class DocumentReferenceValidator:
                     diagnostics=f"Invalid content format code: {content.format.code} format code must be 'urn:nhs-ic:unstructured' for Unstructured Document attachments.",
                     field=f"content[{i}].format.code",
                 )
+            elif (
+                content.attachment.contentType
+                in {
+                    "application/json",
+                    "application/fhir+json",
+                    "application/json+fhir",
+                }
+                and content.format.code != "urn:nhs-ic:structured"
+            ):
+                self.result.add_error(
+                    issue_code="business-rule",
+                    error_code="UNPROCESSABLE_ENTITY",
+                    diagnostics=f"Invalid content format code: {content.format.code} format code must be 'urn:nhs-ic:structured' for Structured Document attachments.",
+                    field=f"content[{i}].format.code",
+                )
 
     def _validate_content_extension(self, model: DocumentReference):
         """
@@ -613,28 +630,23 @@ class DocumentReferenceValidator:
 
     def _validate_content(self, model: DocumentReference):
         """
-        Validate that the contentType is present and is either 'application/pdf' or 'text/html'.
+        Validate that the contentType is present and supported.
         """
         logger.log(LogReference.VALIDATOR001, step="content")
 
-        format_code_display_map = {
-            "urn:nhs-ic:record-contact": "Contact details (HTTP Unsecured)",
-            "urn:nhs-ic:unstructured": "Unstructured Document",
-        }
-
         for i, content in enumerate(model.content):
-            if content.attachment.contentType not in ["application/pdf", "text/html"]:
+            if content.attachment.contentType not in ATTACHMENT_CONTENT_TYPES:
                 self.result.add_error(
                     issue_code="business-rule",
                     error_code="UNPROCESSABLE_ENTITY",
-                    diagnostics=f"Invalid contentType: {content.attachment.contentType}. Must be 'application/pdf' or 'text/html'",
+                    diagnostics=f"Invalid contentType: {content.attachment.contentType}. Must be 'application/pdf', 'text/html' or 'application/fhir+json'",
                     field=f"content[{i}].attachment.contentType",
                 )
 
             # Validate NRLFormatCode
             format_code = content.format.code
             format_display = content.format.display
-            expected_display = format_code_display_map.get(format_code)
+            expected_display = CONTENT_FORMAT_CODE_MAP.get(format_code)
             if expected_display and format_display != expected_display:
                 self.result.add_error(
                     issue_code="business-rule",

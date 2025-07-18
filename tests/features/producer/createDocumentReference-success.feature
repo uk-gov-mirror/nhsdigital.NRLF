@@ -223,6 +223,10 @@ Feature: Producer - createDocumentReference - Success Scenarios
       | pointer-type    | pointer-category | type-name      |
       | 824321000000109 | 823651000000106  | SUMMARY_RECORD |
 
+    Examples: Record Artifacts
+      | pointer-type    | pointer-category | type-name   |
+      | 749001000000101 | 419891008        | APPOINTMENT |
+
   # Create with content and contact details
   # Create with contact details only
   # Create with multiple attachments
@@ -319,3 +323,56 @@ Feature: Producer - createDocumentReference - Success Scenarios
       | custodian   | ANGY1                          |
       | author      | HAR1                           |
       | url         | https://example.org/my-doc.pdf |
+
+  Scenario Outline: Successfully create a BaRS Appointment pointer
+    Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
+    And the organisation 'BARS1' is authorised to access pointer types:
+      | system                 | value           |
+      | http://snomed.info/sct | 749001000000101 |
+    When producer 'BARS1' creates a DocumentReference with values:
+      | property        | value                         |
+      | subject         | 9278693472                    |
+      | status          | current                       |
+      | type            | 749001000000101               |
+      | category        | 419891008                     |
+      | custodian       | BARS1                         |
+      | author          | HAR0                          |
+      | url             | https://example.org/appt-link |
+      | practiceSetting | 394802001                     |
+      | contentType     | application/json+fhir         |
+      | formatCode      | urn:nhs-ic:structured         |
+      | formatDisplay   | Structured Document           |
+    Then the response status code is 201
+    And the response is an OperationOutcome with 1 issue
+    And the OperationOutcome contains the issue:
+      """
+      {
+      "severity": "information",
+      "code": "informational",
+      "details": {
+      "coding": [
+      {
+      "system": "https://fhir.nhs.uk/ValueSet/NRL-ResponseCode",
+      "code": "RESOURCE_CREATED",
+      "display": "Resource created"
+      }
+      ]
+      },
+      "diagnostics": "The document has been created"
+      }
+      """
+    And the response has a Location header
+    And the Location header starts with '/producer/FHIR/R4/DocumentReference/ANGY1-'
+    And the resource in the Location header exists with values:
+      | property        | value                         |
+      | subject         | 9278693472                    |
+      | status          | current                       |
+      | type            | 749001000000101               |
+      | category        | 419891008                     |
+      | custodian       | BARS1                         |
+      | author          | HAR0                          |
+      | url             | https://example.org/appt-link |
+      | practiceSetting | 394802001                     |
+      | contentType     | application/json+fhir         |
+      | formatCode      | urn:nhs-ic:structured         |
+      | formatDisplay   | Structured Document           |
