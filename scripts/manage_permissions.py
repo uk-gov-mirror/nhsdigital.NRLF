@@ -73,11 +73,11 @@ def list_apps() -> None:
     List all applications in the NRL environment.
     """
     keys = _list_s3_keys("")
-    apps = set([key.split("/")[0] for key in keys])
+    apps = {key.split("/")[0] for key in keys}
 
     if not apps:
         print("No applications found in the bucket.")
-        return []
+        return
 
     print(f"There are {len(apps)} apps in {nrl_env} env:")
     for app in apps:
@@ -110,7 +110,7 @@ def list_allowed_types() -> None:
     print("The following pointer-types are allowed:")
 
     for pointer_type, attributes in TYPE_ATTRIBUTES.items():
-        print(f"- %-45s (%s)" % (pointer_type, attributes["display"][:45]))
+        print("- %-45s (%s)" % (pointer_type, attributes["display"][:45]))
 
 
 def show_perms(app_id: str, org_ods: str) -> None:
@@ -212,6 +212,28 @@ def clear_perms(app_id: str, org_ods: str) -> None:
     Clear permissions for an application and organization.
     This will remove all permissions for the specified app and org.
     """
+    if COMPARE_AND_CONFIRM:
+        current_perms = _get_perms_from_s3(f"{app_id}/{org_ods}.json")
+        if not current_perms or current_perms == "[]":
+            print(
+                f"No need to clear permissions for {app_id}/{org_ods} as it currently has no permissions set."
+            )
+            return
+
+        print()
+        print(f"Current permissions for {app_id}/{org_ods}:")
+        print(current_perms)
+
+        print()
+        confirm = (
+            input("Are you SURE you want to clear these permissions? (yes/NO): ")
+            .strip()
+            .lower()
+        )
+        if confirm != "yes":
+            print("Operation cancelled at user request.")
+            return
+
     s3 = _get_s3_client()
     s3.put_object(
         Bucket=nrl_auth_bucket_name,
