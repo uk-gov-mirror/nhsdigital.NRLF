@@ -59,6 +59,7 @@ resource "aws_glue_crawler" "log_crawler" {
     }
   })
 }
+
 resource "aws_glue_trigger" "log_trigger" {
   count = var.is_enabled ? 1 : 0
 
@@ -66,6 +67,18 @@ resource "aws_glue_trigger" "log_trigger" {
   type = "ON_DEMAND"
   actions {
     crawler_name = aws_glue_crawler.log_crawler[0].name
+  }
+}
+
+resource "aws_glue_trigger" "glue_trigger" {
+  count = var.schedule && var.is_enabled ? 1 : 0
+
+  name     = "${var.name_prefix}-glue-trigger"
+  type     = "SCHEDULED"
+  schedule = "cron(0 0 1 * * *)"
+
+  actions {
+    crawler_name = aws_glue_crawler.glue_job[0].name
   }
 }
 
