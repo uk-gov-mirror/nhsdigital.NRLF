@@ -112,9 +112,9 @@ module "source" {
     "enable" : true,
     "rules" : [
       {
-        "copy_action" : {
+        "copy_action" : [{
           "delete_after" : 4
-        },
+        }],
         "lifecycle" : {
           "delete_after" : 2
         },
@@ -134,9 +134,9 @@ module "source" {
       {
         "name" : "daily",
         "schedule" : "cron(0 0 * * ? *)",
-        "copy_action" : {
+        "copy_action" : [{
           "delete_after" : 4
-        },
+        }],
 
         "lifecycle" : {
           "delete_after" : 2
@@ -145,10 +145,10 @@ module "source" {
       {
         "name" : "monthly"
         "schedule" : "cron(30 0 * * 4#1)" # first Thursday each month from 00:30
-        "copy_action" : {
+        "copy_action" : [{
           "cold_storage_after" : 3,
           "delete_after" : 100 # ensures there will always be min 3
-        },
+        }],
         "lifecycle" : {
           "delete_after" : 2
         }
@@ -157,10 +157,10 @@ module "source" {
       {
         "name" : "weekly"               # overlaps with monthly
         "schedule" : "cron(30 0 * * 4)" # every Thursday from 00:30 to precede releases
-        "copy_action" : {
+        "copy_action" : [{
           "cold_storage_after" : 14 # ensures 2 warm including one from previous release
           "delete_after" : 100
-        },
+        }],
         "lifecycle" : {
           "delete_after" : 2
         }

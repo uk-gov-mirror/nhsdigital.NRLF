@@ -17,11 +17,11 @@ resource "aws_backup_plan" "default" {
         cold_storage_after = rule.value.lifecycle.cold_storage_after != null ? rule.value.lifecycle.cold_storage_after : null
       }
       dynamic "copy_action" {
-        for_each = rule.value.copy_action != null ? rule.value.copy_action : {}
+        for_each = rule.value.copy_action
         content {
           lifecycle {
-            delete_after       = copy_action.value.lifecycle.delete_after
-            cold_storage_after = copy_action.value.lifecycle.cold_storage_after
+            delete_after       = copy_action.value.delete_after
+            cold_storage_after = copy_action.value.cold_storage_after != null ? copy_action.value.cold_storage_after : null
           }
           destination_vault_arn = var.backup_copy_vault_arn
         }
