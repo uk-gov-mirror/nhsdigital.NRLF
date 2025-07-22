@@ -35,7 +35,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
         "details": {
             "coding": [
             {
-                "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                 "code": "UNPROCESSABLE_ENTITY",
                 "display": "Unprocessable Entity"
             }
@@ -74,7 +74,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
   # "details": {
   # "coding": [
   # {
-  # "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+  # "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
   # "code": "BAD_REQUEST",
   # "display": "Bad request"
   # }
@@ -107,7 +107,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
         "details": {
             "coding": [
             {
-                "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                 "code": "UNPROCESSABLE_ENTITY",
                 "display": "Unprocessable Entity"
             }
@@ -144,7 +144,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
         "details": {
             "coding": [
             {
-                "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                 "code": "UNPROCESSABLE_ENTITY",
                 "display": "Unprocessable Entity"
             }
@@ -181,7 +181,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
         "details": {
             "coding": [
             {
-                "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                 "code": "UNPROCESSABLE_ENTITY",
                 "display": "Unprocessable Entity"
             }
@@ -232,7 +232,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
         "details": {
             "coding": [
               {
-                "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                 "code": "UNPROCESSABLE_ENTITY",
                 "display": "Unprocessable Entity"
               }
@@ -282,7 +282,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
         "details": {
           "coding": [
             {
-              "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+              "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
               "code": "ACCESS DENIED",
               "display": "Access has been denied to process this request"
             }
@@ -317,7 +317,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
         "details": {
         "coding": [
         {
-        "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+        "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
         "code": "MESSAGE_NOT_WELL_FORMED",
         "display": "Message not well formed"
         }
@@ -354,7 +354,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
         "details": {
           "coding": [
             {
-              "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+              "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
               "code": "AUTHOR_CREDENTIALS_ERROR",
               "display": "Author credentials error"
             }
@@ -392,7 +392,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
         "details": {
         "coding": [
         {
-        "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+        "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
         "code": "UNPROCESSABLE_ENTITY",
         "display": "Unprocessable Entity"
         }
@@ -451,7 +451,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
         "details": {
           "coding": [
             {
-              "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+              "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
               "code": "UNPROCESSABLE_ENTITY",
               "display": "Unprocessable Entity"
             }
@@ -514,7 +514,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
         "details": {
           "coding": [
             {
-              "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+              "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
               "code": "UNPROCESSABLE_ENTITY",
               "display": "Unprocessable Entity"
             }
@@ -565,7 +565,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
       "details": {
       "coding": [
       {
-      "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+      "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
       "code": "UNPROCESSABLE_ENTITY",
       "display": "Unprocessable Entity"
       }
@@ -601,7 +601,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
         "details": {
             "coding": [
             {
-                "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                 "code": "UNPROCESSABLE_ENTITY",
                 "display": "Unprocessable Entity"
             }
@@ -641,7 +641,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
         "details": {
           "coding": [
             {
-              "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+              "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
               "code": "UNPROCESSABLE_ENTITY",
               "display": "Unprocessable Entity"
             }
@@ -685,7 +685,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
         "details": {
         "coding": [
         {
-        "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+        "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
         "code": "UNPROCESSABLE_ENTITY",
         "display": "Unprocessable Entity"
         }
@@ -738,7 +738,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
         "details": {
             "coding": [
             {
-                "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                 "code": "MESSAGE_NOT_WELL_FORMED",
                 "display": "Message not well formed"
             }
@@ -796,7 +796,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
         "details": {
             "coding": [
             {
-                "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                 "code": "MESSAGE_NOT_WELL_FORMED",
                 "display": "Message not well formed"
             }
@@ -834,7 +834,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
         "details": {
             "coding": [
             {
-                "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                 "code": "UNPROCESSABLE_ENTITY",
                 "display": "Unprocessable Entity"
             }
@@ -892,7 +892,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
         "details": {
             "coding": [
             {
-                "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                 "code": "UNPROCESSABLE_ENTITY",
                 "display": "Unprocessable Entity"
             }
@@ -952,7 +952,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
         "details": {
           "coding": [
             {
-              "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+              "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
               "code": "MESSAGE_NOT_WELL_FORMED",
               "display": "Message not well formed"
             }
@@ -1002,7 +1002,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
         "details": {
             "coding": [
             {
-                "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                 "code": "MESSAGE_NOT_WELL_FORMED",
                 "display": "Message not well formed"
             }
@@ -1034,7 +1034,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
         "details": {
             "coding": [
             {
-                "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                 "code": "MESSAGE_NOT_WELL_FORMED",
                 "display": "Message not well formed"
             }

@@ -30,7 +30,7 @@ Feature: Producer - deleteDocumentReference - Failure Scenarios
         "details": {
           "coding": [
             {
-              "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+              "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
               "code": "AUTHOR_CREDENTIALS_ERROR",
               "display": "Author credentials error"
             }

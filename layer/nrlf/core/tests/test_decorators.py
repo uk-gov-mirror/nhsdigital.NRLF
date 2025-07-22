@@ -72,7 +72,7 @@ def test_operation_outcome_error():
                 "details": {
                     "coding": [
                         {
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                             "code": "AUTHOR_CREDENTIALS_ERROR",
                             "display": "Author credentials error",
                         }
@@ -107,7 +107,7 @@ def test_error_handler_decorator_error_handling():
                 "details": {
                     "coding": [
                         {
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                             "code": "INTERNAL_SERVER_ERROR",
                             "display": "Unexpected internal server error",
                         }
@@ -432,7 +432,7 @@ def test_request_handler_with_params_missing_params():
                 "details": {
                     "coding": [
                         {
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                             "code": "INVALID_PARAMETER",
                             "display": "Invalid parameter",
                         }
@@ -447,7 +447,7 @@ def test_request_handler_with_params_missing_params():
                 "details": {
                     "coding": [
                         {
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                             "code": "INVALID_PARAMETER",
                             "display": "Invalid parameter",
                         }
@@ -524,7 +524,7 @@ def test_request_handler_with_body_missing_body():
                 "details": {
                     "coding": [
                         {
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                             "code": "BAD_REQUEST",
                             "display": "Bad request",
                         }
@@ -572,7 +572,7 @@ def test_request_handler_with_body_invalid_body():
                 "details": {
                     "coding": [
                         {
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                             "code": "MESSAGE_NOT_WELL_FORMED",
                             "display": "Message not well formed",
                         }
@@ -587,7 +587,7 @@ def test_request_handler_with_body_invalid_body():
                 "details": {
                     "coding": [
                         {
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                             "code": "MESSAGE_NOT_WELL_FORMED",
                             "display": "Message not well formed",
                         }
@@ -661,7 +661,7 @@ def test_request_handler_with_missing_request_id(mocker: MockerFixture):
                 "details": {
                     "coding": [
                         {
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                             "code": "MISSING_OR_INVALID_HEADER",
                             "display": "There is a required header missing or invalid",
                         }
@@ -709,7 +709,7 @@ def test_request_handler_with_invalid_headers():
                 "details": {
                     "coding": [
                         {
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                             "code": "MISSING_OR_INVALID_HEADER",
                             "display": "There is a required header missing or invalid",
                         }

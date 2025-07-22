@@ -67,7 +67,7 @@ def test_read_document_reference_not_found(repository: DocumentPointerRepository
                         {
                             "code": "NO_RECORD_FOUND",
                             "display": "No record found",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ]
                 },
@@ -101,7 +101,7 @@ def test_read_document_reference_missing_id():
                         {
                             "code": "INVALID_PARAMETER",
                             "display": "Invalid parameter",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ]
                 },
@@ -147,7 +147,7 @@ def test_read_document_reference_unauthorised_for_type(
                         {
                             "code": "ACCESS DENIED",
                             "display": "Access has been denied to process this request",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ]
                 },
@@ -192,7 +192,7 @@ def test_document_reference_invalid_json(repository: DocumentPointerRepository):
                         {
                             "code": "INTERNAL_SERVER_ERROR",
                             "display": "Unexpected internal server error",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ]
                 },
