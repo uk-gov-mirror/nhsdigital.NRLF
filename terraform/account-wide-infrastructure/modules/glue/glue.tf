@@ -75,10 +75,10 @@ resource "aws_glue_trigger" "glue_trigger" {
 
   name     = "${var.name_prefix}-glue-trigger"
   type     = "SCHEDULED"
-  schedule = "cron(0 0 1 * * *)"
+  schedule = "cron(0 1 * * ? *)"
 
   actions {
-    crawler_name = aws_glue_crawler.glue_job[0].name
+    job_name = aws_glue_job.glue_job[0].name
   }
 }
 
