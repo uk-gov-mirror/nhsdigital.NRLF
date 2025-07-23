@@ -18,7 +18,7 @@ Feature: Consumer - searchDocumentReference - Failure Scenarios
         "code": "invalid",
         "details": {
           "coding": [{
-            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
             "code": "INVALID_PARAMETER",
             "display": "Invalid parameter"
           }]
@@ -44,7 +44,7 @@ Feature: Consumer - searchDocumentReference - Failure Scenarios
         "code": "invalid",
         "details": {
           "coding": [{
-            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
             "code": "INVALID_PARAMETER",
             "display": "Invalid parameter"
           }]
@@ -72,7 +72,7 @@ Feature: Consumer - searchDocumentReference - Failure Scenarios
         "code": "code-invalid",
         "details": {
           "coding": [{
-            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
             "code": "INVALID_CODE_SYSTEM",
             "display": "Invalid code system"
           }]
@@ -100,7 +100,7 @@ Feature: Consumer - searchDocumentReference - Failure Scenarios
         "code": "code-invalid",
         "details": {
           "coding": [{
-            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
             "code": "INVALID_CODE_SYSTEM",
             "display": "Invalid code system"
           }]
@@ -127,7 +127,7 @@ Feature: Consumer - searchDocumentReference - Failure Scenarios
         "code": "invalid",
         "details": {
           "coding": [{
-            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
             "code": "INVALID_NHS_NUMBER",
             "display": "Invalid NHS number"
           }]
@@ -153,7 +153,7 @@ Feature: Consumer - searchDocumentReference - Failure Scenarios
         "code": "forbidden",
         "details": {
           "coding": [{
-            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
             "code": "ACCESS DENIED",
             "display": "Access has been denied to process this request"
           }]
@@ -179,7 +179,7 @@ Feature: Consumer - searchDocumentReference - Failure Scenarios
         "code": "forbidden",
         "details": {
           "coding": [{
-            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
             "code": "ACCESS DENIED",
             "display": "Access has been denied to process this request"
           }]
@@ -240,7 +240,7 @@ Feature: Consumer - searchDocumentReference - Failure Scenarios
         "code": "forbidden",
         "details": {
           "coding": [{
-            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
             "code": "ACCESS DENIED",
             "display": "Access has been denied to process this request"
           }]
@@ -267,7 +267,7 @@ Feature: Consumer - searchDocumentReference - Failure Scenarios
         "code": "code-invalid",
         "details": {
           "coding": [{
-            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
             "code": "INVALID_CODE_SYSTEM",
             "display": "Invalid code system"
           }]
@@ -295,7 +295,7 @@ Feature: Consumer - searchDocumentReference - Failure Scenarios
         "code": "code-invalid",
         "details": {
           "coding": [{
-            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
             "code": "INVALID_CODE_SYSTEM",
             "display": "Invalid code system"
           }]

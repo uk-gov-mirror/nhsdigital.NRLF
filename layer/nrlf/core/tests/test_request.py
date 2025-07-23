@@ -26,7 +26,7 @@ def test_parse_headers_empty_headers():
                 "details": {
                     "coding": [
                         {
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                             "code": "MISSING_OR_INVALID_HEADER",
                             "display": "There is a required header missing or invalid",
                         }
@@ -87,7 +87,7 @@ def test_parse_headers_invalid_headers():
                 "details": {
                     "coding": [
                         {
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                             "code": "MISSING_OR_INVALID_HEADER",
                             "display": "There is a required header missing or invalid",
                         }
@@ -168,7 +168,7 @@ def test_parse_body_valid_docref_with_duplicate_key():
                 "details": {
                     "coding": [
                         {
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                             "code": "MESSAGE_NOT_WELL_FORMED",
                             "display": "Message not well formed",
                         }
@@ -200,7 +200,7 @@ def test_parse_body_no_body():
                 "details": {
                     "coding": [
                         {
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                             "code": "BAD_REQUEST",
                             "display": "Bad request",
                         }
@@ -233,7 +233,7 @@ def test_parse_body_invalid_docref_json():
                 "details": {
                     "coding": [
                         {
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                             "code": "MESSAGE_NOT_WELL_FORMED",
                             "display": "Message not well formed",
                         }
@@ -265,7 +265,7 @@ def test_parse_body_invalid_json():
                 "details": {
                     "coding": [
                         {
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                             "code": "MESSAGE_NOT_WELL_FORMED",
                             "display": "Message not well formed",
                         }
@@ -280,7 +280,7 @@ def test_parse_body_invalid_json():
                 "details": {
                     "coding": [
                         {
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                             "code": "MESSAGE_NOT_WELL_FORMED",
                             "display": "Message not well formed",
                         }
@@ -295,7 +295,7 @@ def test_parse_body_invalid_json():
                 "details": {
                     "coding": [
                         {
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                             "code": "MESSAGE_NOT_WELL_FORMED",
                             "display": "Message not well formed",
                         }
@@ -311,7 +311,7 @@ def test_parse_body_invalid_json():
                         {
                             "code": "MESSAGE_NOT_WELL_FORMED",
                             "display": "Message not well formed",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         },
                     ],
                 },
@@ -328,7 +328,7 @@ def test_parse_body_invalid_json():
                         {
                             "code": "MESSAGE_NOT_WELL_FORMED",
                             "display": "Message not well formed",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         },
                     ],
                 },
@@ -344,7 +344,7 @@ def test_parse_body_invalid_json():
                 "details": {
                     "coding": [
                         {
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                             "code": "MESSAGE_NOT_WELL_FORMED",
                             "display": "Message not well formed",
                         }
@@ -359,7 +359,7 @@ def test_parse_body_invalid_json():
                 "details": {
                     "coding": [
                         {
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                             "code": "MESSAGE_NOT_WELL_FORMED",
                             "display": "Message not well formed",
                         }
@@ -391,7 +391,7 @@ def test_parse_body_not_json():
                 "details": {
                     "coding": [
                         {
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                             "code": "MESSAGE_NOT_WELL_FORMED",
                             "display": "Message not well formed",
                         }

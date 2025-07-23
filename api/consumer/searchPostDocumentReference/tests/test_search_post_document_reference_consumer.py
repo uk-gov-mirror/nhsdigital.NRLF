@@ -330,7 +330,7 @@ def test_search_post_document_reference_missing_nhs_number(
                         {
                             "code": "MESSAGE_NOT_WELL_FORMED",
                             "display": "Message not well formed",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ]
                 },
@@ -374,7 +374,7 @@ def test_search_post_document_reference_invalid_nhs_number(
                         {
                             "code": "INVALID_NHS_NUMBER",
                             "display": "Invalid NHS number",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ]
                 },
@@ -421,7 +421,7 @@ def test_search_post_document_reference_invalid_type(
                         {
                             "code": "INVALID_CODE_SYSTEM",
                             "display": "Invalid code system",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ]
                 },
@@ -468,7 +468,7 @@ def test_search_document_reference_invalid_category(
                         {
                             "code": "INVALID_CODE_SYSTEM",
                             "display": "Invalid code system",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ]
                 },
@@ -567,7 +567,7 @@ def test_search_post_document_reference_invalid_json_adds_operation_outcome(
                         {
                             "code": "INTERNAL_SERVER_ERROR",
                             "display": "Unexpected internal server error",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ]
                 },

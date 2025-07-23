@@ -46,7 +46,7 @@ Feature: Producer - upsertDocumentReference - Duplicate Field Scenarios
         "details": {
             "coding": [
             {
-                "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                 "code": "MESSAGE_NOT_WELL_FORMED",
                 "display": "Message not well formed"
             }
@@ -113,7 +113,7 @@ Feature: Producer - upsertDocumentReference - Duplicate Field Scenarios
         "details": {
             "coding": [
             {
-                "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                 "code": "MESSAGE_NOT_WELL_FORMED",
                 "display": "Message not well formed"
             }

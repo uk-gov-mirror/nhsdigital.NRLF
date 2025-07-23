@@ -183,7 +183,7 @@ def test_upsert_document_reference_cannot_set_status_to_not_current(repository):
                         {
                             "code": "MESSAGE_NOT_WELL_FORMED",
                             "display": "Message not well formed",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ]
                 },
@@ -228,7 +228,7 @@ def test_upsert_document_reference_invalid_category_type():
                         {
                             "code": "UNPROCESSABLE_ENTITY",
                             "display": "Unprocessable Entity",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ]
                 },
@@ -265,7 +265,7 @@ def test_upsert_document_reference_no_body():
                         {
                             "code": "BAD_REQUEST",
                             "display": "Bad request",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ],
                 },
@@ -302,7 +302,7 @@ def test_upsert_document_reference_invalid_body():
                         {
                             "code": "MESSAGE_NOT_WELL_FORMED",
                             "display": "Message not well formed",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ],
                 },
@@ -317,7 +317,7 @@ def test_upsert_document_reference_invalid_body():
                         {
                             "code": "MESSAGE_NOT_WELL_FORMED",
                             "display": "Message not well formed",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ],
                 },
@@ -332,7 +332,7 @@ def test_upsert_document_reference_invalid_body():
                         {
                             "code": "MESSAGE_NOT_WELL_FORMED",
                             "display": "Message not well formed",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ],
                 },
@@ -347,7 +347,7 @@ def test_upsert_document_reference_invalid_body():
                         {
                             "code": "MESSAGE_NOT_WELL_FORMED",
                             "display": "Message not well formed",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ],
                 },
@@ -362,7 +362,7 @@ def test_upsert_document_reference_invalid_body():
                         {
                             "code": "MESSAGE_NOT_WELL_FORMED",
                             "display": "Message not well formed",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ],
                 },
@@ -377,7 +377,7 @@ def test_upsert_document_reference_invalid_body():
                         {
                             "code": "MESSAGE_NOT_WELL_FORMED",
                             "display": "Message not well formed",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ],
                 },
@@ -390,7 +390,7 @@ def test_upsert_document_reference_invalid_body():
                 "details": {
                     "coding": [
                         {
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                             "code": "MESSAGE_NOT_WELL_FORMED",
                             "display": "Message not well formed",
                         }
@@ -433,7 +433,7 @@ def test_upsert_document_reference_invalid_resource():
                         {
                             "code": "UNPROCESSABLE_ENTITY",
                             "display": "Unprocessable Entity",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ],
                 },
@@ -474,7 +474,7 @@ def test_upsert_document_reference_with_no_practiceSetting():
                         {
                             "code": "MESSAGE_NOT_WELL_FORMED",
                             "display": "Message not well formed",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ],
                 },
@@ -515,7 +515,7 @@ def test_upsert_document_reference_with_invalid_docStatus():
                         {
                             "code": "MESSAGE_NOT_WELL_FORMED",
                             "display": "Message not well formed",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ],
                 },
@@ -557,7 +557,7 @@ def test_upsert_document_reference_invalid_producer_id():
                         {
                             "code": "UNPROCESSABLE_ENTITY",
                             "display": "Unprocessable Entity",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ]
                 },
@@ -597,7 +597,7 @@ def test_upsert_document_reference_with_no_custodian():
                         {
                             "code": "UNPROCESSABLE_ENTITY",
                             "display": "Unprocessable Entity",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ],
                 },
@@ -641,7 +641,7 @@ def test_upsert_document_reference_invalid_custodian_id():
                         {
                             "code": "UNPROCESSABLE_ENTITY",
                             "display": "Unprocessable Entity",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ]
                 },
@@ -685,7 +685,7 @@ def test_upsert_document_reference_invalid_pointer_type():
                         {
                             "code": "UNPROCESSABLE_ENTITY",
                             "display": "Unprocessable Entity",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ]
                 },
@@ -734,7 +734,7 @@ def test_upsert_document_reference_pointer_type_not_allowed(
                         {
                             "code": "AUTHOR_CREDENTIALS_ERROR",
                             "display": "Author credentials error",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ]
                 },
@@ -778,7 +778,7 @@ def test_upsert_document_reference_no_relatesto_target():
                         {
                             "code": "MESSAGE_NOT_WELL_FORMED",
                             "display": "Message not well formed",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ],
                 },
@@ -825,7 +825,7 @@ def test_upsert_document_reference_invalid_relatesto_target_producer_id():
                         {
                             "code": "UNPROCESSABLE_ENTITY",
                             "display": "Unprocessable Entity",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ]
                 },
@@ -876,7 +876,7 @@ def test_upsert_document_reference_invalid_relatesto_not_exists(repository):
                         {
                             "code": "UNPROCESSABLE_ENTITY",
                             "display": "Unprocessable Entity",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ]
                 },
@@ -992,7 +992,7 @@ def test_upsert_document_reference_invalid_relatesto_nhs_number(
                         {
                             "code": "UNPROCESSABLE_ENTITY",
                             "display": "Unprocessable Entity",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ]
                 },
@@ -1054,7 +1054,7 @@ def test_upsert_document_reference_invalid_relatesto_type(
                         {
                             "code": "UNPROCESSABLE_ENTITY",
                             "display": "Unprocessable Entity",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ]
                 },
@@ -1101,7 +1101,7 @@ def test_upsert_document_reference_with_no_context_related_for_ssp_url(
                         {
                             "code": "UNPROCESSABLE_ENTITY",
                             "display": "Unprocessable Entity",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ]
                 },
@@ -1155,7 +1155,7 @@ def test_upsert_document_reference_with_no_asid_in_for_ssp_url(
                         {
                             "code": "UNPROCESSABLE_ENTITY",
                             "display": "Unprocessable Entity",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ]
                 },
@@ -1209,7 +1209,7 @@ def test_upsert_document_reference_with_invalid_asid_for_ssp_url(
                         {
                             "code": "UNPROCESSABLE_ENTITY",
                             "display": "Unprocessable Entity",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ]
                 },
@@ -1381,7 +1381,7 @@ def test_upsert_document_reference_supersede_fails_without_toggle(
                         {
                             "code": "UNPROCESSABLE_ENTITY",
                             "display": "Unprocessable Entity",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ]
                 },
