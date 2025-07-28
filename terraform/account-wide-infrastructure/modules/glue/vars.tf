@@ -28,3 +28,9 @@ variable "is_enabled" {
   description = "Flag to enable or disable the Glue module"
   default     = true
 }
+
+variable "schedule" {
+  type        = bool
+  description = "Flag to enable or disable the Glue schedule"
+  default     = false
+}
