@@ -81,7 +81,7 @@ class LogPipeline:
                     },
                     format="json",
                 ).filter(
-                    f=lambda x, n=name: (x["host"].endswith(n))
+                    f=lambda x, n=name: (x["host"] is not None and n in x["host"])
                     and (x["time"] > last_runtime)
                 )
 
@@ -95,7 +95,7 @@ class LogPipeline:
                         "groupSize": "134217728",
                     },
                     format="json",
-                ).filter(f=lambda x, n=name: x["host"].endswith(n))
+                ).filter(f=lambda x, n=name: (x["host"] is not None and n in x["host"]))
 
         return data
 
@@ -107,7 +107,7 @@ class LogPipeline:
         )
         for transformation in self.transformations:
             self.logger.info(f"Applying transformation: {transformation.__name__}")
-            dataframe = transformation(dataframe, self.logger)
+            dataframe = transformation(dataframe, self.logger, name)
         return dataframe
 
     def load(self, data):
@@ -115,15 +115,21 @@ class LogPipeline:
         self.logger.info(f"Loading data into {self.target_path} as Parquet")
         for name, dataframe in data.items():
             name = name.replace("--", "_")
+            if name == "s2c":
+                name = "spine_sspDocumentRetrieval"
             try:
+                if dataframe.rdd.isEmpty():
+                    self.logger.info(f"{name} dataframe has no rows. Skipping.")
+                    continue
+
                 self.logger.info(
                     f"Attempting to load dataframe {name} into {self.target_path}{name}"
                 )
                 dataframe.write.mode("append").partitionBy(
                     *self.partition_cols
                 ).parquet(f"{self.target_path}{name}")
-            except:
-                self.logger.info(f"{name} dataframe has no rows. Skipping.")
+            except Exception as e:
+                self.logger.info(f"{name} failed to write with error: {e}")
 
     def trigger_crawler(self):
         self.glue.start_crawler(Name=f"{self.name_prefix}-log-crawler")

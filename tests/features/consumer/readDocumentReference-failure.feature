@@ -17,7 +17,7 @@ Feature: Consumer - readDocumentReference - Failure Scenarios
         "details": {
           "coding": [
             {
-              "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+              "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
               "code": "NO_RECORD_FOUND",
               "display": "No record found"
             }
@@ -44,7 +44,7 @@ Feature: Consumer - readDocumentReference - Failure Scenarios
         "details": {
           "coding": [
             {
-              "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+              "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
               "code": "NO_RECORD_FOUND",
               "display": "No record found"
             }
@@ -69,7 +69,7 @@ Feature: Consumer - readDocumentReference - Failure Scenarios
         "details": {
           "coding": [
             {
-              "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+              "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
               "code": "ACCESS DENIED",
               "display": "Access has been denied to process this request"
             }
@@ -106,7 +106,7 @@ Feature: Consumer - readDocumentReference - Failure Scenarios
         "details": {
           "coding": [
             {
-              "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+              "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
               "code": "ACCESS DENIED",
               "display": "Access has been denied to process this request"
             }
@@ -131,7 +131,7 @@ Feature: Consumer - readDocumentReference - Failure Scenarios
         "details": {
           "coding": [
             {
-              "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+              "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
               "code": "ACCESS DENIED",
               "display": "Access has been denied to process this request"
             }
@@ -168,7 +168,7 @@ Feature: Consumer - readDocumentReference - Failure Scenarios
         "details": {
           "coding": [
             {
-              "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+              "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
               "code": "ACCESS DENIED",
               "display": "Access has been denied to process this request"
             }

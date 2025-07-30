@@ -82,7 +82,7 @@ def test_delete_document_reference_invalid_id_in_path():
                         {
                             "code": "INVALID_PARAMETER",
                             "display": "Invalid parameter",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ]
                 },
@@ -119,7 +119,7 @@ def test_delete_document_reference_invalid_producer_id():
                         {
                             "code": "AUTHOR_CREDENTIALS_ERROR",
                             "display": "Author credentials error",
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                         }
                     ]
                 },

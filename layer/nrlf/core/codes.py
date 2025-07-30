@@ -42,7 +42,7 @@ class NRLResponseConcept(_CodeableConcept):
 
 
 class SpineErrorConcept(_CodeableConcept):
-    _SYSTEM = "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1"
+    _SYSTEM = "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode"
     _TEXT_MAP = {
         "ACCESS DENIED": "Access has been denied to process this request",
         "NO_RECORD_FOUND": "No record found",

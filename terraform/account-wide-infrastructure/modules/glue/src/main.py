@@ -5,7 +5,7 @@ from awsglue.context import GlueContext
 from awsglue.utils import getResolvedOptions
 from pipeline import LogPipeline
 from pyspark.sql import SparkSession
-from transformations import dtype_conversion, rename_cols, resolve_dupes
+from transformations import dtype_conversion, format_ssp, rename_cols, resolve_dupes
 
 # Spark and Glue Context initialization
 spark = SparkSession.builder.config("spark.sql.caseSensitive", "true").getOrCreate()
@@ -37,6 +37,7 @@ host_prefixes = [
     "producer--updateDocumentReference",
     "producer--deleteDocumentReference",
     "producer--createDocumentReference",
+    "s2c",
 ]
 
 # Initialize ETL process
@@ -49,7 +50,7 @@ etl_job = LogPipeline(
     host_prefixes=host_prefixes,
     job_name=args["job_name"],
     partition_cols=partition_cols,
-    transformations=[rename_cols, resolve_dupes, dtype_conversion],
+    transformations=[rename_cols, resolve_dupes, dtype_conversion, format_ssp],
 )
 
 # Run the job

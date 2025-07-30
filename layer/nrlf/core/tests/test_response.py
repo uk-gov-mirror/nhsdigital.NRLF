@@ -74,7 +74,7 @@ def test_from_exception():
                 "details": {
                     "coding": [
                         {
-                            "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                             "code": "INTERNAL_SERVER_ERROR",
                             "display": "Unexpected internal server error",
                         }

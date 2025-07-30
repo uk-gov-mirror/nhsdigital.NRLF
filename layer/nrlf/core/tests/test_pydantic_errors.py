@@ -23,7 +23,7 @@ def test_validate_content_missing_attachment():
         "details": {
             "coding": [
                 {
-                    "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                    "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                     "code": "BAD_REQUEST",
                     "display": "Bad request",
                 }
@@ -51,7 +51,7 @@ def test_validate_content_missing_content_type():
         "details": {
             "coding": [
                 {
-                    "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                    "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                     "code": "BAD_REQUEST",
                     "display": "Bad request",
                 }
@@ -79,7 +79,7 @@ def test_validate_content_missing_format():
         "details": {
             "coding": [
                 {
-                    "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                    "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                     "code": "BAD_REQUEST",
                     "display": "Bad request",
                 }
@@ -110,7 +110,7 @@ def test_validate_content_multiple_content_stability_extensions():
         "details": {
             "coding": [
                 {
-                    "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                    "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                     "code": "BAD_REQUEST",
                     "display": "Bad request",
                 }
@@ -140,7 +140,7 @@ def test_validate_content_invalid_content_stability_code():
         "details": {
             "coding": [
                 {
-                    "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                    "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                     "code": "BAD_REQUEST",
                     "display": "Bad request",
                 }
@@ -170,7 +170,7 @@ def test_validate_content_invalid_content_stability_display():
         "details": {
             "coding": [
                 {
-                    "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                    "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                     "code": "BAD_REQUEST",
                     "display": "Bad request",
                 }
@@ -202,7 +202,7 @@ def test_validate_content_invalid_content_stability_system():
         "details": {
             "coding": [
                 {
-                    "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                    "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                     "code": "BAD_REQUEST",
                     "display": "Bad request",
                 }
@@ -231,7 +231,7 @@ def test_validate_content_invalid_content_stability_url():
         "details": {
             "coding": [
                 {
-                    "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                    "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                     "code": "BAD_REQUEST",
                     "display": "Bad request",
                 }
@@ -277,7 +277,7 @@ def test_validate_multiple_codings():
         "details": {
             "coding": [
                 {
-                    "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                    "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                     "code": "BAD_REQUEST",
                     "display": "Bad request",
                 }
@@ -313,7 +313,7 @@ def test_validate_whitespace_strings():
         "details": {
             "coding": [
                 {
-                    "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                    "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                     "code": "BAD_REQUEST",
                     "display": "Bad request",
                 }
@@ -343,7 +343,7 @@ def test_validate_no_coding_where_mandatory():
         "details": {
             "coding": [
                 {
-                    "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                    "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                     "code": "BAD_REQUEST",
                     "display": "Bad request",
                 }
@@ -391,7 +391,7 @@ def test_validate_missing_system_from_coding_where_mandatory():
         "details": {
             "coding": [
                 {
-                    "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                    "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                     "code": "BAD_REQUEST",
                     "display": "Bad request",
                 }
@@ -426,7 +426,7 @@ def test_validate_missing_code_from_coding_where_mandatory():
         "details": {
             "coding": [
                 {
-                    "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                    "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                     "code": "BAD_REQUEST",
                     "display": "Bad request",
                 }
@@ -461,7 +461,7 @@ def test_validate_missing_display_from_coding_where_mandatory():
         "details": {
             "coding": [
                 {
-                    "system": "https://fhir.nhs.uk/ValueSet/Spine-ErrorOrWarningCode-1",
+                    "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
                     "code": "BAD_REQUEST",
                     "display": "Bad request",
                 }
