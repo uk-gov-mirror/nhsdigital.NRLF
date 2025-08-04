@@ -2,46 +2,46 @@
 
 [[package]]
 name = "allure-behave"
-version = "2.13.5"
+version = "2.15.0"
 description = "Allure behave integration"
 optional = false
 python-versions = "*"
 groups = ["dev"]
 files = [
-    {file = "allure-behave-2.13.5.tar.gz", hash = "sha256:338ca2cc7395d1ee3dd72f5d7d92d8920f1ade0e07ddebc637b38e61e06dc8dc"},
-    {file = "allure_behave-2.13.5-py3-none-any.whl", hash = "sha256:8b04291f435af536b46c3cbd20d33e61b27f5e25dd2fff2fdc1dc3fa2474e23e"},
+    {file = "allure_behave-2.15.0-py3-none-any.whl", hash = "sha256:bcb7af818bc196e3b7b53285c8a084e50aa22306573e07d285414cc6cf663484"},
+    {file = "allure_behave-2.15.0.tar.gz", hash = "sha256:a6e26e69e03ab85251175652ee3598e793269366384908ae8591841a2ef27b1b"},
 ]
 
 [package.dependencies]
-allure-python-commons = "2.13.5"
+allure-python-commons = "2.15.0"
 behave = ">=1.2.5"
 
 [[package]]
 name = "allure-pytest"
-version = "2.13.5"
+version = "2.15.0"
 description = "Allure pytest integration"
 optional = false
 python-versions = "*"
 groups = ["dev"]
 files = [
-    {file = "allure-pytest-2.13.5.tar.gz", hash = "sha256:0ef8e1790c44a988db6b83c4d4f5e91451e2c4c8ea10601dfa88528d23afcf6e"},
-    {file = "allure_pytest-2.13.5-py3-none-any.whl", hash = "sha256:94130bac32964b78058e62cf4b815ad97a5ac82a065e6dd2d43abac2be7640fc"},
+    {file = "allure_pytest-2.15.0-py3-none-any.whl", hash = "sha256:f33c6ad242995bd27d2b467ee685772904d6941a6a6c9877657e0b8fe97a0ede"},
+    {file = "allure_pytest-2.15.0.tar.gz", hash = "sha256:b8f464d3bfeb6cb5e6a77e70eacd1aa3762133677cabece57a07c9f3bcd4b1e8"},
 ]
 
 [package.dependencies]
-allure-python-commons = "2.13.5"
+allure-python-commons = "2.15.0"
 pytest = ">=4.5.0"
 
 [[package]]
 name = "allure-python-commons"
-version = "2.13.5"
-description = "('Contains the API for end users as well as helper functions and classes to build Allure adapters for Python test frameworks',)"
+version = "2.15.0"
+description = "Contains the API for end users as well as helper functions and classes to build Allure adapters for Python test frameworks"
 optional = false
 python-versions = ">=3.6"
 groups = ["dev"]
 files = [
-    {file = "allure-python-commons-2.13.5.tar.gz", hash = "sha256:a232e7955811f988e49a4c1dd6c16cce7e9b81d0ea0422b1e5654d3254e2caf3"},
-    {file = "allure_python_commons-2.13.5-py3-none-any.whl", hash = "sha256:8b0e837b6e32d810adec563f49e1d04127a5b6770e0232065b7cb09b9953980d"},
+    {file = "allure_python_commons-2.15.0-py3-none-any.whl", hash = "sha256:84ebbbca2e4c147ed151e615f995eb2e0dd688818d06c55df9e8e3ce4de6eeeb"},
+    {file = "allure_python_commons-2.15.0.tar.gz", hash = "sha256:4f639c8bb4b79df0d94f1baa88782c9399be3f45fd839ae583a314a5d451b978"},
 ]
 
 [package.dependencies]
@@ -2749,4 +2749,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "e29c5454e4d33ab0a8dd4e5b05ee436c78664d59d353474fa8707502ff68468d"
+content-hash = "409892c982ed79329d2cac859778bda2b12190f1068a69a32d6a0613ae0b834f"
