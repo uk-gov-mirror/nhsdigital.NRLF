@@ -38,6 +38,8 @@ def _find_patients(
     params: dict[str, Any] = {
         "TableName": table_name,
         "PaginationConfig": {"PageSize": 50},
+        "Select": "SPECIFIC_ATTRIBUTES",
+        "AttributesToGet": ["custodian", "nhs_number", "type"],
     }
 
     total_scanned_count = 0
@@ -49,35 +51,9 @@ def _find_patients(
 
     for page in paginator.paginate(**params):
         for item in page["Items"]:
-            document = item.get("document", {}).get("S", "")
-            # TODO - Dont need to use doc for these attrs - switch to other attrs
-
-            # Do validations
-            try:
-                docref = DocumentReference.model_validate_json(document)
-            except Exception:
-                continue
-
-            patient_number = (
-                docref.subject.identifier.value
-                if docref.subject
-                and docref.subject.identifier
-                and docref.subject.identifier.value
-                else "unknown"
-            )
-            producer = (
-                docref.custodian.identifier.value
-                if docref.custodian
-                and docref.custodian.identifier
-                and docref.custodian.identifier.value
-                else "unknown"
-            )
-            type_coding = (
-                docref.type.coding[0] if docref.type and docref.type.coding else None
-            )
-            type_str = (
-                f"{type_coding.system}|{type_coding.code}" if type_coding else "unknown"
-            )
+            patient_number = item.get("nhs_number", {}).get("S", "")
+            producer = item.get("custodian", {}).get("S", "")
+            type_str = item.get("type", {}).get("S", "")
 
             if producer != org_ods_code or type_str != pointer_type:
                 continue
