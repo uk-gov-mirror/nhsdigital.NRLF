@@ -6,7 +6,6 @@ import boto3
 import fire
 
 from nrlf.consumer.fhir.r4.model import DocumentReference
-from nrlf.core.constants import PointerTypes
 from nrlf.core.logger import logger
 from nrlf.core.validators import DocumentReferenceValidator
 
@@ -18,8 +17,6 @@ dynamodb = boto3.client("dynamodb")
 paginator = dynamodb.get_paginator("scan")
 
 logger.setLevel("ERROR")
-
-type_to_name = {pointer_type.value: pointer_type.name for pointer_type in PointerTypes}
 
 
 def _calc_type_stats(producer: str, type_str: str, stats: dict[str, Any]) -> None:
