@@ -1415,10 +1415,12 @@ components:
         extension:
           type: array
           items:
-            $ref: "#/components/schemas/ContentStabilityExtension"
+            oneOf:
+              - $ref: "#/components/schemas/ContentStabilityExtension"
+              - $ref: "#/components/schemas/RetrievalMechanismExtension"
             description: Additional extension for content stability.
           minItems: 1
-          maxItems: 1
+          maxItems: 2
       required:
         - attachment
         - format
@@ -1627,6 +1629,53 @@ components:
             display:
               type: string
               enum: ["Static", "Dynamic"]
+          required:
+            - system
+            - code
+            - display
+    RetrievalMechanismExtension:
+      allOf:
+        - $ref: "#/components/schemas/Extension"
+        - type: object
+          properties:
+            url:
+              type: string
+              enum:
+                - "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism"
+            valueCodeableConcept:
+              $ref: "#/components/schemas/RetrievalMechanismExtensionValueCodeableConcept"
+          required:
+            - url
+            - valueCodeableConcept
+    RetrievalMechanismExtensionValueCodeableConcept:
+      allOf:
+        - $ref: "#/components/schemas/CodeableConcept"
+        - type: object
+          properties:
+            coding:
+              type: array
+              items:
+                $ref: "#/components/schemas/RetrievalMechanismExtensionCoding"
+              minItems: 1
+              maxItems: 1
+          required:
+            - coding
+    RetrievalMechanismExtensionCoding:
+      allOf:
+        - $ref: "#/components/schemas/Coding"
+        - type: object
+          properties:
+            system:
+              type: string
+              enum:
+                - "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism"
+            code:
+              type: string
+              enum: ["SSP", "Direct", "NDR"]
+            display:
+              type: string
+              enum:
+                ["Spine Secure Proxy", "National Document Repository", "Direct"]
           required:
             - system
             - code

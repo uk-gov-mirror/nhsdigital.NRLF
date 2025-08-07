@@ -10,6 +10,7 @@ from nrlf.core.constants import (
     ATTACHMENT_CONTENT_TYPES,
     CATEGORY_ATTRIBUTES,
     CONTENT_FORMAT_CODE_MAP,
+    CONTENT_RETRIEVAL_CODE_MAP,
     ODS_SYSTEM,
     PRACTICE_SETTING_VALUE_SET_URL,
     REQUIRED_CREATE_FIELDS,
@@ -509,13 +510,56 @@ class DocumentReferenceValidator:
 
         logger.debug("Validating extension")
         for i, content in enumerate(model.content):
-            coding = content.extension[0].valueCodeableConcept.coding[0]
-            if coding.code != coding.display.lower():
+            if len(content.extension) == 0:
                 self.result.add_error(
                     issue_code="business-rule",
                     error_code="UNPROCESSABLE_ENTITY",
-                    diagnostics=f"Invalid content extension display: {coding.display} Extension display must be the same as code either 'Static' or 'Dynamic'",
-                    field=f"content[{i}].extension[0].valueCodeableConcept.coding[0].display",
+                    diagnostics=f"Invalid content extension: Extension must have at least one value",
+                    field=f"content[{i}].extension",
+                )
+                return
+
+            has_content_stability = False
+            for j, extension in enumerate(content.extension):
+                if (
+                    extension.url
+                    == "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-ContentStability"
+                ):
+                    coding = extension.valueCodeableConcept.coding[0]
+                    if coding.code != coding.display.lower() or coding.display not in [
+                        "Static",
+                        "Dynamic",
+                    ]:
+                        self.result.add_error(
+                            issue_code="business-rule",
+                            error_code="UNPROCESSABLE_ENTITY",
+                            diagnostics=f"Invalid content extension display: {coding.display} Extension display must be the same as code either 'Static' or 'Dynamic'",
+                            field=f"content[{i}].extension[{j}].valueCodeableConcept.coding[0].display",
+                        )
+                        return
+                    has_content_stability = True
+
+                elif (
+                    extension.url
+                    == "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism"
+                ):
+                    coding = extension.valueCodeableConcept.coding[0]
+                    retrievalDisplay = CONTENT_RETRIEVAL_CODE_MAP.get(coding.code)
+                    if coding.display != retrievalDisplay:
+                        self.result.add_error(
+                            issue_code="business-rule",
+                            error_code="UNPROCESSABLE_ENTITY",
+                            diagnostics=f"Invalid content extension display: {coding.display} Expected display is '{retrievalDisplay}'",
+                            field=f"content[{i}].extension[{j}].valueCodeableConcept.coding[0].display",
+                        )
+                        return
+
+            if not has_content_stability:
+                self.result.add_error(
+                    issue_code="business-rule",
+                    error_code="UNPROCESSABLE_ENTITY",
+                    diagnostics=f"Invalid content extension: Extension must have one content stability extension see value set ('https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability')",
+                    field=f"content[{i}].extension",
                 )
                 return
 

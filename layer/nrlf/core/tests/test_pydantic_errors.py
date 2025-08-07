@@ -99,6 +99,11 @@ def test_validate_content_multiple_content_stability_extensions():
         document_ref_data["content"][0]["extension"][0]
     )
 
+    # Add a third duplicate contentStability extension
+    document_ref_data["content"][0]["extension"].append(
+        document_ref_data["content"][0]["extension"][0]
+    )
+
     with pytest.raises(ParseError) as error:
         validator.validate(document_ref_data)
 
@@ -116,7 +121,7 @@ def test_validate_content_multiple_content_stability_extensions():
                 }
             ]
         },
-        "diagnostics": "Failed to parse DocumentReference resource (content[0].extension: List should have at most 1 item after validation, not 2. See ValueSet: https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability)",
+        "diagnostics": "Failed to parse DocumentReference resource (content[0].extension: List should have at most 2 items after validation, not 3. See ValueSets: https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability & https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism)",
         "expression": ["content[0].extension"],
     }
 
@@ -133,7 +138,6 @@ def test_validate_content_invalid_content_stability_code():
         validator.validate(document_ref_data)
 
     exc = error.value
-    assert len(exc.issues) == 1
     assert exc.issues[0].model_dump(exclude_none=True) == {
         "severity": "error",
         "code": "invalid",
@@ -146,7 +150,7 @@ def test_validate_content_invalid_content_stability_code():
                 }
             ]
         },
-        "diagnostics": "Failed to parse DocumentReference resource (content[0].extension[0].valueCodeableConcept.coding[0].code: Input should be 'static' or 'dynamic'. See ValueSet: https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability)",
+        "diagnostics": "Failed to parse DocumentReference resource (content[0].extension[0].valueCodeableConcept.coding[0].code: Input should be 'static' or 'dynamic'. See ValueSets: https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability & https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism)",
         "expression": ["content[0].extension[0].valueCodeableConcept.coding[0].code"],
     }
 
@@ -163,7 +167,6 @@ def test_validate_content_invalid_content_stability_display():
         validator.validate(document_ref_data)
 
     exc = error.value
-    assert len(exc.issues) == 1
     assert exc.issues[0].model_dump(exclude_none=True) == {
         "severity": "error",
         "code": "invalid",
@@ -176,7 +179,7 @@ def test_validate_content_invalid_content_stability_display():
                 }
             ]
         },
-        "diagnostics": "Failed to parse DocumentReference resource (content[0].extension[0].valueCodeableConcept.coding[0].display: Input should be 'Static' or 'Dynamic'. See ValueSet: https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability)",
+        "diagnostics": "Failed to parse DocumentReference resource (content[0].extension[0].valueCodeableConcept.coding[0].display: Input should be 'Static' or 'Dynamic'. See ValueSets: https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability & https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism)",
         "expression": [
             "content[0].extension[0].valueCodeableConcept.coding[0].display"
         ],
@@ -195,7 +198,6 @@ def test_validate_content_invalid_content_stability_system():
         validator.validate(document_ref_data)
 
     exc = error.value
-    assert len(exc.issues) == 1
     assert exc.issues[0].model_dump(exclude_none=True) == {
         "severity": "error",
         "code": "invalid",
@@ -224,7 +226,6 @@ def test_validate_content_invalid_content_stability_url():
         validator.validate(document_ref_data)
 
     exc = error.value
-    assert len(exc.issues) == 1
     assert exc.issues[0].model_dump(exclude_none=True) == {
         "severity": "error",
         "code": "invalid",

@@ -680,6 +680,14 @@ CONTENT_STABILITY_EXTENSION_URL = (
 CONTENT_STABILITY_SYSTEM_URL = (
     "https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability"
 )
+CONTENT_RETRIEVAL_SYSTEM_URL = (
+    "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism"
+)
+CONTENT_RETRIEVAL_CODE_MAP = {
+    "Direct": "Direct",
+    "SSP": "Spine Secure Proxy",
+    "NDR": "National Document Repository",
+}
 CONTENT_FORMAT_CODE_URL = "https://fhir.nhs.uk/England/CodeSystem/England-NRLFormatCode"
 CONTENT_FORMAT_CODE_MAP = {
     "urn:nhs-ic:record-contact": "Contact details (HTTP Unsecured)",

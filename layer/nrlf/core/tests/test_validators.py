@@ -1365,6 +1365,92 @@ def test_validate_content_extension_invalid_code_and_display_mismatch():
     }
 
 
+def test_validate_content_extension_missing_content_stability():
+    validator = DocumentReferenceValidator()
+    document_ref_data = load_document_reference_json("Y05868-736253002-Valid")
+
+    # Remove all ContentStability extensions
+    document_ref_data["content"][0]["extension"] = [
+        {
+            "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism",
+            "valueCodeableConcept": {
+                "coding": [
+                    {
+                        "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                        "code": "Direct",
+                        "display": "Direct",
+                    }
+                ]
+            },
+        }
+    ]
+
+    result = validator.validate(document_ref_data)
+
+    assert result.is_valid is False
+    assert result.resource.id == "Y05868-99999-99999-999999"
+    assert len(result.issues) == 1
+    assert result.issues[0].model_dump(exclude_none=True) == {
+        "severity": "error",
+        "code": "business-rule",
+        "details": {
+            "coding": [
+                {
+                    "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
+                    "code": "UNPROCESSABLE_ENTITY",
+                    "display": "Unprocessable Entity",
+                }
+            ]
+        },
+        "diagnostics": "Invalid content extension: Extension must have one content stability extension see value set ('https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability')",
+        "expression": ["content[0].extension"],
+    }
+
+
+def test_validate_content_extension_mismatch_between_retrieval_mechanism_display_and_code():
+    validator = DocumentReferenceValidator()
+    document_ref_data = load_document_reference_json("Y05868-736253002-Valid")
+
+    # Add a retrieval mechanism extension with a valid code but wrong display
+    document_ref_data["content"][0]["extension"].append(
+        {
+            "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism",
+            "valueCodeableConcept": {
+                "coding": [
+                    {
+                        "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                        "code": "Direct",
+                        "display": "Spine Secure Proxy",
+                    }
+                ]
+            },
+        }
+    )
+
+    result = validator.validate(document_ref_data)
+
+    assert result.is_valid is False
+    assert result.resource.id == "Y05868-99999-99999-999999"
+    assert len(result.issues) == 1
+    assert result.issues[0].model_dump(exclude_none=True) == {
+        "severity": "error",
+        "code": "business-rule",
+        "details": {
+            "coding": [
+                {
+                    "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
+                    "code": "UNPROCESSABLE_ENTITY",
+                    "display": "Unprocessable Entity",
+                }
+            ]
+        },
+        "diagnostics": "Invalid content extension display: Spine Secure Proxy Expected display is 'Direct'",
+        "expression": [
+            "content[0].extension[1].valueCodeableConcept.coding[0].display"
+        ],
+    }
+
+
 def test_validate_content_invalid_content_type():
     validator = DocumentReferenceValidator()
     document_ref_data = load_document_reference_json("Y05868-736253002-Valid")
