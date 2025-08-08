@@ -95,7 +95,7 @@ To run all the feature integration tests:
 make test-features-integration
 ```
 
-To run indivudal feature test scenario(s) using the custom tag :
+To run individual feature test scenario(s) using the custom tag :
 
 1. Add `@custom_tag` before each 'Scenario' that needs to be run (in each .feature file)
 2. Run the command below:
@@ -104,7 +104,7 @@ To run indivudal feature test scenario(s) using the custom tag :
 make integration-test-with-custom_tag
 ```
 
-To run all the feature integration tests and generate an interactive Allure report therafter :
+To run all the feature integration tests and generate an interactive Allure report thereafter :
 
 ```
 make test-features-integration-report
