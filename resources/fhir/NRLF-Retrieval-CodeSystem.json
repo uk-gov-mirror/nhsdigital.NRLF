@@ -58,6 +58,11 @@
           "definition": "This document can be retrieved via the National Document Repository proxy service."
         }
       ]
+    },
+    {
+      "code": "Direct_InContext",
+      "display": "Direct using In-Context",
+      "definition": "This document can be retrieved in-context via the In-Context launch mechanism."
     }
   ]
 }
