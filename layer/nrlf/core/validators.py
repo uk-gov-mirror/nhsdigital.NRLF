@@ -519,32 +519,34 @@ class DocumentReferenceValidator:
                 )
                 return
 
-            has_content_stability = False
-            for j, extension in enumerate(content.extension):
-                if (
-                    extension.url
-                    == "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-ContentStability"
-                ):
-                    if not self._validate_content_stability_extension(extension, i, j):
-                        return
-                    has_content_stability = True
-                elif (
-                    extension.url
-                    == "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism"
-                ):
-                    if not self._validate_retrieval_mechanism_extension(
-                        extension, i, j
-                    ):
-                        return
-
-            if not has_content_stability:
-                self.result.add_error(
-                    issue_code="business-rule",
-                    error_code="UNPROCESSABLE_ENTITY",
-                    diagnostics="Invalid content extension: Extension must have one content stability extension see value set ('https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability')",
-                    field=f"content[{i}].extension",
-                )
+            if not self._has_valid_extensions(content.extension, i):
                 return
+
+    def _has_valid_extensions(self, extensions, i):
+        has_content_stability = False
+        for j, extension in enumerate(extensions):
+            if (
+                extension.url
+                == "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-ContentStability"
+            ):
+                if not self._validate_content_stability_extension(extension, i, j):
+                    return False
+                has_content_stability = True
+            elif (
+                extension.url
+                == "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism"
+            ):
+                if not self._validate_retrieval_mechanism_extension(extension, i, j):
+                    return False
+        if not has_content_stability:
+            self.result.add_error(
+                issue_code="business-rule",
+                error_code="UNPROCESSABLE_ENTITY",
+                diagnostics="Invalid content extension: Extension must have one content stability extension see value set ('https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability')",
+                field=f"content[{i}].extension",
+            )
+            return False
+        return True
 
     def _validate_content_stability_extension(self, extension, i, j):
         coding = extension.valueCodeableConcept.coding[0]
