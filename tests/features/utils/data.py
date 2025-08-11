@@ -1,6 +1,8 @@
 from layer.nrlf.core.constants import (
     CATEGORY_ATTRIBUTES,
     CONTENT_FORMAT_CODE_URL,
+    CONTENT_RETRIEVAL_EXTENSION_URL,
+    CONTENT_RETRIEVAL_SYSTEM_URL,
     CONTENT_STABILITY_EXTENSION_URL,
     CONTENT_STABILITY_SYSTEM_URL,
     SNOMED_PRACTICE_SETTINGS,
@@ -22,6 +24,9 @@ from nrlf.producer.fhir.r4.model import (
     NRLCoding,
     NRLFormatCode,
     Reference,
+    RetrievalMechanismExtension,
+    RetrievalMechanismExtensionCoding,
+    RetrievalMechanismExtensionValueCodeableConcept,
 )
 from tests.features.utils.constants import (
     DEFAULT_TEST_AUTHOR,
@@ -75,7 +80,19 @@ def create_test_document_reference(items: dict) -> DocumentReference:
                                     )
                                 ]
                             ),
-                        )
+                        ),
+                        RetrievalMechanismExtension(
+                            url=CONTENT_RETRIEVAL_EXTENSION_URL,
+                            valueCodeableConcept=RetrievalMechanismExtensionValueCodeableConcept(
+                                coding=[
+                                    RetrievalMechanismExtensionCoding(
+                                        system=CONTENT_RETRIEVAL_SYSTEM_URL,
+                                        code="Direct",
+                                        display="Direct",
+                                    )
+                                ]
+                            ),
+                        ),
                     ],
                 )
             ],
