@@ -33,6 +33,10 @@
           {
             "code": "LDR",
             "display": "Large Document Retrieval"
+          },
+          {
+            "code": "Direct_InContext",
+            "display": "Direct using In-Context"
           }
         ]
       }
