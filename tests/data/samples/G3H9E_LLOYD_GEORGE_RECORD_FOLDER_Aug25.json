@@ -1,0 +1,88 @@
+{
+  "resourceType": "DocumentReference",
+  "id": "G3H9E-1c9c2030-6ef4-4564-ac62-c9c321659cc9",
+  "meta": {
+    "lastUpdated": "2025-01-06T16:04:28.966Z"
+  },
+  "status": "current",
+  "type": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "16521000000101",
+        "display": "Lloyd George record folder"
+      }
+    ]
+  },
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://snomed.info/sct",
+          "code": "734163000",
+          "display": "Care plan"
+        }
+      ]
+    }
+  ],
+  "subject": {
+    "identifier": {
+      "system": "https://fhir.nhs.uk/Id/nhs-number",
+      "value": "9730326991"
+    }
+  },
+  "date": "2025-01-06T16:04:28.966Z",
+  "author": [
+    {
+      "identifier": {
+        "system": "https://fhir.nhs.uk/Id/ods-organization-code",
+        "value": "G3H9E"
+      }
+    }
+  ],
+  "custodian": {
+    "identifier": {
+      "system": "https://fhir.nhs.uk/Id/ods-organization-code",
+      "value": "G3H9E"
+    }
+  },
+  "content": [
+    {
+      "attachment": {
+        "contentType": "application/pdf",
+        "language": "en-UK",
+        "url": "https://dev.api.service.nhs.uk/national-document-repository/FHIR/R4/DocumentReference/f0c41c3a-d43d-4c7a-9d96-61c6903bf2bd"
+      },
+      "format": {
+        "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLFormatCode",
+        "code": "urn:nhs-ic:unstructured",
+        "display": "Unstructured Document"
+      },
+      "extension": [
+        {
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability",
+                "code": "static",
+                "display": "Static"
+              }
+            ]
+          },
+          "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-ContentStability"
+        }
+      ]
+    }
+  ],
+  "context": {
+    "practiceSetting": {
+      "coding": [
+        {
+          "system": "http://snomed.info/sct",
+          "code": "1060971000000108",
+          "display": "General practice service"
+        }
+      ]
+    }
+  }
+}
