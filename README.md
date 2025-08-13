@@ -95,7 +95,7 @@ To run all the feature integration tests:
 make test-features-integration
 ```
 
-To run indivudal feature test scenario(s) using the custom tag :
+To run individual feature test scenario(s) using the custom tag :
 
 1. Add `@custom_tag` before each 'Scenario' that needs to be run (in each .feature file)
 2. Run the command below:
@@ -104,11 +104,76 @@ To run indivudal feature test scenario(s) using the custom tag :
 make integration-test-with-custom_tag
 ```
 
-To run all the feature integration tests and generate an interactive Allure report therafter :
+To run all the feature integration tests and generate an interactive Allure report thereafter :
 
 ```
 make test-features-integration-report
 ```
+
+### Debugging Behave Integration Tests in VS Code
+
+Integration tests can be debugged directly in **VS Code** using a launch configuration. Instructions on how to set this up for the first time and run the debugger are below.
+
+---
+
+#### 1. Create the Launch Configuration
+
+To get started:
+
+1. Open VS Code and press `Ctrl+Shift+P`
+2. Search for **“Add Configuration”** and select it
+3. Choose **Python** > **Module**
+4. Replace the generated entry in `.vscode/launch.json` with an appropriate launch.json configuration. Below is a example which can be modified as required:
+
+```json
+// .vscode/launch.json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Behave",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "behave",
+      "args": [
+        "-D",
+        "env=example-env",
+        "tests/features",
+        "-D",
+        "integration_test=true",
+        "--tags=@custom_tag"
+      ],
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}" // adds your project code to Python path
+      },
+      "cwd": "${workspaceFolder}" // resolves to the root directory
+    }
+  ]
+}
+```
+
+Once steps 1-4 are done, "Debug Behave" should appear in the Run and Debug panel.
+
+#### 2. Customizing the Debug Configuration
+
+You can tailor the args section in .vscode/launch.json to suit your specific environment, tags, or test structure.
+
+For example:
+To run only tests with the @api tag, set the --tags accordingly:
+
+```
+"args": ["--tags=@api"..]
+```
+
+#### 3. Running the Debugger
+
+To start debugging using the launch configuration from VS Code:
+
+1. Go to the Run and Debug panel `Ctrl+Shift+D`
+2. Ensure **“Debug Behave”** (if this is the name used in **“launch.json”**) is selected from the dropdown at the top
+3. Press `F5` to start debugging
 
 ### Smoke testing
 
