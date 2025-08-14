@@ -2,10 +2,10 @@
   "resourceType": "ValueSet",
   "id": "NRLF-RecordType",
   "url": "https://fhir.nhs.uk/England/ValueSet/England-NRLRecordType",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "name": "NRLF Record Type",
   "status": "draft",
-  "date": "2025-05-22T00:00:00+00:00",
+  "date": "2025-08-14T00:00:00+00:00",
   "publisher": "NHS Digital",
   "contact": {
     "name": "NRL Team at NHS Digital",
@@ -73,6 +73,10 @@
           {
             "code": "749001000000101",
             "display": "Appointment"
+          },
+          {
+            "code": "887181000000106",
+            "display": "Clinical summary"
           }
         ]
       },
