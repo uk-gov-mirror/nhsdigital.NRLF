@@ -102,6 +102,7 @@ def test_validate_content_invalid_content_stability_code():
         validator.validate(document_ref_data)
 
     exc = error.value
+    assert len(exc.issues) == 1
     assert exc.issues[0].model_dump(exclude_none=True) == {
         "severity": "error",
         "code": "invalid",
@@ -131,6 +132,7 @@ def test_validate_content_invalid_content_stability_display():
         validator.validate(document_ref_data)
 
     exc = error.value
+    assert len(exc.issues) == 1
     assert exc.issues[0].model_dump(exclude_none=True) == {
         "severity": "error",
         "code": "invalid",
@@ -162,6 +164,7 @@ def test_validate_content_invalid_content_stability_system():
         validator.validate(document_ref_data)
 
     exc = error.value
+    assert len(exc.issues) == 1
     assert exc.issues[0].model_dump(exclude_none=True) == {
         "severity": "error",
         "code": "invalid",
@@ -190,6 +193,7 @@ def test_validate_content_invalid_content_stability_url():
         validator.validate(document_ref_data)
 
     exc = error.value
+    assert len(exc.issues) == 1
     assert exc.issues[0].model_dump(exclude_none=True) == {
         "severity": "error",
         "code": "invalid",
