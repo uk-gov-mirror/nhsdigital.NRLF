@@ -87,7 +87,8 @@ variable "backup_plan_config" {
         cold_storage_after = optional(number)
       })
       copy_action = optional(list(object({
-        delete_after = optional(number)
+        delete_after       = optional(number)
+        cold_storage_after = optional(number)
       })))
     })))
   })
