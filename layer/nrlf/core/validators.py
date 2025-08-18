@@ -25,6 +25,10 @@ from nrlf.core.errors import ParseError
 from nrlf.core.logger import LogReference, logger
 from nrlf.core.types import DocumentReference, OperationOutcomeIssue, RequestQueryType
 from nrlf.producer.fhir.r4 import model as producer_model
+from nrlf.producer.fhir.r4.model import (
+    ContentStabilityExtension,
+    RetrievalMechanismExtension,
+)
 
 
 def validate_type(type_: Optional[RequestQueryType], pointer_types: List[str]) -> bool:
@@ -523,37 +527,64 @@ class DocumentReferenceValidator:
                 return
 
     def _has_valid_extensions(self, extensions, i):
-        has_content_stability = False
-        for j, extension in enumerate(extensions):
-            if (
-                extension.url
-                == "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-ContentStability"
-            ):
-                if not self._validate_content_stability_extension(extension, i, j):
-                    return False
-                has_content_stability = True
-            elif (
-                extension.url
-                == "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism"
-            ):
-                if not self._validate_retrieval_mechanism_extension(extension, i, j):
-                    return False
-        if not has_content_stability:
+        content_stability_count = 0
+        content_retrieval_count = 0
+
+        for extension in extensions:
+            # if extension.url == CONTENT_STABILITY_EXTENSION_URL:
+            #     content_stability_count += 1
+            # elif extension.url == CONTENT_RETRIEVAL_EXTENSION_URL:
+            #     content_retrieval_count += 1
+            if "ContentStability" in str(extension):
+                content_stability_count += 1
+            elif "RetrievalMechanism" in str(extension):
+                content_retrieval_count += 1
+
+        if content_stability_count != 1:
             self.result.add_error(
                 issue_code="business-rule",
                 error_code="UNPROCESSABLE_ENTITY",
-                diagnostics="Invalid content extension: Extension must have one content stability extension see value set ('https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability')",
+                diagnostics="Invalid content extension: Extension must have one content stability extension, see: ('https://fhir.nhs.uk/England/ValueSet/England-NRLContentStability')",
                 field=f"content[{i}].extension",
             )
             return False
+
+        if content_retrieval_count > 1:
+            self.result.add_error(
+                issue_code="business-rule",
+                error_code="UNPROCESSABLE_ENTITY",
+                diagnostics="Invalid content retrieval extension: Extension must have one content retrieval extension, see: ('https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism')",
+                field=f"content[{i}].extension",
+            )
+            return False
+
+        for j, extension in enumerate(extensions):
+            # if extension.url == CONTENT_STABILITY_EXTENSION_URL:
+            if "ContentStability" in str(extension):
+                if not self._validate_content_stability_extension(extension, i, j):
+                    return False
+            # elif extension.url == CONTENT_RETRIEVAL_EXTENSION_URL:
+            elif "RetrievalMechanism" in str(extension):
+                if not self._validate_retrieval_mechanism_extension(extension, i, j):
+                    return False
+
         return True
 
     def _validate_content_stability_extension(self, extension, i, j):
+        try:
+            ContentStabilityExtension.model_validate(extension.model_dump())
+        except ValidationError as exc:
+            # for error in exc.errors():
+            #     error["loc"] = ("content", i, "extension", j) + error["loc"]
+            raise ParseError.from_validation_error(
+                exc,
+                details=SpineErrorConcept.from_code("BAD_REQUEST"),
+                msg="Invalid content stability extension",
+                value_set="https://fhir.nhs.uk/England/ValueSet/England-NRLContentStability",
+                root_location=("content", i, "extension", j),
+            ) from None
         coding = extension.valueCodeableConcept.coding[0]
-        if coding.code != coding.display.lower() or coding.display not in [
-            "Static",
-            "Dynamic",
-        ]:
+        if coding.code != coding.display.lower():
             self.result.add_error(
                 issue_code="business-rule",
                 error_code="UNPROCESSABLE_ENTITY",
@@ -564,6 +595,17 @@ class DocumentReferenceValidator:
         return True
 
     def _validate_retrieval_mechanism_extension(self, extension, i, j):
+        try:
+            RetrievalMechanismExtension.model_validate(extension.model_dump())
+        except ValidationError as exc:
+            for error in exc.errors():
+                error["loc"] = ("content", i, "extension", j) + error["loc"]
+            raise ParseError.from_validation_error(
+                exc,
+                details=SpineErrorConcept.from_code("BAD_REQUEST"),
+                msg="Invalid content retrieval extension",
+                value_set="https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism",
+            ) from None
         coding = extension.valueCodeableConcept.coding[0]
         expected_retrieval_display = CONTENT_RETRIEVAL_CODE_MAP.get(coding.code)
         if coding.display != expected_retrieval_display:

@@ -3,11 +3,6 @@ from typing import List, Optional
 from pydantic import ValidationError
 from pydantic_core import ErrorDetails
 
-from nrlf.core.constants import (
-    CONTENT_FORMAT_CODE_URL,
-    CONTENT_RETRIEVAL_SYSTEM_URL,
-    CONTENT_STABILITY_SYSTEM_URL,
-)
 from nrlf.core.response import Response
 from nrlf.core.types import CodeableConcept
 from nrlf.producer.fhir.r4 import model as producer_model
@@ -15,12 +10,8 @@ from nrlf.producer.fhir.r4.model import OperationOutcome, OperationOutcomeIssue
 
 
 def format_error_location(loc: List) -> str:
-    # List of extension class names to exclude from error paths
-    exclude_classes = {"ContentStabilityExtension", "RetrievalMechanismExtension"}
-    filtered_loc = [each for each in loc if each not in exclude_classes]
-
     formatted_loc = ""
-    for each in filtered_loc:
+    for each in loc:
         if isinstance(each, int):
             formatted_loc = f"{formatted_loc}[{each}]"
         else:
@@ -28,28 +19,25 @@ def format_error_location(loc: List) -> str:
     return formatted_loc
 
 
-def append_value_set_url(loc_string: str) -> str:
-    if loc_string.endswith(("url", "system")):
-        return ""
-
-    if "content" in loc_string:
-        if "extension" in loc_string:
-            return f". See ValueSets: {CONTENT_STABILITY_SYSTEM_URL} & {CONTENT_RETRIEVAL_SYSTEM_URL}"
-        if "format" in loc_string:
-            return f". See ValueSet: {CONTENT_FORMAT_CODE_URL}"
-
-    return ""
-
-
-def diag_for_error(error: ErrorDetails) -> str:
+def diag_for_error(error: ErrorDetails, value_set: str, root_location: tuple) -> str:
     loc_string = format_error_location(error["loc"])
+    if root_location:
+        loc_string = format_error_location(root_location) + "." + loc_string
+
     msg = f"{loc_string or 'DocumentReference'}: {error['msg']}"
-    msg += append_value_set_url(loc_string)
+    msg += f", see: {value_set}" if value_set else ""
     return msg
 
 
-def expression_for_error(error: ErrorDetails) -> Optional[str]:
-    return format_error_location(error["loc"]) or "DocumentReference"
+def expression_for_error(error: ErrorDetails, root_location: tuple) -> Optional[str]:
+    loc_string = format_error_location(error["loc"]) or "DocumentReference"
+    if root_location and error["loc"]:
+        loc_string = (
+            format_error_location(root_location)
+            + "."
+            + format_error_location(error["loc"])
+        )
+    return loc_string
 
 
 class OperationOutcomeError(Exception):
@@ -99,15 +87,20 @@ class ParseError(Exception):
 
     @classmethod
     def from_validation_error(
-        cls, exc: ValidationError, details: CodeableConcept, msg: str = ""
+        cls,
+        exc: ValidationError,
+        details: CodeableConcept,
+        msg: str = "",
+        value_set: str = "",
+        root_location: tuple = None,
     ):
         issues = [
             producer_model.OperationOutcomeIssue(
                 severity="error",
                 code="invalid",
                 details=details,  # type: ignore
-                diagnostics=f"{msg} ({diag_for_error(error)})",
-                expression=[expression_for_error(error)],  # type: ignore
+                diagnostics=f"{msg} ({diag_for_error(error, value_set, root_location)})",
+                expression=[expression_for_error(error, root_location)],  # type: ignore
             )
             for error in exc.errors()
         ]

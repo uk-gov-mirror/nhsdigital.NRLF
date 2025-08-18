@@ -1402,7 +1402,7 @@ def test_validate_content_extension_missing_content_stability():
                 }
             ]
         },
-        "diagnostics": "Invalid content extension: Extension must have one content stability extension see value set ('https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability')",
+        "diagnostics": "Invalid content extension: Extension must have one content stability extension, see: ('https://fhir.nhs.uk/England/ValueSet/England-NRLContentStability')",
         "expression": ["content[0].extension"],
     }
 
@@ -1558,4 +1558,75 @@ def test_validate_nrl_format_code_display_mismatch(
         },
         "diagnostics": f"Invalid display for format code '{format_code}'. Expected '{expected_display}'",
         "expression": ["content[0].format.display"],
+    }
+
+
+def test_validate_content_multiple_content_stability_extensions():
+    validator = DocumentReferenceValidator()
+    document_ref_data = load_document_reference_json("Y05868-736253002-Valid")
+
+    # Add a second duplicate contentStability extension
+    document_ref_data["content"][0]["extension"].append(
+        document_ref_data["content"][0]["extension"][0]
+    )
+
+    result = validator.validate(document_ref_data)
+
+    assert result.is_valid is False
+    assert len(result.issues) == 1
+    assert result.issues[0].model_dump(exclude_none=True) == {
+        "severity": "error",
+        "code": "business-rule",
+        "details": {
+            "coding": [
+                {
+                    "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
+                    "code": "UNPROCESSABLE_ENTITY",
+                    "display": "Unprocessable Entity",
+                }
+            ]
+        },
+        "diagnostics": "Invalid content extension: Extension must have one content stability extension, see: ('https://fhir.nhs.uk/England/ValueSet/England-NRLContentStability')",
+        "expression": ["content[0].extension"],
+    }
+
+
+def test_validate_content_multiple_content_retrieval_extensions():
+    validator = DocumentReferenceValidator()
+    document_ref_data = load_document_reference_json("Y05868-736253002-Valid")
+
+    # Add 2 content retrieval extensions
+    content_retrieval_extension = {
+        "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism",
+        "valueCodeableConcept": {
+            "coding": [
+                {
+                    "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                    "code": "Direct",
+                    "display": "Direct",
+                }
+            ]
+        },
+    }
+    document_ref_data["content"][0]["extension"].append(content_retrieval_extension)
+    document_ref_data["content"][0]["extension"].append(content_retrieval_extension)
+
+    result = validator.validate(document_ref_data)
+
+    assert result.is_valid is False
+    assert len(result.issues) == 1
+    assert result.issues[0].model_dump(exclude_none=True) == {
+        "severity": "error",
+        "code": "business-rule",
+        "details": {
+            "coding": [
+                {
+                    "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
+                    "code": "UNPROCESSABLE_ENTITY",
+                    "display": "Unprocessable Entity",
+                }
+            ]
+        },
+        "diagnostics": "Invalid content retrieval extension: Extension must have one content retrieval extension, see: ('https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism')",
+        "expression": ["content[0].extension"],
     }

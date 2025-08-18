@@ -1418,9 +1418,9 @@ components:
             oneOf:
               - $ref: "#/components/schemas/ContentStabilityExtension"
               - $ref: "#/components/schemas/RetrievalMechanismExtension"
-            description: Additional extension for content stability.
+              - $ref: "#/components/schemas/Extension"
+            description: Additional extensions which include Content Stability and Retrieval Mechanism.
           minItems: 1
-          maxItems: 2
       required:
         - attachment
         - format

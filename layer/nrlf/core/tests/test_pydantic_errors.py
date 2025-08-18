@@ -85,44 +85,8 @@ def test_validate_content_missing_format():
                 }
             ]
         },
-        "diagnostics": "Failed to parse DocumentReference resource (content[0].format: Field required. See ValueSet: https://fhir.nhs.uk/England/CodeSystem/England-NRLFormatCode)",
+        "diagnostics": "Failed to parse DocumentReference resource (content[0].format: Field required)",
         "expression": ["content[0].format"],
-    }
-
-
-def test_validate_content_multiple_content_stability_extensions():
-    validator = DocumentReferenceValidator()
-    document_ref_data = load_document_reference_json("Y05868-736253002-Valid")
-
-    # Add a second duplicate contentStability extension
-    document_ref_data["content"][0]["extension"].append(
-        document_ref_data["content"][0]["extension"][0]
-    )
-
-    # Add a third duplicate contentStability extension
-    document_ref_data["content"][0]["extension"].append(
-        document_ref_data["content"][0]["extension"][0]
-    )
-
-    with pytest.raises(ParseError) as error:
-        validator.validate(document_ref_data)
-
-    exc = error.value
-    assert len(exc.issues) == 1
-    assert exc.issues[0].model_dump(exclude_none=True) == {
-        "severity": "error",
-        "code": "invalid",
-        "details": {
-            "coding": [
-                {
-                    "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
-                    "code": "BAD_REQUEST",
-                    "display": "Bad request",
-                }
-            ]
-        },
-        "diagnostics": "Failed to parse DocumentReference resource (content[0].extension: List should have at most 2 items after validation, not 3. See ValueSets: https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability & https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism)",
-        "expression": ["content[0].extension"],
     }
 
 
@@ -150,7 +114,7 @@ def test_validate_content_invalid_content_stability_code():
                 }
             ]
         },
-        "diagnostics": "Failed to parse DocumentReference resource (content[0].extension[0].valueCodeableConcept.coding[0].code: Input should be 'static' or 'dynamic'. See ValueSets: https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability & https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism)",
+        "diagnostics": "Invalid content stability extension (content[0].extension[0].valueCodeableConcept.coding[0].code: Input should be 'static' or 'dynamic', see: https://fhir.nhs.uk/England/ValueSet/England-NRLContentStability)",
         "expression": ["content[0].extension[0].valueCodeableConcept.coding[0].code"],
     }
 
@@ -179,7 +143,7 @@ def test_validate_content_invalid_content_stability_display():
                 }
             ]
         },
-        "diagnostics": "Failed to parse DocumentReference resource (content[0].extension[0].valueCodeableConcept.coding[0].display: Input should be 'Static' or 'Dynamic'. See ValueSets: https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability & https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism)",
+        "diagnostics": "Invalid content stability extension (content[0].extension[0].valueCodeableConcept.coding[0].display: Input should be 'Static' or 'Dynamic', see: https://fhir.nhs.uk/England/ValueSet/England-NRLContentStability)",
         "expression": [
             "content[0].extension[0].valueCodeableConcept.coding[0].display"
         ],
@@ -210,7 +174,7 @@ def test_validate_content_invalid_content_stability_system():
                 }
             ]
         },
-        "diagnostics": "Failed to parse DocumentReference resource (content[0].extension[0].valueCodeableConcept.coding[0].system: Input should be 'https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability')",
+        "diagnostics": "Invalid content stability extension (content[0].extension[0].valueCodeableConcept.coding[0].system: Input should be 'https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability', see: https://fhir.nhs.uk/England/ValueSet/England-NRLContentStability)",
         "expression": ["content[0].extension[0].valueCodeableConcept.coding[0].system"],
     }
 
@@ -238,7 +202,7 @@ def test_validate_content_invalid_content_stability_url():
                 }
             ]
         },
-        "diagnostics": "Failed to parse DocumentReference resource (content[0].extension[0].url: Input should be 'https://fhir.nhs.uk/England/StructureDefinition/Extension-England-ContentStability')",
+        "diagnostics": "Invalid content stability extension (content[0].extension[0].url: Input should be 'https://fhir.nhs.uk/England/StructureDefinition/Extension-England-ContentStability', see: https://fhir.nhs.uk/England/ValueSet/England-NRLContentStability)",
         "expression": ["content[0].extension[0].url"],
     }
 
