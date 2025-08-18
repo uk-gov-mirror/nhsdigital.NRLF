@@ -1039,12 +1039,14 @@ components:
               enum:
                 - "urn:nhs-ic:record-contact"
                 - "urn:nhs-ic:unstructured"
+                - "urn:nhs-ic:structured"
               description: The code representing the format of the document.
             display:
               type: string
               enum:
                 - "Contact details (HTTP Unsecured)"
                 - "Unstructured Document"
+                - "Structured Document"
               description: The display text for the code.
           required:
             - system
