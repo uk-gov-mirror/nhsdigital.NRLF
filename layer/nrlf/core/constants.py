@@ -197,7 +197,7 @@ TYPE_CATEGORIES = {
     PointerTypes.APPOINTMENT.value: Categories.RECORD_ARTIFACT.value,
     #
     # Shared Care Records
-    PointerTypes.SHARED_CARE_RECORD.value: Categories.RECORD_ARTIFACT.value,
+    PointerTypes.SHARED_CARE_RECORD.value: Categories.RECORD_HEADINGS.value,
 }
 
 PRACTICE_SETTING_VALUE_SET_URL = (
