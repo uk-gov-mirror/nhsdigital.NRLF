@@ -48,7 +48,7 @@ jobs:
     environment: pull-request
     steps:
       - name: Git Clone - ${{ github.event.pull_request.head.ref }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ github.event.pull_request.head.ref }}
 
@@ -111,7 +111,7 @@ jobs:
 
     steps:
       - name: Git Clone - ${{ github.event.pull_request.head.ref }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ github.event.pull_request.head.ref }}
 
@@ -193,7 +193,7 @@ jobs:
 
     steps:
       - name: Git Clone - ${{ github.event.pull_request.head.ref }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ github.event.pull_request.head.ref }}
 
@@ -230,7 +230,7 @@ jobs:
     runs-on: codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
     steps:
       - name: Git Clone - ${{ github.event.pull_request.head.ref }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ github.event.pull_request.head.ref }}
 
@@ -265,7 +265,7 @@ jobs:
 
     steps:
       - name: Git Clone - ${{ github.event.pull_request.head.ref }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ github.event.pull_request.head.ref }}
 
