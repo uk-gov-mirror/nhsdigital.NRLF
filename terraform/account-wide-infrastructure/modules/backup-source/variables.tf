@@ -78,7 +78,7 @@ variable "backup_plan_config" {
     enable                    = bool
     selection_tag             = string
     compliance_resource_types = list(string)
-    rules = optional(list(object({
+    rules = list(object({
       name                     = string
       schedule                 = string
       enable_continuous_backup = optional(bool)
@@ -90,7 +90,7 @@ variable "backup_plan_config" {
         delete_after       = optional(number)
         cold_storage_after = optional(number)
       })))
-    })))
+    }))
   })
 }
 variable "backup_plan_config_dynamodb" {

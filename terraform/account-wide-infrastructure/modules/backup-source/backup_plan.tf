@@ -20,8 +20,7 @@ resource "aws_backup_plan" "default" {
         for_each = rule.value.copy_action
         content {
           lifecycle {
-            delete_after       = copy_action.value.delete_after
-            cold_storage_after = copy_action.value.cold_storage_after
+            delete_after = copy_action.value.delete_after
           }
           destination_vault_arn = var.backup_copy_vault_arn
         }
