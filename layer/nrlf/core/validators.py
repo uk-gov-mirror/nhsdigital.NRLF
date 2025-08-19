@@ -531,10 +531,6 @@ class DocumentReferenceValidator:
         content_retrieval_count = 0
 
         for extension in extensions:
-            # if extension.url == CONTENT_STABILITY_EXTENSION_URL:
-            #     content_stability_count += 1
-            # elif extension.url == CONTENT_RETRIEVAL_EXTENSION_URL:
-            #     content_retrieval_count += 1
             if "ContentStability" in str(extension):
                 content_stability_count += 1
             elif "RetrievalMechanism" in str(extension):
@@ -559,11 +555,9 @@ class DocumentReferenceValidator:
             return False
 
         for j, extension in enumerate(extensions):
-            # if extension.url == CONTENT_STABILITY_EXTENSION_URL:
             if "ContentStability" in str(extension):
                 if not self._validate_content_stability_extension(extension, i, j):
                     return False
-            # elif extension.url == CONTENT_RETRIEVAL_EXTENSION_URL:
             elif "RetrievalMechanism" in str(extension):
                 if not self._validate_retrieval_mechanism_extension(extension, i, j):
                     return False
@@ -574,8 +568,6 @@ class DocumentReferenceValidator:
         try:
             ContentStabilityExtension.model_validate(extension.model_dump())
         except ValidationError as exc:
-            # for error in exc.errors():
-            #     error["loc"] = ("content", i, "extension", j) + error["loc"]
             raise ParseError.from_validation_error(
                 exc,
                 details=SpineErrorConcept.from_code("BAD_REQUEST"),
