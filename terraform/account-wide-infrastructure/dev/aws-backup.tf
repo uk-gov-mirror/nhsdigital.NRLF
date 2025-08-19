@@ -109,12 +109,12 @@ module "source" {
     "compliance_resource_types" : [
       "S3"
     ],
-    "enable" = true,
+    "enable" : true,
     "rules" : [
       {
-        "copy_action" : {
-          "delete_after" : 4
-        },
+        "copy_action" : [{
+          "delete_after" : 4,
+        }],
         "lifecycle" : {
           "delete_after" : 2
         },
@@ -132,14 +132,39 @@ module "source" {
     "enable" : true,
     "rules" : [
       {
-        "copy_action" : {
-          "delete_after" : 4
-        },
+        "name" : "daily",
+        "schedule" : "cron(0 0 * * ? *)",
+        "copy_action" : [{
+          "delete_after" : 4,
+        }],
+
         "lifecycle" : {
           "delete_after" : 2
-        },
-        "name" : "daily_kept_for_2_days",
-        "schedule" : "cron(0 0 * * ? *)"
+        }
+      },
+      {
+        "name" : "monthly"
+        "schedule" : "cron(30 0 ? * 4#1)" # first Thursday each month from 00:30
+        "copy_action" : [{
+          "cold_storage_after" : 3,
+          "delete_after" : 100 # ensures there will always be min 3
+        }],
+        "lifecycle" : {
+          "delete_after" : 2
+        }
+
+      },
+      {
+        "name" : "weekly"               # overlaps with monthly
+        "schedule" : "cron(30 0 ? * 4)" # every Thursday from 00:30 to precede releases
+        "copy_action" : [{
+          "cold_storage_after" : 14 # ensures 2 warm including one from previous release
+          "delete_after" : 105
+        }],
+        "lifecycle" : {
+          "delete_after" : 2
+        }
+
       }
     ],
     "selection_tag" : "NHSE-Enable-DDB-Backup"

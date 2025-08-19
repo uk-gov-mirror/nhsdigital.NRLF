@@ -86,9 +86,10 @@ variable "backup_plan_config" {
         delete_after       = optional(number)
         cold_storage_after = optional(number)
       })
-      copy_action = optional(object({
-        delete_after = optional(number)
-      }))
+      copy_action = optional(list(object({
+        delete_after       = optional(number)
+        cold_storage_after = optional(number)
+      })))
     }))
   })
 }
@@ -106,9 +107,10 @@ variable "backup_plan_config_dynamodb" {
         delete_after       = number
         cold_storage_after = optional(number)
       })
-      copy_action = optional(object({
-        delete_after = optional(number)
-      }))
+      copy_action = optional(list(object({
+        delete_after       = optional(number)
+        cold_storage_after = optional(number)
+      })))
     })))
   })
 
