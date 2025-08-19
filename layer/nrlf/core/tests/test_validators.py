@@ -1630,3 +1630,100 @@ def test_validate_content_multiple_content_retrieval_extensions():
         "diagnostics": "Invalid content retrieval extension: Extension must have one content retrieval extension, see: ('https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism')",
         "expression": ["content[0].extension"],
     }
+
+
+def test_validate_two_content_with_different_retrieval_mechanisms():
+    """Test that two content items with different retrieval mechanisms are valid."""
+    validator = DocumentReferenceValidator()
+    document_ref_data = load_document_reference_json("Y05868-736253002-Valid")
+
+    unstructured_format = {
+        "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLFormatCode",
+        "code": "urn:nhs-ic:unstructured",
+        "display": "Unstructured Document",
+    }
+
+    static_content_stability = {
+        "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-ContentStability",
+        "valueCodeableConcept": {
+            "coding": [
+                {
+                    "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability",
+                    "code": "static",
+                    "display": "Static",
+                }
+            ]
+        },
+    }
+
+    # Add retrieval mechanism extension to the first content item, ssp
+    first_content = {
+        "attachment": {
+            "contentType": "application/pdf",
+            "url": "ssp://example.com/document1.pdf",
+        },
+        "format": unstructured_format,
+        "extension": [
+            {
+                "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism",
+                "valueCodeableConcept": {
+                    "coding": [
+                        {
+                            "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                            "code": "SSP",
+                            "display": "Spine Secure Proxy",
+                        }
+                    ]
+                },
+            },
+            static_content_stability,
+        ],
+    }
+
+    document_ref_data["content"] = [first_content]
+
+    # Add valid ASID identifier in context.related
+    document_ref_data["context"]["related"] = [
+        {
+            "identifier": {
+                "system": "https://fhir.nhs.uk/Id/nhsSpineASID",
+                "value": "123456789012",
+            }
+        }
+    ]
+
+    result = validator.validate(document_ref_data)
+
+    assert result.is_valid is True
+    assert len(result.issues) == 0
+
+    # Add a second content item with a different retrieval mechanism
+    second_content = {
+        "attachment": {
+            "contentType": "application/pdf",
+            "url": "http://example.com/document2.pdf",
+        },
+        "format": unstructured_format,
+        "extension": [
+            {
+                "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism",
+                "valueCodeableConcept": {
+                    "coding": [
+                        {
+                            "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                            "code": "Direct",
+                            "display": "Direct",
+                        }
+                    ]
+                },
+            },
+            static_content_stability,
+        ],
+    }
+
+    document_ref_data["content"].append(second_content)
+
+    result = validator.validate(document_ref_data)
+
+    assert result.is_valid is True
+    assert len(result.issues) == 0
