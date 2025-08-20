@@ -1,5 +1,4 @@
 
-# First, we create an S3 bucket for compliance reports.
 resource "aws_s3_bucket" "backup_reports" {
   bucket_prefix = "${local.prefix}-backup-reports"
 }
@@ -45,6 +44,22 @@ resource "aws_s3_bucket_policy" "backup_reports_bucket_policy" {
           }
         }
       },
+      {
+        Sid    = "AllowBackupReportsWrite"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${local.account_id}:role/aws-service-role/reports.backup.amazonaws.com/AWSServiceRoleForBackupReports"
+        }
+        Action = "s3:PutObject"
+        Resource = [
+          "${aws_s3_bucket.backup_reports.arn}/*",
+        ]
+        Condition = {
+          StringEquals = {
+            "s3:x-amz-acl" = "bucket-owner-full-control"
+          }
+        }
+      }
     ]
   })
 }
