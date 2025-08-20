@@ -30,3 +30,8 @@ resource "aws_secretsmanager_secret" "powerbi_gw_recovery_key" {
   name        = "${local.project}--prod-powerbi-gw-recovery-key"
   description = "Recovery key for the PowerBI Gateway EC2 instance"
 }
+
+resource "aws_secretsmanager_secret" "backup_destination_parameters" {
+  name        = "${local.prefix}--backup-destination-parameters"
+  description = "Parameters used to configure the backup destination"
+}
