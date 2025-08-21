@@ -2,7 +2,7 @@
   "resourceType": "CodeSystem",
   "id": "England-RetrievalMechanismNRL",
   "url": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanismNRL",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "name": "EnglandRetrievalMechanismNRL",
   "title": "England Retrieval MechanismNRL",
   "status": "draft",
@@ -40,7 +40,14 @@
     {
       "code": "Direct",
       "display": "Direct",
-      "definition": "This document can be directly retrieved via HTTP(s) at its public URL."
+      "definition": "This document can be directly retrieved via HTTP(s) at its public URL.",
+      "concept": [
+        {
+          "code": "InContext",
+          "display": "Direct using In-Context",
+          "definition": "This document can be retrieved in-context via the In-Context launch mechanism."
+        }
+      ]
     },
     {
       "code": "Proxy",
@@ -58,11 +65,6 @@
           "definition": "This document can be retrieved via the Large Document Retrieval proxy service."
         }
       ]
-    },
-    {
-      "code": "Direct_InContext",
-      "display": "Direct using In-Context",
-      "definition": "This document can be retrieved in-context via the In-Context launch mechanism."
     }
   ]
 }
