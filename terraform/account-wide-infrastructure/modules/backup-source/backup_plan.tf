@@ -17,7 +17,7 @@ resource "aws_backup_plan" "default" {
         cold_storage_after = rule.value.lifecycle.cold_storage_after
       }
       dynamic "copy_action" {
-        for_each = rule.value.copy_action
+        for_each = rule.value.copy_action != null ? rule.value.copy_action : []
         content {
           lifecycle {
             delete_after = copy_action.value.delete_after
@@ -48,7 +48,7 @@ resource "aws_backup_plan" "dynamodb" {
         cold_storage_after = rule.value.lifecycle.cold_storage_after
       }
       dynamic "copy_action" {
-        for_each = rule.value.copy_action
+        for_each = rule.value.copy_action != null ? rule.value.copy_action : []
         content {
           lifecycle {
             delete_after       = copy_action.value.delete_after

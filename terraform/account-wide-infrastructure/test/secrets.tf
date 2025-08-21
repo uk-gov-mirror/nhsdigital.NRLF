@@ -2,7 +2,6 @@ resource "aws_secretsmanager_secret" "identities_account_id" {
   name = "${local.prefix}--nhs-identities-account-id"
 }
 
-// TODO-NOW - Get apigee app config for test/qa smoke tests
 resource "aws_secretsmanager_secret" "qa_smoke_test_apigee_app" {
   name        = "${local.prefix}--qa--apigee-app--smoke-test"
   description = "APIGEE App used to run Smoke Tests against the QA environment"
@@ -18,6 +17,10 @@ resource "aws_secretsmanager_secret" "ref_smoke_test_apigee_app" {
   description = "APIGEE App used to run Smoke Tests against the REF environment"
 }
 
+resource "aws_secretsmanager_secret" "backup_destination_parameters" {
+  name        = "${local.prefix}--backup-destination-parameters"
+  description = "Parameters used to configure the backup destination"
+}
 
 #
 # Smoke test parameters secrets
