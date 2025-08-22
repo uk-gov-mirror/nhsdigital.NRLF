@@ -223,9 +223,10 @@ Feature: Producer - createDocumentReference - Success Scenarios
       | pointer-type    | pointer-category | type-name      |
       | 824321000000109 | 823651000000106  | SUMMARY_RECORD |
 
-    Examples: Record Artifacts
-      | pointer-type    | pointer-category | type-name   |
-      | 749001000000101 | 419891008        | APPOINTMENT |
+    Examples: Record Artifacts and Headings
+      | pointer-type    | pointer-category | type-name          |
+      | 749001000000101 | 419891008        | APPOINTMENT        |
+      | 887181000000106 | 716931000000107  | SHARED_CARE_RECORD |
 
   # Create with content and contact details
   # Create with contact details only

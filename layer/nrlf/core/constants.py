@@ -67,6 +67,7 @@ class PointerTypes(Enum):
     MRA_UPPER_LIMB_ARTERY = "https://nicip.nhs.uk|MAULR"
     MRI_AXILLA_BOTH = "https://nicip.nhs.uk|MAXIB"
     APPOINTMENT = "http://snomed.info/sct|749001000000101"
+    SHARED_CARE_RECORD = "http://snomed.info/sct|887181000000106"
 
     @staticmethod
     def list():
@@ -86,6 +87,7 @@ class Categories(Enum):
     DIAGNOSTIC_STUDIES_REPORT = "http://snomed.info/sct|721981007"
     DIAGNOSTIC_PROCEDURE = "http://snomed.info/sct|103693007"
     RECORD_ARTIFACT = "http://snomed.info/sct|419891008"
+    RECORD_HEADINGS = "http://snomed.info/sct|716931000000107"
 
     @staticmethod
     def list():
@@ -115,6 +117,7 @@ CATEGORY_ATTRIBUTES = {
         "display": "Diagnostic procedure",
     },
     Categories.RECORD_ARTIFACT.value: {"display": "Record artifact"},
+    Categories.RECORD_HEADINGS.value: {"display": "Record headings"},
 }
 
 TYPE_ATTRIBUTES = {
@@ -163,6 +166,7 @@ TYPE_ATTRIBUTES = {
     PointerTypes.APPOINTMENT.value: {
         "display": "Appointment",
     },
+    PointerTypes.SHARED_CARE_RECORD.value: {"display": "Clinical summary"},
 }
 
 TYPE_CATEGORIES = {
@@ -191,6 +195,9 @@ TYPE_CATEGORIES = {
     #
     # Bookings and Referrals
     PointerTypes.APPOINTMENT.value: Categories.RECORD_ARTIFACT.value,
+    #
+    # Shared Care Records
+    PointerTypes.SHARED_CARE_RECORD.value: Categories.RECORD_HEADINGS.value,
 }
 
 PRACTICE_SETTING_VALUE_SET_URL = (

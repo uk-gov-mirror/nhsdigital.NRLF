@@ -33,6 +33,7 @@ POINTER_TYPES = {
     "735324008": "Treatment Escalation Plan",
     "824321000000109": "Summary Record",
     "2181441000000107": "Personalised Care and Support Plan",
+    "887181000000106": "Clinical summary",
 }
 
 
