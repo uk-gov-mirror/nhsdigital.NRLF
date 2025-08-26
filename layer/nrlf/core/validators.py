@@ -531,9 +531,9 @@ class DocumentReferenceValidator:
         content_retrieval_count = 0
 
         for extension in extensions:
-            if "ContentStability" in str(extension):
+            if "contentstability" in str(extension).lower():
                 content_stability_count += 1
-            elif "RetrievalMechanism" in str(extension):
+            elif "retrievalmechanism" in str(extension).lower():
                 content_retrieval_count += 1
 
         if content_stability_count != 1:
@@ -555,10 +555,10 @@ class DocumentReferenceValidator:
             return False
 
         for j, extension in enumerate(extensions):
-            if "ContentStability" in str(extension):
+            if "contentstability" in str(extension).lower():
                 if not self._validate_content_stability_extension(extension, i, j):
                     return False
-            elif "RetrievalMechanism" in str(extension):
+            elif "retrievalmechanism" in str(extension).lower():
                 if not self._validate_retrieval_mechanism_extension(extension, i, j):
                     return False
 
@@ -590,13 +590,12 @@ class DocumentReferenceValidator:
         try:
             RetrievalMechanismExtension.model_validate(extension.model_dump())
         except ValidationError as exc:
-            for error in exc.errors():
-                error["loc"] = ("content", i, "extension", j) + error["loc"]
             raise ParseError.from_validation_error(
                 exc,
                 details=SpineErrorConcept.from_code("BAD_REQUEST"),
                 msg="Invalid content retrieval extension",
                 value_set="https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism",
+                root_location=("content", i, "extension", j),
             ) from None
         coding = extension.valueCodeableConcept.coding[0]
         expected_retrieval_display = CONTENT_RETRIEVAL_CODE_MAP.get(coding.code)

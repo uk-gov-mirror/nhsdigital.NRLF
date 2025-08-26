@@ -1727,3 +1727,56 @@ def test_validate_two_content_with_different_retrieval_mechanisms():
 
     assert result.is_valid is True
     assert len(result.issues) == 0
+
+
+def test_validate_content_retrieval_lowercase_urls():
+    """Test that the extension is recognised when 'RetrievalMechanism' is in lowercase and throws an error for mismatching the URL case."""
+    validator = DocumentReferenceValidator()
+    document_ref_data = load_document_reference_json("Y05868-736253002-Valid")
+
+    document_ref_data["content"][0]["extension"] = [
+        {
+            "url": "https://fhir.nhs.uk/england/structuredefinition/extension-england-retrievalmechanism",
+            "valueCodeableConcept": {
+                "coding": [
+                    {
+                        "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                        "code": "Direct",
+                        "display": "Direct",
+                    }
+                ]
+            },
+        },
+        {
+            "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-ContentStability",
+            "valueCodeableConcept": {
+                "coding": [
+                    {
+                        "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability",
+                        "code": "static",
+                        "display": "Static",
+                    }
+                ]
+            },
+        },
+    ]
+
+    with pytest.raises(ParseError) as exc_info:
+        validator.validate(document_ref_data)
+
+    assert len(exc_info.value.issues) == 1
+    assert exc_info.value.issues[0].model_dump(exclude_none=True) == {
+        "severity": "error",
+        "code": "invalid",
+        "details": {
+            "coding": [
+                {
+                    "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
+                    "code": "BAD_REQUEST",
+                    "display": "Bad request",
+                }
+            ]
+        },
+        "diagnostics": "Invalid content retrieval extension (content[0].extension[0].url: Input should be 'https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism', see: https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism)",
+        "expression": ["content[0].extension[0].url"],
+    }
