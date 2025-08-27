@@ -1089,3 +1089,413 @@ Feature: Producer - createDocumentReference - Failure Scenarios
         ]
       }
       """
+
+  Scenario: Multiple RetrievalMechanism extensions in content
+    Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
+    And the organisation 'TSTCUS' is authorised to access pointer types:
+      | system                 | value     |
+      | http://snomed.info/sct | 736253002 |
+    When producer 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
+      """
+      "content": [
+        {
+          "attachment": {
+              "contentType": "application/pdf",
+              "url": "https://example.org/my-doc.pdf"
+          },
+          "format": {
+              "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLFormatCode",
+              "code": "urn:nhs-ic:unstructured",
+              "display": "Unstructured Document"
+          },
+          "extension": [
+            {
+              "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                    "code": "Direct",
+                    "display": "Direct"
+                  }
+                ]
+              }
+            },
+            {
+              "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                    "code": "Direct",
+                    "display": "Direct"
+                  }
+                ]
+              }
+            },
+            {
+              "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-ContentStability",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability",
+                    "code": "static",
+                    "display": "Static"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+      """
+    Then the response status code is 422
+    And the response is an OperationOutcome with 1 issue
+    And the OperationOutcome contains the issue:
+      """
+      {
+        "severity": "error",
+        "code": "business-rule",
+        "details": {
+          "coding": [
+            {
+              "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
+              "code": "UNPROCESSABLE_ENTITY",
+              "display": "Unprocessable Entity"
+            }
+          ]
+        },
+        "diagnostics": "Invalid content retrieval extension: Extension must have one content retrieval extension, see: ('https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism')",
+        "expression": ["content[0].extension"]
+      }
+      """
+
+  Scenario: RetrievalMechanism extension with mismatched code and display
+    Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
+    And the organisation 'TSTCUS' is authorised to access pointer types:
+      | system                 | value     |
+      | http://snomed.info/sct | 736253002 |
+    When producer 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
+      """
+      "content": [
+        {
+          "attachment": {
+              "contentType": "application/pdf",
+              "url": "https://example.org/my-doc.pdf"
+          },
+          "format": {
+              "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLFormatCode",
+              "code": "urn:nhs-ic:unstructured",
+              "display": "Unstructured Document"
+          },
+          "extension": [
+            {
+              "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                    "code": "Direct",
+                    "display": "Spine Secure Proxy"
+                  }
+                ]
+              }
+            },
+            {
+              "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-ContentStability",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability",
+                    "code": "static",
+                    "display": "Static"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+      """
+    Then the response status code is 422
+    And the response is an OperationOutcome with 1 issue
+    And the OperationOutcome contains the issue:
+      """
+      {
+        "severity": "error",
+        "code": "business-rule",
+        "details": {
+          "coding": [
+            {
+              "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
+              "code": "UNPROCESSABLE_ENTITY",
+              "display": "Unprocessable Entity"
+            }
+          ]
+        },
+        "diagnostics": "Invalid content extension display: Spine Secure Proxy Expected display is 'Direct'",
+        "expression": ["content[0].extension[0].valueCodeableConcept.coding[0].display"]
+      }
+      """
+
+  Scenario: RetrievalMechanism extension with invalid URL case
+    Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
+    And the organisation 'TSTCUS' is authorised to access pointer types:
+      | system                 | value     |
+      | http://snomed.info/sct | 736253002 |
+    When producer 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
+      """
+      "content": [
+        {
+          "attachment": {
+              "contentType": "application/pdf",
+              "url": "https://example.org/my-doc.pdf"
+          },
+          "format": {
+              "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLFormatCode",
+              "code": "urn:nhs-ic:unstructured",
+              "display": "Unstructured Document"
+          },
+          "extension": [
+            {
+              "url": "https://fhir.nhs.uk/england/structuredefinition/extension-england-retrievalmechanism",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                    "code": "Direct",
+                    "display": "Direct"
+                  }
+                ]
+              }
+            },
+            {
+              "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-ContentStability",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability",
+                    "code": "static",
+                    "display": "Static"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+      """
+    Then the response status code is 400
+    And the response is an OperationOutcome with 1 issue
+    And the OperationOutcome contains the issue:
+      """
+      {
+        "severity": "error",
+        "code": "invalid",
+        "details": {
+          "coding": [
+            {
+              "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
+              "code": "BAD_REQUEST",
+              "display": "Bad request"
+            }
+          ]
+        },
+        "diagnostics": "Invalid content retrieval extension (content[0].extension[0].url: Input should be 'https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism', see: https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism)",
+        "expression": ["content[0].extension[0].url"]
+      }
+      """
+
+  Scenario: RetrievalMechanism extension with invalid code
+    Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
+    And the organisation 'TSTCUS' is authorised to access pointer types:
+      | system                 | value     |
+      | http://snomed.info/sct | 736253002 |
+    When producer 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
+      """
+      "content": [
+        {
+          "attachment": {
+              "contentType": "application/pdf",
+              "url": "https://example.org/my-doc.pdf"
+          },
+          "format": {
+              "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLFormatCode",
+              "code": "urn:nhs-ic:unstructured",
+              "display": "Unstructured Document"
+          },
+          "extension": [
+            {
+              "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                    "code": "INVALID_CODE",
+                    "display": "Direct"
+                  }
+                ]
+              }
+            },
+            {
+              "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-ContentStability",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability",
+                    "code": "static",
+                    "display": "Static"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+      """
+    Then the response status code is 400
+    And the response is an OperationOutcome with 1 issue
+    And the OperationOutcome contains the issue:
+      """
+      {
+        "severity": "error",
+        "code": "invalid",
+        "details": {
+          "coding": [
+            {
+              "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
+              "code": "BAD_REQUEST",
+              "display": "Bad request"
+            }
+          ]
+        },
+        "diagnostics": "Invalid content retrieval extension (content[0].extension[0].valueCodeableConcept.coding[0].code: Input should be 'SSP', 'Direct' or 'LDR', see: https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism)",
+        "expression": ["content[0].extension[0].valueCodeableConcept.coding[0].code"]
+      }
+      """
+
+  Scenario: RetrievalMechanism extension with missing display
+    Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
+    And the organisation 'TSTCUS' is authorised to access pointer types:
+      | system                 | value     |
+      | http://snomed.info/sct | 736253002 |
+    When producer 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
+      """
+      "content": [
+        {
+          "attachment": {
+              "contentType": "application/pdf",
+              "url": "https://example.org/my-doc.pdf"
+          },
+          "format": {
+              "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLFormatCode",
+              "code": "urn:nhs-ic:unstructured",
+              "display": "Unstructured Document"
+          },
+          "extension": [
+            {
+              "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                    "code": "Direct"
+                  }
+                ]
+              }
+            },
+            {
+              "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-ContentStability",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability",
+                    "code": "static",
+                    "display": "Static"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+      """
+    Then the response status code is 400
+    And the response is an OperationOutcome with 1 issue
+    And the OperationOutcome contains the issue:
+      """
+      {
+        "severity": "error",
+        "code": "invalid",
+        "details": {
+          "coding": [
+            {
+              "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
+              "code": "BAD_REQUEST",
+              "display": "Bad request"
+            }
+          ]
+        },
+        "diagnostics": "Invalid content retrieval extension (content[0].extension[0].valueCodeableConcept.coding[0].display: Input should be 'Spine Secure Proxy', 'Large Document Repository' or 'Direct', see: https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism)",
+        "expression": ["content[0].extension[0].valueCodeableConcept.coding[0].display"]
+      }
+      """
+
+  Scenario: RetrievalMechanism extension with missing valueCodeableConcept
+    Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
+    And the organisation 'TSTCUS' is authorised to access pointer types:
+      | system                 | value     |
+      | http://snomed.info/sct | 736253002 |
+    When producer 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
+      """
+      "content": [
+        {
+          "attachment": {
+              "contentType": "application/pdf",
+              "url": "https://example.org/my-doc.pdf"
+          },
+          "format": {
+              "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLFormatCode",
+              "code": "urn:nhs-ic:unstructured",
+              "display": "Unstructured Document"
+          },
+          "extension": [
+            {
+              "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism"
+            },
+            {
+              "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-ContentStability",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability",
+                    "code": "static",
+                    "display": "Static"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+      """
+    Then the response status code is 400
+    And the response is an OperationOutcome with 1 issue
+    And the OperationOutcome contains the issue:
+      """
+      {
+        "severity": "error",
+        "code": "invalid",
+        "details": {
+          "coding": [
+            {
+              "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
+              "code": "BAD_REQUEST",
+              "display": "Bad request"
+            }
+          ]
+        },
+        "diagnostics": "Invalid content retrieval extension (content[0].extension[0].valueCodeableConcept: Input should be a valid dictionary or instance of RetrievalMechanismExtensionValueCodeableConcept, see: https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism)",
+        "expression": ["content[0].extension[0].valueCodeableConcept"]
+      }
+      """
