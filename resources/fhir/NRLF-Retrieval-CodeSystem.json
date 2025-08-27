@@ -53,9 +53,9 @@
           "definition": "This document can be retrieved via Spine Secure Proxy by authorised organisations. The custodian's ASID will be needed and can be found in the context.related field."
         },
         {
-          "code": "NDR",
-          "display": "National Document Repository",
-          "definition": "This document can be retrieved via the National Document Repository proxy service."
+          "code": "LDR",
+          "display": "Large Document Repository",
+          "definition": "This document can be retrieved via the Large Document Repository proxy service."
         }
       ]
     }
