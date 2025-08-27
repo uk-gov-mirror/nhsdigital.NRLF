@@ -1701,7 +1701,7 @@ def test_validate_two_content_with_different_retrieval_mechanisms():
     second_content = {
         "attachment": {
             "contentType": "application/pdf",
-            "url": "http://example.com/document2.pdf",
+            "url": "https://example.com/document2.pdf",
         },
         "format": unstructured_format,
         "extension": [

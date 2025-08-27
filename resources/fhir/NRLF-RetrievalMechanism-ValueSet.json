@@ -2,7 +2,7 @@
   "resourceType": "ValueSet",
   "id": "England-RetrievalMechanism",
   "url": "https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "name": "EnglandRetrievalMechanism",
   "status": "draft",
   "date": "2025-02-28",
