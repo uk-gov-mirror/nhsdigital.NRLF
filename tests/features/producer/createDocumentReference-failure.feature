@@ -1369,7 +1369,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
             }
           ]
         },
-        "diagnostics": "Invalid content retrieval extension (content[0].extension[0].valueCodeableConcept.coding[0].code: Input should be 'SSP', 'Direct' or 'LDR', see: https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism)",
+        "diagnostics": "Invalid content retrieval extension (content[0].extension[0].valueCodeableConcept.coding[0].code: Input should be 'SSP', 'Direct', 'LDR' or 'InContext', see: https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism)",
         "expression": ["content[0].extension[0].valueCodeableConcept.coding[0].code"]
       }
       """
@@ -1436,7 +1436,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
             }
           ]
         },
-        "diagnostics": "Invalid content retrieval extension (content[0].extension[0].valueCodeableConcept.coding[0].display: Input should be 'Spine Secure Proxy', 'Direct' or 'Large Document Retrieval', see: https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism)",
+        "diagnostics": "Invalid content retrieval extension (content[0].extension[0].valueCodeableConcept.coding[0].display: Input should be 'Spine Secure Proxy', 'Direct', 'Large Document Retrieval' or 'Direct using In-Context', see: https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism)",
         "expression": ["content[0].extension[0].valueCodeableConcept.coding[0].display"]
       }
       """
