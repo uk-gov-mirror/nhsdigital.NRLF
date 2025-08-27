@@ -491,3 +491,80 @@ Feature: Producer - createDocumentReference - Success Scenarios
       | content[1].attachment.url                                      | https://example.org/doc2.pdf |
       | content[1].extension[1].valueCodeableConcept.coding[0].code    | SSP                          |
       | content[1].extension[1].valueCodeableConcept.coding[0].display | Spine Secure Proxy           |
+
+  Scenario: Successfully create a Document Pointer with InContext retrieval mechanism and structured format
+    Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
+    And the organisation 'TSTCUS' is authorised to access pointer types:
+      | system                 | value            |
+      | http://snomed.info/sct | 1363501000000100 |
+    When producer 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
+      """
+      "content": [
+        {
+          "attachment": {
+            "contentType": "text/html",
+            "url": "https://example.org/incontext-launch.html"
+          },
+          "format": {
+            "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLFormatCode",
+            "code": "urn:nhs-ic:structured",
+            "display": "Structured Document"
+          },
+          "extension": [
+            {
+              "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-ContentStability",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability",
+                    "code": "dynamic",
+                    "display": "Dynamic"
+                  }
+                ]
+              }
+            },
+            {
+              "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                    "code": "InContext",
+                    "display": "Direct using In-Context"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+      """
+    Then the response status code is 201
+    And the response is an OperationOutcome with 1 issue
+    And the OperationOutcome contains the issue:
+      """
+      {
+        "severity": "information",
+        "code": "informational",
+        "details": {
+          "coding": [
+            {
+              "system": "https://fhir.nhs.uk/ValueSet/NRL-ResponseCode",
+              "code": "RESOURCE_CREATED",
+              "display": "Resource created"
+            }
+          ]
+        },
+        "diagnostics": "The document has been created"
+      }
+      """
+    And the response has a Location header
+    And the Location header starts with '/producer/FHIR/R4/DocumentReference/TSTCUS-'
+    And the resource in the Location header exists with values:
+      | property                                                       | value                                     |
+      | content[0].attachment.url                                      | https://example.org/incontext-launch.html |
+      | content[0].attachment.contentType                              | text/html                                 |
+      | content[0].format.code                                         | urn:nhs-ic:structured                     |
+      | content[0].format.display                                      | Structured Document                       |
+      | content[0].extension[1].valueCodeableConcept.coding[0].code    | InContext                                 |
+      | content[0].extension[1].valueCodeableConcept.coding[0].display | Direct using In-Context                   |

@@ -687,7 +687,7 @@ CONTENT_RETRIEVAL_SYSTEM_URL = (
 CONTENT_RETRIEVAL_CODE_MAP = {
     "Direct": "Direct",
     "SSP": "Spine Secure Proxy",
-    "NDR": "Large Document Retrieval",
+    "LDR": "Large Document Retrieval",
     "InContext": "Direct using In-Context",
 }
 CONTENT_FORMAT_CODE_URL = "https://fhir.nhs.uk/England/CodeSystem/England-NRLFormatCode"
