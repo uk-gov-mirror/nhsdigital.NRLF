@@ -514,15 +514,6 @@ class DocumentReferenceValidator:
         logger.debug("Validating extension")
 
         for i, content in enumerate(model.content):
-            if not content.extension:
-                self.result.add_error(
-                    issue_code="business-rule",
-                    error_code="UNPROCESSABLE_ENTITY",
-                    diagnostics="Invalid content extension: Extension must have at least one value",
-                    field=f"content[{i}].extension",
-                )
-                return
-
             if not self._has_valid_extensions(content.extension, i):
                 return
 

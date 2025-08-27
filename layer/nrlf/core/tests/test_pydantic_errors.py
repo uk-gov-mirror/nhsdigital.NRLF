@@ -439,3 +439,31 @@ def test_validate_missing_display_from_coding_where_mandatory():
         "diagnostics": "Failed to parse DocumentReference resource (context.practiceSetting.coding[0].display: Field required)",
         "expression": ["context.practiceSetting.coding[0].display"],
     }
+
+
+def test_validate_content_no_content_extension():
+    validator = DocumentReferenceValidator()
+    document_ref_data = load_document_reference_json("Y05868-736253002-Valid")
+
+    document_ref_data["content"][0].pop("extension")
+
+    with pytest.raises(ParseError) as error:
+        validator.validate(document_ref_data)
+
+    exc = error.value
+    assert len(exc.issues) == 1
+    assert exc.issues[0].model_dump(exclude_none=True) == {
+        "severity": "error",
+        "code": "invalid",
+        "details": {
+            "coding": [
+                {
+                    "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
+                    "code": "BAD_REQUEST",
+                    "display": "Bad request",
+                }
+            ]
+        },
+        "diagnostics": "Failed to parse DocumentReference resource (content[0].extension: Field required)",
+        "expression": ["content[0].extension"],
+    }

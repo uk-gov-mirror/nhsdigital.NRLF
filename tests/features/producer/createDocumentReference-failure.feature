@@ -1044,3 +1044,48 @@ Feature: Producer - createDocumentReference - Failure Scenarios
         "expression": ["DocumentReference"]
       }
       """
+
+  Scenario: RetrievalMechanism extension is empty
+    Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
+    And the organisation 'TSTCUS' is authorised to access pointer types:
+      | system                 | value     |
+      | http://snomed.info/sct | 736253002 |
+    When producer 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
+      """
+      "content": [
+        {
+          "attachment": {
+            "contentType": "application/pdf",
+            "url": "https://example.org/my-doc.pdf"
+          },
+          "format": {
+            "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLFormatCode",
+            "code": "urn:nhs-ic:unstructured",
+            "display": "Unstructured Document"
+          },
+          "extension": []
+        }
+      ]
+      """
+    Then the response status code is 400
+    And the response is an OperationOutcome with 1 issue
+    And the OperationOutcome contains the issue:
+      """
+      {
+        "severity": "error",
+        "code": "invalid",
+        "details": {
+          "coding": [
+            {
+              "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
+              "code": "MESSAGE_NOT_WELL_FORMED",
+              "display": "Message not well formed"
+            }
+          ]
+        },
+        "diagnostics": "Request body could not be parsed (DocumentReference: Value error, The following fields are empty: content[0].extension)",
+        "expression": [
+          "DocumentReference"
+        ]
+      }
+      """
