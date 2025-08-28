@@ -517,14 +517,20 @@ class DocumentReferenceValidator:
             if not self._has_valid_extensions(content.extension, i):
                 return
 
+    def _is_content_stability_extension(self, extension):
+        return "contentstability" in str(extension).lower()
+
+    def _is_retrieval_mechanism_extension(self, extension):
+        return "retrievalmechanism" in str(extension).lower()
+
     def _has_valid_extensions(self, extensions, i):
         content_stability_count = 0
         content_retrieval_count = 0
 
         for extension in extensions:
-            if "contentstability" in str(extension).lower():
+            if self._is_content_stability_extension(extension):
                 content_stability_count += 1
-            elif "retrievalmechanism" in str(extension).lower():
+            elif self._is_retrieval_mechanism_extension(extension):
                 content_retrieval_count += 1
 
         if content_stability_count != 1:
@@ -545,14 +551,16 @@ class DocumentReferenceValidator:
             )
             return False
 
+        return self._validate_content_extension_items(extensions, i)
+
+    def _validate_content_extension_items(self, extensions, i):
         for j, extension in enumerate(extensions):
-            if "contentstability" in str(extension).lower():
+            if self._is_content_stability_extension(extension):
                 if not self._validate_content_stability_extension(extension, i, j):
                     return False
-            elif "retrievalmechanism" in str(extension).lower():
+            elif self._is_retrieval_mechanism_extension(extension):
                 if not self._validate_retrieval_mechanism_extension(extension, i, j):
                     return False
-
         return True
 
     def _validate_content_stability_extension(self, extension, i, j):
