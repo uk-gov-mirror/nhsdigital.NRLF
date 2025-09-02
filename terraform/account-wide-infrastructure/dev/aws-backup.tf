@@ -159,7 +159,7 @@ module "source" {
       },
       {
         "name" : "monthly"
-        "schedule" : "cron(30 0 ? * 4#1)" # first Thursday each month from 00:30
+        "schedule" : "cron(30 0 ? * 5#1 *)" # first Thursday each month from 00:30
         "copy_action" : [{
           "cold_storage_after" : 3,
           "delete_after" : 100 # ensures there will always be min 3
@@ -170,8 +170,8 @@ module "source" {
 
       },
       {
-        "name" : "weekly"               # overlaps with monthly
-        "schedule" : "cron(30 0 ? * 4)" # every Thursday from 00:30 to precede releases
+        "name" : "weekly"                 # overlaps with monthly
+        "schedule" : "cron(30 0 ? * 5 *)" # every Thursday from 00:30 to precede releases
         "copy_action" : [{
           "cold_storage_after" : 14 # ensures 2 warm including one from previous release
           "delete_after" : 105
