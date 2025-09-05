@@ -1436,7 +1436,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
             }
           ]
         },
-        "diagnostics": "Invalid content retrieval extension (content[0].extension[0].valueCodeableConcept.coding[0].display: Input should be 'Spine Secure Proxy', 'Direct' or 'Large Document Repository', see: https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism)",
+        "diagnostics": "Invalid content retrieval extension (content[0].extension[0].valueCodeableConcept.coding[0].display: Input should be 'Spine Secure Proxy', 'Direct' or 'Large Document Retrieval', see: https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism)",
         "expression": ["content[0].extension[0].valueCodeableConcept.coding[0].display"]
       }
       """

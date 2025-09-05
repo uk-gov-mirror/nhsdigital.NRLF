@@ -4,6 +4,7 @@ import pytest
 
 from nrlf.core.constants import (
     CATEGORY_ATTRIBUTES,
+    CONTENT_RETRIEVAL_CODE_MAP,
     ODS_SYSTEM,
     TYPE_ATTRIBUTES,
     TYPE_CATEGORIES,
@@ -16,9 +17,15 @@ from nrlf.core.validators import (
     validate_type,
 )
 from nrlf.producer.fhir.r4.model import (
+    ContentStabilityExtension,
+    ContentStabilityExtensionCoding,
+    ContentStabilityExtensionValueCodeableConcept,
     DocumentReference,
     OperationOutcomeIssue,
     RequestQueryType,
+    RetrievalMechanismExtension,
+    RetrievalMechanismExtensionCoding,
+    RetrievalMechanismExtensionValueCodeableConcept,
 )
 from nrlf.tests.data import load_document_reference_json
 
@@ -1780,3 +1787,127 @@ def test_validate_content_retrieval_lowercase_urls():
         "diagnostics": "Invalid content retrieval extension (content[0].extension[0].url: Input should be 'https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism', see: https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism)",
         "expression": ["content[0].extension[0].url"],
     }
+
+
+def make_content_stability_extension(code, display):
+    return ContentStabilityExtension(
+        url="https://fhir.nhs.uk/England/StructureDefinition/Extension-England-ContentStability",
+        valueCodeableConcept=ContentStabilityExtensionValueCodeableConcept(
+            coding=[
+                ContentStabilityExtensionCoding(
+                    system="https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability",
+                    code=code,
+                    display=display,
+                )
+            ]
+        ),
+    )
+
+
+def make_retrieval_mechanism_extension(code, display):
+    return RetrievalMechanismExtension(
+        url="https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism",
+        valueCodeableConcept=RetrievalMechanismExtensionValueCodeableConcept(
+            coding=[
+                RetrievalMechanismExtensionCoding(
+                    system="https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                    code=code,
+                    display=display,
+                )
+            ]
+        ),
+    )
+
+
+def test_has_valid_extensions():
+    validator = DocumentReferenceValidator()
+    extensions = [
+        make_content_stability_extension("static", "Static"),
+        make_retrieval_mechanism_extension("Direct", "Direct"),
+    ]
+    assert validator._has_valid_extensions(extensions, 0) is True
+
+
+def test_has_valid_extensions_multiple_retrieval_mechanism():
+    validator = DocumentReferenceValidator()
+    extensions = [
+        make_content_stability_extension("static", "Static"),
+        make_retrieval_mechanism_extension("Direct", "Direct"),
+        make_retrieval_mechanism_extension("SSP", "Spine Secure Proxy"),
+    ]
+    assert validator._has_valid_extensions(extensions, 0) is False
+    assert any(
+        "Invalid content retrieval extension: Extension must have one content retrieval extension, see: ('https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism')"
+        in issue.diagnostics
+        for issue in validator.result.issues
+    )
+
+
+def test_no_content_extensions():
+    validator = DocumentReferenceValidator()
+    extensions = []
+    assert validator._has_valid_extensions(extensions, 0) is False
+    assert any(
+        "Invalid content extension: Extension must have one content stability extension, see: ('https://fhir.nhs.uk/England/ValueSet/England-NRLContentStability')"
+        in issue.diagnostics
+        for issue in validator.result.issues
+    )
+
+
+@pytest.mark.parametrize(
+    "code, display", [("static", "Static"), ("dynamic", "Dynamic")]
+)
+def test_validate_content_stability_extension_valid(code, display):
+    validator = DocumentReferenceValidator()
+    ext = make_content_stability_extension("static", "Static")
+    assert validator._validate_content_stability_extension(ext, 0, 0) is True
+    assert validator.result.issues == []
+
+
+@pytest.mark.parametrize(
+    "code, display", [("dynamic", "Static"), ("static", "Dynamic")]
+)
+def test_validate_content_stability_extension_display_mismatch(code, display):
+    validator = DocumentReferenceValidator()
+    ext = make_content_stability_extension(code, display)
+    assert validator._validate_content_stability_extension(ext, 0, 0) is False
+    assert any(
+        f"Invalid content extension display: {display} Extension display must be the same as code either 'Static' or 'Dynamic'"
+        in issue.diagnostics
+        for issue in validator.result.issues
+    )
+
+
+@pytest.mark.parametrize(
+    "code, display",
+    [
+        ("SSP", "Spine Secure Proxy"),
+        ("Direct", "Direct"),
+        ("LDR", "Large Document Retrieval"),
+    ],
+)
+def test_validate_retrieval_mechanism_extension_valid(code, display):
+    validator = DocumentReferenceValidator()
+    ext = make_retrieval_mechanism_extension(code, display)
+    assert validator._validate_retrieval_mechanism_extension(ext, 0, 0) is True
+    assert validator.result.issues == []
+
+
+@pytest.mark.parametrize(
+    "code, display",
+    [
+        (code, wrong_display)
+        for code, correct_display in CONTENT_RETRIEVAL_CODE_MAP.items()
+        for wrong_display in CONTENT_RETRIEVAL_CODE_MAP.values()
+        if wrong_display != correct_display
+    ],
+)
+def test_validate_retrieval_mechanism_extension_display_mismatch(code, display):
+    validator = DocumentReferenceValidator()
+    ext = make_retrieval_mechanism_extension(code, display)
+    assert validator._validate_retrieval_mechanism_extension(ext, 0, 0) is False
+    assert any(
+        f"Invalid content extension display: {display} Expected display is '{CONTENT_RETRIEVAL_CODE_MAP.get(code)}'"
+        in issue.diagnostics
+        for issue in validator.result.issues
+    )

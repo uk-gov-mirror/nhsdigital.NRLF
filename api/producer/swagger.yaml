@@ -1674,8 +1674,7 @@ components:
               enum: ["SSP", "Direct", "LDR"]
             display:
               type: string
-              enum:
-                ["Spine Secure Proxy", "Direct", "Large Document Repository"]
+              enum: ["Spine Secure Proxy", "Direct", "Large Document Retrieval"]
           required:
             - system
             - code

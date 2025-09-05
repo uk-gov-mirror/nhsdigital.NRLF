@@ -54,8 +54,8 @@
         },
         {
           "code": "LDR",
-          "display": "Large Document Repository",
-          "definition": "This document can be retrieved via the Large Document Repository proxy service."
+          "display": "Large Document Retrieval",
+          "definition": "This document can be retrieved via the Large Document Retrieval proxy service."
         }
       ]
     }
