@@ -1859,7 +1859,7 @@ def test_no_content_extensions():
 )
 def test_validate_content_stability_extension_valid(code, display):
     validator = DocumentReferenceValidator()
-    ext = make_content_stability_extension("static", "Static")
+    ext = make_content_stability_extension(code, display)
     assert validator._validate_content_stability_extension(ext, 0, 0) is True
     assert validator.result.issues == []
 
