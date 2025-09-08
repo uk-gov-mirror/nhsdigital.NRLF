@@ -2,7 +2,7 @@
   "resourceType": "CodeSystem",
   "id": "England-RetrievalMechanismNRL",
   "url": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanismNRL",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "name": "EnglandRetrievalMechanismNRL",
   "title": "England Retrieval MechanismNRL",
   "status": "draft",
@@ -53,9 +53,9 @@
           "definition": "This document can be retrieved via Spine Secure Proxy by authorised organisations. The custodian's ASID will be needed and can be found in the context.related field."
         },
         {
-          "code": "NDR",
-          "display": "National Document Repository",
-          "definition": "This document can be retrieved via the National Document Repository proxy service."
+          "code": "LDR",
+          "display": "Large Document Retrieval",
+          "definition": "This document can be retrieved via the Large Document Retrieval proxy service."
         }
       ]
     }

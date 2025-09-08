@@ -2,7 +2,7 @@
   "resourceType": "ValueSet",
   "id": "England-RetrievalMechanism",
   "url": "https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "name": "EnglandRetrievalMechanism",
   "status": "draft",
   "date": "2025-02-28",
@@ -31,8 +31,8 @@
             "display": "Spine Secure Proxy"
           },
           {
-            "code": "NDR",
-            "display": "National Document Repository"
+            "code": "LDR",
+            "display": "Large Document Retrieval"
           }
         ]
       }

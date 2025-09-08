@@ -87,6 +87,18 @@ Feature: Consumer - readDocumentReference - Success Scenarios
                     }
                   ]
                 }
+              },
+              {
+                "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                      "code": "Direct",
+                      "display": "Direct"
+                    }
+                  ]
+                }
               }
             ]
           }
@@ -189,6 +201,18 @@ Feature: Consumer - readDocumentReference - Success Scenarios
                       "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability",
                       "code": "static",
                       "display": "Static"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                      "code": "Direct",
+                      "display": "Direct"
                     }
                   ]
                 }

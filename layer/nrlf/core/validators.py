@@ -10,6 +10,7 @@ from nrlf.core.constants import (
     ATTACHMENT_CONTENT_TYPES,
     CATEGORY_ATTRIBUTES,
     CONTENT_FORMAT_CODE_MAP,
+    CONTENT_RETRIEVAL_CODE_MAP,
     ODS_SYSTEM,
     PRACTICE_SETTING_VALUE_SET_URL,
     REQUIRED_CREATE_FIELDS,
@@ -24,6 +25,10 @@ from nrlf.core.errors import ParseError
 from nrlf.core.logger import LogReference, logger
 from nrlf.core.types import DocumentReference, OperationOutcomeIssue, RequestQueryType
 from nrlf.producer.fhir.r4 import model as producer_model
+from nrlf.producer.fhir.r4.model import (
+    ContentStabilityExtension,
+    RetrievalMechanismExtension,
+)
 
 
 def validate_type(type_: Optional[RequestQueryType], pointer_types: List[str]) -> bool:
@@ -506,18 +511,102 @@ class DocumentReferenceValidator:
         Validate the content.extension field contains an appropriate coding.
         """
         logger.log(LogReference.VALIDATOR001, step="content_extension")
-
         logger.debug("Validating extension")
+
         for i, content in enumerate(model.content):
-            coding = content.extension[0].valueCodeableConcept.coding[0]
-            if coding.code != coding.display.lower():
-                self.result.add_error(
-                    issue_code="business-rule",
-                    error_code="UNPROCESSABLE_ENTITY",
-                    diagnostics=f"Invalid content extension display: {coding.display} Extension display must be the same as code either 'Static' or 'Dynamic'",
-                    field=f"content[{i}].extension[0].valueCodeableConcept.coding[0].display",
-                )
+            if not self._has_valid_extensions(content.extension, i):
                 return
+
+    def _is_content_stability_extension(self, extension):
+        return "contentstability" in str(extension).lower()
+
+    def _is_retrieval_mechanism_extension(self, extension):
+        return "retrievalmechanism" in str(extension).lower()
+
+    def _has_valid_extensions(self, extensions, i):
+        content_stability_count = 0
+        content_retrieval_count = 0
+
+        for extension in extensions:
+            if self._is_content_stability_extension(extension):
+                content_stability_count += 1
+            elif self._is_retrieval_mechanism_extension(extension):
+                content_retrieval_count += 1
+
+        if content_stability_count != 1:
+            self.result.add_error(
+                issue_code="business-rule",
+                error_code="UNPROCESSABLE_ENTITY",
+                diagnostics="Invalid content extension: Extension must have one content stability extension, see: ('https://fhir.nhs.uk/England/ValueSet/England-NRLContentStability')",
+                field=f"content[{i}].extension",
+            )
+            return False
+
+        if content_retrieval_count > 1:
+            self.result.add_error(
+                issue_code="business-rule",
+                error_code="UNPROCESSABLE_ENTITY",
+                diagnostics="Invalid content retrieval extension: Extension must have one content retrieval extension, see: ('https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism')",
+                field=f"content[{i}].extension",
+            )
+            return False
+
+        return self._validate_content_extension_items(extensions, i)
+
+    def _validate_content_extension_items(self, extensions, i):
+        for j, extension in enumerate(extensions):
+            if self._is_content_stability_extension(extension):
+                if not self._validate_content_stability_extension(extension, i, j):
+                    return False
+            elif self._is_retrieval_mechanism_extension(extension):
+                if not self._validate_retrieval_mechanism_extension(extension, i, j):
+                    return False
+        return True
+
+    def _validate_content_stability_extension(self, extension, i, j):
+        try:
+            ContentStabilityExtension.model_validate(extension.model_dump())
+        except ValidationError as exc:
+            raise ParseError.from_validation_error(
+                exc,
+                details=SpineErrorConcept.from_code("BAD_REQUEST"),
+                msg="Invalid content stability extension",
+                value_set="https://fhir.nhs.uk/England/ValueSet/England-NRLContentStability",
+                root_location=("content", i, "extension", j),
+            ) from None
+        coding = extension.valueCodeableConcept.coding[0]
+        if coding.code != coding.display.lower():
+            self.result.add_error(
+                issue_code="business-rule",
+                error_code="UNPROCESSABLE_ENTITY",
+                diagnostics=f"Invalid content extension display: {coding.display} Extension display must be the same as code either 'Static' or 'Dynamic'",
+                field=f"content[{i}].extension[{j}].valueCodeableConcept.coding[0].display",
+            )
+            return False
+        return True
+
+    def _validate_retrieval_mechanism_extension(self, extension, i, j):
+        try:
+            RetrievalMechanismExtension.model_validate(extension.model_dump())
+        except ValidationError as exc:
+            raise ParseError.from_validation_error(
+                exc,
+                details=SpineErrorConcept.from_code("BAD_REQUEST"),
+                msg="Invalid content retrieval extension",
+                value_set="https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism",
+                root_location=("content", i, "extension", j),
+            ) from None
+        coding = extension.valueCodeableConcept.coding[0]
+        expected_retrieval_display = CONTENT_RETRIEVAL_CODE_MAP.get(coding.code)
+        if coding.display != expected_retrieval_display:
+            self.result.add_error(
+                issue_code="business-rule",
+                error_code="UNPROCESSABLE_ENTITY",
+                diagnostics=f"Invalid content extension display: {coding.display} Expected display is '{expected_retrieval_display}'",
+                field=f"content[{i}].extension[{j}].valueCodeableConcept.coding[0].display",
+            )
+            return False
+        return True
 
     def _validate_author(self, model: DocumentReference):
         """

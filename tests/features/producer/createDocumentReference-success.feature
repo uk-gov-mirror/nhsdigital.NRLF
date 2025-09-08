@@ -377,3 +377,117 @@ Feature: Producer - createDocumentReference - Success Scenarios
       | contentType     | application/json+fhir         |
       | formatCode      | urn:nhs-ic:structured         |
       | formatDisplay   | Structured Document           |
+
+  Scenario: Successfully create a DocumentReference with two contents and different retrieval mechanisms
+    Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
+    And the organisation 'TSTCUS' is authorised to access pointer types:
+      | system                 | value            |
+      | http://snomed.info/sct | 1363501000000100 |
+    When producer 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
+      """
+      "content": [
+        {
+          "attachment": {
+            "contentType": "application/pdf",
+            "url": "https://example.org/doc1.pdf"
+          },
+          "format": {
+            "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLFormatCode",
+            "code": "urn:nhs-ic:unstructured",
+            "display": "Unstructured Document"
+          },
+          "extension": [
+            {
+              "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-ContentStability",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability",
+                    "code": "static",
+                    "display": "Static"
+                  }
+                ]
+              }
+            },
+            {
+              "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                    "code": "Direct",
+                    "display": "Direct"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "attachment": {
+            "contentType": "application/pdf",
+            "url": "https://example.org/doc2.pdf"
+          },
+          "format": {
+            "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLFormatCode",
+            "code": "urn:nhs-ic:unstructured",
+            "display": "Unstructured Document"
+          },
+          "extension": [
+            {
+              "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-ContentStability",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability",
+                    "code": "static",
+                    "display": "Static"
+                  }
+                ]
+              }
+            },
+            {
+              "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                    "code": "SSP",
+                    "display": "Spine Secure Proxy"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+      """
+    Then the response status code is 201
+    And the response is an OperationOutcome with 1 issue
+    And the OperationOutcome contains the issue:
+      """
+      {
+        "severity": "information",
+        "code": "informational",
+        "details": {
+          "coding": [
+            {
+              "system": "https://fhir.nhs.uk/ValueSet/NRL-ResponseCode",
+              "code": "RESOURCE_CREATED",
+              "display": "Resource created"
+            }
+          ]
+        },
+        "diagnostics": "The document has been created"
+      }
+      """
+    And the response has a Location header
+    And the Location header starts with '/producer/FHIR/R4/DocumentReference/TSTCUS-'
+    And the resource in the Location header exists with values:
+      | property                                                       | value                        |
+      | content[0].attachment.url                                      | https://example.org/doc1.pdf |
+      | content[0].extension[1].valueCodeableConcept.coding[0].code    | Direct                       |
+      | content[0].extension[1].valueCodeableConcept.coding[0].display | Direct                       |
+      | content[1].attachment.url                                      | https://example.org/doc2.pdf |
+      | content[1].extension[1].valueCodeableConcept.coding[0].code    | SSP                          |
+      | content[1].extension[1].valueCodeableConcept.coding[0].display | Spine Secure Proxy           |

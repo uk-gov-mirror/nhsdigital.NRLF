@@ -89,6 +89,18 @@ Feature: Producer - readDocumentReference - Success Scenarios
                     }
                   ]
                 }
+              },
+              {
+                "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                      "code": "Direct",
+                      "display": "Direct"
+                    }
+                  ]
+                }
               }
             ]
           }

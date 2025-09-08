@@ -677,9 +677,18 @@ SYSTEM_SHORT_IDS = {"http://snomed.info/sct": "SCT", "https://nicip.nhs.uk": "NI
 CONTENT_STABILITY_EXTENSION_URL = (
     "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-ContentStability"
 )
+CONTENT_RETRIEVAL_EXTENSION_URL = "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism"
 CONTENT_STABILITY_SYSTEM_URL = (
     "https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability"
 )
+CONTENT_RETRIEVAL_SYSTEM_URL = (
+    "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism"
+)
+CONTENT_RETRIEVAL_CODE_MAP = {
+    "Direct": "Direct",
+    "SSP": "Spine Secure Proxy",
+    "LDR": "Large Document Retrieval",
+}
 CONTENT_FORMAT_CODE_URL = "https://fhir.nhs.uk/England/CodeSystem/England-NRLFormatCode"
 CONTENT_FORMAT_CODE_MAP = {
     "urn:nhs-ic:record-contact": "Contact details (HTTP Unsecured)",
