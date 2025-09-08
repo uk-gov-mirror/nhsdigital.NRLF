@@ -1,0 +1,107 @@
+{
+  "resourceType": "DocumentReference",
+  "id": "INCTX-197ca0ca-f547-42b6-a68c-99b75a3a2df5",
+  "meta": {
+    "lastUpdated": "2025-02-10T16:48:27.326Z"
+  },
+  "masterIdentifier": {
+    "system": "urn:ietf:rfc:3986",
+    "value": "mid_197ca0ca-f547-42b6-a68c-99b75a3a2df5"
+  },
+  "status": "current",
+  "type": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "736253002",
+        "display": "Mental health crisis plan"
+      }
+    ]
+  },
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://snomed.info/sct",
+          "code": "734163000",
+          "display": "Care plan"
+        }
+      ]
+    }
+  ],
+  "subject": {
+    "identifier": {
+      "system": "https://fhir.nhs.uk/Id/nhs-number",
+      "value": "9999999999"
+    }
+  },
+  "date": "2025-02-10T16:48:27.326Z",
+  "author": [
+    {
+      "identifier": {
+        "system": "https://fhir.nhs.uk/Id/ods-organization-code",
+        "value": "L85012"
+      }
+    }
+  ],
+  "custodian": {
+    "identifier": {
+      "system": "https://fhir.nhs.uk/Id/ods-organization-code",
+      "value": "INCTX"
+    }
+  },
+  "content": [
+    {
+      "attachment": {
+        "contentType": "text/html",
+        "url": "https://supplier.inctxlaunch.example/content",
+        "creation": "2025-02-10T16:48:27.326Z"
+      },
+      "format": {
+        "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLFormatCode",
+        "code": "urn:nhs-ic:structured",
+        "display": "Structured Document"
+      },
+      "extension": [
+        {
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability",
+                "code": "dynamic",
+                "display": "Dynamic"
+              }
+            ]
+          },
+          "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-ContentStability"
+        },
+        {
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                "code": "InContext",
+                "display": "Direct using In-Context"
+              }
+            ]
+          },
+          "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism"
+        }
+      ]
+    }
+  ],
+  "context": {
+    "period": {
+      "start": "2025-02-10T16:48:27.326Z"
+    },
+    "practiceSetting": {
+      "coding": [
+        {
+          "system": "http://snomed.info/sct",
+          "code": "1060971000000108",
+          "display": "General practice service"
+        }
+      ]
+    }
+  }
+}

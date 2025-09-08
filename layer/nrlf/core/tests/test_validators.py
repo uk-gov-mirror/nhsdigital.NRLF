@@ -1884,6 +1884,7 @@ def test_validate_content_stability_extension_display_mismatch(code, display):
         ("SSP", "Spine Secure Proxy"),
         ("Direct", "Direct"),
         ("LDR", "Large Document Retrieval"),
+        ("InContext", "Direct using In-Context"),
     ],
 )
 def test_validate_retrieval_mechanism_extension_valid(code, display):
@@ -1911,3 +1912,45 @@ def test_validate_retrieval_mechanism_extension_display_mismatch(code, display):
         in issue.diagnostics
         for issue in validator.result.issues
     )
+
+
+def test_validate_structured_format_with_text_html_for_incontext_launch():
+    validator = DocumentReferenceValidator()
+    document_ref_data = load_document_reference_json("Y05868-736253002-Valid")
+
+    # Set up for direct in-context launch
+    document_ref_data["content"][0]["attachment"]["contentType"] = "text/html"
+    document_ref_data["content"][0]["format"] = {
+        "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLFormatCode",
+        "code": "urn:nhs-ic:structured",
+        "display": "Structured Document",
+    }
+    document_ref_data["content"][0]["extension"] = [
+        {
+            "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism",
+            "valueCodeableConcept": {
+                "coding": [
+                    {
+                        "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                        "code": "InContext",
+                        "display": "Direct using In-Context",
+                    }
+                ]
+            },
+        },
+        {
+            "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-ContentStability",
+            "valueCodeableConcept": {
+                "coding": [
+                    {
+                        "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability",
+                        "code": "dynamic",
+                        "display": "Dynamic",
+                    }
+                ]
+            },
+        },
+    ]
+
+    result = validator.validate(document_ref_data)
+    assert result.is_valid is True

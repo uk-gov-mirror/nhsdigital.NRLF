@@ -286,8 +286,13 @@ class ContentStabilityExtensionCoding(Coding):
 
 class RetrievalMechanismExtensionCoding(Coding):
     system: Literal["https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism"]
-    code: Literal["SSP", "Direct", "LDR"]
-    display: Literal["Spine Secure Proxy", "Direct", "Large Document Retrieval"]
+    code: Literal["SSP", "Direct", "LDR", "InContext"]
+    display: Literal[
+        "Spine Secure Proxy",
+        "Direct",
+        "Large Document Retrieval",
+        "Direct using In-Context",
+    ]
 
 
 class NRLFormatCode(Coding):

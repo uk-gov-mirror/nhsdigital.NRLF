@@ -2,7 +2,7 @@
   "resourceType": "ValueSet",
   "id": "England-RetrievalMechanism",
   "url": "https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "name": "EnglandRetrievalMechanism",
   "status": "draft",
   "date": "2025-02-28",
@@ -33,6 +33,10 @@
           {
             "code": "LDR",
             "display": "Large Document Retrieval"
+          },
+          {
+            "code": "InContext",
+            "display": "Direct using In-Context"
           }
         ]
       }

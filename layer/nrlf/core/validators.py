@@ -472,7 +472,8 @@ class DocumentReferenceValidator:
         for i, content in enumerate(model.content):
             if (
                 content.attachment.contentType == "text/html"
-                and content.format.code != "urn:nhs-ic:record-contact"
+                and content.format.code
+                not in ["urn:nhs-ic:record-contact", "urn:nhs-ic:structured"]
             ):
                 self.result.add_error(
                     issue_code="business-rule",
