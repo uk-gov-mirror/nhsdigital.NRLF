@@ -90,7 +90,8 @@ resource "aws_glue_job" "glue_job" {
   description       = "Transfer logs from source to bucket"
   glue_version      = "5.0"
   worker_type       = "G.1X"
-  timeout           = 2880
+  execution_class   = "STANDARD"
+  timeout           = 60 # minutes
   max_retries       = 0
   number_of_workers = 4
   command {
@@ -110,5 +111,7 @@ resource "aws_glue_job" "glue_job" {
     "--enable-continuous-log-filter"    = "true"
     "--enable-metrics"                  = "true"
     "--extra-py-files"                  = "s3://${aws_s3_bucket.code-bucket.id}/src.zip"
+    "--enable-job-insights"             = "true"
+    "--job-language"                    = "python"
   }
 }
