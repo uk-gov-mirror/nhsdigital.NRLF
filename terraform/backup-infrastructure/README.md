@@ -28,8 +28,8 @@ Then, initialise the terraform backup workspace. For the test account:
 ```shell
 $ cd test
 $ terraform init && ( \
-    terraform workspace new backup-infra-test || \
-    terraform workspace select backup-infra-test )
+    terraform workspace new test || \
+    terraform workspace select test )
 ```
 
 If you want to apply changes to prod, use the `prod` directory and the `backup-infra-prod` terraform workspace.
@@ -69,8 +69,8 @@ Then, initialise your terraform workspace. For the test account:
 ```shell
 $ cd test
 $ terraform init && ( \
-    terraform workspace new backup-infra-test || \
-    terraform workspace select backup-infra-test )
+    terraform workspace new test || \
+    terraform workspace select test )
 ```
 
 If you want to destroy resources in prod, use the `prod` directory and the `backup-infra-prod` terraform workspace.

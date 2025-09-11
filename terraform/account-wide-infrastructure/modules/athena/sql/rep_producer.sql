@@ -33,12 +33,12 @@ WITH
    , event_function_request_id
    , event_correlation_id
    , event_xray_trace_id
-   , event_pointer_types
+   --, event_pointer_types
    , COALESCE("event_headers_nhsd-end-user-organisation-ods", event_metadata_ods_code) user_ods
    FROM
      producer_deletedocumentreference
 )
-, pr AS (
+/*, pr AS (
    SELECT
      time
    , event_timestamp
@@ -56,8 +56,8 @@ WITH
    , COALESCE("event_headers_nhsd-end-user-organisation-ods", event_metadata_ods_code) user_ods
    FROM
      producer_readdocumentreference
-)
-, ps AS (
+)*/
+/*, ps AS (
    SELECT
      time
    , event_timestamp
@@ -75,7 +75,7 @@ WITH
    , COALESCE("event_headers_nhsd-end-user-organisation-ods", event_metadata_ods_code) user_ods
    FROM
      producer_searchdocumentreference
-)
+)*/
 , psp AS (
    SELECT
      time
@@ -90,12 +90,12 @@ WITH
    , event_function_request_id
    , event_correlation_id
    , event_xray_trace_id
-   , event_pointer_types
+   --, event_pointer_types
    , COALESCE("event_headers_nhsd-end-user-organisation-ods", event_metadata_ods_code) user_ods
    FROM
      producer_searchpostdocumentreference
 )
-, pu AS (
+/*, pu AS (
    SELECT
      time
    , event_timestamp
@@ -113,7 +113,7 @@ WITH
    , COALESCE("event_headers_nhsd-end-user-organisation-ods", event_metadata_ods_code) user_ods
    FROM
      producer_updatedocumentreference
-)
+)*/
 , pus AS (
    SELECT
      time
@@ -128,7 +128,7 @@ WITH
    , event_function_request_id
    , event_correlation_id
    , event_xray_trace_id
-   , event_pointer_types
+   --, event_pointer_types
    , COALESCE("event_headers_nhsd-end-user-organisation-ods", event_metadata_ods_code) user_ods
    FROM
      producer_upsertdocumentreference
@@ -140,18 +140,18 @@ WITH
 UNION    SELECT *
    FROM
      pd
-UNION    SELECT *
+/*UNION    SELECT *
    FROM
      pr
 UNION    SELECT *
    FROM
-     ps
+     ps*/
 UNION    SELECT *
    FROM
      psp
-UNION    SELECT *
+/*UNION    SELECT *
    FROM
-     pu
+     pu*/
 UNION    SELECT *
    FROM
      pus
@@ -177,7 +177,7 @@ SELECT
 , event_function_request_id
 , b.event_correlation_id
 , b.event_xray_trace_id
-, event_pointer_types
+--, event_pointer_types
 , oc.user_ods
 FROM
   (base b
