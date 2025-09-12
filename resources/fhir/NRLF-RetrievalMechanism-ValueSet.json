@@ -1,9 +1,9 @@
 {
   "resourceType": "ValueSet",
-  "id": "England-RetrievalMechanism",
-  "url": "https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism",
+  "id": "England-NRLRetrievalMechanism",
+  "url": "https://fhir.nhs.uk/England/ValueSet/England-NRLRetrievalMechanism",
   "version": "1.1.0",
-  "name": "EnglandRetrievalMechanism",
+  "name": "EnglandNRLRetrievalMechanism",
   "status": "draft",
   "date": "2025-02-28",
   "publisher": "NHS Digital",
@@ -20,7 +20,7 @@
   "compose": {
     "include": [
       {
-        "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanismNRL",
+        "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLRetrievalMechanismNRL",
         "concept": [
           {
             "code": "Direct",

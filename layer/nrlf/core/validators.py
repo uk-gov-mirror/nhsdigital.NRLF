@@ -27,7 +27,7 @@ from nrlf.core.types import DocumentReference, OperationOutcomeIssue, RequestQue
 from nrlf.producer.fhir.r4 import model as producer_model
 from nrlf.producer.fhir.r4.model import (
     ContentStabilityExtension,
-    RetrievalMechanismExtension,
+    NRLRetrievalMechanismExtension,
 )
 
 
@@ -547,7 +547,7 @@ class DocumentReferenceValidator:
             self.result.add_error(
                 issue_code="business-rule",
                 error_code="UNPROCESSABLE_ENTITY",
-                diagnostics="Invalid content retrieval extension: Extension must have one content retrieval extension, see: ('https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism')",
+                diagnostics="Invalid content retrieval extension: Extension must have one content retrieval extension, see: ('https://fhir.nhs.uk/England/ValueSet/England-NRLRetrievalMechanism')",
                 field=f"content[{i}].extension",
             )
             return False
@@ -588,13 +588,13 @@ class DocumentReferenceValidator:
 
     def _validate_retrieval_mechanism_extension(self, extension, i, j):
         try:
-            RetrievalMechanismExtension.model_validate(extension.model_dump())
+            NRLRetrievalMechanismExtension.model_validate(extension.model_dump())
         except ValidationError as exc:
             raise ParseError.from_validation_error(
                 exc,
                 details=SpineErrorConcept.from_code("BAD_REQUEST"),
                 msg="Invalid content retrieval extension",
-                value_set="https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism",
+                value_set="https://fhir.nhs.uk/England/ValueSet/England-NRLRetrievalMechanism",
                 root_location=("content", i, "extension", j),
             ) from None
         coding = extension.valueCodeableConcept.coding[0]

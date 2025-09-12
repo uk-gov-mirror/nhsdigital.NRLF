@@ -1,9 +1,9 @@
 {
   "resourceType": "CodeSystem",
-  "id": "England-RetrievalMechanismNRL",
-  "url": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanismNRL",
+  "id": "England-NRLRetrievalMechanismNRL",
+  "url": "https://fhir.nhs.uk/England/CodeSystem/England-NRLRetrievalMechanismNRL",
   "version": "1.1.0",
-  "name": "EnglandRetrievalMechanismNRL",
+  "name": "EnglandNRLRetrievalMechanismNRL",
   "title": "England Retrieval MechanismNRL",
   "status": "draft",
   "experimental": false,

@@ -1045,7 +1045,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
       }
       """
 
-  Scenario: RetrievalMechanism extension is empty
+  Scenario: NRLRetrievalMechanism extension is empty
     Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
     And the organisation 'TSTCUS' is authorised to access pointer types:
       | system                 | value     |
@@ -1090,7 +1090,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
       }
       """
 
-  Scenario: Multiple RetrievalMechanism extensions in content
+  Scenario: Multiple NRLRetrievalMechanism extensions in content
     Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
     And the organisation 'TSTCUS' is authorised to access pointer types:
       | system                 | value     |
@@ -1110,11 +1110,11 @@ Feature: Producer - createDocumentReference - Failure Scenarios
           },
           "extension": [
             {
-              "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism",
+              "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-NRLRetrievalMechanism",
               "valueCodeableConcept": {
                 "coding": [
                   {
-                    "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                    "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLRetrievalMechanism",
                     "code": "Direct",
                     "display": "Direct"
                   }
@@ -1122,11 +1122,11 @@ Feature: Producer - createDocumentReference - Failure Scenarios
               }
             },
             {
-              "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism",
+              "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-NRLRetrievalMechanism",
               "valueCodeableConcept": {
                 "coding": [
                   {
-                    "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                    "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLRetrievalMechanism",
                     "code": "Direct",
                     "display": "Direct"
                   }
@@ -1165,12 +1165,12 @@ Feature: Producer - createDocumentReference - Failure Scenarios
             }
           ]
         },
-        "diagnostics": "Invalid content retrieval extension: Extension must have one content retrieval extension, see: ('https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism')",
+        "diagnostics": "Invalid content retrieval extension: Extension must have one content retrieval extension, see: ('https://fhir.nhs.uk/England/ValueSet/England-NRLRetrievalMechanism')",
         "expression": ["content[0].extension"]
       }
       """
 
-  Scenario: RetrievalMechanism extension with mismatched code and display
+  Scenario: NRLRetrievalMechanism extension with mismatched code and display
     Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
     And the organisation 'TSTCUS' is authorised to access pointer types:
       | system                 | value     |
@@ -1190,11 +1190,11 @@ Feature: Producer - createDocumentReference - Failure Scenarios
           },
           "extension": [
             {
-              "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism",
+              "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-NRLRetrievalMechanism",
               "valueCodeableConcept": {
                 "coding": [
                   {
-                    "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                    "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLRetrievalMechanism",
                     "code": "Direct",
                     "display": "Spine Secure Proxy"
                   }
@@ -1238,7 +1238,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
       }
       """
 
-  Scenario: RetrievalMechanism extension with invalid URL case
+  Scenario: NRLRetrievalMechanism extension with invalid URL case
     Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
     And the organisation 'TSTCUS' is authorised to access pointer types:
       | system                 | value     |
@@ -1258,11 +1258,11 @@ Feature: Producer - createDocumentReference - Failure Scenarios
           },
           "extension": [
             {
-              "url": "https://fhir.nhs.uk/england/structuredefinition/extension-england-retrievalmechanism",
+              "url": "https://fhir.nhs.uk/england/structuredefinition/extension-england-nrlretrievalmechanism",
               "valueCodeableConcept": {
                 "coding": [
                   {
-                    "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                    "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLRetrievalMechanism",
                     "code": "Direct",
                     "display": "Direct"
                   }
@@ -1301,12 +1301,12 @@ Feature: Producer - createDocumentReference - Failure Scenarios
             }
           ]
         },
-        "diagnostics": "Invalid content retrieval extension (content[0].extension[0].url: Input should be 'https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism', see: https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism)",
+        "diagnostics": "Invalid content retrieval extension (content[0].extension[0].url: Input should be 'https://fhir.nhs.uk/England/StructureDefinition/Extension-England-NRLRetrievalMechanism', see: https://fhir.nhs.uk/England/ValueSet/England-NRLRetrievalMechanism)",
         "expression": ["content[0].extension[0].url"]
       }
       """
 
-  Scenario: RetrievalMechanism extension with invalid code
+  Scenario: NRLRetrievalMechanism extension with invalid code
     Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
     And the organisation 'TSTCUS' is authorised to access pointer types:
       | system                 | value     |
@@ -1326,11 +1326,11 @@ Feature: Producer - createDocumentReference - Failure Scenarios
           },
           "extension": [
             {
-              "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism",
+              "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-NRLRetrievalMechanism",
               "valueCodeableConcept": {
                 "coding": [
                   {
-                    "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                    "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLRetrievalMechanism",
                     "code": "INVALID_CODE",
                     "display": "Direct"
                   }
@@ -1369,12 +1369,12 @@ Feature: Producer - createDocumentReference - Failure Scenarios
             }
           ]
         },
-        "diagnostics": "Invalid content retrieval extension (content[0].extension[0].valueCodeableConcept.coding[0].code: Input should be 'SSP', 'Direct', 'LDR' or 'InContext', see: https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism)",
+        "diagnostics": "Invalid content retrieval extension (content[0].extension[0].valueCodeableConcept.coding[0].code: Input should be 'SSP', 'Direct', 'LDR' or 'InContext', see: https://fhir.nhs.uk/England/ValueSet/England-NRLRetrievalMechanism)",
         "expression": ["content[0].extension[0].valueCodeableConcept.coding[0].code"]
       }
       """
 
-  Scenario: RetrievalMechanism extension with missing display
+  Scenario: NRLRetrievalMechanism extension with missing display
     Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
     And the organisation 'TSTCUS' is authorised to access pointer types:
       | system                 | value     |
@@ -1394,11 +1394,11 @@ Feature: Producer - createDocumentReference - Failure Scenarios
           },
           "extension": [
             {
-              "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism",
+              "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-NRLRetrievalMechanism",
               "valueCodeableConcept": {
                 "coding": [
                   {
-                    "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                    "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLRetrievalMechanism",
                     "code": "Direct"
                   }
                 ]
@@ -1436,12 +1436,12 @@ Feature: Producer - createDocumentReference - Failure Scenarios
             }
           ]
         },
-        "diagnostics": "Invalid content retrieval extension (content[0].extension[0].valueCodeableConcept.coding[0].display: Input should be 'Spine Secure Proxy', 'Direct', 'Large Document Retrieval' or 'Direct using In-Context', see: https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism)",
+        "diagnostics": "Invalid content retrieval extension (content[0].extension[0].valueCodeableConcept.coding[0].display: Input should be 'Spine Secure Proxy', 'Direct', 'Large Document Retrieval' or 'Direct using In-Context', see: https://fhir.nhs.uk/England/ValueSet/England-NRLRetrievalMechanism)",
         "expression": ["content[0].extension[0].valueCodeableConcept.coding[0].display"]
       }
       """
 
-  Scenario: RetrievalMechanism extension with missing valueCodeableConcept
+  Scenario: NRLRetrievalMechanism extension with missing valueCodeableConcept
     Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
     And the organisation 'TSTCUS' is authorised to access pointer types:
       | system                 | value     |
@@ -1461,7 +1461,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
           },
           "extension": [
             {
-              "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism"
+              "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-NRLRetrievalMechanism"
             },
             {
               "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-ContentStability",
@@ -1495,7 +1495,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
             }
           ]
         },
-        "diagnostics": "Invalid content retrieval extension (content[0].extension[0].valueCodeableConcept: Input should be a valid dictionary or instance of RetrievalMechanismExtensionValueCodeableConcept, see: https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism)",
+        "diagnostics": "Invalid content retrieval extension (content[0].extension[0].valueCodeableConcept: Input should be a valid dictionary or instance of NRLRetrievalMechanismExtensionValueCodeableConcept, see: https://fhir.nhs.uk/England/ValueSet/England-NRLRetrievalMechanism)",
         "expression": ["content[0].extension[0].valueCodeableConcept"]
       }
       """

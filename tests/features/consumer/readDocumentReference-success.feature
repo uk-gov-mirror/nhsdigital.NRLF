@@ -89,11 +89,11 @@ Feature: Consumer - readDocumentReference - Success Scenarios
                 }
               },
               {
-                "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism",
+                "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-NRLRetrievalMechanism",
                 "valueCodeableConcept": {
                   "coding": [
                     {
-                      "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                      "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLRetrievalMechanism",
                       "code": "Direct",
                       "display": "Direct"
                     }
@@ -206,11 +206,11 @@ Feature: Consumer - readDocumentReference - Success Scenarios
                 }
               },
               {
-                "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism",
+                "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-NRLRetrievalMechanism",
                 "valueCodeableConcept": {
                   "coding": [
                     {
-                      "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                      "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLRetrievalMechanism",
                       "code": "Direct",
                       "display": "Direct"
                     }

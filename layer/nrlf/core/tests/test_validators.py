@@ -21,11 +21,11 @@ from nrlf.producer.fhir.r4.model import (
     ContentStabilityExtensionCoding,
     ContentStabilityExtensionValueCodeableConcept,
     DocumentReference,
+    NRLRetrievalMechanismExtension,
+    NRLRetrievalMechanismExtensionCoding,
+    NRLRetrievalMechanismExtensionValueCodeableConcept,
     OperationOutcomeIssue,
     RequestQueryType,
-    RetrievalMechanismExtension,
-    RetrievalMechanismExtensionCoding,
-    RetrievalMechanismExtensionValueCodeableConcept,
 )
 from nrlf.tests.data import load_document_reference_json
 
@@ -1379,11 +1379,11 @@ def test_validate_content_extension_missing_content_stability():
     # Remove all ContentStability extensions
     document_ref_data["content"][0]["extension"] = [
         {
-            "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism",
+            "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-NRLRetrievalMechanism",
             "valueCodeableConcept": {
                 "coding": [
                     {
-                        "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                        "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLRetrievalMechanism",
                         "code": "Direct",
                         "display": "Direct",
                     }
@@ -1421,11 +1421,11 @@ def test_validate_content_extension_mismatch_between_retrieval_mechanism_display
     # Add a retrieval mechanism extension with a valid code but wrong display
     document_ref_data["content"][0]["extension"].append(
         {
-            "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism",
+            "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-NRLRetrievalMechanism",
             "valueCodeableConcept": {
                 "coding": [
                     {
-                        "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                        "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLRetrievalMechanism",
                         "code": "Direct",
                         "display": "Spine Secure Proxy",
                     }
@@ -1604,11 +1604,11 @@ def test_validate_content_multiple_content_retrieval_extensions():
 
     # Add 2 content retrieval extensions
     content_retrieval_extension = {
-        "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism",
+        "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-NRLRetrievalMechanism",
         "valueCodeableConcept": {
             "coding": [
                 {
-                    "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                    "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLRetrievalMechanism",
                     "code": "Direct",
                     "display": "Direct",
                 }
@@ -1634,7 +1634,7 @@ def test_validate_content_multiple_content_retrieval_extensions():
                 }
             ]
         },
-        "diagnostics": "Invalid content retrieval extension: Extension must have one content retrieval extension, see: ('https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism')",
+        "diagnostics": "Invalid content retrieval extension: Extension must have one content retrieval extension, see: ('https://fhir.nhs.uk/England/ValueSet/England-NRLRetrievalMechanism')",
         "expression": ["content[0].extension"],
     }
 
@@ -1672,11 +1672,11 @@ def test_validate_two_content_with_different_retrieval_mechanisms():
         "format": unstructured_format,
         "extension": [
             {
-                "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism",
+                "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-NRLRetrievalMechanism",
                 "valueCodeableConcept": {
                     "coding": [
                         {
-                            "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                            "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLRetrievalMechanism",
                             "code": "SSP",
                             "display": "Spine Secure Proxy",
                         }
@@ -1713,11 +1713,11 @@ def test_validate_two_content_with_different_retrieval_mechanisms():
         "format": unstructured_format,
         "extension": [
             {
-                "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism",
+                "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-NRLRetrievalMechanism",
                 "valueCodeableConcept": {
                     "coding": [
                         {
-                            "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                            "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLRetrievalMechanism",
                             "code": "Direct",
                             "display": "Direct",
                         }
@@ -1737,17 +1737,17 @@ def test_validate_two_content_with_different_retrieval_mechanisms():
 
 
 def test_validate_content_retrieval_lowercase_urls():
-    """Test that the extension is recognised when 'RetrievalMechanism' is in lowercase and throws an error for mismatching the URL case."""
+    """Test that the extension is recognised when 'NRLRetrievalMechanism' is in lowercase and throws an error for mismatching the URL case."""
     validator = DocumentReferenceValidator()
     document_ref_data = load_document_reference_json("Y05868-736253002-Valid")
 
     document_ref_data["content"][0]["extension"] = [
         {
-            "url": "https://fhir.nhs.uk/england/structuredefinition/extension-england-retrievalmechanism",
+            "url": "https://fhir.nhs.uk/england/structuredefinition/extension-england-nrlretrievalmechanism",
             "valueCodeableConcept": {
                 "coding": [
                     {
-                        "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                        "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLRetrievalMechanism",
                         "code": "Direct",
                         "display": "Direct",
                     }
@@ -1784,7 +1784,7 @@ def test_validate_content_retrieval_lowercase_urls():
                 }
             ]
         },
-        "diagnostics": "Invalid content retrieval extension (content[0].extension[0].url: Input should be 'https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism', see: https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism)",
+        "diagnostics": "Invalid content retrieval extension (content[0].extension[0].url: Input should be 'https://fhir.nhs.uk/England/StructureDefinition/Extension-England-NRLRetrievalMechanism', see: https://fhir.nhs.uk/England/ValueSet/England-NRLRetrievalMechanism)",
         "expression": ["content[0].extension[0].url"],
     }
 
@@ -1805,12 +1805,12 @@ def make_content_stability_extension(code, display):
 
 
 def make_retrieval_mechanism_extension(code, display):
-    return RetrievalMechanismExtension(
-        url="https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism",
-        valueCodeableConcept=RetrievalMechanismExtensionValueCodeableConcept(
+    return NRLRetrievalMechanismExtension(
+        url="https://fhir.nhs.uk/England/StructureDefinition/Extension-England-NRLRetrievalMechanism",
+        valueCodeableConcept=NRLRetrievalMechanismExtensionValueCodeableConcept(
             coding=[
-                RetrievalMechanismExtensionCoding(
-                    system="https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                NRLRetrievalMechanismExtensionCoding(
+                    system="https://fhir.nhs.uk/England/CodeSystem/England-NRLRetrievalMechanism",
                     code=code,
                     display=display,
                 )
@@ -1837,7 +1837,7 @@ def test_has_valid_extensions_multiple_retrieval_mechanism():
     ]
     assert validator._has_valid_extensions(extensions, 0) is False
     assert any(
-        "Invalid content retrieval extension: Extension must have one content retrieval extension, see: ('https://fhir.nhs.uk/England/ValueSet/England-RetrievalMechanism')"
+        "Invalid content retrieval extension: Extension must have one content retrieval extension, see: ('https://fhir.nhs.uk/England/ValueSet/England-NRLRetrievalMechanism')"
         in issue.diagnostics
         for issue in validator.result.issues
     )
@@ -1927,11 +1927,11 @@ def test_validate_structured_format_with_text_html_for_incontext_launch():
     }
     document_ref_data["content"][0]["extension"] = [
         {
-            "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-RetrievalMechanism",
+            "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-NRLRetrievalMechanism",
             "valueCodeableConcept": {
                 "coding": [
                     {
-                        "system": "https://fhir.nhs.uk/England/CodeSystem/England-RetrievalMechanism",
+                        "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLRetrievalMechanism",
                         "code": "InContext",
                         "display": "Direct using In-Context",
                     }
