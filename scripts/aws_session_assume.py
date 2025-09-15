@@ -3,6 +3,7 @@ import boto3
 
 _AWS_ACCOUNT_FOR_ENV = {
     "dev": "dev",
+    "drdev": "dev",
     "dev-sandbox": "dev",
     "qa": "test",
     "qa-sandbox": "test",

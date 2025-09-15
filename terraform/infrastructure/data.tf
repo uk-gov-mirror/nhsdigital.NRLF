@@ -1,13 +1,13 @@
 data "aws_caller_identity" "current" {}
 
 data "aws_s3_object" "api-truststore-certificate" {
-  bucket = "${local.shared_prefix}-api-truststore"
+  bucket = "nhsd-nrlf--drdev-api-truststore"
   key    = "certificates.pem"
 }
 
 data "aws_s3_bucket" "authorization-store" {
   count  = var.use_shared_resources ? 1 : 0
-  bucket = "${local.shared_prefix}-authorization-store"
+  bucket = "nhsd-nrlf--drdev-authorization-store"
 }
 
 data "aws_iam_policy" "auth-store-read-policy" {
@@ -43,9 +43,9 @@ data "external" "current-info" {
 }
 
 data "aws_s3_bucket" "source-data-bucket" {
-  bucket = "${local.account_prefix}-source-data-bucket"
+  bucket = "nhsd-nrlf--drdev-source-data-bucket"
 }
 
 data "aws_kms_key" "glue" {
-  key_id = "alias/${local.account_prefix}-glue"
+  key_id = "alias/nhsd-nrlf--drdev-glue"
 }
