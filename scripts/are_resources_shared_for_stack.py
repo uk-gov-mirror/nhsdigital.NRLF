@@ -19,6 +19,8 @@ persistent_environments = [
     "int-sandbox-2",
     "prod-1",
     "prod-2",
+    "drdev-1",
+    "drdev-2",
 ]
 
 

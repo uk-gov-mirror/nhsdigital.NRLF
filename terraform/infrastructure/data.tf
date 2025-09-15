@@ -12,7 +12,7 @@ data "aws_s3_bucket" "authorization-store" {
 
 data "aws_iam_policy" "auth-store-read-policy" {
   count = var.use_shared_resources ? 1 : 0
-  name  = "${local.shared_prefix}-read-s3-authorization-store"
+  name  = "nhsd-nrlf--drdev-read-s3-authorization-store"
 }
 
 data "aws_dynamodb_table" "pointers-table" {
