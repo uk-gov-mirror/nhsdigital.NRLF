@@ -135,7 +135,7 @@ test-smoke-internal: check-warn ## Run the smoke tests against the internal envi
 	@echo "Running smoke tests against the internal environment ${TF_WORKSPACE_NAME}"
 	TEST_ENVIRONMENT_NAME=$(ENV) \
 	TEST_STACK_NAME=$(TF_WORKSPACE_NAME) \
-	TEST_STACK_DOMAIN=$(shell terraform -chdir=terraform/infrastructure output -raw domain 2>/dev/null) \
+	TEST_STACK_DOMAIN=dev.api.record-locator.dev.national.nhs.uk \
 	TEST_CONNECT_MODE="internal" \
 		pytest ./tests/smoke/scenarios/* $(SMOKE_TEST_ARGS)
 
