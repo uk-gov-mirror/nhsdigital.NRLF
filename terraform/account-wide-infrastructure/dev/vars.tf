@@ -6,13 +6,13 @@ variable "assume_role" {}
 
 variable "dev_api_domain_name" {
   description = "The internal DNS name of the API Gateway for the dev environment"
-  default     = "dev.api.record-locator.dev.national.nhs.uk"
+  default     = "drdev.api.record-locator.dev.national.nhs.uk"
 }
 
-variable "devsandbox_api_domain_name" {
-  description = "The internal DNS name of the API Gateway for the dev sandbox environment"
-  default     = "dev-sandbox.api.record-locator.dev.national.nhs.uk"
-}
+# variable "devsandbox_api_domain_name" {
+#   description = "The internal DNS name of the API Gateway for the dev sandbox environment"
+#   default     = "dev-sandbox.api.record-locator.dev.national.nhs.uk"
+# }
 
 variable "enable_reporting" {
   type        = bool
@@ -65,5 +65,5 @@ variable "powerbi_gw_instance_type" {
 variable "use_powerbi_gw_custom_ami" {
   type        = bool
   description = "Use custom image for PowerBI GW instance"
-  default     = true
+  default     = false
 }

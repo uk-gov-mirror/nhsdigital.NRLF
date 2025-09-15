@@ -1,9 +1,9 @@
 resource "aws_s3_bucket" "athena" {
-  bucket = "${var.name_prefix}-athena"
+  bucket = "${var.name_prefix}-dr-athena"
 }
 
 resource "aws_s3_bucket_policy" "athena" {
-  bucket = "${var.name_prefix}-athena"
+  bucket = "${var.name_prefix}-dr-athena"
 
   policy = jsonencode({
     Version = "2012-10-17"
