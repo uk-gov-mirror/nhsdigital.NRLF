@@ -23,10 +23,10 @@ from nrlf.producer.fhir.r4.model import (
     NRLCodeableConcept,
     NRLCoding,
     NRLFormatCode,
+    NRLRetrievalMechanismExtension,
+    NRLRetrievalMechanismExtensionCoding,
+    NRLRetrievalMechanismExtensionValueCodeableConcept,
     Reference,
-    RetrievalMechanismExtension,
-    RetrievalMechanismExtensionCoding,
-    RetrievalMechanismExtensionValueCodeableConcept,
 )
 from tests.features.utils.constants import (
     DEFAULT_TEST_AUTHOR,
@@ -81,11 +81,11 @@ def create_test_document_reference(items: dict) -> DocumentReference:
                                 ]
                             ),
                         ),
-                        RetrievalMechanismExtension(
+                        NRLRetrievalMechanismExtension(
                             url=CONTENT_RETRIEVAL_EXTENSION_URL,
-                            valueCodeableConcept=RetrievalMechanismExtensionValueCodeableConcept(
+                            valueCodeableConcept=NRLRetrievalMechanismExtensionValueCodeableConcept(
                                 coding=[
-                                    RetrievalMechanismExtensionCoding(
+                                    NRLRetrievalMechanismExtensionCoding(
                                         system=CONTENT_RETRIEVAL_SYSTEM_URL,
                                         code="Direct",
                                         display="Direct",
