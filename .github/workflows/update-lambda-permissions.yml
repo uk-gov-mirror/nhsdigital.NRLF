@@ -193,10 +193,12 @@ jobs:
               terraform -chdir=terraform/infrastructure workspace select ${{ inputs.stack_name }}
 
       - name: Terraform Plan
+        env:
+          DEPLOY_ROLE_ARN: ${{ secrets.DEPLOY_ROLE_ARN }}
         run: |
           terraform -chdir=terraform/infrastructure plan \
               --var-file=etc/${{ vars.ACCOUNT_NAME }}.tfvars \
-              --var assume_role_arn=${{ secrets.DEPLOY_ROLE_ARN }} \
+              --var assume_role_arn=${DEPLOY_ROLE_ARN} \
               --var use_shared_resources=$(poetry run python scripts/are_resources_shared_for_stack.py ${{ inputs.stack_name }}) \
               --out tfplan
 

@@ -80,10 +80,12 @@ jobs:
         run: make build get-s3-perms
 
       - name: Terraform Destroy
+        env:
+          DEPLOY_ROLE_ARN: ${{ secrets.DEPLOY_ROLE_ARN }}
         run: |
           terraform -chdir=terraform/infrastructure destroy \
             --var-file=etc/dev.tfvars \
-            --var assume_role_arn=${{ secrets.DEPLOY_ROLE_ARN }} \
+            --var assume_role_arn=${DEPLOY_ROLE_ARN} \
             -auto-approve
 
       - name: Cleanup Terraform Workspace
