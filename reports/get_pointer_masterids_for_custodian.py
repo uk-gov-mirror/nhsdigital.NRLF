@@ -9,20 +9,25 @@ dynamodb = boto3.client("dynamodb")
 paginator = dynamodb.get_paginator("scan")
 
 
-def _get_masterids_for_custodians(table_name: str, custodians: str) -> Any:
+def _get_masterids_for_custodians(table_name: str, custodians: str | tuple[str]) -> Any:
     """
     Get masterids for pointers in the given table for a list of custodians.
     Parameters:
     - table_name: The name of the pointers table to use.
     """
-
-    print(  # noqa
-        f"Getting masterids for custodians {custodians} in table {table_name}...."
+    custodian_list = (
+        custodians.split(",") if isinstance(custodians, str) else list(custodians)
     )
 
-    expression_names_str = ",".join([f":param_{custodian}" for custodian in custodians])
+    print(  # noqa
+        f"Getting masterids for custodians {custodian_list} in table {table_name}...."
+    )
+
+    expression_names_str = ",".join(
+        [f":param{custodian}" for custodian in custodian_list]
+    )
     expression_values_list = {
-        f":param_{custodian}": {"S": custodian} for custodian in custodians
+        f":param{custodian}": {"S": custodian} for custodian in custodian_list
     }
 
     params: dict[str, Any] = {
