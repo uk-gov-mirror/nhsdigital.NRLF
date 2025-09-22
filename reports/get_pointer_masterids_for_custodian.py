@@ -1,9 +1,12 @@
 import json
+import os
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
 import boto3
 import fire
+
+INCLUDE_PATIENT_IDS = os.environ.get("INCLUDE_PATIENT_IDS", "false").lower() == "true"
 
 dynamodb = boto3.client("dynamodb")
 paginator = dynamodb.get_paginator("scan")
@@ -23,6 +26,12 @@ def _get_masterids_for_custodians(table_name: str, custodians: str | tuple[str])
         f"Getting masterids for custodians {custodian_list} in table {table_name}...."
     )
 
+    required_attributes = (
+        ["id", "type_id", "master_identifier", "custodian"]
+        if not INCLUDE_PATIENT_IDS
+        else ["id", "type_id", "master_identifier", "custodian", "nhs_number"]
+    )
+
     expression_names_str = ",".join(
         [f":param{custodian}" for custodian in custodian_list]
     )
@@ -35,7 +44,7 @@ def _get_masterids_for_custodians(table_name: str, custodians: str | tuple[str])
         "PaginationConfig": {"PageSize": 50},
         "FilterExpression": f"custodian IN ({expression_names_str})",
         "ExpressionAttributeValues": expression_values_list,
-        "ProjectionExpression": "id, type_id, master_identifier",
+        "ProjectionExpression": ",".join(required_attributes),
     }
 
     pointers_info: list[dict[str, str]] = []
@@ -48,12 +57,15 @@ def _get_masterids_for_custodians(table_name: str, custodians: str | tuple[str])
             pointer_id = item.get("id", {}).get("S", "no-id")
             pointer_type = item.get("type_id", {}).get("S", "no-type")
             master_id = item.get("master_identifier", {}).get("S", "no-master-id")
+            custodian = item.get("custodian", {}).get("S", "no-custodian")
 
             pointers_info.append(
                 {
                     "nrl-id": pointer_id,
                     "pointer-type": pointer_type,
                     "master_identifier": master_id,
+                    "custodian": custodian,
+                    "patient_id": item.get("nhs_number", {}).get("S", "no-patient-id"),
                 }
             )
 
@@ -70,7 +82,7 @@ def _get_masterids_for_custodians(table_name: str, custodians: str | tuple[str])
     print(" Done")  # noqa
 
     print(f"Writing pointers to file ./pointer-masterids.txt ...")  # noqa
-    with open(f"pointer-masterids.txt", "w") as f:
+    with open("pointer-masterids.txt", "w") as f:
         f.write(json.dumps(pointers_info, indent=2))
 
     return {
