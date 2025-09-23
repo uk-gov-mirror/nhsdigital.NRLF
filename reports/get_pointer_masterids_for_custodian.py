@@ -26,11 +26,9 @@ def _get_masterids_for_custodians(table_name: str, custodians: str | tuple[str])
         f"Getting masterids for custodians {custodian_list} in table {table_name}...."
     )
 
-    required_attributes = (
-        ["id", "type_id", "master_identifier", "custodian"]
-        if not INCLUDE_PATIENT_IDS
-        else ["id", "type_id", "master_identifier", "custodian", "nhs_number"]
-    )
+    required_attributes = ["id", "type_id", "master_identifier", "custodian"]
+    if INCLUDE_PATIENT_IDS:
+        required_attributes.append("nhs_number")
 
     expression_names_str = ",".join(
         [f":param{custodian}" for custodian in custodian_list]
