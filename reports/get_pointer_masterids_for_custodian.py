@@ -56,6 +56,7 @@ def _get_masterids_for_custodians(table_name: str, custodians: str | tuple[str])
             pointer_type = item.get("type_id", {}).get("S", "no-type")
             master_id = item.get("master_identifier", {}).get("S", "no-master-id")
             custodian = item.get("custodian", {}).get("S", "no-custodian")
+            patient_id = item.get("nhs_number", {}).get("S", "no-patient-id")
 
             pointers_info.append(
                 {
@@ -63,7 +64,7 @@ def _get_masterids_for_custodians(table_name: str, custodians: str | tuple[str])
                     "pointer-type": pointer_type,
                     "master_identifier": master_id,
                     "custodian": custodian,
-                    "patient_id": item.get("nhs_number", {}).get("S", "no-patient-id"),
+                    "patient_id": patient_id if INCLUDE_PATIENT_IDS else "not-included",
                 }
             )
 
