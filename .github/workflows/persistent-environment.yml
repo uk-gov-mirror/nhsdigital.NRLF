@@ -45,7 +45,7 @@ jobs:
         run: make build
 
       - name: Configure Management Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a #v4.3.1
         with:
           aws-region: eu-west-2
           role-to-assume: ${{ secrets.MGMT_ROLE_ARN }}
@@ -89,7 +89,7 @@ jobs:
           poetry install --no-root
 
       - name: Configure Management Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a #v4.3.1
         with:
           aws-region: eu-west-2
           role-to-assume: ${{ secrets.MGMT_ROLE_ARN }}
@@ -121,11 +121,13 @@ jobs:
             terraform -chdir=terraform/infrastructure workspace select ${inactive_stack}
 
       - name: Terraform Plan
+        env:
+          DEPLOY_ROLE_ARN: ${{ secrets.DEPLOY_ROLE_ARN }}
         run: |
           inactive_stack=$(poetry run python ./scripts/get_env_config.py inactive-stack ${{ inputs.environment }})
           terraform -chdir=terraform/infrastructure plan \
             --var-file=etc/${{ vars.ACCOUNT_NAME }}.tfvars \
-            --var assume_role_arn=${{ secrets.DEPLOY_ROLE_ARN }} \
+            --var assume_role_arn=${DEPLOY_ROLE_ARN} \
             --var use_shared_resources=$(poetry run python scripts/are_resources_shared_for_stack.py ${inactive_stack}) \
             -out tfplan
 
@@ -166,7 +168,7 @@ jobs:
           fail-on-cache-miss: true
 
       - name: Configure Management Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a #v4.3.1
         with:
           aws-region: eu-west-2
           role-to-assume: ${{ secrets.MGMT_ROLE_ARN }}
@@ -219,7 +221,7 @@ jobs:
           poetry install --no-root
 
       - name: Configure Management Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a #v4.3.1
         with:
           aws-region: eu-west-2
           role-to-assume: ${{ secrets.MGMT_ROLE_ARN }}
@@ -248,7 +250,7 @@ jobs:
           poetry install --no-root
 
       - name: Configure Management Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a #v4.3.1
         with:
           aws-region: eu-west-2
           role-to-assume: ${{ secrets.MGMT_ROLE_ARN }}
@@ -277,7 +279,7 @@ jobs:
           poetry install --no-root
 
       - name: Configure Management Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a #v4.3.1
         with:
           aws-region: eu-west-2
           role-to-assume: ${{ secrets.MGMT_ROLE_ARN }}

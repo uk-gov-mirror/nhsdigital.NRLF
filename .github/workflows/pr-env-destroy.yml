@@ -61,7 +61,7 @@ jobs:
           poetry install --no-root
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a #v4.3.1
         with:
           aws-region: eu-west-2
           role-to-assume: ${{ secrets.CI_ROLE_NAME }}
@@ -80,10 +80,12 @@ jobs:
         run: make build get-s3-perms
 
       - name: Terraform Destroy
+        env:
+          DEPLOY_ROLE_ARN: ${{ secrets.DEPLOY_ROLE_ARN }}
         run: |
           terraform -chdir=terraform/infrastructure destroy \
             --var-file=etc/dev.tfvars \
-            --var assume_role_arn=${{ secrets.DEPLOY_ROLE_ARN }} \
+            --var assume_role_arn=${DEPLOY_ROLE_ARN} \
             -auto-approve
 
       - name: Cleanup Terraform Workspace
