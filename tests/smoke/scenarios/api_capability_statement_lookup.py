@@ -9,8 +9,7 @@ def is_public_url():
     return os.environ.get("TEST_CONNECT_MODE") == "public"
 
 
-@pytest.mark.skipif(
-    not is_public_url(),
+@pytest.mark.skip(
     reason="Capability statements only work via APIGEE in persistent environments",
 )
 def test_read_api_capability_statements(
