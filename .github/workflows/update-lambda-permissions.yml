@@ -50,12 +50,16 @@ jobs:
           role-session-name: github-actions-ci-${{ inputs.environment }}-${{ github.run_id }}
 
       - name: Terraform Init
+        env:
+          STACK_NAME: ${{ inputs.stack_name }}
         run: |
           terraform -chdir=terraform/infrastructure init
-          terraform -chdir=terraform/infrastructure workspace new ${{ inputs.stack_name }} || \
-              terraform -chdir=terraform/infrastructure workspace select ${{ inputs.stack_name }}
+          terraform -chdir=terraform/infrastructure workspace new $STACK_NAME || \
+              terraform -chdir=terraform/infrastructure workspace select $STACK_NAME
 
       - name: Check deployed version matches build version
+        env:
+          STRICT_VERSIONING: ${{ inputs.strict_versioning }}
         run: |
           this_version="$(./scripts/get-current-info.sh | jq -r .version)"
           deployed_version="$(terraform -chdir=terraform/infrastructure output --raw version)"
@@ -66,7 +70,7 @@ jobs:
           then
             echo "${this_version} does not match deployed version: ${deployed_version}" 1>&2
 
-            if [ "${{ inputs.strict_versioning }}" == "true" ]; then
+            if [ "$STRICT_VERSIONING" == "true" ]; then
               echo "Strict version checking failed, cancelling workflow" 1>&2
               exit 1
             fi
@@ -98,9 +102,12 @@ jobs:
           role-session-name: github-actions-ci-${{ inputs.environment }}-${{ github.run_id }}
 
       - name: Create lambda permissions layer
+        env:
+          ENVIRONMENT: ${{ inputs.environment }}
+          STACK_NAME: ${{ inputs.stack_name }}
         run: |
-          account=$(echo '${{ inputs.environment }}' | cut -d '-' -f1)
-          make get-s3-perms ENV=${account} TF_WORKSPACE_NAME=${{ inputs.stack_name }}
+          account=$(echo "$ENVIRONMENT" | cut -d '-' -f1)
+          make get-s3-perms ENV=${account} TF_WORKSPACE_NAME=$STACK_NAME
 
       - name: Save NRLF permissions in cache
         uses: actions/cache/save@v4
@@ -137,9 +144,12 @@ jobs:
           role-session-name: github-actions-ci-acc-${{ inputs.environment }}-${{ github.run_id }}
 
       - name: Pull deployed lambda artifacts
+        env:
+          ENVIRONMENT: ${{ inputs.environment }}
+          STACK_NAME: ${{ inputs.stack_name }}
         run: |
-          account=$(echo '${{ inputs.environment }}' | cut -d '-' -f1)
-          ./scripts/pull-lambda-code-for-stack.sh ${{ inputs.stack_name }}
+          account=$(echo "$ENVIRONMENT" | cut -d '-' -f1)
+          ./scripts/pull-lambda-code-for-stack.sh $STACK_NAME
 
       - name: Save lambda artifacts in cache
         uses: actions/cache/save@v4
@@ -187,26 +197,31 @@ jobs:
           role-session-name: github-actions-ci-${{ inputs.environment }}-${{ github.run_id }}
 
       - name: Terraform Init
+        env:
+          STACK_NAME: ${{ inputs.stack_name }}
         run: |
           terraform -chdir=terraform/infrastructure init
-          terraform -chdir=terraform/infrastructure workspace new ${{ inputs.stack_name }} || \
-              terraform -chdir=terraform/infrastructure workspace select ${{ inputs.stack_name }}
+          terraform -chdir=terraform/infrastructure workspace new $STACK_NAME || \
+              terraform -chdir=terraform/infrastructure workspace select $STACK_NAME
 
       - name: Terraform Plan
         env:
           DEPLOY_ROLE_ARN: ${{ secrets.DEPLOY_ROLE_ARN }}
+          STACK_NAME: ${{ inputs.stack_name }}
         run: |
           terraform -chdir=terraform/infrastructure plan \
               --var-file=etc/${{ vars.ACCOUNT_NAME }}.tfvars \
               --var assume_role_arn=${DEPLOY_ROLE_ARN} \
-              --var use_shared_resources=$(poetry run python scripts/are_resources_shared_for_stack.py ${{ inputs.stack_name }}) \
+              --var use_shared_resources=$(poetry run python scripts/are_resources_shared_for_stack.py $STACK_NAME) \
               --out tfplan
 
       - name: Save Terraform Plan
+        env:
+          ENVIRONMENT: ${{ inputs.environment }}
         run: |
           terraform -chdir=terraform/infrastructure show -no-color tfplan > terraform/infrastructure/tfplan.txt
-          aws s3 cp terraform/infrastructure/tfplan s3://nhsd-nrlf--mgmt--github-ci-logging/${{ inputs.environment }}/${{ github.run_id }}/tfplan
-          aws s3 cp terraform/infrastructure/tfplan.txt s3://nhsd-nrlf--mgmt--github-ci-logging/${{ inputs.environment }}/${{ github.run_id }}/tfplan.txt
+          aws s3 cp terraform/infrastructure/tfplan s3://nhsd-nrlf--mgmt--github-ci-logging/$ENVIRONMENT/${{ github.run_id }}/tfplan
+          aws s3 cp terraform/infrastructure/tfplan.txt s3://nhsd-nrlf--mgmt--github-ci-logging/$ENVIRONMENT/${{ github.run_id }}/tfplan.txt
 
   terraform-apply:
     name: Apply permissions
@@ -248,13 +263,17 @@ jobs:
           role-session-name: github-actions-ci-${{ inputs.environment }}-${{ github.run_id }}
 
       - name: Download Terraform Plan artifact
-        run: aws s3 cp s3://nhsd-nrlf--mgmt--github-ci-logging/${{ inputs.environment }}/${{ github.run_id }}/tfplan terraform/infrastructure/tfplan
+        env:
+          ENVIRONMENT: ${{ inputs.environment }}
+        run: aws s3 cp s3://nhsd-nrlf--mgmt--github-ci-logging/$ENVIRONMENT/${{ github.run_id }}/tfplan terraform/infrastructure/tfplan
 
       - name: Terraform Init
+        env:
+          STACK_NAME: ${{ inputs.stack_name }}
         run: |
           terraform -chdir=terraform/infrastructure init
-          terraform -chdir=terraform/infrastructure workspace new ${{ inputs.stack_name }} || \
-              terraform -chdir=terraform/infrastructure workspace select ${{ inputs.stack_name }}
+          terraform -chdir=terraform/infrastructure workspace new $STACK_NAME || \
+              terraform -chdir=terraform/infrastructure workspace select $STACK_NAME
 
       - name: Terraform Apply
         run: |

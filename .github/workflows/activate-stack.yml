@@ -45,9 +45,14 @@ jobs:
           role-session-name: github-actions-ci-${{ inputs.environment }}-${{ github.run_id}}
 
       - name: Get current environment config
+        env:
+          ENVIRONMENT: ${{ inputs.environment }}
         run: |
-          poetry run python ./scripts/get_env_config.py all ${{ inputs.environment }}
+          poetry run python ./scripts/get_env_config.py all $ENVIRONMENT
 
       - name: Activate Stack
+        env:
+          STACK_NAME: ${{ inputs.stack_name }}
+          ENVIRONMENT: ${{ inputs.environment }}
         run: |
-          poetry run python ./scripts/activate_stack.py ${{ inputs.stack_name }} ${{ inputs.environment }}
+          poetry run python ./scripts/activate_stack.py $STACK_NAME $ENVIRONMENT

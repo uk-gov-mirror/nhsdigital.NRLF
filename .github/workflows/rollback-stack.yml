@@ -40,14 +40,20 @@ jobs:
           role-session-name: github-actions-ci-${{ inputs.environment }}-${{ github.run_id}}
 
       - name: Get current environment config
+        env:
+          ENVIRONMENT: ${{ inputs.environment }}
         run: |
-          poetry run python ./scripts/get_env_config.py all ${{ inputs.environment }}
+          poetry run python ./scripts/get_env_config.py all $ENVIRONMENT
 
       - name: Rollback
+        env:
+          ENVIRONMENT: ${{ inputs.environment }}
         run: |
-          inactive_stack_name=$(poetry run python ./scripts/get_env_config.py inactive-stack ${{ inputs.environment }})
-          poetry run python ./scripts/activate_stack.py ${inactive_stack_name} ${{ inputs.environment }}
+          inactive_stack_name=$(poetry run python ./scripts/get_env_config.py inactive-stack $ENVIRONMENT)
+          poetry run python ./scripts/activate_stack.py ${inactive_stack_name} $ENVIRONMENT
 
       - name: "Smoke Test"
+        env:
+          ENVIRONMENT: ${{ inputs.environment }}
         run: |
-          make ENV=${{ inputs.environment }} test-smoke-public
+          make ENV=$ENVIRONMENT test-smoke-public

@@ -52,9 +52,11 @@ jobs:
           role-session-name: github-actions-ci-${{ inputs.environment }}-${{ github.run_id }}
 
       - name: Add S3 Permissions to Lambda
+        env:
+          ENVIRONMENT: ${{ inputs.environment }}
         run: |
-          account=$(echo '${{ inputs.environment }}' | cut -d '-' -f1)
-          inactive_stack=$(poetry run python ./scripts/get_env_config.py inactive-stack ${{ inputs.environment }})
+          account=$(echo "$ENVIRONMENT" | cut -d '-' -f1)
+          inactive_stack=$(poetry run python ./scripts/get_env_config.py inactive-stack $ENVIRONMENT)
           make get-s3-perms ENV=${account} TF_WORKSPACE_NAME=${inactive_stack}
 
       - name: Save Build Artifacts
@@ -96,8 +98,10 @@ jobs:
           role-session-name: github-actions-ci-${{ inputs.environment }}-${{ github.run_id }}
 
       - name: Retrieve Server Certificates
+        env:
+          ENVIRONMENT: ${{ inputs.environment }}
         run: |
-          account=$(echo '${{ inputs.environment }}' | cut -d '-' -f1)
+          account=$(echo "$ENVIRONMENT" | cut -d '-' -f1)
           make truststore-pull-server ENV=${account}
 
       - name: Download build artifacts
@@ -114,8 +118,10 @@ jobs:
           fail-on-cache-miss: true
 
       - name: Terraform Init
+        env:
+          ENVIRONMENT: ${{ inputs.environment }}
         run: |
-          inactive_stack=$(poetry run python ./scripts/get_env_config.py inactive-stack ${{ inputs.environment }})
+          inactive_stack=$(poetry run python ./scripts/get_env_config.py inactive-stack $ENVIRONMENT)
           terraform -chdir=terraform/infrastructure init
           terraform -chdir=terraform/infrastructure workspace new ${inactive_stack} || \
             terraform -chdir=terraform/infrastructure workspace select ${inactive_stack}
@@ -123,8 +129,9 @@ jobs:
       - name: Terraform Plan
         env:
           DEPLOY_ROLE_ARN: ${{ secrets.DEPLOY_ROLE_ARN }}
+          ENVIRONMENT: ${{ inputs.environment }}
         run: |
-          inactive_stack=$(poetry run python ./scripts/get_env_config.py inactive-stack ${{ inputs.environment }})
+          inactive_stack=$(poetry run python ./scripts/get_env_config.py inactive-stack $ENVIRONMENT)
           terraform -chdir=terraform/infrastructure plan \
             --var-file=etc/${{ vars.ACCOUNT_NAME }}.tfvars \
             --var assume_role_arn=${DEPLOY_ROLE_ARN} \
@@ -132,10 +139,12 @@ jobs:
             -out tfplan
 
       - name: Save Terraform Plan
+        env:
+          ENVIRONMENT: ${{ inputs.environment }}
         run: |
           terraform -chdir=terraform/infrastructure show -no-color tfplan > terraform/infrastructure/tfplan.txt
-          aws s3 cp terraform/infrastructure/tfplan s3://nhsd-nrlf--mgmt--github-ci-logging/${{ inputs.environment }}/${{ github.run_id }}/tfplan
-          aws s3 cp terraform/infrastructure/tfplan.txt s3://nhsd-nrlf--mgmt--github-ci-logging/${{ inputs.environment }}/${{ github.run_id }}/tfplan.txt
+          aws s3 cp terraform/infrastructure/tfplan s3://nhsd-nrlf--mgmt--github-ci-logging/$ENVIRONMENT/${{ github.run_id }}/tfplan
+          aws s3 cp terraform/infrastructure/tfplan.txt s3://nhsd-nrlf--mgmt--github-ci-logging/$ENVIRONMENT/${{ github.run_id }}/tfplan.txt
 
   terraform-apply:
     name: Terraform Apply - ${{ inputs.environment }}
@@ -175,16 +184,22 @@ jobs:
           role-session-name: github-actions-ci-${{ inputs.environment }}-${{ github.run_id}}
 
       - name: Download Terraform Plan artifact
-        run: aws s3 cp s3://nhsd-nrlf--mgmt--github-ci-logging/${{ inputs.environment }}/${{ github.run_id }}/tfplan terraform/infrastructure/tfplan
+        env:
+          ENVIRONMENT: ${{ inputs.environment }}
+        run: aws s3 cp s3://nhsd-nrlf--mgmt--github-ci-logging/$ENVIRONMENT/${{ github.run_id }}/tfplan terraform/infrastructure/tfplan
 
       - name: Retrieve Server Certificates
+        env:
+          ENVIRONMENT: ${{ inputs.environment }}
         run: |
-          account=$(echo '${{ inputs.environment }}' | cut -d '-' -f1)
+          account=$(echo "$ENVIRONMENT" | cut -d '-' -f1)
           make truststore-pull-server ENV=${account}
 
       - name: Terraform Init
+        env:
+          ENVIRONMENT: ${{ inputs.environment }}
         run: |
-          inactive_stack=$(poetry run python ./scripts/get_env_config.py inactive-stack ${{ inputs.environment }})
+          inactive_stack=$(poetry run python ./scripts/get_env_config.py inactive-stack $ENVIRONMENT)
           terraform -chdir=terraform/infrastructure init
           terraform -chdir=terraform/infrastructure workspace new ${inactive_stack} || \
             terraform -chdir=terraform/infrastructure workspace select ${inactive_stack}
@@ -193,15 +208,19 @@ jobs:
         run: terraform -chdir=terraform/infrastructure apply tfplan
 
       - name: Update environment config version
+        env:
+          ENVIRONMENT: ${{ inputs.environment }}
         run: |
           deployed_version=$(terraform -chdir=terraform/infrastructure output --raw version)
-          poetry run python ./scripts/set_env_config.py inactive-version ${deployed_version} ${{ inputs.environment }}
+          poetry run python ./scripts/set_env_config.py inactive-version ${deployed_version} $ENVIRONMENT
 
       - name: Smoke Test
+        env:
+          ENVIRONMENT: ${{ inputs.environment }}
         run: |
-          account=$(echo '${{ inputs.environment }}' | cut -d '-' -f1)
+          account=$(echo "$ENVIRONMENT" | cut -d '-' -f1)
           make ENV=${account} truststore-pull-client
-          make ENV=${{ inputs.environment }} test-smoke-internal
+          make ENV=$ENVIRONMENT test-smoke-internal
 
   activate-stack:
     name: Activate - ${{ inputs.environment }}
@@ -228,9 +247,11 @@ jobs:
           role-session-name: github-actions-ci-${{ inputs.environment }}-${{ github.run_id}}
 
       - name: Activate Stack
+        env:
+          ENVIRONMENT: ${{ inputs.environment }}
         run: |
-          inactive_stack=$(poetry run python ./scripts/get_env_config.py inactive-stack ${{ inputs.environment }})
-          poetry run python ./scripts/activate_stack.py ${inactive_stack} ${{ inputs.environment }}
+          inactive_stack=$(poetry run python ./scripts/get_env_config.py inactive-stack $ENVIRONMENT)
+          poetry run python ./scripts/activate_stack.py ${inactive_stack} $ENVIRONMENT
 
   post-release-verify:
     name: Verify - ${{ inputs.environment }}
@@ -257,8 +278,10 @@ jobs:
           role-session-name: github-actions-ci-${{ inputs.environment }}-${{ github.run_id}}
 
       - name: "Smoke Test"
+        env:
+          ENVIRONMENT: ${{ inputs.environment }}
         run: |
-          make ENV=${{ inputs.environment }} test-smoke-public
+          make ENV=$ENVIRONMENT test-smoke-public
 
   rollback-stack:
     name: Rollback - ${{ inputs.environment }}
@@ -286,6 +309,8 @@ jobs:
           role-session-name: github-actions-ci-${{ inputs.environment }}-${{ github.run_id}}
 
       - name: Deactivate Stack
+        env:
+          ENVIRONMENT: ${{ inputs.environment }}
         run: |
-          inactive_stack_name=$(poetry run python ./scripts/get_env_config.py inactive-stack ${{ inputs.environment }})
-          poetry run python ./scripts/activate_stack.py ${inactive_stack_name} ${{ inputs.environment }}
+          inactive_stack_name=$(poetry run python ./scripts/get_env_config.py inactive-stack $ENVIRONMENT)
+          poetry run python ./scripts/activate_stack.py ${inactive_stack_name} $ENVIRONMENT
