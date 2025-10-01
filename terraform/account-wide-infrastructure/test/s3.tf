@@ -9,8 +9,9 @@ module "qa-sandbox-permissions-store-bucket" {
 }
 
 module "int-permissions-store-bucket" {
-  source      = "../modules/permissions-store-bucket"
-  name_prefix = "nhsd-nrlf--int"
+  source         = "../modules/permissions-store-bucket"
+  name_prefix    = "nhsd-nrlf--int"
+  enable_backups = true
 }
 
 module "int-sandbox-permissions-store-bucket" {
