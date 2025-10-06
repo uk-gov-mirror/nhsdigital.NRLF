@@ -35,7 +35,7 @@ Feature: Producer - createDocumentReference - Success Scenarios
       }
       """
     And the response has a Location header
-    And the Location header starts with '/producer/FHIR/R4/DocumentReference/ANGY1-'
+    And the Location header starts with '/DocumentReference/ANGY1-'
     And the resource in the Location header exists with values:
       | property        | value                          |
       | subject         | 9278693472                     |
@@ -82,7 +82,7 @@ Feature: Producer - createDocumentReference - Success Scenarios
   # }
   # """
   # And the response has a Location header
-  # And the Location header starts with '/producer/FHIR/R4/DocumentReference/ANGY1'
+  # And the Location header starts with '/DocumentReference/ANGY1'
   # And the resource in the Location header exists with values:
   # | property  | value                          |
   # | subject   | 9278693472                     |
@@ -141,7 +141,7 @@ Feature: Producer - createDocumentReference - Success Scenarios
       }
       """
     And the response has a Location header
-    And the Location header starts with '/producer/FHIR/R4/DocumentReference/ANGY1-'
+    And the Location header starts with '/DocumentReference/ANGY1-'
     And the resource in the Location header exists with values:
       | property        | value                          |
       | subject         | 9278693472                     |
@@ -191,7 +191,7 @@ Feature: Producer - createDocumentReference - Success Scenarios
       }
       """
     And the response has a Location header
-    And the Location header starts with '/producer/FHIR/R4/DocumentReference/ANGY1-'
+    And the Location header starts with '/DocumentReference/ANGY1-'
     And the resource in the Location header exists with values:
       | property  | value                          |
       | subject   | 9278693472                     |
@@ -270,7 +270,7 @@ Feature: Producer - createDocumentReference - Success Scenarios
       }
       """
     And the response has a Location header
-    And the Location header starts with '/producer/FHIR/R4/DocumentReference/ANGY1-'
+    And the Location header starts with '/DocumentReference/ANGY1-'
     And the resource in the Location header exists with values:
       | property        | value                          |
       | subject         | 9278693472                     |
@@ -313,7 +313,7 @@ Feature: Producer - createDocumentReference - Success Scenarios
       }
       """
     And the response has a Location header
-    And the Location header starts with '/producer/FHIR/R4/DocumentReference/ANGY1-'
+    And the Location header starts with '/DocumentReference/ANGY1-'
     And the resource in the Location header exists with values:
       | property    | value                          |
       | subject     | 9278693472                     |
@@ -363,7 +363,7 @@ Feature: Producer - createDocumentReference - Success Scenarios
       }
       """
     And the response has a Location header
-    And the Location header starts with '/producer/FHIR/R4/DocumentReference/ANGY1-'
+    And the Location header starts with '/DocumentReference/ANGY1-'
     And the resource in the Location header exists with values:
       | property        | value                         |
       | subject         | 9278693472                    |
@@ -482,7 +482,7 @@ Feature: Producer - createDocumentReference - Success Scenarios
       }
       """
     And the response has a Location header
-    And the Location header starts with '/producer/FHIR/R4/DocumentReference/TSTCUS-'
+    And the Location header starts with '/DocumentReference/TSTCUS-'
     And the resource in the Location header exists with values:
       | property                                                       | value                        |
       | content[0].attachment.url                                      | https://example.org/doc1.pdf |
@@ -559,7 +559,7 @@ Feature: Producer - createDocumentReference - Success Scenarios
       }
       """
     And the response has a Location header
-    And the Location header starts with '/producer/FHIR/R4/DocumentReference/TSTCUS-'
+    And the Location header starts with '/DocumentReference/TSTCUS-'
     And the resource in the Location header exists with values:
       | property                                                       | value                                     |
       | content[0].attachment.url                                      | https://example.org/incontext-launch.html |
