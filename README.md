@@ -8,6 +8,8 @@ This project uses the `Makefile` to build, test and deploy. This will ensure tha
 
 IVE JUST ADDED THIS TO CHANGE SOMETHING
 
+AND ANOTHER
+
 ## Table of Contents
 
 - [Before You Begin](#before-you-begin)
