@@ -382,6 +382,29 @@ paths:
       description: |
         Read a single document pointer by specifying the `DocumentReference.id`.  Note that you will only be able to
         retrieve document pointers that have the `type` that was agreed during the [onboarding](#api-description__onboarding) process.
+
+  /metadata:
+    get:
+      summary: Retrieve FHIR Capability Statement
+      operationId: getCapabilityStatement
+      responses:
+        "200":
+          description: Capability statement response
+          content:
+            application/json:
+              schema:
+                type: object
+      x-amazon-apigateway-integration:
+        type: MOCK
+        requestTemplates:
+          application/json: '{ "statusCode": 200 }'
+        responses:
+          default:
+            statusCode: "200"
+            responseTemplates:
+              # prettier-ignore
+              application/json: '${capability_statement_json}'
+
   /_status:
     get:
       tags:
