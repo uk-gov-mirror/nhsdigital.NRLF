@@ -2,50 +2,12 @@ resource "aws_api_gateway_rest_api" "api_gateway_rest_api" {
   name                         = "${var.prefix}--${var.apitype}"
   description                  = "Manages an API Gateway Rest API."
   disable_execute_api_endpoint = true
-  body                         = templatefile("${path.module}/../../../../api/${var.apitype}/swagger.yaml", var.lambdas)
-}
-
-resource "aws_api_gateway_resource" "capability" {
-  rest_api_id = aws_api_gateway_rest_api.api_gateway_rest_api.id
-  parent_id   = aws_api_gateway_rest_api.api_gateway_rest_api.root_resource_id
-  path_part   = "metadata"
-}
-
-resource "aws_api_gateway_method" "capability" {
-  rest_api_id   = aws_api_gateway_rest_api.api_gateway_rest_api.id
-  resource_id   = aws_api_gateway_resource.capability.id
-  http_method   = "GET"
-  authorization = "NONE"
-
-  depends_on = [aws_api_gateway_resource.capability]
-}
-
-resource "aws_api_gateway_integration" "capability" {
-  rest_api_id = aws_api_gateway_rest_api.api_gateway_rest_api.id
-  resource_id = aws_api_gateway_resource.capability.id
-  http_method = aws_api_gateway_method.capability.http_method
-  type        = "MOCK"
-  request_templates = {
-    "application/json" = jsonencode({ "statusCode" = 200 })
-  }
-}
-
-resource "aws_api_gateway_method_response" "capability_200" {
-  rest_api_id = aws_api_gateway_rest_api.api_gateway_rest_api.id
-  resource_id = aws_api_gateway_resource.capability.id
-  http_method = aws_api_gateway_method.capability.http_method
-  status_code = "200"
-}
-
-resource "aws_api_gateway_integration_response" "capability" {
-  rest_api_id = aws_api_gateway_rest_api.api_gateway_rest_api.id
-  resource_id = aws_api_gateway_resource.capability.id
-  http_method = aws_api_gateway_method.capability.http_method
-  status_code = aws_api_gateway_method_response.capability_200.status_code
-
-  response_templates = {
-    "application/json" = var.capability_statement_content
-  }
+  body = templatefile(
+    "${path.module}/../../../../api/${var.apitype}/swagger.yaml",
+    merge(var.lambdas, {
+      capability_statement_json = var.capability_statement_content
+    })
+  )
 }
 
 resource "aws_api_gateway_deployment" "api_gateway_deployment" {
@@ -65,11 +27,6 @@ resource "aws_api_gateway_deployment" "api_gateway_deployment" {
 
   depends_on = [
     aws_api_gateway_rest_api.api_gateway_rest_api,
-    aws_api_gateway_resource.capability,
-    aws_api_gateway_method.capability,
-    aws_api_gateway_integration.capability,
-    aws_api_gateway_method_response.capability_200,
-    aws_api_gateway_integration_response.capability,
     aws_api_gateway_integration_response.head_integration_response
   ]
 }
