@@ -201,7 +201,7 @@ truststore-build-ca: check-warn ## Build a CA (Certificate Authority)
 truststore-build-cert: check-warn ## Build a certificate
 	@./scripts/truststore.sh build-cert "$(CA_NAME)" "$(CERT_NAME)" "$(CERT_SUBJECT)"
 
-truststore-build-all: check-warn ## Pull all certificates
+truststore-pull-all: check-warn ## Pull all certificates
 	@./scripts/truststore.sh pull-all "$(ENV)"
 
 truststore-pull-server: check-warn ## Pull a server certificate
