@@ -1699,3 +1699,52 @@ def test__set_create_time_fields_when_no_date_but_perms():
         },
         "date": test_time,
     }
+
+
+@mock_aws
+@mock_repository
+def test_upsert_logs_for_unexpected_multi_pointer(
+    repository: DocumentPointerRepository,
+):
+    doc_ref = load_document_reference("Y05868-736253002-Valid")
+    doc_pointer = DocumentPointer.from_document_reference(doc_ref)
+    repository.create(doc_pointer)
+
+    event = create_test_api_gateway_event(
+        headers=create_headers(),
+        body=doc_ref.model_dump_json(exclude_none=True),
+    )
+
+    result = handler(event, create_mock_context())
+    body = result.pop("body")
+
+    assert result == {
+        "statusCode": "200",
+        "headers": {
+            "Location": "/producer/FHIR/R4/DocumentReference/Y05868-99999-99999-999999",
+            **default_response_headers(),
+        },
+        "isBase64Encoded": False,
+    }
+
+    parsed_body = json.loads(body)
+
+    assert parsed_body == {
+        "resourceType": "OperationOutcome",
+        "issue": [
+            {
+                "severity": "information",
+                "code": "informational",
+                "details": {
+                    "coding": [
+                        {
+                            "code": "RESOURCE_UPDATED",
+                            "display": "Resource updated",
+                            "system": "https://fhir.nhs.uk/ValueSet/NRL-ResponseCode",
+                        }
+                    ]
+                },
+                "diagnostics": "The document has been updated",
+            }
+        ],
+    }

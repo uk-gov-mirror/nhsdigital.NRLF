@@ -270,6 +270,9 @@ class LogReference(Enum):
     PROCREATE011 = _Reference(
         "INFO", "Preserved .date field when creating new document reference"
     )
+    PROCREATE012 = _Reference(
+        "WARN", "Existing pointers found  for patient during create operation"
+    )
     PROCREATE999 = _Reference(
         "INFO", "Successfully completed producer createDocumentReference"
     )
@@ -328,6 +331,9 @@ class LogReference(Enum):
     PROUPSERT010 = _Reference("INFO", "Superseding document reference for upsert")
     PROUPSERT011 = _Reference(
         "INFO", "Preserved .date field when creating new document reference for upsert"
+    )
+    PROUPSERT012 = _Reference(
+        "WARN", "Existing pointers found for patient during upsert operation"
     )
     PROUPSERT999 = _Reference(
         "INFO", "Successfully completed producer upsertDocumentReference"
