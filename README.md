@@ -65,7 +65,7 @@ In order to do this, make sure you have AWS CLI installed and configured, then r
 make ENV=env truststore-pull-all
 ```
 
-Where `env` is one of `dev`, `test` or `prod`.
+Where `env` is one of `dev`, `qa` , `int`, `ref` or `prod`.
 
 ## Getting Started
 
