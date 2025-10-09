@@ -37,6 +37,36 @@ Then install all the dependency packages with:
 make configure
 ```
 
+### Set up AWS CLI access
+
+There are several ways to set up your AWS CLI access. The recommended way is to use [granted](https://docs.commonfate.io/granted/getting-started). Follow the instructions on their website to install and configure `granted`.
+
+One of the gotchas with using `granted` is that you need to ensure that you source the environment variables into your shell session. You can do this by running:
+
+```
+source assume <profile>
+```
+
+Where `<profile>` is one of the profiles which should be in your `~/.aws/config`. You can customize the profile names to your liking.
+
+From here on, you can use the AWS CLI as normal and run commands that need AWS access on that terminal session.
+
+As a short guideline about profiles to assume for a typical workflow:
+
+- Assume mgmt account for stack specific terraform deployment as indicated in `terraform/infrastructure/README.md`.
+- Assume the specific environment for running feature tests against that environment.
+
+### Set up client certificates
+
+In order to access the NRLF APIs, you will need to set up client certificates for mutual TLS authentication.
+In order to do this, make sure you have AWS CLI installed and configured, then run:
+
+```
+make ENV=env truststore-pull-client
+```
+
+Where `env` is one of `dev`, `test` or `prod`.
+
 ## Getting Started
 
 To build packages:
