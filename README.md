@@ -56,13 +56,13 @@ As a short guideline about profiles to assume for a typical workflow:
 - Assume mgmt account for stack specific terraform deployment as indicated in `terraform/infrastructure/README.md`.
 - Assume the specific environment for running feature tests against that environment.
 
-### Set up client certificates
+### Set up NRLF certificates
 
-In order to access the NRLF APIs, you will need to set up client certificates for mutual TLS authentication.
+In order to execute make commands that need AWS access, you will need to pull the NRLF certificates.
 In order to do this, make sure you have AWS CLI installed and configured, then run:
 
 ```
-make ENV=env truststore-pull-client
+make ENV=env truststore-pull-all
 ```
 
 Where `env` is one of `dev`, `test` or `prod`.
