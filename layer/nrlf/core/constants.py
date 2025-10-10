@@ -48,7 +48,7 @@ X_REQUEST_ID_HEADER = "X-Request-Id"
 X_CORRELATION_ID_HEADER = "X-Correlation-Id"
 
 
-PRODUCER_URL_PATH = "/producer/FHIR/R4/DocumentReference"
+PRODUCER_URL_PATH = "/DocumentReference"
 
 
 class PointerTypes(Enum):
