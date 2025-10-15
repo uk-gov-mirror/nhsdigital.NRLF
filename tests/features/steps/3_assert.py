@@ -373,9 +373,9 @@ def assert_header_starts_with(context: Context, header_name: str, starts_with: s
 def assert_resource_in_location_header_exists_with_values(context: Context):
     location = context.response.headers.get("Location")
 
-    assert location.startswith("/producer/FHIR/R4/DocumentReference/"), format_error(
+    assert location.startswith("/DocumentReference/"), format_error(
         "Unexpected Location header",
-        "/producer/FHIR/R4/DocumentReference/",
+        "/DocumentReference/",
         location,
         context.response.text,
     )
