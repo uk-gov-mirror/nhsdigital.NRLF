@@ -55,6 +55,13 @@ def create_test_api_gateway_event(
             "resourcePath": "/",
             "httpMethod": "GET",
             "path": "/Prod/",
+            "identity": {
+                "client_cert": {
+                    "subject_dn": "CN=TEST SUBJECT",
+                    "issuer_dn": "CN=TEST ISSUER",
+                    "serial_number": "0000001",
+                }
+            },
         },
         "headers": headers or create_headers(),
         "multiValueHeaders": {},
