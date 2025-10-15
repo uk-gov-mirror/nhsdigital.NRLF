@@ -19,3 +19,8 @@ variable "mtls_certificate_file" {
   description = "The path to the mtls certificate file"
   type        = string
 }
+
+variable "mtls_certificate_file_version" {
+  description = "The S3 version of the mtls certificate file"
+  type        = string
+}

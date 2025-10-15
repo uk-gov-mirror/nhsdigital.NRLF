@@ -46,7 +46,8 @@ resource "aws_api_gateway_domain_name" "domain" {
   }
 
   mutual_tls_authentication {
-    truststore_uri = "s3://${data.aws_s3_object.api-truststore-certificate.bucket}/${data.aws_s3_object.api-truststore-certificate.key}"
+    truststore_uri     = "s3://${data.aws_s3_object.api-truststore-certificate.bucket}/${data.aws_s3_object.api-truststore-certificate.key}"
+    truststore_version = data.aws_s3_object.api-truststore-certificate.version_id
   }
 
   depends_on = [

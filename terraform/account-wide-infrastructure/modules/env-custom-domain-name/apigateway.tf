@@ -7,7 +7,8 @@ resource "aws_api_gateway_domain_name" "domain" {
   }
 
   mutual_tls_authentication {
-    truststore_uri = var.mtls_certificate_file
+    truststore_uri     = var.mtls_certificate_file
+    truststore_version = var.mtls_certificate_file_version
   }
 
   depends_on = [
