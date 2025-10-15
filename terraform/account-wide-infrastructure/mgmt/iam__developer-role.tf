@@ -101,6 +101,19 @@ module "developer_policy" {
     },
     {
       Action = [
+        "s3:PutObject",
+        "s3:GetObject",
+        "s3:DeleteObject"
+      ]
+      Effect = "Deny"
+      Resource = [
+        "${data.aws_s3_bucket.truststore.arn}/ca/prod*",
+        "${data.aws_s3_bucket.truststore.arn}/client/prod*",
+        "${data.aws_s3_bucket.truststore.arn}/server/prod*"
+      ]
+    },
+    {
+      Action = [
         "s3:GetObject"
       ]
       Effect = "Allow"
