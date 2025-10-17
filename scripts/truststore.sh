@@ -25,11 +25,13 @@ function _truststore_help() {
     echo "  pull-ca-key <ca>                - Pull the certificate authority private key"
     echo "  pull-client <env>               - pull the files needed for a client connection"
     echo "  pull-server <env>               - pull the files needed for a server connection"
+    echo "  pull-all <env>                  - pull all the truststore files for an environment"
+    echo "  push-all <env>                  - push all the truststore files for an environment"
     echo "  rotate-ca <env>                 - rotate the certificate authority, archiving the previous one"
-    echo "  rotate-client <env>             - rotate the client certificate, archiving the previous one"
+    echo "  rotate-cert <env>               - rotate the client certificate, archiving the previous one"
     echo "  disable-archived-ca <env>       - disable an archived certificate authority"
     echo "  restore-archived-ca <env>       - restore an archived certificate authority"
-    echo "  restore-archived-client <env>   - restore an archived client certificate"
+    echo "  restore-archived-cert <env>     - restore an archived client certificate"
     echo
 }
 
