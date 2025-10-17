@@ -1725,7 +1725,7 @@ def test_upsert_logs_for_unexpected_multi_pointer(
     assert result == {
         "statusCode": "201",
         "headers": {
-            "Location": "/producer/FHIR/R4/DocumentReference/Y05868-99999-99999-999999-02",
+            "Location": "/DocumentReference/Y05868-99999-99999-999999-02",
             **default_response_headers(),
         },
         "isBase64Encoded": False,
@@ -1808,7 +1808,7 @@ def test_upsert_logs_for_expected_multi_pointer(
     assert result == {
         "statusCode": "201",
         "headers": {
-            "Location": "/producer/FHIR/R4/DocumentReference/Y05868-99999-99999-999999-02",
+            "Location": "/DocumentReference/Y05868-99999-99999-999999-02",
             **default_response_headers(),
         },
         "isBase64Encoded": False,
