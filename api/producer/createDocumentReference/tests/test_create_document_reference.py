@@ -1,5 +1,5 @@
 import json
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from freeze_uuid import freeze_uuid
 from freezegun import freeze_time
@@ -1734,3 +1734,143 @@ def test__set_create_time_fields_when_no_date_but_perms():
         },
         "date": test_time,
     }
+
+
+@mock_aws
+@mock_repository
+@freeze_uuid("00000000-0000-0000-0000-000000000001")
+@patch("api.producer.createDocumentReference.create_document_reference.logger")
+def test_create_logs_for_unexpected_multi_pointer(
+    mock_logger: Mock,
+    repository: DocumentPointerRepository,
+):
+    doc_ref = load_document_reference("Y05868-736253002-Valid-with-master-id")
+    doc_pointer = DocumentPointer.from_document_reference(doc_ref)
+    repository.create(doc_pointer)
+
+    event = create_test_api_gateway_event(
+        headers=create_headers(),
+        body=doc_ref.model_dump_json(exclude_none=True),
+    )
+
+    result = handler(event, create_mock_context())
+    body = result.pop("body")
+
+    assert result == {
+        "statusCode": "201",
+        "headers": {
+            "Location": "/producer/FHIR/R4/DocumentReference/Y05868-00000000-0000-0000-0000-000000000001",
+            **default_response_headers(),
+        },
+        "isBase64Encoded": False,
+    }
+
+    parsed_body = json.loads(body)
+
+    assert parsed_body == {
+        "resourceType": "OperationOutcome",
+        "issue": [
+            {
+                "severity": "information",
+                "code": "informational",
+                "details": {
+                    "coding": [
+                        {
+                            "code": "RESOURCE_CREATED",
+                            "display": "Resource created",
+                            "system": "https://fhir.nhs.uk/ValueSet/NRL-ResponseCode",
+                        }
+                    ]
+                },
+                "diagnostics": "The document has been created",
+            }
+        ],
+    }
+
+    assert any(
+        call[0][0].name == "PROCREATE012" for call in mock_logger.log.call_args_list
+    )
+
+    assert {
+        "existing_pointers_count": 1,
+        "nhs_number": (
+            doc_ref.subject.identifier.value
+            if doc_ref.subject and doc_ref.subject.identifier
+            else None
+        ),
+        "pointer_type": (
+            f"{doc_ref.type.coding[0].system}|{doc_ref.type.coding[0].code}"
+            if doc_ref.type and doc_ref.type.coding
+            else None
+        ),
+        "custodian": (
+            doc_ref.custodian.identifier.value
+            if doc_ref.custodian and doc_ref.custodian.identifier
+            else None
+        ),
+        "new_pointer_master_id": (
+            doc_ref.masterIdentifier.value if doc_ref.masterIdentifier else None
+        ),
+    } == [
+        call[1:][0]
+        for call in mock_logger.log.call_args_list
+        if call[0][0].name == "PROCREATE012"
+    ][
+        0
+    ]
+
+
+@mock_aws
+@mock_repository
+@freeze_uuid("00000000-0000-0000-0000-000000000001")
+@patch("api.producer.createDocumentReference.create_document_reference.logger")
+def test_create_logs_for_expected_multi_pointer(
+    mock_logger: Mock,
+    repository: DocumentPointerRepository,
+):
+    doc_ref = load_document_reference("Y05868-Appointment-Valid")
+    doc_pointer = DocumentPointer.from_document_reference(doc_ref)
+    repository.create(doc_pointer)
+
+    event = create_test_api_gateway_event(
+        headers=create_headers(),
+        body=doc_ref.model_dump_json(exclude_none=True),
+    )
+
+    result = handler(event, create_mock_context())
+    body = result.pop("body")
+
+    assert result == {
+        "statusCode": "201",
+        "headers": {
+            "Location": "/producer/FHIR/R4/DocumentReference/Y05868-00000000-0000-0000-0000-000000000001",
+            **default_response_headers(),
+        },
+        "isBase64Encoded": False,
+    }
+
+    parsed_body = json.loads(body)
+
+    assert parsed_body == {
+        "resourceType": "OperationOutcome",
+        "issue": [
+            {
+                "severity": "information",
+                "code": "informational",
+                "details": {
+                    "coding": [
+                        {
+                            "code": "RESOURCE_CREATED",
+                            "display": "Resource created",
+                            "system": "https://fhir.nhs.uk/ValueSet/NRL-ResponseCode",
+                        }
+                    ]
+                },
+                "diagnostics": "The document has been created",
+            }
+        ],
+    }
+
+    assert not any(
+        call[0][0].name == "PROCREATE012" for call in mock_logger.log.call_args_list
+    )

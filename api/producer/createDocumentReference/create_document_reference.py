@@ -258,19 +258,21 @@ def handler(
 
     pointer_type = core_model.type
     if pointer_type not in TYPES_WITH_MULTIPLES:
-        patient_number = core_model.nhs_number
+        nhs_number = core_model.nhs_number
         pointer_custodian = core_model.custodian
+        pointer_master_identifier = core_model.master_identifier
         existing_pointers_count = repository.count_by_nhs_number(
-            patient_number, [pointer_type]
+            nhs_number, [pointer_type]
         )
 
         if existing_pointers_count > 0:
             logger.log(
                 LogReference.PROCREATE012,
+                new_pointer_master_id=pointer_master_identifier,
                 pointer_type=pointer_type,
-                patient_number=patient_number,
+                nhs_number=nhs_number,
                 existing_pointers_count=existing_pointers_count,
-                pointer_custodian=pointer_custodian,
+                custodian=pointer_custodian,
             )
 
     logger.log(LogReference.PROCREATE009, pointer_id=result.resource.id)
