@@ -266,7 +266,6 @@ def handler(
     pointer_type = core_model.type
     if pointer_type not in TYPES_WITH_MULTIPLES:
         nhs_number = core_model.nhs_number
-        pointer_custodian = core_model.custodian
         existing_pointers_count = repository.count_by_nhs_number(
             nhs_number, [pointer_type]
         )
@@ -275,10 +274,11 @@ def handler(
             logger.log(
                 LogReference.PROUPSERT012,
                 new_pointer_id=core_model.id,
+                new_pointer_master_id=core_model.master_identifier,
                 pointer_type=pointer_type,
                 nhs_number=nhs_number,
+                custodian=core_model.custodian,
                 existing_pointers_count=existing_pointers_count,
-                custodian=pointer_custodian,
             )
 
     logger.log(LogReference.PROUPSERT009, pointer_id=result.resource.id)

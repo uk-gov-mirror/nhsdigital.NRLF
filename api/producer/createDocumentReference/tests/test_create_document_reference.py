@@ -1808,6 +1808,7 @@ def test_create_logs_for_unexpected_multi_pointer(
             if doc_ref.custodian and doc_ref.custodian.identifier
             else None
         ),
+        "new_pointer_id": "Y05868-00000000-0000-0000-0000-000000000001",
         "new_pointer_master_id": (
             doc_ref.masterIdentifier.value if doc_ref.masterIdentifier else None
         ),

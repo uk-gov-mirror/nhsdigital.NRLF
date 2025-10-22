@@ -1775,6 +1775,9 @@ def test_upsert_logs_for_unexpected_multi_pointer(
             else None
         ),
         "new_pointer_id": doc_ref.id,
+        "new_pointer_master_id": (
+            doc_ref.masterIdentifier.value if doc_ref.masterIdentifier else None
+        ),
     } == [
         call[1:][0]
         for call in mock_logger.log.call_args_list
