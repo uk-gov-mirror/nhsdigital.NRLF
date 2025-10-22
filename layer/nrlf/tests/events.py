@@ -56,10 +56,10 @@ def create_test_api_gateway_event(
             "httpMethod": "GET",
             "path": "/Prod/",
             "identity": {
-                "client_cert": {
-                    "subject_dn": "CN=TEST SUBJECT",
-                    "issuer_dn": "CN=TEST ISSUER",
-                    "serial_number": "0000001",
+                "clientCert": {
+                    "subjectDN": "CN=TEST SUBJECT",
+                    "issuerDN": "CN=TEST ISSUER",
+                    "serialNumber": "0000001",
                 }
             },
         },
