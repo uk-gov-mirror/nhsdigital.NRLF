@@ -128,12 +128,12 @@ module "source" {
     "rules" : [
       {
         "copy_action" : [{
-          "delete_after" : 4,
+          "delete_after" : 30,
         }],
         "lifecycle" : {
           "delete_after" : 2
         },
-        "name" : "daily_kept_for_2_days",
+        "name" : "daily_kept_for_30",
         "schedule" : "cron(0 0 * * ? *)"
       }
     ],
@@ -150,7 +150,7 @@ module "source" {
         "name" : "daily",
         "schedule" : "cron(0 0 * * ? *)",
         "copy_action" : [{
-          "delete_after" : 4,
+          "delete_after" : 5,
         }],
 
         "lifecycle" : {
@@ -161,8 +161,8 @@ module "source" {
         "name" : "monthly"
         "schedule" : "cron(30 0 ? * 4#1)" # first Thursday each month from 00:30
         "copy_action" : [{
-          "cold_storage_after" : 3,
-          "delete_after" : 100 # ensures there will always be min 3
+          "cold_storage_after" : 35,
+          "delete_after" : 400 # ensures 1 from previous restore test
         }],
         "lifecycle" : {
           "delete_after" : 2
