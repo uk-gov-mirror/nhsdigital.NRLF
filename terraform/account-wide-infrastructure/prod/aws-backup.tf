@@ -150,7 +150,7 @@ module "source" {
         "name" : "daily",
         "schedule" : "cron(0 0 * * ? *)",
         "copy_action" : [{
-          "delete_after" : 5,
+          "delete_after" : 28,
         }],
 
         "lifecycle" : {
