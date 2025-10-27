@@ -105,7 +105,7 @@ jobs:
           make truststore-pull-server ENV=${account}
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: build-artifacts
           path: dist
@@ -164,7 +164,7 @@ jobs:
           poetry install --no-root
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: build-artifacts
           path: dist
