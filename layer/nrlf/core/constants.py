@@ -200,6 +200,14 @@ TYPE_CATEGORIES = {
     PointerTypes.SHARED_CARE_RECORD.value: Categories.RECORD_HEADINGS.value,
 }
 
+#
+# Pointer types that can have multiple pointers for a single patient
+TYPES_WITH_MULTIPLES = [
+    PointerTypes.MRA_UPPER_LIMB_ARTERY.value,
+    PointerTypes.MRI_AXILLA_BOTH.value,
+    PointerTypes.APPOINTMENT.value,
+]
+
 PRACTICE_SETTING_VALUE_SET_URL = (
     "https://fhir.nhs.uk/England/ValueSet/England-PracticeSetting"
 )

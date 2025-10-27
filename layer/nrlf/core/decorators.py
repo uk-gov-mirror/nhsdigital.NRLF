@@ -236,15 +236,23 @@ def request_handler(
     """
 
     def wrapped_func(func: RequestHandler):
-        def wrapper(*args, **kwargs):
-            event: APIGatewayProxyEvent = args[0]
-            context: LambdaContext = args[1]
+        def wrapper(event: APIGatewayProxyEvent, context: LambdaContext, **kwargs):
+            client_cert = event.request_context.identity.client_cert
+            if client_cert:
+                client_cert_info = {
+                    "subject_dn": client_cert.subject_dn,
+                    "issuer_dn": client_cert.issuer_dn,
+                    "serial_number": client_cert.serial_number,
+                }
+            else:
+                client_cert_info = "No client certificate provided"
 
             logger.log(
                 code=LogReference.HANDLER000,
                 method=event.http_method,
                 path=event.path,
                 headers=event.headers,
+                client_cert_info=client_cert_info,
             )
 
             if skip_request_verification:

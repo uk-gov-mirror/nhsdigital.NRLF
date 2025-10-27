@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from typing import Any
 
 from aws_lambda_powertools import Logger as PowertoolsLogger
 from aws_lambda_powertools.logging.formatter import LambdaPowertoolsFormatter
@@ -9,7 +10,7 @@ from nrlf.core.log_references import LogReference
 
 
 class SplunkFormatter(LambdaPowertoolsFormatter):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.splunk_index = os.getenv("SPLUNK_INDEX", "aws_recordlocator_dev")
 
@@ -30,7 +31,7 @@ class SplunkFormatter(LambdaPowertoolsFormatter):
 
 
 class Logger(PowertoolsLogger):
-    def log(self, code: LogReference, **kwargs):
+    def log(self, code: LogReference, **kwargs: Any) -> None:
         kwargs["log_reference"] = code.name
         match code.value.level:
             case "DEBUG":
@@ -45,6 +46,11 @@ class Logger(PowertoolsLogger):
                 self.critical(code.value.message, stacklevel=3, **kwargs)
             case "EXCEPTION":
                 self.exception(code.value.message, **kwargs)
+            case _:
+                self.warning(
+                    f"Unhandled log level: {code.value.level} - {code.value.message}",
+                    **kwargs,
+                )
 
 
 logger = Logger(logger_formatter=SplunkFormatter())
