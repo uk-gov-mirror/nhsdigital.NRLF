@@ -80,7 +80,7 @@ jobs:
           make get-s3-perms ENV=dev
 
       - name: Save Build Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: build-artifacts
           path: |
@@ -309,7 +309,7 @@ jobs:
         run: make test-performance-output
 
       - name: Store Performance Test Outputs
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: performance-test-outputs
           path: dist/*.png

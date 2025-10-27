@@ -55,7 +55,7 @@ jobs:
           make get-s3-perms ENV=${account} TF_WORKSPACE_NAME=${inactive_stack}
 
       - name: Save Build Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: build-artifacts
           path: |
