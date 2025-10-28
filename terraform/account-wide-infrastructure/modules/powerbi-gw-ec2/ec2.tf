@@ -43,6 +43,8 @@ resource "aws_ssm_maintenance_window_task" "patch_task" {
   task_type        = "RUN_COMMAND"
   task_arn         = "AWS-RunPatchBaseline"
   priority         = 1
+  max_concurrency  = 1
+  max_errors       = 1
   service_role_arn = aws_iam_role.maintenance_window_role.arn
 
   targets {
