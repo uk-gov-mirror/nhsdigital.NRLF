@@ -1,3 +1,4 @@
+import json
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
@@ -21,11 +22,15 @@ REQUIRED_ATTRIBUTES = [
 ]
 
 
-def _get_duplicates(table_name: str, custodians: str | tuple[str]) -> Any:
+def _get_duplicates(
+    table_name: str, custodians: str | tuple[str], filename: str = "duplicates"
+) -> Any:
     """
     Get masterids for duplicate pointers in the given table for a list of custodians.
     Parameters:
     - table_name: The name of the pointers table to use.
+    - custodians: The ODS codes of the custodian(s) to check.
+    - filename: A name for the output text file containing the list of affected pointers.
     """
     custodian_list = (
         custodians.split(",") if isinstance(custodians, str) else list(custodians)
@@ -73,7 +78,7 @@ def _get_duplicates(table_name: str, custodians: str | tuple[str]) -> Any:
                 "datetime": created_on,
             }
 
-            px_type_ods_key = f"{patient_id}-{custodian}-{pointer_type}"
+            px_type_ods_key = f"{custodian}-{patient_id}-{pointer_type}"
 
             if px_type_ods_key not in pointers_by_key:
                 pointers_by_key[px_type_ods_key] = [pointer_data]
@@ -96,11 +101,17 @@ def _get_duplicates(table_name: str, custodians: str | tuple[str]) -> Any:
 
     print(" Table scan completed")  # noqa
 
-    for key in duplicates_set:
-        print(f"Duplicates for {key}:")  # noqa
-        print(pointers_by_key[key])  # noqa
+    output_pointers = dict()
+
+    for key in sorted(duplicates_set):
+        output_pointers[key] = pointers_by_key[key]
+
+    print(f"Writing pointers to file ./{filename}.txt ...")  # noqa
+    with open(f"{filename}.txt", "w") as f:
+        f.write(json.dumps(output_pointers, indent=2))
 
     return {
+        "output_file": f"{filename}.txt",
         "duplicates-found": duplicate_count,
         "scanned-count": total_scanned_count,
         "took-secs": timedelta.total_seconds(end_time - start_time),
