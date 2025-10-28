@@ -4,4 +4,5 @@ module "prod-pointers-table" {
   enable_deletion_protection  = true
   enable_pitr                 = true
   kms_deletion_window_in_days = 30
+  enable_backups              = true
 }
