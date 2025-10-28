@@ -56,7 +56,7 @@ def _get_duplicates(
         "ExpressionAttributeValues": expression_values_list,
         "ProjectionExpression": ",".join(required_attributes),
     }
-    pointers_by_key = dict()
+    pointers_by_key = {}
     total_scanned_count = 0
     duplicate_count = 0
     duplicates_set = set()
@@ -101,7 +101,7 @@ def _get_duplicates(
 
     print(" Table scan completed")  # noqa
 
-    output_pointers = dict()
+    output_pointers = {}
 
     for key in sorted(duplicates_set):
         output_pointers[key] = pointers_by_key[key]
