@@ -1,5 +1,5 @@
 import json
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 from unittest.mock import Mock
 
 
@@ -46,7 +46,7 @@ def create_test_api_gateway_event(
     query_string_parameters: Optional[Dict[str, str]] = None,
     path_parameters: Optional[Dict[str, str]] = None,
     body: Optional[str] = None,
-):
+) -> Dict[str, Any]:
     return {
         "resource": "/",
         "path": "/",
@@ -55,6 +55,13 @@ def create_test_api_gateway_event(
             "resourcePath": "/",
             "httpMethod": "GET",
             "path": "/Prod/",
+            "identity": {
+                "clientCert": {
+                    "subjectDN": "CN=TEST SUBJECT",
+                    "issuerDN": "CN=TEST ISSUER",
+                    "serialNumber": "0000001",
+                }
+            },
         },
         "headers": headers or create_headers(),
         "multiValueHeaders": {},

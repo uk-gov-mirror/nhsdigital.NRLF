@@ -4,6 +4,7 @@ from nrlf.core.codes import SpineErrorConcept
 from nrlf.core.constants import (
     PERMISSION_AUDIT_DATES_FROM_PAYLOAD,
     PERMISSION_SUPERSEDE_IGNORE_DELETE_FAIL,
+    TYPES_WITH_MULTIPLES,
 )
 from nrlf.core.decorators import request_handler
 from nrlf.core.dynamodb.repository import DocumentPointer, DocumentPointerRepository
@@ -254,6 +255,24 @@ def handler(
         repository.supersede(core_model, ids_to_delete, can_ignore_delete_fail)
         logger.log(LogReference.PROCREATE999)
         return NRLResponse.RESOURCE_SUPERSEDED(resource_id=result.resource.id)
+
+    pointer_type = core_model.type
+    if pointer_type not in TYPES_WITH_MULTIPLES:
+        nhs_number = core_model.nhs_number
+        existing_pointers_count = repository.count_by_nhs_number(
+            nhs_number, [pointer_type]
+        )
+
+        if existing_pointers_count > 0:
+            logger.log(
+                LogReference.PROCREATE012,
+                new_pointer_id=core_model.id,
+                new_pointer_master_id=core_model.master_identifier,
+                pointer_type=pointer_type,
+                nhs_number=nhs_number,
+                custodian=core_model.custodian,
+                existing_pointers_count=existing_pointers_count,
+            )
 
     logger.log(LogReference.PROCREATE009, pointer_id=result.resource.id)
     repository.create(core_model)

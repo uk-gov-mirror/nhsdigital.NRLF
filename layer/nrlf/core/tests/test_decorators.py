@@ -1,5 +1,6 @@
 import json
 import warnings
+from typing import Any
 
 import pytest
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
@@ -286,6 +287,74 @@ def test_logger_initialiser_no_correlation_id(mocker: MockerFixture):
         id_header="NHSD-Correlation-Id",
         headers=test_event["headers"],
     )
+
+
+def test_log_includes_client_cert_details(mocker: MockerFixture):
+    @request_handler()
+    def decorated_function() -> Response:
+        return Response(
+            statusCode="200",
+            body=json.dumps({"message": "Hello, World!"}),
+            headers={"Content-Type": "application/json"},
+        )
+
+    test_event = create_test_api_gateway_event()
+    event = APIGatewayProxyEvent(test_event)
+
+    mock_logger = mocker.patch("nrlf.core.decorators.logger")
+
+    decorated_function(event, create_mock_context())
+
+    assert any(
+        call[1]["code"].name == "HANDLER000"
+        for call in mock_logger.log.call_args_list
+        if call[1]
+    )
+
+    logged_cert_info: dict[str, Any] = [
+        call[1:][0]
+        for call in mock_logger.log.call_args_list
+        if call[1] and "code" in call[1] and call[1]["code"].name == "HANDLER000"
+    ][0]["client_cert_info"]
+
+    client_cert = event.request_context.identity.client_cert
+    assert logged_cert_info == {
+        "subject_dn": client_cert.subject_dn,
+        "issuer_dn": client_cert.issuer_dn,
+        "serial_number": client_cert.serial_number,
+    }
+
+
+def test_log_includes_client_cert_details_when_no_cert(mocker: MockerFixture):
+    @request_handler()
+    def decorated_function() -> Response:
+        return Response(
+            statusCode="200",
+            body=json.dumps({"message": "Hello, World!"}),
+            headers={"Content-Type": "application/json"},
+        )
+
+    test_event = create_test_api_gateway_event()
+    test_event["requestContext"]["identity"]["clientCert"] = None
+    event = APIGatewayProxyEvent(test_event)
+
+    mock_logger = mocker.patch("nrlf.core.decorators.logger")
+
+    decorated_function(event, create_mock_context())
+
+    assert any(
+        call[1]["code"].name == "HANDLER000"
+        for call in mock_logger.log.call_args_list
+        if call[1]
+    )
+
+    logged_cert_info: dict[str, Any] = [
+        call[1:][0]
+        for call in mock_logger.log.call_args_list
+        if call[1] and "code" in call[1] and call[1]["code"].name == "HANDLER000"
+    ][0]["client_cert_info"]
+
+    assert logged_cert_info == "No client certificate provided"
 
 
 def test_verify_request_id_happy_path():
