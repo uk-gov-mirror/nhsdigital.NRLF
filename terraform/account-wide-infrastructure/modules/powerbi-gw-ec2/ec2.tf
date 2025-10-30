@@ -23,7 +23,7 @@ resource "aws_instance" "powerbi_gw" {
 
 resource "aws_ssm_maintenance_window" "updates" {
   name     = "windows-updates"
-  schedule = "cron(0 2 ? * SUN *)" # Sunday 2am UTC
+  schedule = "cron(0 2 ? * MON *)" # Monday 2am UTC
   duration = 3
   cutoff   = 1
 }
