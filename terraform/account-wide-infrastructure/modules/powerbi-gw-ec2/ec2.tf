@@ -15,9 +15,71 @@ resource "aws_instance" "powerbi_gw" {
   user_data = file("${path.module}/scripts/user_data.tpl")
 
   tags = {
-    Name = "${var.name_prefix}-ec2"
+    Name       = "${var.name_prefix}-ec2"
+    PatchGroup = local.windows_patching_tag
   }
 
+}
+
+resource "aws_ssm_maintenance_window" "updates" {
+  name     = "windows-updates"
+  schedule = "cron(0 2 ? * MON *)" # Monday 2am UTC
+  duration = 3
+  cutoff   = 1
+}
+
+resource "aws_ssm_maintenance_window_target" "windows_instances" {
+  window_id     = aws_ssm_maintenance_window.updates.id
+  resource_type = "INSTANCE"
+
+  targets {
+    key    = "tag:PatchGroup"
+    values = [local.windows_patching_tag]
+  }
+}
+
+resource "aws_ssm_maintenance_window_task" "patch_task" {
+  window_id        = aws_ssm_maintenance_window.updates.id
+  task_type        = "RUN_COMMAND"
+  task_arn         = "AWS-RunPatchBaseline"
+  priority         = 1
+  max_concurrency  = 1
+  max_errors       = 1
+  service_role_arn = aws_iam_role.maintenance_window_role.arn
+
+  targets {
+    key    = "WindowTargetIds"
+    values = [aws_ssm_maintenance_window_target.windows_instances.id]
+  }
+
+  task_invocation_parameters {
+    run_command_parameters {
+      parameter {
+        name   = "Operation"
+        values = ["Install"]
+      }
+    }
+  }
+}
+
+resource "aws_iam_role" "maintenance_window_role" {
+  name = "maintenance-window-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "ssm.amazonaws.com"
+      }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "maintenance_window_policy" {
+  role       = aws_iam_role.maintenance_window_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonSSMMaintenanceWindowRole"
 }
 
 resource "tls_private_key" "instance_key_pair" {
