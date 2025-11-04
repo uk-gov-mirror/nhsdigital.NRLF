@@ -38,3 +38,11 @@ module "ref-custom-domain-name" {
   mtls_certificate_file         = "s3://${module.ref-truststore-bucket.bucket_name}/${module.ref-truststore-bucket.certificates_object_key}"
   mtls_certificate_file_version = module.ref-truststore-bucket.certificates_object_version
 }
+
+module "perftest-custom-domain-name" {
+  source                        = "../modules/env-custom-domain-name"
+  domain_name                   = var.perftest_api_domain_name
+  domain_zone                   = aws_route53_zone.test-perftest-api-ns.name
+  mtls_certificate_file         = "s3://${module.perftest-truststore-bucket.bucket_name}/${module.perftest-truststore-bucket.certificates_object_key}"
+  mtls_certificate_file_version = module.perftest-truststore-bucket.certificates_object_version
+}
