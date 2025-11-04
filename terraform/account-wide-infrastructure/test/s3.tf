@@ -24,6 +24,11 @@ module "ref-permissions-store-bucket" {
   name_prefix = "nhsd-nrlf--ref"
 }
 
+module "perftest-permissions-store-bucket" {
+  source      = "../modules/permissions-store-bucket"
+  name_prefix = "nhsd-nrlf--perftest"
+}
+
 module "qa-truststore-bucket" {
   source                  = "../modules/truststore-bucket"
   name_prefix             = "nhsd-nrlf--qa"
@@ -52,4 +57,10 @@ module "ref-truststore-bucket" {
   source                  = "../modules/truststore-bucket"
   name_prefix             = "nhsd-nrlf--ref"
   server_certificate_file = "../../../truststore/server/ref.pem"
+}
+
+module "perftest-truststore-bucket" {
+  source                  = "../modules/truststore-bucket"
+  name_prefix             = "nhsd-nrlf--perftest"
+  server_certificate_file = "../../../truststore/server/perftest.pem"
 }
