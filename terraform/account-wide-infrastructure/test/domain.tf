@@ -45,4 +45,5 @@ module "perftest-custom-domain-name" {
   domain_zone                   = aws_route53_zone.test-perftest-ns.name
   mtls_certificate_file         = "s3://${module.perftest-truststore-bucket.bucket_name}/${module.perftest-truststore-bucket.certificates_object_key}"
   mtls_certificate_file_version = module.perftest-truststore-bucket.certificates_object_version
+  depends_on                    = [aws_route53_zone.test-perftest-ns]
 }
