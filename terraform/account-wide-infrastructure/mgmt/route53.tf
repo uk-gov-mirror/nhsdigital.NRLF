@@ -141,10 +141,10 @@ resource "aws_route53_record" "perftest_zone_delegation" {
   zone_id = aws_route53_zone.prod_zone.zone_id
   name    = "perftest.record-locator.national.nhs.uk"
   records = [
-    "ns-1821.awsdns-35.co.uk.",
-    "ns-1449.awsdns-53.org.",
-    "ns-933.awsdns-52.net.",
-    "ns-500.awsdns-62.com."
+    "ns-885.awsdns-46.net.",
+    "ns-1995.awsdns-57.co.uk.",
+    "ns-239.awsdns-29.com.",
+    "ns-1424.awsdns-50.org."
   ]
   ttl  = 300
   type = "NS"
