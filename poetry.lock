@@ -97,28 +97,32 @@ tests-no-zope = ["attrs[tests-mypy]", "cloudpickle ; platform_python_implementat
 
 [[package]]
 name = "aws-lambda-powertools"
-version = "2.35.1"
+version = "3.22.0"
 description = "Powertools for AWS Lambda (Python) is a developer toolkit to implement Serverless best practices and increase developer velocity."
 optional = false
-python-versions = ">=3.8,<4.0.0"
+python-versions = "<4.0.0,>=3.9"
 groups = ["main"]
 files = [
-    {file = "aws_lambda_powertools-2.35.1-py3-none-any.whl", hash = "sha256:70ff17435a973d9dffff9f99c513477de190c675ad8c0297f67951f0724adcda"},
-    {file = "aws_lambda_powertools-2.35.1.tar.gz", hash = "sha256:dc58bbe8a81c22f8cf525cac5c09fa3fcabfd1a4b2ec2abbfeb4c445e0912aa5"},
+    {file = "aws_lambda_powertools-3.22.0-py3-none-any.whl", hash = "sha256:6318c5c897a28ba56a927211e92266017bf039e6c13a86c2bf485080e535367b"},
+    {file = "aws_lambda_powertools-3.22.0.tar.gz", hash = "sha256:7cae86a286bf1e19eb9821ffc2305fe8b57ddd53c69331008d3ad19dad46c77f"},
 ]
 
 [package.dependencies]
-typing-extensions = ">=4.6.2,<5.0.0"
+jmespath = ">=1.0.1,<2.0.0"
+typing-extensions = ">=4.11.0,<5.0.0"
 
 [package.extras]
-all = ["aws-xray-sdk (>=2.8.0,<3.0.0)", "fastjsonschema (>=2.14.5,<3.0.0)", "pydantic (>=1.8.2,<2.0.0)"]
-aws-sdk = ["boto3 (>=1.26.164,<2.0.0)"]
-datadog = ["datadog-lambda (>=4.77,<6.0)"]
-datamasking = ["aws-encryption-sdk (>=3.1.1,<4.0.0)", "jsonpath-ng (>=1.6.0,<2.0.0)"]
-parser = ["pydantic (>=1.8.2,<2.0.0)"]
-redis = ["redis (>=4.4,<6.0)"]
+all = ["aws-encryption-sdk (>=3.1.1,<5.0.0)", "aws-xray-sdk (>=2.8.0,<3.0.0)", "fastjsonschema (>=2.14.5,<3.0.0)", "jsonpath-ng (>=1.6.0,<2.0.0)", "pydantic (>=2.4.0,<3.0.0)", "pydantic-settings (>=2.6.1,<3.0.0)"]
+aws-sdk = ["boto3 (>=1.34.32,<2.0.0)"]
+datadog = ["datadog-lambda (>=6.106.0,<7.0.0)"]
+datamasking = ["aws-encryption-sdk (>=3.1.1,<5.0.0)", "jsonpath-ng (>=1.6.0,<2.0.0)"]
+kafka-consumer-avro = ["avro (>=1.12.0,<2.0.0)"]
+kafka-consumer-protobuf = ["protobuf (>=6.30.2,<7.0.0)"]
+parser = ["pydantic (>=2.4.0,<3.0.0)"]
+redis = ["redis (>=4.4,<7.0)"]
 tracer = ["aws-xray-sdk (>=2.8.0,<3.0.0)"]
 validation = ["fastjsonschema (>=2.14.5,<3.0.0)"]
+valkey = ["valkey-glide (>=1.3.5,<3.0)"]
 
 [[package]]
 name = "behave"
@@ -1443,7 +1447,7 @@ version = "1.0.1"
 description = "JSON Matching Expressions"
 optional = false
 python-versions = ">=3.7"
-groups = ["dev"]
+groups = ["main", "dev"]
 files = [
     {file = "jmespath-1.0.1-py3-none-any.whl", hash = "sha256:02e2e4cc71b5bcab88332eebf907519190dd9e6e82107fa7f83b1003a6252980"},
     {file = "jmespath-1.0.1.tar.gz", hash = "sha256:90261b206d6defd58fdd5e85f478bf633a2901798906be2ad389150c5c60edbe"},
@@ -2784,4 +2788,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "271e47c0f480bfd99d294c43c634c02613abc61d2652e9e39c76ac1e55a520f0"
+content-hash = "cfc7899be5c2539fb4ab5e41a9580d0002c61163395529d01ad1abd6b95da986"
