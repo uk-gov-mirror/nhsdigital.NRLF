@@ -246,17 +246,19 @@ function _restore_archived_cert() {
 }
 
 function _truststore_build_all() {
-    _truststore_build_ca "prod" "record-locator.national.nhs.uk_CA2"
-    _truststore_build_ca "int"  "record-locator.int.national.nhs.uk_CA2"
-    _truststore_build_ca "ref"  "record-locator.ref.national.nhs.uk_CA2"
-    _truststore_build_ca "qa"   "qa.record-locator.national.nhs.uk_CA2"
-    _truststore_build_ca "dev"  "record-locator.dev.national.nhs.uk_CA2"
+    _truststore_build_ca "prod"     "record-locator.national.nhs.uk_CA2"
+    _truststore_build_ca "int"      "record-locator.int.national.nhs.uk_CA2"
+    _truststore_build_ca "ref"      "record-locator.ref.national.nhs.uk_CA2"
+    _truststore_build_ca "perftest" "perftest.record-locator.national.nhs.uk_CA2"
+    _truststore_build_ca "qa"       "qa.record-locator.national.nhs.uk_CA2"
+    _truststore_build_ca "dev"      "record-locator.dev.national.nhs.uk_CA2"
 
-    _truststore_build_cert "prod" "prod" "api.record-locator.national.nhs.uk"
-    _truststore_build_cert "int"  "int"  "int.api.record-locator.int.national.nhs.uk"
-    _truststore_build_cert "ref"  "ref"  "ref.api.record-locator.ref.national.nhs.uk"
-    _truststore_build_cert "qa"   "qa"   "api.qa.record-locator.national.nhs.uk"
-    _truststore_build_cert "dev"  "dev"  "dev.api.record-locator.dev.national.nhs.uk"
+    _truststore_build_cert "prod"     "prod" "api.record-locator.national.nhs.uk"
+    _truststore_build_cert "int"      "int"  "int.api.record-locator.int.national.nhs.uk"
+    _truststore_build_cert "ref"      "ref"  "ref.api.record-locator.ref.national.nhs.uk"
+    _truststore_build_cert "perftest" "perftest"  "api.perftest.record-locator.national.nhs.uk"
+    _truststore_build_cert "qa"       "qa"   "api.qa.record-locator.national.nhs.uk"
+    _truststore_build_cert "dev"      "dev"  "dev.api.record-locator.dev.national.nhs.uk"
 
     echo -e "✅ Successfully built all truststore files"
     return 0
