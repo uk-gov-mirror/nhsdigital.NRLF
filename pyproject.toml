@@ -14,7 +14,7 @@ aws-lambda-powertools = "^2.35.1"
 requests = "^2.32.4"
 boto3-stubs = {extras = ["dynamodb", "firehose", "kinesis", "lambda", "rds", "s3"], version = "^1.40.59"}
 pyjwt = "^2.8.0"
-pydantic = "^2.9.2"
+pydantic = "^2.12.3"
 pydantic-settings = "^2.5.2"
 
 [tool.poetry.group.dev.dependencies]
