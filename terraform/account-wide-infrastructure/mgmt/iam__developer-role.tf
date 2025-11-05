@@ -46,6 +46,9 @@ module "developer_policy" {
       Resource = [
         "${data.aws_s3_bucket.terraform_state.arn}/${local.project}/prod/*",
         "${data.aws_s3_bucket.terraform_state.arn}/${local.project}/mgmt/*",
+        "${data.aws_s3_bucket.truststore.arn}/ca/prod.*",
+        "${data.aws_s3_bucket.truststore.arn}/client/prod.*",
+        "${data.aws_s3_bucket.truststore.arn}/server/prod.*"
       ]
     },
     {
@@ -98,19 +101,6 @@ module "developer_policy" {
       Resource = [
         data.aws_s3_bucket.ci_logging.arn,
         "${data.aws_s3_bucket.ci_logging.arn}/*"
-      ]
-    },
-    {
-      Action = [
-        "s3:PutObject",
-        "s3:GetObject",
-        "s3:DeleteObject"
-      ]
-      Effect = "Deny"
-      Resource = [
-        "${data.aws_s3_bucket.truststore.arn}/ca/prod*",
-        "${data.aws_s3_bucket.truststore.arn}/client/prod*",
-        "${data.aws_s3_bucket.truststore.arn}/server/prod*"
       ]
     },
     {
