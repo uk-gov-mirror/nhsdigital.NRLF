@@ -17,3 +17,7 @@ resource "aws_route53_zone" "NEW_test-ref-ns" {
 resource "aws_route53_zone" "test-ref-ns" {
   name = "api.record-locator.ref.national.nhs.uk"
 }
+
+resource "aws_route53_zone" "test-perftest-ns" {
+  name = "perftest.record-locator.national.nhs.uk"
+}

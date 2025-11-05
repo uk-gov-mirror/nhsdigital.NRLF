@@ -8,16 +8,17 @@ Each developer/QA can create their own ephemeral instance of the NRLF infrastruc
 
 This project has a number of "persistent environments", similar to traditional dev, ref and prod environments. Each of these environments will typically contain multiple NRLF stacks, allowing for blue/green style deployment, and have shared storage infrastructure like DynamoDB tables and S3 buckets. The persistent environments are deployed as follows:
 
-| Environment  | TF Workspace  | TF Config         | AWS Account | Internal Domain                      | Public Domain                             |
-| ------------ | ------------- | ----------------- | ----------- | ------------------------------------ | ----------------------------------------- |
-| internal-dev | dev-N         | `etc/dev.tfvars`  | dev         | `record-locator.dev.national.nhs.uk` | `internal-dev.api.service.nhs.uk`         |
-| dev-sandbox  | dev-sandbox-N | `etc/dev.tfvars`  | dev         | `record-locator.dev.national.nhs.uk` | `internal-dev-sandbox.api.service.nhs.uk` |
-| internal-qa  | qa-N          | `etc/qa.tfvars`   | test        | `qa.record-locator.national.nhs.uk`  | `internal-qa.api.service.nhs.uk`          |
-| qa-sandbox   | qa-sandbox-N  | `etc/qa.tfvars`   | test        | `qa.record-locator.national.nhs.uk`  | `internal-qa-sandbox.api.service.nhs.uk`  |
-| int          | int-N         | `etc/int.tfvars`  | test        | `record-locator.int.national.nhs.uk` | `int.api.service.nhs.uk`                  |
-| sandbox      | int-sandbox-N | `etc/int.tfvars`  | test        | `record-locator.int.national.nhs.uk` | `sandbox.api.service.nhs.uk`              |
-| ref          | ref-N         | `etc/ref.tfvars`  | test        | `record-locator.ref.national.nhs.uk` | `ref.api.service.nhs.uk`                  |
-| prod         | prod-N        | `etc/prod.tfvars` | prod        | `record-locator.national.nhs.uk`     | `api.service.nhs.uk`                      |
+| Environment  | TF Workspace  | TF Config             | AWS Account | Internal Domain                           | Public Domain                             |
+| ------------ | ------------- | --------------------- | ----------- | ----------------------------------------- | ----------------------------------------- |
+| internal-dev | dev-N         | `etc/dev.tfvars`      | dev         | `record-locator.dev.national.nhs.uk`      | `internal-dev.api.service.nhs.uk`         |
+| dev-sandbox  | dev-sandbox-N | `etc/dev.tfvars`      | dev         | `record-locator.dev.national.nhs.uk`      | `internal-dev-sandbox.api.service.nhs.uk` |
+| internal-qa  | qa-N          | `etc/qa.tfvars`       | test        | `qa.record-locator.national.nhs.uk`       | `internal-qa.api.service.nhs.uk`          |
+| qa-sandbox   | qa-sandbox-N  | `etc/qa.tfvars`       | test        | `qa.record-locator.national.nhs.uk`       | `internal-qa-sandbox.api.service.nhs.uk`  |
+| int          | int-N         | `etc/int.tfvars`      | test        | `record-locator.int.national.nhs.uk`      | `int.api.service.nhs.uk`                  |
+| sandbox      | int-sandbox-N | `etc/int.tfvars`      | test        | `record-locator.int.national.nhs.uk`      | `sandbox.api.service.nhs.uk`              |
+| perftest     | perftest-N    | `etc/perftest.tfvars` | test        | `perftest.record-locator.national.nhs.uk` | `perftest.api.service.nhs.uk`             |
+| ref          | ref-N         | `etc/ref.tfvars`      | test        | `record-locator.ref.national.nhs.uk`      | `ref.api.service.nhs.uk`                  |
+| prod         | prod-N        | `etc/prod.tfvars`     | prod        | `record-locator.national.nhs.uk`          | `api.service.nhs.uk`                      |
 
 The `N` in the TF workspace name repesents the stack id in that environment. So, for example, the internal-dev environment might have two stacks, `dev-1` and `dev-2` with TF workspace names matching their stack names. All resources for the `dev-1` stack will be contained within the `dev-1` TF workspace.
 

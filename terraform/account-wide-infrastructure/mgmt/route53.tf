@@ -136,3 +136,16 @@ resource "aws_route53_record" "NEW_qa_zone_delegation" {
   ttl  = 300
   type = "NS"
 }
+
+resource "aws_route53_record" "perftest_zone_delegation" {
+  zone_id = aws_route53_zone.prod_zone.zone_id
+  name    = "perftest.record-locator.national.nhs.uk"
+  records = [
+    "ns-1821.awsdns-35.co.uk.",
+    "ns-1449.awsdns-53.org.",
+    "ns-933.awsdns-52.net.",
+    "ns-500.awsdns-62.com."
+  ]
+  ttl  = 300
+  type = "NS"
+}
