@@ -142,6 +142,15 @@ function _truststore_rotate_ca() {
     env="$1"
     fqdn="$2"
 
+    if [[ ! -f "truststore/ca/$env.crt" ]] ||
+       [[ ! -f "truststore/ca/$env.key" ]] ||
+       [[ ! -f "truststore/server/$env.pem" ]]; then
+        echo "Error: One or more ca cert truststore files not found for environment $env - cannot rotate CA" 1>&2
+        echo "Try running this first:" 1>&2
+        echo "    $0 pull-all $env && $0 pull-ca-key dev" 1>&2
+        return 1
+    fi
+
     # Archive the existing ca certs
     archive_date="$(date +%Y-%m-%d)"
     if [[ -f "truststore/ca/$env.archived_$archive_date.crt" ]] ||
@@ -175,6 +184,14 @@ function _truststore_rotate_cert() {
     cert_name="$1"
     ca_name="$2"
     fqdn="$3"
+
+    if [[ ! -f "truststore/client/$cert_name.crt" ]] ||
+       [[ ! -f "truststore/client/$cert_name.key" ]]; then
+        echo "Error: One or more client cert truststore files not found for $cert_name - cannot rotate client cert" 1>&2
+        echo "Try running this first:" 1>&2
+        echo "    $0 pull-all $cert_name" 1>&2
+        return 1
+    fi
 
     # Archive the existing client certs
     archive_date=$(date +%Y-%m-%d)
