@@ -63,7 +63,8 @@ module "developer_policy" {
       Resource = [
         "arn:aws:iam::${data.aws_secretsmanager_secret_version.dev_account_id.secret_string}:role/terraform",
         "arn:aws:iam::${data.aws_secretsmanager_secret_version.test_account_id.secret_string}:role/terraform",
-        "arn:aws:iam::${data.aws_secretsmanager_secret_version.test_backup_account_id.secret_string}:role/terraform"
+        "arn:aws:iam::${data.aws_secretsmanager_secret_version.test_backup_account_id.secret_string}:role/terraform",
+        "arn:aws:iam::${data.aws_secretsmanager_secret_version.test_restore_account_id.secret_string}:role/terraform"
       ]
     },
     {
