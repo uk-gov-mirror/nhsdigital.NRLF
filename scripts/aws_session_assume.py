@@ -7,6 +7,7 @@ _AWS_ACCOUNT_FOR_ENV = {
     "qa": "test",
     "qa-sandbox": "test",
     "ref": "test",
+    "perftest": "test",
     "int": "test",
     "int-sandbox": "test",
     "prod": "prod",
