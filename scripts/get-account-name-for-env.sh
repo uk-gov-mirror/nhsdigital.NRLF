@@ -13,7 +13,7 @@ case "${env}" in
     dev|dev-sandbox)
         echo "dev"
         ;;
-    qa|qa-sandbox|ref|int|int-sandbox)
+    qa|qa-sandbox|perftest|ref|int|int-sandbox)
         echo "test"
         ;;
     prod)

@@ -13,6 +13,8 @@ persistent_environments = [
     "qa-sandbox-2",
     "ref-1",
     "ref-2",
+    "perftest-1",
+    "perftest-2",
     "int-1",
     "int-2",
     "int-sandbox-1",
