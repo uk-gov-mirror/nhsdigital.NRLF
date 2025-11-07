@@ -6,4 +6,5 @@ module "dev-custom-domain-name" {
   domain_zone                   = aws_route53_zone.prod-ns.name
   mtls_certificate_file         = "s3://${module.prod-truststore-bucket.bucket_name}/${module.prod-truststore-bucket.certificates_object_key}"
   mtls_certificate_file_version = module.prod-truststore-bucket.certificates_object_version
+  depends_on                    = [aws_route53_zone.prod-ns]
 }
