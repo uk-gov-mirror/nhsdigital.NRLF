@@ -32,7 +32,7 @@ locals {
 
   reporting_bucket_arn = data.aws_s3_bucket.source-data-bucket.arn
   reporting_kms_arn    = data.aws_kms_key.glue.arn
-  firehose_lambda_subscriptions = var.use_shared_resources ? (
+  firehose_lambda_subscriptions = var.use_shared_resources && !var.disable_firehose_lambda_subscriptions ? (
     var.enable_reporting ? {
       "splunk_subscription"  = module.firehose__processor[0].firehose_subscription,
       "reports_subscription" = module.firehose__processor[0].firehose_reporting_subscription
