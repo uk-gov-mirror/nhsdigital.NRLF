@@ -61,3 +61,9 @@ variable "enable_reporting" {
   description = "Enable reporting for this environment"
   default     = false
 }
+
+variable "disable_firehose_lambda_subscriptions" {
+  description = "Disable firehose lambda subscriptions (e.g: splunk, reporting) for shared environments (e.g: perftest). This doesn't affect ephemeral environments as the firehose subscriptions are disabled regardless of this setting"
+  type        = bool
+  default     = false
+}
