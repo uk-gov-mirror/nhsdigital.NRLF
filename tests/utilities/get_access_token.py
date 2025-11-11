@@ -37,6 +37,7 @@ AWS_ACCOUNT_FOR_ENV = {
     "qa": "test",
     "ref": "test",
     "int": "test",
+    "perftest": "test",
     "prod": "prod",
 }
 APIGEE_ENV_FOR_ENV = {
@@ -47,6 +48,7 @@ APIGEE_ENV_FOR_ENV = {
     "ref": "ref",
     "int": "int",
     "int-sandbox": "sandbox",
+    "perftest": "internal-qa",  # NRL-1802: Hijacking qa to not create a new APIGEE proxy environment.
     "prod": "prod",
 }
 APP_FOR_ALIAS = {

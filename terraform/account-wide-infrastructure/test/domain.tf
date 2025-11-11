@@ -5,6 +5,7 @@ module "qa-custom-domain-name" {
   domain_zone                   = aws_route53_zone.test-qa-ns.name
   mtls_certificate_file         = "s3://${module.qa-truststore-bucket.bucket_name}/${module.qa-truststore-bucket.certificates_object_key}"
   mtls_certificate_file_version = module.qa-truststore-bucket.certificates_object_version
+  depends_on                    = [aws_route53_zone.test-qa-ns]
 }
 
 module "qasandbox-custom-domain-name" {
@@ -13,6 +14,7 @@ module "qasandbox-custom-domain-name" {
   domain_zone                   = aws_route53_zone.test-qa-ns.name
   mtls_certificate_file         = "s3://${module.qa-truststore-bucket.bucket_name}/${module.qa-truststore-bucket.certificates_object_key}"
   mtls_certificate_file_version = module.qa-truststore-bucket.certificates_object_version
+  depends_on                    = [aws_route53_zone.test-qa-ns]
 }
 
 module "int-custom-domain-name" {
@@ -21,6 +23,7 @@ module "int-custom-domain-name" {
   domain_zone                   = aws_route53_zone.test-int-ns.name
   mtls_certificate_file         = "s3://${module.int-truststore-bucket.bucket_name}/${module.int-truststore-bucket.certificates_object_key}"
   mtls_certificate_file_version = module.int-truststore-bucket.certificates_object_version
+  depends_on                    = [aws_route53_zone.test-int-ns]
 }
 
 module "intsandbox-custom-domain-name" {
@@ -29,6 +32,7 @@ module "intsandbox-custom-domain-name" {
   domain_zone                   = aws_route53_zone.test-int-ns.name
   mtls_certificate_file         = "s3://${module.int-truststore-bucket.bucket_name}/${module.int-truststore-bucket.certificates_object_key}"
   mtls_certificate_file_version = module.int-truststore-bucket.certificates_object_version
+  depends_on                    = [aws_route53_zone.test-int-ns]
 }
 
 module "ref-custom-domain-name" {
@@ -37,4 +41,14 @@ module "ref-custom-domain-name" {
   domain_zone                   = aws_route53_zone.test-ref-ns.name
   mtls_certificate_file         = "s3://${module.ref-truststore-bucket.bucket_name}/${module.ref-truststore-bucket.certificates_object_key}"
   mtls_certificate_file_version = module.ref-truststore-bucket.certificates_object_version
+  depends_on                    = [aws_route53_zone.test-ref-ns]
+}
+
+module "perftest-custom-domain-name" {
+  source                        = "../modules/env-custom-domain-name"
+  domain_name                   = var.perftest_api_domain_name
+  domain_zone                   = aws_route53_zone.test-perftest-ns.name
+  mtls_certificate_file         = "s3://${module.perftest-truststore-bucket.bucket_name}/${module.perftest-truststore-bucket.certificates_object_key}"
+  mtls_certificate_file_version = module.perftest-truststore-bucket.certificates_object_version
+  depends_on                    = [aws_route53_zone.test-perftest-ns]
 }

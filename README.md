@@ -65,7 +65,7 @@ In order to do this, make sure you have AWS CLI installed and configured, then r
 make ENV=env truststore-pull-all
 ```
 
-Where `env` is one of `dev`, `qa` , `int`, `ref` or `prod`.
+Where `env` is one of `dev`, `qa` , `int`, `perftest`, `ref` or `prod`.
 
 ## Getting Started
 
@@ -414,7 +414,7 @@ If the Producer API has changed, or the documentation for that API has changed, 
 
 Once you have a new release version ready, you can deploy it through our environments as follows:
 
-1. Use the "Persistent Environment Deploy" Github Action workflow to deploy the release tag to `dev`, `dev-sandbox`, `qa`, `qa-sandbox`, `int` and `int-sandbox` environments.
+1. Use the "Persistent Environment Deploy" Github Action workflow to deploy the release tag to `dev`, `dev-sandbox`, `qa`, `qa-sandbox`, `int`, `int-sandbox` and `perftest` environments.
 2. If any issues arise in the deployment, fix the issues, create a new release version and start this process again.
 3. Once the deployments are complete, use the "Persistent Environment Deploy" Github Action workflow to deploy the release version to `ref`.
 4. Once that is complete, use the "Persistent Environment Deploy" workflow to deploy the release version to `prod`.
