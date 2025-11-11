@@ -48,7 +48,7 @@ APIGEE_ENV_FOR_ENV = {
     "ref": "ref",
     "int": "int",
     "int-sandbox": "sandbox",
-    "perftest": "internal-qa",  # TODO: Hijacking qa to not create a new APIGEE proxy environment. Once we have proxygen, rethink this
+    "perftest": "internal-qa",  # NRL-1802: Hijacking qa to not create a new APIGEE proxy environment.
     "prod": "prod",
 }
 APP_FOR_ALIAS = {
