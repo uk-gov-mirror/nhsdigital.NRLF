@@ -16,13 +16,15 @@ This project has a number of "persistent environments", similar to traditional d
 | qa-sandbox   | qa-sandbox-N  | `etc/qa.tfvars`       | test        | `qa.record-locator.national.nhs.uk`       | `internal-qa-sandbox.api.service.nhs.uk`  |
 | int          | int-N         | `etc/int.tfvars`      | test        | `record-locator.int.national.nhs.uk`      | `int.api.service.nhs.uk`                  |
 | sandbox      | int-sandbox-N | `etc/int.tfvars`      | test        | `record-locator.int.national.nhs.uk`      | `sandbox.api.service.nhs.uk`              |
-| perftest     | perftest-N    | `etc/perftest.tfvars` | test        | `perftest.record-locator.national.nhs.uk` | `perftest.api.service.nhs.uk`             |
+| perftest     | perftest-N    | `etc/perftest.tfvars` | test        | `perftest.record-locator.national.nhs.uk` | `internal-qa.api.service.nhs.uk`          |
 | ref          | ref-N         | `etc/ref.tfvars`      | test        | `record-locator.ref.national.nhs.uk`      | `ref.api.service.nhs.uk`                  |
 | prod         | prod-N        | `etc/prod.tfvars`     | prod        | `record-locator.national.nhs.uk`          | `api.service.nhs.uk`                      |
 
 The `N` in the TF workspace name repesents the stack id in that environment. So, for example, the internal-dev environment might have two stacks, `dev-1` and `dev-2` with TF workspace names matching their stack names. All resources for the `dev-1` stack will be contained within the `dev-1` TF workspace.
 
 CI pipeline creates infrastructure in the dev AWS account. These will have workspace id of `nrl<jira-id>-<first six char of commit hash>` and use variables in `etc/dev.tfvars`
+
+Please note: There is currently no dedicated APIGEE proxy for the perftest environment. As a temporary measure, `internal-qa.api.service.nhs.uk` points to perftest. You can switch the `internal-qa` APIGEE proxy between QA and perftest by running the `persistent environment deploy` or `switch active stack` GitHub Actions.
 
 ## Table of Contents
 

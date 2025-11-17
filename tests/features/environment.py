@@ -17,13 +17,16 @@ def before_all(context: Context):
 
     context.env = context.config.userdata.get("env")
     context.account_name = context.config.userdata.get("account_name")
-    context.is_shared_resources = context.config.userdata.get("is_shared_resources")
-
-    context.stack_name = (
-        context.account_name if context.is_shared_resources else context.env
+    context.use_shared_resources = context.config.userdata.get("use_shared_resources")
+    context.host = context.config.userdata.get(
+        "host", default=f"https://{context.env}.api.record-locator.dev.national.nhs.uk/"
     )
 
-    context.base_url = f"https://{context.env}.api.record-locator.dev.national.nhs.uk/"
+    context.stack_name = (
+        context.account_name if context.use_shared_resources else context.env
+    )
+
+    context.base_url = f"https://{context.host}/"
     context.request_id = "feature-test-request-id"
     context.correlation_id = "feature-test-correlation-id"
 

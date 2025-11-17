@@ -12,17 +12,19 @@ def get_cert_path_for_environment(environment: Optional[str]) -> Tuple[str, str]
     if not environment:
         raise ValueError("Environment (env) not provided")
 
-    cert_path: Optional[Path] = None
-    key_path: Optional[Path] = None
+    # List only non-sandbox environments
+    # Sandbox uses the same certs as their non-sandbox equivalents.
+    ENVIRONMENTS = ["dev", "qa", "int", "ref", "perftest", "prod"]
 
-    match environment:
-        case "dev":
-            cert_path = CLIENT_CERT_PATH / "dev.crt"
-            key_path = CLIENT_CERT_PATH / "dev.key"
+    selected_env = "dev"  # default to dev (e.g: ci environments)
+    for env in ENVIRONMENTS:
+        # match dev-1, qa-2, etc. it works for sandbox too
+        if environment == env or environment.startswith(f"{env}-"):
+            selected_env = env
+            break
 
-        case _:
-            cert_path = CLIENT_CERT_PATH / "dev.crt"
-            key_path = CLIENT_CERT_PATH / "dev.key"
+    cert_path = CLIENT_CERT_PATH / f"{selected_env}.crt"
+    key_path = CLIENT_CERT_PATH / f"{selected_env}.key"
 
     if not cert_path.exists() or not key_path.exists():
         raise FileNotFoundError(

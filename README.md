@@ -140,6 +140,24 @@ To run all the feature integration tests and generate an interactive Allure repo
 make test-features-integration-report
 ```
 
+#### Persistent environment testing
+
+To run feature tests against a persistent environment:
+
+1. Select the appropriate Terraform workspace, ensure you are logged in the AWS mgmt account (see `terraform/infrastructure/README.md`), for example to test the `qa-1` environment:
+
+   ```
+   cd terraform/infrastructure
+   make ENV=qa TF_WORKSPACE_NAME=qa-1 init
+   cd ../..
+   ```
+
+2. Switch to the relevant AWS account (e.g., test), then run:
+
+   ```
+   make ENV=qa TF_WORKSPACE_NAME=qa-1 HOST=qa-1.qa.record-locator.national.nhs.uk test-features-integration
+   ```
+
 ### Debugging Behave Integration Tests in VS Code
 
 Integration tests can be debugged directly in **VS Code** using a launch configuration. Instructions on how to set this up for the first time and run the debugger are below.
