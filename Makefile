@@ -12,6 +12,7 @@ SMOKE_TEST_ARGS ?=
 FEATURE_TEST_ARGS ?= ./tests/features --format progress2
 TF_WORKSPACE_NAME ?= $(shell terraform -chdir=terraform/infrastructure workspace show)
 ENV ?= dev
+ACCOUNT ?= dev
 APP_ALIAS ?= default
 HOST ?= $(TF_WORKSPACE_NAME).api.record-locator.$(ENV).national.nhs.uk
 ENV_TYPE ?= $(ENV)
@@ -200,6 +201,9 @@ truststore-build-ca: check-warn ## Build a CA (Certificate Authority)
 
 truststore-build-cert: check-warn ## Build a certificate
 	@./scripts/truststore.sh build-cert "$(CA_NAME)" "$(CERT_NAME)" "$(CERT_SUBJECT)"
+
+truststore-pull-all-for-account: check-warn ## Pull all certificates for each environment in a given account
+	@./scripts/truststore.sh pull-all-for-account "$(ACCOUNT)"
 
 truststore-pull-all: check-warn ## Pull all certificates
 	@./scripts/truststore.sh pull-all "$(ENV)"

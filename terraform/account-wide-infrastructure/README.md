@@ -18,7 +18,7 @@ Each subdirectory corresponds to each AWS account (`mgmt`, `prod`, `test` and `d
 Before deploying the NRLF account-wide infrastructure, you will need:
 
 - AWS accounts that have already been bootstrapped, as described in [bootstrap/README.md](../bootstrap/README.md). This is a one-time account setup step.
-- The required packages to build NRLF, see [the Setup section in README.md](../../README.md#setup).
+- The required packages to build NRLF, see [the Setup section in README.md](../../README.md#before-you-begin).
 
 ## Deploy mgmt resources
 
@@ -45,7 +45,7 @@ terraform apply
 
 ### If you get "Error: creating CodeBuild Webhook"
 
-If you see this erro:
+If you see this error:
 
 ```
 │ Error: creating CodeBuild Webhook (nhsd-nrlf-ci-build-project): operation error CodeBuild: CreateWebhook, https response error StatusCode: 400, RequestID: , ResourceNotFoundException: Access token not found in CodeBuild project for server type github

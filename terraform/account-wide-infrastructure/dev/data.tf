@@ -17,3 +17,10 @@ data "aws_secretsmanager_secret" "emails" {
 data "aws_secretsmanager_secret_version" "emails" {
   secret_id = data.aws_secretsmanager_secret.emails.id
 }
+
+data "external" "current-info" {
+  program = [
+    "bash",
+    "../../../scripts/get-current-info.sh",
+  ]
+}

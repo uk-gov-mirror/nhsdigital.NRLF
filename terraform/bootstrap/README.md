@@ -15,7 +15,7 @@ The setup creates AWS resources to enable terraform deployments to AWS accounts.
 Before you begin deploying NRLF bootstrap components, you will need:
 
 - Four AWS accounts created. These will be assigned as: mgmt, prod, test and dev
-- The required packages to build NRLF, see [the Setup section in README.md](../../README.md#setup).
+- The required packages to build NRLF, see [the Setup section in README.md](../../README.md#before-you-begin).
 
 ## Bootstrapping the environments
 

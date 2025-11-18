@@ -35,7 +35,7 @@ CI pipeline creates infrastructure in the dev AWS account. These will have works
 Before you begin deploying NRLF infrastructure, you will need:
 
 - An NRLF-enabled AWS account, ideally `dev`. See [bootstrap](../bootstrap/README.md) for details on setting up a new account.
-- The required packages to build NRLF, see [the Setup section in README.md](../../README.md#setup).
+- The required packages to build NRLF, see [the Setup section in README.md](../../README.md#before-you-begin).
 - To be logged into the AWS mgmt account on the CLI that you are deploying from.
 
 If infrastructure changes require account wide AWS resources. Please deploy the corresponding [NRLF account wide infrastructure](../account-wide-infrastructure/README.md) first.
