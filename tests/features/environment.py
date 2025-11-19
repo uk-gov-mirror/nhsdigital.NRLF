@@ -19,7 +19,7 @@ def before_all(context: Context):
     context.account_name = context.config.userdata.get("account_name")
     context.use_shared_resources = context.config.userdata.get("use_shared_resources")
     context.host = context.config.userdata.get(
-        "host", default=f"https://{context.env}.api.record-locator.dev.national.nhs.uk/"
+        "host", f"https://{context.env}.api.record-locator.dev.national.nhs.uk/"
     )
 
     context.stack_name = (
