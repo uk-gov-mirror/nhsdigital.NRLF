@@ -12,6 +12,27 @@ import { randomItem } from "https://jslib.k6.io/k6-utils/1.2.0/index.js";
 import { crypto } from "k6/experimental/webcrypto";
 import { createRecord } from "../setup.js";
 
+let NHS_NUMBERS, pickNHSNumber;
+if (__ENV.ISPERFTEST === "true") {
+  const referenceData = JSON.parse(open("./producer_reference_data.json"));
+  const NEW_NHS_NUMBERS = referenceData.new_nhs_numbers;
+  const EXISTING_NHS_NUMBERS = referenceData.existing_nhs_numbers;
+  const RATIO = referenceData.ratio || 0.8;
+  pickNHSNumber = function () {
+    if (Math.random() < RATIO) {
+      return randomItem(NEW_NHS_NUMBERS);
+    } else {
+      return randomItem(EXISTING_NHS_NUMBERS);
+    }
+  };
+  NHS_NUMBERS = NEW_NHS_NUMBERS.concat(EXISTING_NHS_NUMBERS);
+} else {
+  NHS_NUMBERS = require("../constants.js").NHS_NUMBERS;
+  pickNHSNumber = function () {
+    return randomItem(NHS_NUMBERS);
+  };
+}
+
 function getBaseURL() {
   return `https://${__ENV.HOST}/producer/DocumentReference`;
 }
@@ -42,7 +63,7 @@ function checkResponse(res) {
 }
 
 export function createDocumentReference() {
-  const nhsNumber = randomItem(NHS_NUMBERS);
+  const nhsNumber = pickNHSNumber();
   const pointerType = randomItem(POINTER_TYPES);
   const record = createRecord(nhsNumber, pointerType);
 
@@ -93,7 +114,7 @@ export function deleteDocumentReference() {
 }
 
 export function upsertDocumentReference() {
-  const nhsNumber = randomItem(NHS_NUMBERS);
+  const nhsNumber = pickNHSNumber();
   const pointerType = randomItem(POINTER_TYPES);
   const record = createRecord(nhsNumber, pointerType);
 
@@ -115,7 +136,7 @@ export function upsertDocumentReference() {
 }
 
 export function searchDocumentReference() {
-  const nhsNumber = randomItem(NHS_NUMBERS);
+  const nhsNumber = pickNHSNumber();
   const pointerType = randomItem(POINTER_TYPES);
 
   const identifier = encodeURIComponent(
@@ -139,7 +160,7 @@ export function searchDocumentReference() {
 }
 
 export function searchPostDocumentReference() {
-  const nhsNumber = randomItem(NHS_NUMBERS);
+  const nhsNumber = pickNHSNumber();
   const pointerType = randomItem(POINTER_TYPES);
 
   const body = JSON.stringify({

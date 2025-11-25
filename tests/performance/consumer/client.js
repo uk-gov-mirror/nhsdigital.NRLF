@@ -1,5 +1,4 @@
 import {
-  NHS_NUMBERS,
   POINTER_IDS,
   POINTER_TYPES,
   ODS_CODE,
@@ -7,6 +6,18 @@ import {
 } from "../constants.js";
 import http from "k6/http";
 import { check } from "k6";
+
+let NHS_NUMBERS, POINTER_IDS, ODS_CODE;
+if (__ENV.ISPERFTEST === "true") {
+  const referenceData = JSON.parse(open("./consumer_reference_data.json"));
+  NHS_NUMBERS = referenceData.nhs_numbers;
+  POINTER_IDS = referenceData.pointer_ids;
+  ODS_CODE = referenceData.ods_codes[0];
+} else {
+  NHS_NUMBERS = require("../constants.js").NHS_NUMBERS;
+  POINTER_IDS = require("../constants.js").POINTER_IDS;
+  ODS_CODE = require("../constants.js").ODS_CODE;
+}
 
 function getHeaders(odsCode = ODS_CODE) {
   return {
