@@ -59,7 +59,7 @@ As a short guideline about profiles to assume for a typical workflow:
 ### Set up NRLF certificates
 
 In order to execute make commands that need AWS access, you will need to pull the NRLF certificates.
-In order to do this, make sure you have AWS CLI installed and configured, then run:
+In order to do this, make sure you have AWS CLI installed and configured, assume the mgmt account, then run:
 
 ```
 make ENV=env truststore-pull-all

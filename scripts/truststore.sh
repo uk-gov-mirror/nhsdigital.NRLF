@@ -303,11 +303,31 @@ function _truststore_pull_server() {
 
 function _truststore_pull_all() {
     env=$1
+
     _truststore_pull_ca $env
     _truststore_pull_client $env
     _truststore_pull_server $env
 
     echo -e "✅ Successfully pulled all ${env} truststore files from s3://${BUCKET}"
+    return 0
+}
+
+function _truststore_pull_all_for_account() {
+    account=$1
+
+    # sets envs_array
+    source ./scripts/get-envs-for-account.sh $account
+
+    echo "Pulling certs for environments ${envs_array[@]} in ${account} account"
+
+    for env in ${envs_array[@]}; do
+        echo "⏳ Pulling ${env} truststore certs"
+        _truststore_pull_ca $env
+        _truststore_pull_client $env
+        _truststore_pull_server $env
+    done
+
+    echo -e "✅ Successfully pulled all ${account} truststore files from s3://${BUCKET}"
     return 0
 }
 
@@ -364,6 +384,7 @@ function _truststore() {
         "build-ca") _truststore_build_ca $args ;;
         "build-cert") _truststore_build_cert $args ;;
         "pull-all") _truststore_pull_all $args ;;
+        "pull-all-for-account") _truststore_pull_all_for_account $args ;;
         "pull-server") _truststore_pull_server $args ;;
         "pull-client") _truststore_pull_client $args ;;
         "pull-ca") _truststore_pull_ca $args ;;

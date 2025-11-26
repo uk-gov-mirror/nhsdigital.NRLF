@@ -17,3 +17,10 @@ data "aws_secretsmanager_secret_version" "emails" {
 data "aws_secretsmanager_secret_version" "backup_destination_parameters" {
   secret_id = aws_secretsmanager_secret.backup_destination_parameters.name
 }
+
+data "external" "current-info" {
+  program = [
+    "bash",
+    "../../../scripts/get-current-info.sh",
+  ]
+}

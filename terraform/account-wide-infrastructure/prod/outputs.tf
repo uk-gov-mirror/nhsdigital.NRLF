@@ -22,3 +22,7 @@ output "athena_kms_key_arn" {
   description = "KMS key ARN for Athena encryption"
   value       = var.enable_reporting ? module.prod-athena[0].kms_key_arn : null
 }
+
+output "version" {
+  value = data.external.current-info.result.version
+}
