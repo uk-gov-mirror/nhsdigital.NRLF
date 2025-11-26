@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: "Environment to deploy to"
+        description: "Account to deploy to"
         required: true
         default: "account-dev"
         type: environment
