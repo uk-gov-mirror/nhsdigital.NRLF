@@ -25,7 +25,7 @@ def extract_consumer_data(stack_name, out="consumer_reference_data.json"):
     start_key = None
     nhs_numbers = set()
     pointer_ids = []
-    ods_codes = set()
+    custodians = set()
     while not done:
         if start_key:
             scan_kwargs["ExclusiveStartKey"] = start_key
@@ -33,19 +33,19 @@ def extract_consumer_data(stack_name, out="consumer_reference_data.json"):
         for item in response.get("Items", []):
             nhs_number = item.get("nhs_number")
             pointer_id = item.get("id")
-            ods_code = item.get("ods_code")
+            custodian = item.get("custodian")
             if nhs_number:
                 nhs_numbers.add(nhs_number)
             if pointer_id:
                 pointer_ids.append(pointer_id)
-            if ods_code:
-                ods_codes.add(ods_code)
+            if custodian:
+                custodians.add(custodian)
         start_key = response.get("LastEvaluatedKey", None)
         done = start_key is None
     data = {
         "nhs_numbers": list(nhs_numbers),
         "pointer_ids": pointer_ids,
-        "ods_codes": list(ods_codes),
+        "custodians": list(custodians),
     }
     pathlib.Path(out).write_text(json.dumps(data))
     print(f"Consumer data written to {out}")  # noqa: T201
