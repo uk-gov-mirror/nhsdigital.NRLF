@@ -25,6 +25,7 @@ function _truststore_help() {
     echo "  pull-ca-key <ca>                - Pull the certificate authority private key"
     echo "  pull-client <env>               - pull the files needed for a client connection"
     echo "  pull-server <env>               - pull the files needed for a server connection"
+    echo "  pull-all-for-account <acc>      - pull all the truststore files for all environments in a given account"
     echo "  pull-all <env>                  - pull all the truststore files for an environment"
     echo "  push-all <env>                  - push all the truststore files for an environment"
     echo "  rotate-ca <env>                 - rotate the certificate authority, archiving the previous one"
@@ -318,13 +319,15 @@ function _truststore_pull_all_for_account() {
     # sets envs_array
     source ./scripts/get-envs-for-account.sh $account
 
-    echo "Pulling certs for environments ${envs_array[@]} in ${account} account"
-
     for env in ${envs_array[@]}; do
-        echo "⏳ Pulling ${env} truststore certs"
-        _truststore_pull_ca $env
-        _truststore_pull_client $env
-        _truststore_pull_server $env
+        # don't need to pull sandbox certs
+        if [[ $env != *"-sandbox" ]];
+        then
+            echo "⏳ Pulling ${env} truststore certs"
+            _truststore_pull_ca $env
+            _truststore_pull_client $env
+            _truststore_pull_server $env
+        fi
     done
 
     echo -e "✅ Successfully pulled all ${account} truststore files from s3://${BUCKET}"
