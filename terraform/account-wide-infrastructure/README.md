@@ -91,6 +91,9 @@ make publish-ci-image
 
 ## Deploy account wide resources
 
+> Run the [Deploy Account-wide infrastructure](https://github.com/NHSDigital/NRLF/actions/workflows/deploy-account-wide-infra.yml) github workflow to deploy account wide infrastructure. Select your branch/tag and `account-dev`, `account-test`, or `account-prod` to deploy infra to the corresponding account.
+> Else follow the steps below to deploy manually.
+
 To deploy the account wide resources, first login to the AWS mgmt account on the CLI.
 
 Then, initialise your terraform workspace with:
