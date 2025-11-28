@@ -42,6 +42,8 @@ If infrastructure changes require account wide AWS resources. Please deploy the 
 
 ## Deploy infrastructure
 
+> Run the [Persistent Environment Deploy](https://github.com/NHSDigital/NRLF/actions/workflows/persistent-environment.yml) github workflow to deploy infrastructure changes to your chosen environment. Else follow the steps below to deploy manually.
+
 To deploy the infrastructure, you need to build the NRLF artifacts and then deploy them with Terraform.
 
 The steps are as follows:
