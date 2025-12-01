@@ -1,19 +1,3 @@
-resource "aws_iam_role" "developer_role" {
-  name = "NHSDDeveloperRole"
-  assume_role_policy = jsonencode({
-    Version : "2012-10-17",
-    Statement : [
-      {
-        Action : "sts:AssumeRole",
-        Principal : {
-          AWS : "arn:aws:iam::${data.aws_secretsmanager_secret_version.identities_account_id.secret_string}:root"
-        },
-        Effect : "Allow"
-      }
-    ]
-  })
-}
-
 module "developer_policy" {
   source    = "../modules/role-policy"
   name      = "${local.prefix}--developer-policy"
