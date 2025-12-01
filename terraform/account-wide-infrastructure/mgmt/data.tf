@@ -18,10 +18,6 @@ data "aws_s3_bucket" "truststore" {
   bucket = "${local.project}--truststore"
 }
 
-data "aws_secretsmanager_secret_version" "identities_account_id" {
-  secret_id = aws_secretsmanager_secret.identities_account_id.name
-}
-
 data "aws_secretsmanager_secret" "prod_account_id" {
   name = "${local.project}--mgmt--prod-account-id"
 }
