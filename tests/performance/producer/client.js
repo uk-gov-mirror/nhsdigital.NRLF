@@ -2,7 +2,6 @@ import http from "k6/http";
 import {
   POINTER_TYPES,
   ODS_CODE,
-  NHS_NUMBERS,
   POINTER_IDS,
   POINTER_DOCUMENTS,
   POINTERS_TO_DELETE,
@@ -18,6 +17,7 @@ if (__ENV.ISPERFTEST === "true") {
   const NEW_NHS_NUMBERS = referenceData.new_nhs_numbers;
   const EXISTING_NHS_NUMBERS = referenceData.existing_nhs_numbers;
   const RATIO = referenceData.ratio || 0.8;
+
   pickNHSNumber = function () {
     if (Math.random() < RATIO) {
       return randomItem(NEW_NHS_NUMBERS);
@@ -44,9 +44,6 @@ function getHeaders(odsCode = ODS_CODE) {
     "NHSD-Correlation-Id": "K6PerformanceTest",
     "NHSD-Connection-Metadata": JSON.stringify({
       "nrl.ods-code": odsCode,
-      "nrl.pointer-types": POINTER_TYPES.map(
-        (type) => `http://snomed.info/sct|${type}`
-      ),
       "nrl.app-id": "K6PerformanceTest",
     }),
     "NHSD-Client-RP-Details": JSON.stringify({
