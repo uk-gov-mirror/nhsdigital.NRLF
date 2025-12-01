@@ -1,22 +1,16 @@
-import {
-  POINTER_IDS,
-  POINTER_TYPES,
-  ODS_CODE,
-  CATEGORIES,
-} from "../constants.js";
+import { POINTER_TYPES, CATEGORIES } from "../constants.js";
 import http from "k6/http";
 import { check } from "k6";
 
-let NHS_NUMBERS, POINTER_IDS, ODS_CODE;
+let NHS_NUMBERS, POINTER_IDS;
+ODS_CODE = require("../constants.js").ODS_CODE;
 if (__ENV.ISPERFTEST === "true") {
   const referenceData = JSON.parse(open("./consumer_reference_data.json"));
   NHS_NUMBERS = referenceData.nhs_numbers;
   POINTER_IDS = referenceData.pointer_ids;
-  ODS_CODE = referenceData.ods_codes[0];
 } else {
   NHS_NUMBERS = require("../constants.js").NHS_NUMBERS;
   POINTER_IDS = require("../constants.js").POINTER_IDS;
-  ODS_CODE = require("../constants.js").ODS_CODE;
 }
 
 function getHeaders(odsCode = ODS_CODE) {
@@ -26,9 +20,6 @@ function getHeaders(odsCode = ODS_CODE) {
     "NHSD-Correlation-Id": "K6PerformanceTest",
     "NHSD-Connection-Metadata": JSON.stringify({
       "nrl.ods-code": odsCode,
-      "nrl.pointer-types": POINTER_TYPES.map(
-        (type) => `http://snomed.info/sct|${type}`
-      ),
       "nrl.app-id": "K6PerformanceTest",
     }),
     "NHSD-Client-RP-Details": JSON.stringify({
@@ -169,4 +160,47 @@ export function countPostDocumentReference() {
     }
   );
   checkResponse(res);
+}
+
+export function searchPostDocumentReferenceAccessDenied() {
+  const nhsNumber = NHS_NUMBERS[Math.floor(Math.random() * NHS_NUMBERS.length)];
+  const pointer_type =
+    POINTER_TYPES[Math.floor(Math.random() * POINTER_TYPES.length)];
+
+  const body = JSON.stringify({
+    "subject:identifier": `https://fhir.nhs.uk/Id/nhs-number|${nhsNumber}`,
+    type: `http://snomed.info/sct|${pointer_type}`,
+  });
+
+  let headers = getHeaders();
+  headers["NHSD-Connection-Metadata"] = JSON.stringify({
+    "nrl.ods-code": ODS_CODE,
+    "nrl.app-id": "K6PerformanceTest",
+  });
+  const res = http.post(
+    `https://${__ENV.HOST}/consumer/DocumentReference/_search`,
+    body,
+    {
+      headers: headers,
+    }
+  );
+
+  const is_denied = check(res, { "status is 403": (r) => r.status === 403 });
+  if (!is_denied) {
+    console.warn(`Expected access denied but got: ${res.status}`);
+  }
+}
+
+export function readDocumentReferenceNotFound() {
+  const choice = Math.floor(Math.random() * POINTER_IDS.length);
+
+  const res = http.get(
+    `https://${__ENV.HOST}/consumer/DocumentReference/NonExistentID`,
+    {
+      headers: getHeaders(),
+    }
+  );
+
+  //we expect a 404 here
+  check(res, { "status is 404": (r) => r.status === 404 });
 }
