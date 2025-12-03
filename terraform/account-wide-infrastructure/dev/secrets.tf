@@ -1,7 +1,3 @@
-resource "aws_secretsmanager_secret" "identities_account_id" {
-  name = "${local.prefix}--nhs-identities-account-id"
-}
-
 resource "aws_secretsmanager_secret" "backup_destination_parameters" {
   name        = "${local.prefix}--backup-destination-parameters"
   description = "Parameters used to configure the backup destination"
