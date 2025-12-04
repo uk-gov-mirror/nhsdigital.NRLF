@@ -130,8 +130,8 @@ def _make_seed_pointer(
     doc_ref.type.coding[0].display = TYPE_ATTRIBUTES.get(
         f"{SNOMED_SYSTEM_URL}|{type_code}"
     ).get("display")
-    type = f"{SNOMED_SYSTEM_URL}|{type_code}"
-    category = TYPE_CATEGORIES.get(type)
+    type_url = f"{SNOMED_SYSTEM_URL}|{type_code}"
+    category = TYPE_CATEGORIES.get(type_url)
     doc_ref.category[0].coding[0].code = category.split("|")[-1]
     doc_ref.category[0].coding[0].display = CATEGORY_ATTRIBUTES.get(category).get(
         "display"
@@ -229,10 +229,12 @@ def _set_up_count_iterator(pointers_per_px: float) -> iter:
     generates a distribution of counts per individual patient.
     """
 
-    sum = int((pointers_per_px - 1.0) * 100)  # no patients can have zero pointers
+    extra_per_hundred = int(
+        (pointers_per_px - 1.0) * 100
+    )  # no patients can have zero pointers
     counts = {}
-    counts["3"] = sum // 10
-    counts["2"] = sum - 2 * counts["3"]
+    counts["3"] = extra_per_hundred // 10
+    counts["2"] = extra_per_hundred - 2 * counts["3"]
     counts["1"] = 100 - counts[2] - counts[3]
     return _set_up_cyclical_iterator(counts)
 
