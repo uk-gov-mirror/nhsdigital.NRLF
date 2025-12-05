@@ -151,18 +151,56 @@ test-performance-prepare:
 	mkdir -p $(DIST_PATH)
 	PYTHONPATH=. poetry run python tests/performance/environment.py setup $(TF_WORKSPACE_NAME)
 
-test-performance: check-warn test-performance-baseline test-performance-stress ## Run the performance tests
+test-performance-internal: check-warn test-performance-baseline-internal test-performance-stress-internal ## Run the performance tests against the internal access points
 
-test-performance-baseline:
-	@echo "Running consumer performance baseline test"
-	k6 run --out csv=$(DIST_PATH)/consumer-baseline.csv tests/performance/consumer/baseline.js -e HOST=$(HOST) -e ENV_TYPE=$(ENV_TYPE)
+test-performance-baseline-internal: check-warn ## Run the performance baseline tests for the internal access points
+	@echo "Running internal consumer performance baseline test"
+	TEST_CONNECT_MODE=internal \
+	TEST_STACK_DOMAIN=$(shell terraform -chdir=terraform/infrastructure output -raw domain 2>/dev/null) \
+		k6 run --out csv=$(DIST_PATH)/consumer-baseline.csv tests/performance/consumer/baseline.js -e HOST=$(HOST) -e ENV_TYPE=$(ENV_TYPE)
 
-test-performance-stress:
-	@echo "Running consumer performance stress test"
+test-performance-baseline-public: check-warn ## Run the baseline performance tests for the external access points
+	@echo "Fetching public mode configuration and bearer token..."
+	$(eval TEST_CONFIG := $(shell PYTHONPATH=. python3 tests/performance/get_test_config.py $(ENV_TYPE) 2>&1 | tail -n 1))
+	$(eval PUBLIC_BASE_URL := $(shell echo '$(TEST_CONFIG)' | jq -r '.public_base_url'))
+	$(eval BEARER_TOKEN := $(shell echo '$(TEST_CONFIG)' | jq -r '.bearer_token'))
+	@echo "Running consumer performance baseline test against the external access points"
+	TEST_CONNECT_MODE=public \
+	TEST_PUBLIC_BASE_URL=$(PUBLIC_BASE_URL) \
+	TEST_BEARER_TOKEN=$(BEARER_TOKEN) \
+		k6 run --out csv=$(DIST_PATH)/consumer-baseline-public.csv tests/performance/consumer/baseline.js -e ENV_TYPE=$(ENV_TYPE)
+
+test-performance-stress-internal: ## Run the performance stress tests for the internal access points
+	@echo "Running internal consumer performance stress test"
 	k6 run --out csv=$(DIST_PATH)/consumer-stress.csv tests/performance/consumer/stress.js -e HOST=$(HOST) -e ENV_TYPE=$(ENV_TYPE)
 
-test-performance-soak:
-	@echo "Running consumer performance soak test"
+test-performance-stress-public:
+	@echo "Fetching public mode configuration and bearer token..."
+	$(eval TEST_CONFIG := $(shell PYTHONPATH=. python3 tests/performance/get_test_config.py $(ENV_TYPE) 2>&1 | tail -n 1))
+	$(eval PUBLIC_BASE_URL := $(shell echo '$(TEST_CONFIG)' | jq -r '.public_base_url'))
+	$(eval BEARER_TOKEN := $(shell echo '$(TEST_CONFIG)' | jq -r '.bearer_token'))
+	TEST_CONNECT_MODE=public \
+	TEST_PUBLIC_BASE_URL=$(PUBLIC_BASE_URL) \
+	TEST_BEARER_TOKEN=$(BEARER_TOKEN) \
+	@echo "Running consumer performance stress test against the external access points" ; \
+	k6 run --out csv=$(DIST_PATH)/consumer-stress.csv tests/performance/consumer/stress.js -e HOST=$(HOST) -e ENV_TYPE=$(ENV_TYPE)
+
+test-performance-soak-internal:
+	@echo "Running internal consumer performance soak test"
+	k6 run --out csv=$(DIST_PATH)/consumer-soak.csv tests/performance/consumer/soak.js -e HOST=$(HOST) -e ENV_TYPE=$(ENV_TYPE)
+
+test-performance-soak-public:
+	@echo "Fetching public mode configuration and bearer token..."
+	$(eval TEST_CONFIG := $(shell PYTHONPATH=. python3 tests/performance/get_test_config.py $(ENV_TYPE) 2>&1 | tail -n 1))
+	$(eval PUBLIC_BASE_URL := $(shell echo '$(TEST_CONFIG)' | jq -r '.public_base_url'))
+	$(eval BEARER_TOKEN := $(shell echo '$(TEST_CONFIG)' | jq -r '.bearer_token'))
+	@echo "heres what PUBLIC_BASE_URL looks like $(PUBLIC_BASE_URL)"
+	@echo "heres what BEARER_TOKEN looks like $(BEARER_TOKEN)"
+	@echo "heres what raw TEST_CONFIG looks like $(TEST_CONFIG)"
+	TEST_CONNECT_MODE=public \
+	TEST_PUBLIC_BASE_URL=$(PUBLIC_BASE_URL) \
+	TEST_BEARER_TOKEN=$(BEARER_TOKEN) \
+	@echo "Running consumer performance soak test against the external access points" ; \
 	k6 run --out csv=$(DIST_PATH)/consumer-soak.csv tests/performance/consumer/soak.js -e HOST=$(HOST) -e ENV_TYPE=$(ENV_TYPE)
 
 test-performance-output: ## Process outputs from the performance tests
