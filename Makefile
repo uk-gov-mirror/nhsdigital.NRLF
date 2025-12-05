@@ -194,9 +194,6 @@ test-performance-soak-public:
 	$(eval TEST_CONFIG := $(shell PYTHONPATH=. python3 tests/performance/get_test_config.py $(ENV_TYPE) 2>&1 | tail -n 1))
 	$(eval PUBLIC_BASE_URL := $(shell echo '$(TEST_CONFIG)' | jq -r '.public_base_url'))
 	$(eval BEARER_TOKEN := $(shell echo '$(TEST_CONFIG)' | jq -r '.bearer_token'))
-	@echo "heres what PUBLIC_BASE_URL looks like $(PUBLIC_BASE_URL)"
-	@echo "heres what BEARER_TOKEN looks like $(BEARER_TOKEN)"
-	@echo "heres what raw TEST_CONFIG looks like $(TEST_CONFIG)"
 	TEST_CONNECT_MODE=public \
 	TEST_PUBLIC_BASE_URL=$(PUBLIC_BASE_URL) \
 	TEST_BEARER_TOKEN=$(BEARER_TOKEN) \
