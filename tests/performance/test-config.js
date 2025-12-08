@@ -81,8 +81,14 @@ export function getHeaders(appId = "K6PerformanceTest") {
   }
 }
 
-export function getFullUrl(path, apiType = "consumer") {
+export function getFullUrl(path, actorType) {
+  if (!actorType || (actorType !== "consumer" && actorType !== "producer")) {
+    throw new Error("actorType must be either 'consumer' or 'producer'");
+  }
   const cfg = initConfig();
-  const apiPath = apiType === "producer" ? cfg.producerPath : cfg.consumerPath;
-  return `${cfg.baseUrl}${apiPath}${path}`;
+  const apiPath =
+    actorType === "producer" ? cfg.producerPath : cfg.consumerPath;
+  const fullUrl = `${cfg.baseUrl}${apiPath}${path}`;
+
+  return fullUrl;
 }

@@ -24,7 +24,7 @@ export function countDocumentReference() {
   );
 
   const path = `/DocumentReference?_summary=count&subject:identifier=${identifier}`;
-  const res = http.get(getFullUrl(path), {
+  const res = http.get(getFullUrl(path, "consumer"), {
     headers: getHeaders(),
   });
   checkResponse(res);
@@ -35,7 +35,7 @@ export function readDocumentReference() {
   const id = POINTER_IDS[choice];
 
   const path = `/DocumentReference/${id}`;
-  const res = http.get(getFullUrl(path), {
+  const res = http.get(getFullUrl(path, "consumer"), {
     headers: getHeaders(),
   });
 
@@ -53,7 +53,7 @@ export function searchDocumentReference() {
   const type = encodeURIComponent(`http://snomed.info/sct|${pointer_type}`);
 
   const path = `/DocumentReference?subject:identifier=${identifier}&type=${type}`;
-  const res = http.get(getFullUrl(path), {
+  const res = http.get(getFullUrl(path, "consumer"), {
     headers: getHeaders(),
   });
   checkResponse(res);
@@ -72,7 +72,7 @@ export function searchDocumentReferenceByCategory() {
   );
 
   const path = `/DocumentReference?subject:identifier=${identifier}&category=${category}`;
-  const res = http.get(getFullUrl(path), {
+  const res = http.get(getFullUrl(path, "consumer"), {
     headers: getHeaders(),
   });
   checkResponse(res);
@@ -89,7 +89,7 @@ export function searchPostDocumentReference() {
   });
 
   const path = `/DocumentReference/_search`;
-  const res = http.post(getFullUrl(path), body, {
+  const res = http.post(getFullUrl(path, "consumer"), body, {
     headers: getHeaders(),
   });
   checkResponse(res);
@@ -105,7 +105,7 @@ export function searchPostDocumentReferenceByCategory() {
   });
 
   const path = `/DocumentReference/_search`;
-  const res = http.post(getFullUrl(path), body, {
+  const res = http.post(getFullUrl(path, "consumer"), body, {
     headers: getHeaders(),
   });
   checkResponse(res);
@@ -120,7 +120,7 @@ export function countPostDocumentReference() {
   });
 
   const path = `/DocumentReference/_search?_summary=count`;
-  const res = http.post(getFullUrl(path), body, {
+  const res = http.post(getFullUrl(path, "consumer"), body, {
     headers: getHeaders(),
   });
   checkResponse(res);
