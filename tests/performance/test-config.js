@@ -2,12 +2,21 @@ import { POINTER_TYPES, ODS_CODE } from "./constants.js";
 
 let config = null;
 
+const connectMode = __ENV.TEST_CONNECT_MODE || "internal";
+let configData = null;
+
+if (connectMode === "public") {
+  const configFile = __ENV.TEST_CONFIG_FILE;
+  if (!configFile) {
+    throw new Error("Public mode requires TEST_CONFIG_FILE");
+  }
+  configData = JSON.parse(open(configFile));
+}
+
 function initConfig() {
   if (config !== null) {
     return config;
   }
-
-  const connectMode = __ENV.TEST_CONNECT_MODE || "internal";
 
   if (connectMode === "public") {
     config = {
@@ -16,14 +25,14 @@ function initConfig() {
       consumerPath: "/consumer/FHIR/R4",
       producerPath: "/producer/FHIR/R4",
       odsCode: ODS_CODE,
-      bearerToken: __ENV.TEST_BEARER_TOKEN,
+      bearerToken: configData.bearer_token,
     };
 
     if (!config.baseUrl) {
       throw new Error("Public mode requires TEST_PUBLIC_BASE_URL");
     }
     if (!config.bearerToken) {
-      throw new Error("Public mode requires TEST_BEARER_TOKEN");
+      throw new Error("Bearer token not found in config file");
     }
   } else {
     config = {

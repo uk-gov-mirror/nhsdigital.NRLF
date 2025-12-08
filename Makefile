@@ -1,4 +1,3 @@
-
 .EXPORT_ALL_VARIABLES:
 .NOTPARALLEL:
 .PHONY: *
@@ -161,44 +160,47 @@ test-performance-baseline-internal: check-warn ## Run the performance baseline t
 
 test-performance-baseline-public: check-warn ## Run the baseline performance tests for the external access points
 	@echo "Fetching public mode configuration and bearer token..."
-	$(eval TEST_CONFIG := $(shell PYTHONPATH=. python3 tests/performance/get_test_config.py $(ENV_TYPE) 2>&1 | tail -n 1))
-	$(eval PUBLIC_BASE_URL := $(shell echo '$(TEST_CONFIG)' | jq -r '.public_base_url'))
-	$(eval BEARER_TOKEN := $(shell echo '$(TEST_CONFIG)' | jq -r '.bearer_token'))
-	@echo "Running consumer performance baseline test against the external access points"
+	@CONFIG_FILE=$$(mktemp /tmp/perf_config_XXXXXX); \
+	trap "rm -f $$CONFIG_FILE" EXIT; \
+	PYTHONPATH=. python3 tests/performance/get_test_config.py $(ENV_TYPE) 2>&1 | tail -n 1 > $$CONFIG_FILE; \
+	PUBLIC_BASE_URL=$$(jq -r '.public_base_url' $$CONFIG_FILE); \
+	echo "Running consumer performance baseline test against the external access points"; \
 	TEST_CONNECT_MODE=public \
-	TEST_PUBLIC_BASE_URL=$(PUBLIC_BASE_URL) \
-	TEST_BEARER_TOKEN=$(BEARER_TOKEN) \
+	TEST_PUBLIC_BASE_URL=$$PUBLIC_BASE_URL \
+	TEST_CONFIG_FILE=$$CONFIG_FILE \
 		k6 run --out csv=$(DIST_PATH)/consumer-baseline-public.csv tests/performance/consumer/baseline.js -e ENV_TYPE=$(ENV_TYPE)
 
 test-performance-stress-internal: ## Run the performance stress tests for the internal access points
 	@echo "Running internal consumer performance stress test"
 	k6 run --out csv=$(DIST_PATH)/consumer-stress.csv tests/performance/consumer/stress.js -e HOST=$(HOST) -e ENV_TYPE=$(ENV_TYPE)
 
-test-performance-stress-public:
+test-performance-stress-public: check-warn ## Run the stress performance tests for the external access points
 	@echo "Fetching public mode configuration and bearer token..."
-	$(eval TEST_CONFIG := $(shell PYTHONPATH=. python3 tests/performance/get_test_config.py $(ENV_TYPE) 2>&1 | tail -n 1))
-	$(eval PUBLIC_BASE_URL := $(shell echo '$(TEST_CONFIG)' | jq -r '.public_base_url'))
-	$(eval BEARER_TOKEN := $(shell echo '$(TEST_CONFIG)' | jq -r '.bearer_token'))
+	@CONFIG_FILE=$$(mktemp /tmp/perf_config_XXXXXX); \
+	trap "rm -f $$CONFIG_FILE" EXIT; \
+	PYTHONPATH=. python3 tests/performance/get_test_config.py $(ENV_TYPE) 2>&1 | tail -n 1 > $$CONFIG_FILE; \
+	PUBLIC_BASE_URL=$$(jq -r '.public_base_url' $$CONFIG_FILE); \
+	echo "Running consumer performance stress test against the external access points"; \
 	TEST_CONNECT_MODE=public \
-	TEST_PUBLIC_BASE_URL=$(PUBLIC_BASE_URL) \
-	TEST_BEARER_TOKEN=$(BEARER_TOKEN) \
-	@echo "Running consumer performance stress test against the external access points" ; \
-	k6 run --out csv=$(DIST_PATH)/consumer-stress.csv tests/performance/consumer/stress.js -e HOST=$(HOST) -e ENV_TYPE=$(ENV_TYPE)
+	TEST_PUBLIC_BASE_URL=$$PUBLIC_BASE_URL \
+	TEST_CONFIG_FILE=$$CONFIG_FILE \
+		k6 run --out csv=$(DIST_PATH)/consumer-stress-public.csv tests/performance/consumer/stress.js -e ENV_TYPE=$(ENV_TYPE)
 
 test-performance-soak-internal:
 	@echo "Running internal consumer performance soak test"
 	k6 run --out csv=$(DIST_PATH)/consumer-soak.csv tests/performance/consumer/soak.js -e HOST=$(HOST) -e ENV_TYPE=$(ENV_TYPE)
 
-test-performance-soak-public:
+test-performance-soak-public: check-warn ## Run the soak performance tests for the external access points
 	@echo "Fetching public mode configuration and bearer token..."
-	$(eval TEST_CONFIG := $(shell PYTHONPATH=. python3 tests/performance/get_test_config.py $(ENV_TYPE) 2>&1 | tail -n 1))
-	$(eval PUBLIC_BASE_URL := $(shell echo '$(TEST_CONFIG)' | jq -r '.public_base_url'))
-	$(eval BEARER_TOKEN := $(shell echo '$(TEST_CONFIG)' | jq -r '.bearer_token'))
+	@CONFIG_FILE=$$(mktemp /tmp/perf_config_XXXXXX); \
+	trap "rm -f $$CONFIG_FILE" EXIT; \
+	PYTHONPATH=. python3 tests/performance/get_test_config.py $(ENV_TYPE) 2>&1 | tail -n 1 > $$CONFIG_FILE; \
+	PUBLIC_BASE_URL=$$(jq -r '.public_base_url' $$CONFIG_FILE); \
+	echo "Running consumer performance soak test against the external access points"; \
 	TEST_CONNECT_MODE=public \
-	TEST_PUBLIC_BASE_URL=$(PUBLIC_BASE_URL) \
-	TEST_BEARER_TOKEN=$(BEARER_TOKEN) \
-	@echo "Running consumer performance soak test against the external access points" ; \
-	k6 run --out csv=$(DIST_PATH)/consumer-soak.csv tests/performance/consumer/soak.js -e HOST=$(HOST) -e ENV_TYPE=$(ENV_TYPE)
+	TEST_PUBLIC_BASE_URL=$$PUBLIC_BASE_URL \
+	TEST_CONFIG_FILE=$$CONFIG_FILE \
+		k6 run --out csv=$(DIST_PATH)/consumer-soak-public.csv tests/performance/consumer/soak.js -e ENV_TYPE=$(ENV_TYPE)
 
 test-performance-output: ## Process outputs from the performance tests
 	@echo "Processing performance test outputs"
