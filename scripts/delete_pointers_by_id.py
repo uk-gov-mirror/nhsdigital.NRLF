@@ -263,36 +263,30 @@ def _batch_delete_pointers(
 def _delete_pointers_by_id(
     table_name: str,
     ods_code: str,
-    pointers_to_delete: List[str] | None = None,
+    pointers_to_delete: list[str] | None = None,
     pointers_file: str | None = None,
 ) -> None:
     """
-    Delete pointers from DynamoDB table.
+    Delete DynamoDB pointers by ID with ODS code validation.
+
+    REQUIRED: Provide either --pointers_to_delete OR --pointers_file (but not both)
 
     Can accept pointers as:
-    - list of strings: pointers_to_delete=["id1", "id2"]
-    - JSON file: pointers_file=/path/to/pointers.json (array of objects with "id" field)
-    - text file: pointers_file=/path/to/ids.txt (one id per line)
+    - list of strings: --pointers_to_delete '["ABC123-12345678910", "ABC123-109876543210"]'
+    - JSON file: --pointers_file /path/to/pointers.json (array of objects with "id" field)
+    - text file: --pointers_file /path/to/ids.txt (one id per line)
 
-    Parameters:
-    - table_name: DynamoDB table name
-    - ods_code: ODS code of the organisation that the pointers belong to
-    - pointers_to_delete: list of pointer ids to delete
-    - pointers_file: path to JSON file (array of objects with "id" field) or text file (one id per line)
-
-    Sample usage:
-    - Delete by list of ids:
-      python delete_pointers_by_id.py --table_name MyTable --ods_code ABC123 --pointers_to_delete '["ABC123-12345678910", "ABC123-109876543210"]'
-    - Delete by JSON file:
-      python delete_pointers_by_id.py --table_name MyTable --ods_code ABC123 --pointers_file /path/to/pointers.json
-    - Delete by text file:
-      python delete_pointers_by_id.py --table_name MyTable --ods_code ABC123 --pointers_file /path/to/ids.txt
+    Args:
+        table_name: DynamoDB table name
+        ods_code: ODS code to validate pointer IDs against
+        pointers_to_delete: List of pointer IDs as JSON string
+        pointers_file: Path to file containing pointer IDs
     """
     if pointers_to_delete is None and pointers_file is None:
-        raise ValueError("Provide either pointers_to_delete or pointers_file")
+        raise ValueError("Must provide either --pointers_to_delete or --pointers_file")
 
     if pointers_to_delete is not None and pointers_file is not None:
-        raise ValueError("Provide either pointers_to_delete or pointers_file, not both")
+        raise ValueError("Cannot provide both --pointers_to_delete and --pointers_file")
 
     if pointers_file:
         pointers_to_delete = _load_pointers_from_file(pointers_file)
