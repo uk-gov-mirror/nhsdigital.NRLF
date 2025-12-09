@@ -3,7 +3,7 @@ from enum import Enum
 
 class Source(Enum):
     NRLF = "NRLF"
-    LEGACY = "NRL"
+    LEGACY = "NRL"  # not actually used
     PERFTEST = "NFT-SEED"
 
 

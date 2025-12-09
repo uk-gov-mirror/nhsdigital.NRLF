@@ -18,7 +18,6 @@ from nrlf.core.constants import (
 )
 from nrlf.core.dynamodb.model import DocumentPointer
 from nrlf.core.logger import logger
-from nrlf.core.validators import DocumentReferenceValidator
 from nrlf.tests.data import load_document_reference
 
 dynamodb = boto3.client("dynamodb")
@@ -89,6 +88,8 @@ DEFAULT_CUSTODIAN_DISTRIBUTIONS = {
     },  # summary record currently has only one supplier
 }
 
+DEFAULT_COUNT_DISTRIBUTIONS = {"1": 91, "2": 8, "3": 1}
+
 
 class TestNhsNumbersIterator:
     def __iter__(self):
@@ -129,8 +130,8 @@ def _make_seed_pointer(
     doc_ref.type.coding[0].display = TYPE_ATTRIBUTES.get(
         f"{SNOMED_SYSTEM_URL}|{type_code}"
     ).get("display")
-    type = f"{SNOMED_SYSTEM_URL}|{type_code}"
-    category = TYPE_CATEGORIES.get(type)
+    type_url = f"{SNOMED_SYSTEM_URL}|{type_code}"
+    category = TYPE_CATEGORIES.get(type_url)
     doc_ref.category[0].coding[0].code = category.split("|")[-1]
     doc_ref.category[0].coding[0].display = CATEGORY_ATTRIBUTES.get(category).get(
         "display"
@@ -143,41 +144,52 @@ def _populate_seed_table(
     table_name: str,
     px_with_pointers: int,
     pointers_per_px: float = 1.0,
-    type_dists=DEFAULT_TYPE_DISTRIBUTIONS,
-    custodian_dists=DEFAULT_CUSTODIAN_DISTRIBUTIONS,
+    type_dists: dict[str, int] = DEFAULT_TYPE_DISTRIBUTIONS,
+    custodian_dists: dict[str, int] = DEFAULT_CUSTODIAN_DISTRIBUTIONS,
 ):
-
-    table = resource.Table(table_name)
-
+    """
+    Seeds a table with example data for non-functional testing.
+    """
+    if pointers_per_px < 1.0:
+        raise ValueError("Cannot populate table with patients with zero pointers")
     # set up iterations
     type_iter = _set_up_cyclical_iterator(type_dists)
     custodian_iters = _set_up_custodian_iterators(custodian_dists)
+    count_iter = _set_up_cyclical_iterator(DEFAULT_COUNT_DISTRIBUTIONS)
     testnum_cls = TestNhsNumbersIterator()
     testnum_iter = iter(testnum_cls)
 
     px_counter = 0
-    doc_ref_target = pointers_per_px * px_with_pointers
+    doc_ref_target = int(pointers_per_px * px_with_pointers)
     print(
         f"Will upsert {doc_ref_target} test pointers for {px_with_pointers} patients."
     )
     doc_ref_counter = 0
+    batch_counter = 0
 
     start_time = datetime.now(tz=timezone.utc)
 
-    while px_counter < px_with_pointers:
+    batch_upsert_items = []
+    while px_counter <= px_with_pointers:
+        pointers_for_px = int(next(count_iter))
+        if batch_counter + pointers_for_px > 25 or px_counter == px_with_pointers:
+            resource.batch_write_item(RequestItems={table_name: batch_upsert_items})
+            batch_upsert_items = []
+            batch_counter = 0
+
         new_px = next(testnum_iter)
-        new_type = next(type_iter)
-        new_custodian = next(custodian_iters[new_type])
-        px_counter += 1
-        doc_ref_counter += 1
-        try:
-            print(f"Putting item {doc_ref_counter}....")
+        for _ in range(pointers_for_px):
+            new_type = next(type_iter)
+            new_custodian = next(custodian_iters[new_type])
+            doc_ref_counter += 1
+            batch_counter += 1
+
             pointer = _make_seed_pointer(
                 new_type, new_custodian, new_px, doc_ref_counter
             )
-            table.put_item(Item=pointer.model_dump())
-        except Exception as e:
-            print(f"Unable to upsert pointer for item {doc_ref_counter}. Error: {e}")
+            put_req = {"PutRequest": {"Item": pointer.model_dump()}}
+            batch_upsert_items.append(put_req)
+        px_counter += 1
 
     end_time = datetime.now(tz=timezone.utc)
     print(
@@ -209,6 +221,22 @@ def _set_up_custodian_iterators(
             custodian_dists[pointer_type]
         )
     return custodian_iters
+
+
+def _set_up_count_iterator(pointers_per_px: float) -> iter:
+    """
+    Given a target average number of pointers per patient,
+    generates a distribution of counts per individual patient.
+    """
+
+    extra_per_hundred = int(
+        (pointers_per_px - 1.0) * 100
+    )  # no patients can have zero pointers
+    counts = {}
+    counts["3"] = extra_per_hundred // 10
+    counts["2"] = extra_per_hundred - 2 * counts["3"]
+    counts["1"] = 100 - counts[2] - counts[3]
+    return _set_up_cyclical_iterator(counts)
 
 
 if __name__ == "__main__":
