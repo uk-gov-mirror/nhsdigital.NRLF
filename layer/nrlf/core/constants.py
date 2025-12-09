@@ -3,7 +3,8 @@ from enum import Enum
 
 class Source(Enum):
     NRLF = "NRLF"
-    LEGACY = "NRL"
+    LEGACY = "NRL"  # not actually used
+    PERFTEST = "NFT-SEED"
 
 
 VALID_SOURCES = frozenset(item.value for item in Source.__members__.values())
