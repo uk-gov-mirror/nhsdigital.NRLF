@@ -1,3 +1,5 @@
+import { CATEGORY_TYPE_GROUPS } from "./type-category-mappings.js";
+
 export const DEFAULT_TEST_RECORD = open(
   "../data/DocumentReference/Y05868-736253002-Valid.json"
 );
@@ -12,23 +14,37 @@ export const ALL_POINTER_IDS =
 export const POINTERS_TO_DELETE = ALL_POINTER_IDS.slice(0, 3500);
 export const POINTER_IDS = ALL_POINTER_IDS.slice(3500);
 export const NHS_NUMBERS = REFERENCE_DATA["nhs_numbers"];
-export const POINTER_TYPES = [
+
+// export const POINTER_TYPES = CATEGORY_TYPE_GROUPS.flatMap((group) =>
+//   group.types.map((t) => t.code)
+// );
+// filter only 736253001, 736253002, 1363501000000100, 861421000000109, 749001000000101 for now
+export const FILTERED_POINTER_TYPES = [
+  "736253001",
   "736253002",
   "1363501000000100",
-  "1382601000000107",
-  "325691000000100",
-  "736373009",
   "861421000000109",
-  "887701000000100",
-  "736366004",
-  "735324008",
-  "824321000000109",
-  "2181441000000107",
+  "749001000000101",
 ];
-export const CATEGORIES = [
-  "734163000",
-  "1102421000000108",
-  "823651000000106",
-  "721981007",
-  "103693007",
-];
+
+export const POINTER_TYPES = FILTERED_POINTER_TYPES;
+
+export const CATEGORIES = CATEGORY_TYPE_GROUPS.map(
+  (group) => group.category.code
+);
+export const POINTER_TYPE_DISPLAY = Object.fromEntries(
+  CATEGORY_TYPE_GROUPS.flatMap((group) =>
+    group.types.map((t) => [t.code, t.display])
+  )
+);
+export const TYPE_CATEGORY_MAP = Object.fromEntries(
+  CATEGORY_TYPE_GROUPS.flatMap((group) =>
+    group.types.map((t) => [t.code, group.category.code])
+  )
+);
+export const CATEGORY_DISPLAY = Object.fromEntries(
+  CATEGORY_TYPE_GROUPS.map((group) => [
+    group.category.code,
+    group.category.display,
+  ])
+);

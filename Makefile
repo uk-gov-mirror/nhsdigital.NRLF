@@ -1,4 +1,3 @@
-
 .EXPORT_ALL_VARIABLES:
 .NOTPARALLEL:
 .PHONY: *
@@ -246,3 +245,16 @@ generate-models: check-warn ## Generate Pydantic Models
 		--output ./layer/nrlf/consumer/fhir/r4/model.py \
 		--base-class nrlf.core.parent_model.Parent \
 		--output-model-type "pydantic_v2.BaseModel"
+
+
+generate-perftest-permissions: ## Generate perftest permissions and add to nrlf_permissions
+	poetry run python tests/performance/producer/generate_permissions.py --output_dir="$(DIST_PATH)/nrlf_permissions/K6PerformanceTest"
+
+# Run producer performance tests with configurable HOST and ENV_TYPE
+perftest-producer:
+	@echo "Running producer performance tests with HOST=$(HOST) and ENV_TYPE=$(ENV_TYPE)"
+	k6 run tests/performance/producer/perftest.js -e HOST=$(HOST) -e ENV_TYPE=$(ENV_TYPE)
+
+perftest-consumer:
+	@echo "Running consumer performance tests with HOST=$(HOST) and ENV_TYPE=$(ENV_TYPE)"
+	k6 run tests/performance/consumer/perftest.js -e HOST=$(HOST) -e ENV_TYPE=$(ENV_TYPE)
