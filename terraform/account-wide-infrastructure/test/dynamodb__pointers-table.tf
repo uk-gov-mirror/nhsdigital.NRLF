@@ -32,9 +32,31 @@ module "ref-pointers-table" {
 }
 
 module "perftest-pointers-table" {
-  source                      = "../modules/pointers-table"
-  name_prefix                 = "nhsd-nrlf--perftest"
-  enable_deletion_protection  = true
-  enable_pitr                 = true
-  kms_deletion_window_in_days = 30
+  source      = "../modules/pointers-table"
+  name_prefix = "nhsd-nrlf--perftest"
+}
+
+module "perftest-2.5m-pointers-table" {
+  source      = "../modules/pointers-table"
+  name_prefix = "nhsd-nrlf--perftest-2.5m"
+}
+
+module "perftest-7.5m-pointers-table" {
+  source      = "../modules/pointers-table"
+  name_prefix = "nhsd-nrlf--perftest-7.5m"
+}
+
+module "perftest-15m-pointers-table" {
+  source      = "../modules/pointers-table"
+  name_prefix = "nhsd-nrlf--perftest-15m"
+}
+
+module "perftest-25m-pointers-table" {
+  source      = "../modules/pointers-table"
+  name_prefix = "nhsd-nrlf--perftest-25m"
+}
+
+module "perftest-55m-pointers-table" {
+  source      = "../modules/pointers-table"
+  name_prefix = "nhsd-nrlf--perftest-55m"
 }

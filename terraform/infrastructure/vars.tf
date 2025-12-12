@@ -67,3 +67,14 @@ variable "disable_firehose_lambda_subscriptions" {
   type        = bool
   default     = false
 }
+
+variable "dynamodb_pointers_table_name" {
+  type        = string
+  description = "The name of the DynamoDB pointers table to use when using shared resources"
+}
+
+variable "dynamodb_sandbox_pointers_table_name" {
+  type        = string
+  description = "The name of the DynamoDB pointers table to use when using shared resources in a sandbox environment"
+  default     = null
+}

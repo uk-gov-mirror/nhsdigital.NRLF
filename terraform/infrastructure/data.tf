@@ -17,7 +17,7 @@ data "aws_iam_policy" "auth-store-read-policy" {
 
 data "aws_dynamodb_table" "pointers-table" {
   count = var.use_shared_resources ? 1 : 0
-  name  = "${local.shared_prefix}-pointers-table"
+  name  = local.is_sandbox_env ? var.dynamodb_sandbox_pointers_table_name : var.dynamodb_pointers_table_name
 }
 
 data "aws_iam_policy" "pointers-table-read" {
