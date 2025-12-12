@@ -3,7 +3,6 @@ import boto3
 dynamodb = boto3.client("dynamodb")
 resource = boto3.resource("dynamodb")
 
-logger.setLevel("ERROR")
 
 # DOC_REF_TEMPLATE = load_document_reference("NFT-template")
 

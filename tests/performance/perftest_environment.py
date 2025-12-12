@@ -24,7 +24,8 @@ def _get_pointers_table_name():
     return f"nhsd-nrlf--{perftest_table_name}-pointers-table"
 
 
-def extract_consumer_data(out="consumer_reference_data.json"):
+def extract_consumer_data(output_dir="."):
+    out = output_dir + "/consumer_reference_data.json"
     table_name = _get_pointers_table_name()
     table = DYNAMODB.Table(table_name)
     scan_kwargs = {}
@@ -87,9 +88,9 @@ class TestNhsNumbersIterator:
 
 
 def generate_producer_data(
+    output_dir=".",
     proportion_existing=0.8,  # Proportion of output that should be existing NHS numbers
     total_count=1000,  # Total number of NHS numbers to output
-    out="producer_reference_data.json",
     last_existing_nhs_number=None,  # Optionally specify the last NHS number in the table
 ):
     """
@@ -98,12 +99,14 @@ def generate_producer_data(
     - total_count: total number of NHS numbers in output
     NHS numbers are generated in a semi-deterministic way, similar to the NFT seeding script.
     """
+    out = output_dir + "/producer_reference_data.json"
     table_name = _get_pointers_table_name()
     table = DYNAMODB.Table(table_name)
     scan_kwargs = {}
     done = False
     start_key = None
     existing_nhs_numbers = set()
+
     # Scan DynamoDB table for all existing NHS numbers
     while not done:
         if start_key:
@@ -178,11 +181,12 @@ def generate_producer_data(
 
 
 def generate_pointer_table_extract(
-    out="producer_reference_data.csv",
+    output_dir=".",
 ):
     """
     Generate a CSV file containing all pointer IDs, pointer type, custodian, and nhs_number (patient).
     """
+    out = output_dir + "/producer_reference_data.csv"
     table_name = _get_pointers_table_name()
     table = DYNAMODB.Table(table_name)
     scan_kwargs = {}
@@ -192,8 +196,8 @@ def generate_pointer_table_extract(
     buffer_size = 1_000_000  # 10k rows needs ~3MB of RAM, so 1M rows needs ~300MB
     count = 1
 
-    with open(out, "w", newline="") as csvfile:
-        writer = csv.writer(csvfile)
+    with open(out, "w", newline="") as csv_file:
+        writer = csv.writer(csv_file)
         writer.writerow(
             ["count", "pointer_id", "pointer_type", "custodian", "nhs_number"]
         )
