@@ -52,27 +52,18 @@ function randomNHSNumberInRange(start, end) {
 }
 
 function generateValidNHSNumber(first9) {
-  // NHS number with checksum logic
-  // const CHECKSUM_WEIGHTS = [10, 9, 8, 7, 6, 5, 4, 3, 2];
-  // while (true) {
-  //   const first9Str = String(first9).padStart(9, "0");
-  //   const digits = first9Str.split("").map(Number);
-  //   if (digits.some(isNaN)) {
-  //     throw new Error("Invalid digit in NHS number generation");
-  //   }
-  //   let sum = digits.reduce((acc, digit, idx) => acc + digit * CHECKSUM_WEIGHTS[idx], 0);
-  //   // Python: checksum = (sum * -1) % 11
-  //   let checksum = (sum * -1) % 11;
-  //   if (checksum === 10) {
-  //     first9++;
-  //     if (first9 > 999999999) {
-  //       throw new Error("No valid NHS number found in range.");
-  //     }
-  //     continue;
-  //   }
-  //   return first9Str + String(checksum);
-  // }
-  return "3226053469";
+  const first9Str = String(first9).padStart(9, "0");
+
+  if (first9Str.match(/^\d{9}$/)) {
+    throw new Error(
+      "bad NHS number generated - expected 9 digits",
+      first9Str,
+      first9
+    );
+  }
+
+  // NHS numbers not validated, checksum doesn't need to be legit
+  return `${first9Str}${"1"}`;
 }
 
 function pickNHSNumber() {

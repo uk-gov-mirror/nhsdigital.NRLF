@@ -15,6 +15,7 @@ ACCOUNT ?= dev
 APP_ALIAS ?= default
 HOST ?= $(TF_WORKSPACE_NAME).api.record-locator.$(ENV).national.nhs.uk
 ENV_TYPE ?= $(ENV)
+PERFTEST_TABLE_NAME ?= nhsd-nrlf--xaxel-deleteme-pointers-table
 
 export PATH := $(PATH):$(PWD)/.venv/bin
 export USE_SHARED_RESOURCES := $(shell poetry run python scripts/are_resources_shared_for_stack.py $(TF_WORKSPACE_NAME))
@@ -253,8 +254,17 @@ generate-perftest-permissions: ## Generate perftest permissions and add to nrlf_
 # Run producer performance tests with configurable HOST and ENV_TYPE
 perftest-producer:
 	@echo "Running producer performance tests with HOST=$(HOST) and ENV_TYPE=$(ENV_TYPE)"
-	k6 run tests/performance/producer/perftest.js -e HOST=$(HOST) -e ENV_TYPE=$(ENV_TYPE)
+	k6 run tests/performance/producer/perftest.js -e HOST=$(HOST) -e ENV_TYPE=$(ENV_TYPE) -e PERFTEST_TABLE_NAME=$(PERFTEST_TABLE_NAME)
 
 perftest-consumer:
 	@echo "Running consumer performance tests with HOST=$(HOST) and ENV_TYPE=$(ENV_TYPE)"
 	k6 run tests/performance/consumer/perftest.js -e HOST=$(HOST) -e ENV_TYPE=$(ENV_TYPE)
+
+# Generates input csv for a given table
+perftest-prepare:
+	mkdir -p $(DIST_PATH)
+	PYTHONPATH=. poetry run python tests/performance/perftest_environment.py generate_pointer_table_extract $(PERFTEST_TABLE_NAME)
+
+perftest-seed-data: perftest-prepare
+	@echo "Seeding dynamo with data for performance tests with HOST=$(HOST) and ENV_TYPE=$(ENV_TYPE)"
+	poetry run python tests/performance/consumer/perftest.js --table_name="" --px_with_pointers="" --pointers_per_px="" --type_dists="" --custodian_dists=""

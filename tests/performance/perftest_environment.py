@@ -1,28 +1,31 @@
 import csv
 import json
+import os
 import pathlib
+import re
 
 import boto3
 
 # from nhs_number import generate
 
-# from scripts.are_resources_shared_for_stack import uses_shared_resources
 
 DYNAMODB = boto3.resource("dynamodb", region_name="eu-west-2")
 
-
-def get_pointers_table_name(stack_name):
-    # if uses_shared_resources(stack_name):
-    #     env = stack_name.split("-")[0]
-    #     return f"nhsd-nrlf--{env}-pointers-table"
-    # else:
-    #     return f"nhsd-nrlf--{stack_name}-pointers-table"
-    # return f"nhsd-nrlf--perftest-pointers-table"
-    return f"nhsd-nrlf--xaxel-deleteme-pointers-table"
+default_table_name = "default-table-name"
+# default_table_name = "nhsd-nrlf--xaxel-deleteme-pointers-table"
 
 
-def extract_consumer_data(stack_name, out="consumer_reference_data.json"):
-    table_name = get_pointers_table_name(stack_name)
+def _get_pointers_table_name():
+    perftest_table_name = os.environ.get("PERFTEST_TABLE_NAME", default_table_name)
+
+    if re.search("^nhsd-nrlf--.+-pointers-table$", perftest_table_name):
+        return perftest_table_name
+
+    return f"nhsd-nrlf--{perftest_table_name}-pointers-table"
+
+
+def extract_consumer_data(out="consumer_reference_data.json"):
+    table_name = _get_pointers_table_name()
     table = DYNAMODB.Table(table_name)
     scan_kwargs = {}
     done = False
@@ -84,7 +87,6 @@ class TestNhsNumbersIterator:
 
 
 def generate_producer_data(
-    stack_name,
     proportion_existing=0.8,  # Proportion of output that should be existing NHS numbers
     total_count=1000,  # Total number of NHS numbers to output
     out="producer_reference_data.json",
@@ -96,7 +98,7 @@ def generate_producer_data(
     - total_count: total number of NHS numbers in output
     NHS numbers are generated in a semi-deterministic way, similar to the NFT seeding script.
     """
-    table_name = get_pointers_table_name(stack_name)
+    table_name = _get_pointers_table_name()
     table = DYNAMODB.Table(table_name)
     scan_kwargs = {}
     done = False
@@ -176,13 +178,12 @@ def generate_producer_data(
 
 
 def generate_pointer_table_extract(
-    stack_name,
     out="producer_reference_data.csv",
 ):
     """
     Generate a CSV file containing all pointer IDs, pointer type, custodian, and nhs_number (patient).
     """
-    table_name = get_pointers_table_name(stack_name)
+    table_name = _get_pointers_table_name()
     table = DYNAMODB.Table(table_name)
     scan_kwargs = {}
     done = False
@@ -197,6 +198,7 @@ def generate_pointer_table_extract(
             ["count", "pointer_id", "pointer_type", "custodian", "nhs_number"]
         )
         while not done:
+
             if start_key:
                 scan_kwargs["ExclusiveStartKey"] = start_key
             response = table.scan(**scan_kwargs)
