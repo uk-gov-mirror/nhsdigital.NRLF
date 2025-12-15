@@ -230,11 +230,11 @@ def _populate_seed_table(
         f"Created {doc_ref_counter} pointers in {timedelta.total_seconds(end_time - start_time)} seconds."
     )
 
-    with open("./seed-nft-pointers.csv", "w") as f:
+    with open("./dist/seed-nft-pointers.csv", "w") as f:
         writer = csv.writer(f)
         writer.writerow(["pointer_id", "pointer_type", "custodian", "nhs_number"])
         writer.writerows(pointer_data)
-    print(f"Pointer data saved to ./seed-nft-pointers.csv")  # noqa
+    print(f"Pointer data saved to ./dist/seed-nft-pointers.csv")  # noqa
 
 
 def _set_up_cyclical_iterator(dists: dict[str, int]) -> Iterator[str]:
