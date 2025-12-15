@@ -33,30 +33,5 @@ module "ref-pointers-table" {
 
 module "perftest-pointers-table" {
   source      = "../modules/pointers-table"
-  name_prefix = "nhsd-nrlf--perftest-baseline"
-}
-
-module "perftest-4m-pointers-table" {
-  source      = "../modules/pointers-table"
-  name_prefix = "nhsd-nrlf--perftest-4m"
-}
-
-module "perftest-8m-pointers-table" {
-  source      = "../modules/pointers-table"
-  name_prefix = "nhsd-nrlf--perftest-8m"
-}
-
-module "perftest-16m-pointers-table" {
-  source      = "../modules/pointers-table"
-  name_prefix = "nhsd-nrlf--perftest-16m"
-}
-
-module "perftest-32m-pointers-table" {
-  source      = "../modules/pointers-table"
-  name_prefix = "nhsd-nrlf--perftest-32m"
-}
-
-module "perftest-64m-pointers-table" {
-  source      = "../modules/pointers-table"
-  name_prefix = "nhsd-nrlf--perftest-64m"
+  name_prefix = "nhsd-nrlf--perftest"
 }
