@@ -11,15 +11,11 @@ const lines = csv.trim().split("\n");
 // Skip header
 const dataLines = lines.slice(1);
 
-// console.log("__ENV", JSON.stringify(__ENV, null, 2));
-console.log("__ENV.HOST", JSON.stringify(__ENV.HOST, null, 2));
-
 function getNextPointer() {
   // pick the next line according to iteration in scenario
   const iter = exec.vu.iterationInScenario;
   const index = iter % dataLines.length;
   const line = dataLines[index];
-  console.log("🚀 ~ getNextPointer ~ line:", line);
   const [count, pointer_id, pointer_type, custodian, nhs_number] = line
     .split(",")
     .map((field) => field.trim());
@@ -50,7 +46,6 @@ function getCustodianFromPointerId(pointer_id) {
 function checkResponse(res) {
   const is_success = check(res, { "status is 200": (r) => r.status === 200 });
   if (!is_success) {
-    console.log("🚀 ~ checkResponse ~ res.status:", res.status);
     console.warn(res.json());
   }
 }
@@ -69,10 +64,6 @@ export function countDocumentReference() {
     `https://fhir.nhs.uk/Id/nhs-number|${nhs_number}`
   );
 
-  console.log(
-    "🚀 ~ countDocumentReference ~ `https://${__ENV.HOST}/consumer/DocumentReference?_summary=count&subject:identifier=${identifier}`:",
-    `https://${__ENV.HOST}/consumer/DocumentReference?_summary=count&subject:identifier=${identifier}`
-  );
   const res = http.get(
     `https://${__ENV.HOST}/consumer/DocumentReference?_summary=count&subject:identifier=${identifier}`,
     {
@@ -85,8 +76,6 @@ export function countDocumentReference() {
 export function readDocumentReference() {
   const { pointer_id } = getNextPointer();
   const custodian = getCustodianFromPointerId(pointer_id);
-
-  console.log("🚀 ~ countDocumentReference ~ __ENV.HOST:", __ENV.HOST);
 
   const res = http.get(
     `https://${__ENV.HOST}/consumer/DocumentReference/${pointer_id}`,
@@ -106,8 +95,6 @@ export function searchDocumentReference() {
     `https://fhir.nhs.uk/Id/nhs-number|${nhs_number}`
   );
   const type = encodeURIComponent(`http://snomed.info/sct|${pointer_type}`);
-
-  console.log("🚀 ~ countDocumentReference ~ __ENV.HOST:", __ENV.HOST);
 
   const res = http.get(
     `https://${__ENV.HOST}/consumer/DocumentReference?subject:identifier=${identifier}&type=${type}`,
@@ -130,8 +117,6 @@ export function searchDocumentReferenceByCategory() {
     `http://snomed.info/sct|${category_code}`
   );
 
-  console.log("🚀 ~ countDocumentReference ~ __ENV.HOST:", __ENV.HOST);
-
   const res = http.get(
     `https://${__ENV.HOST}/consumer/DocumentReference?subject:identifier=${identifier}&category=${category}`,
     {
@@ -149,8 +134,6 @@ export function searchPostDocumentReference() {
     "subject:identifier": `https://fhir.nhs.uk/Id/nhs-number|${nhs_number}`,
     type: `http://snomed.info/sct|${pointer_type}`,
   });
-
-  console.log("🚀 ~ countDocumentReference ~ __ENV.HOST:", __ENV.HOST);
 
   const res = http.post(
     `https://${__ENV.HOST}/consumer/DocumentReference/_search`,
@@ -172,8 +155,6 @@ export function searchPostDocumentReferenceByCategory() {
     category: `http://snomed.info/sct|${category_code}`,
   });
 
-  console.log("🚀 ~ countDocumentReference ~ __ENV.HOST:", __ENV.HOST);
-
   const res = http.post(
     `https://${__ENV.HOST}/consumer/DocumentReference/_search`,
     body,
@@ -192,7 +173,6 @@ export function countPostDocumentReference() {
     "subject:identifier": `https://fhir.nhs.uk/Id/nhs-number|${nhs_number}`,
   });
 
-  console.log("🚀 ~ countDocumentReference ~ __ENV.HOST:", __ENV.HOST);
   const res = http.post(
     `https://${__ENV.HOST}/consumer/DocumentReference/_search?_summary=count`,
     body,
@@ -218,8 +198,6 @@ export function searchPostDocumentReferenceAccessDenied() {
     "nrl.ods-code": deniedCustodian,
     "nrl.app-id": "K6PerformanceTest",
   });
-
-  console.log("🚀 ~ countDocumentReference ~ __ENV.HOST:", __ENV.HOST);
 
   const res = http.post(
     `https://${__ENV.HOST}/consumer/DocumentReference/_search`,

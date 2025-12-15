@@ -6,13 +6,9 @@ import re
 
 import boto3
 
-# from nhs_number import generate
-
-
 DYNAMODB = boto3.resource("dynamodb", region_name="eu-west-2")
 
 default_table_name = "default-table-name"
-# default_table_name = "nhsd-nrlf--xaxel-deleteme-pointers-table"
 
 
 def _get_pointers_table_name():
