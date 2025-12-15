@@ -1,8 +1,8 @@
 account_name     = "dev"
 aws_account_name = "dev"
 
-dynamodb_pointers_table_name         = "nhsd-nrlf--dev-pointers-table"
-dynamodb_sandbox_pointers_table_name = "nhsd-nrlf--dev-sandbox-pointers-table"
+dynamodb_pointers_table_prefix         = "nhsd-nrlf--dev"
+dynamodb_sandbox_pointers_table_prefix = "nhsd-nrlf--dev-sandbox"
 
 domain                = "api.record-locator.dev.national.nhs.uk"
 public_domain         = "internal-dev.api.service.nhs.uk"

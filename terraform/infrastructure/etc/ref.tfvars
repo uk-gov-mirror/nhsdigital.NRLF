@@ -1,7 +1,7 @@
 account_name     = "ref"
 aws_account_name = "test"
 
-dynamodb_pointers_table_name = "nhsd-nrlf--ref-pointers-table"
+dynamodb_pointers_table_prefix = "nhsd-nrlf--ref"
 
 domain        = "api.record-locator.ref.national.nhs.uk"
 public_domain = "ref.api.service.nhs.uk"
