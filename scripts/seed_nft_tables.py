@@ -174,6 +174,7 @@ def _populate_seed_table(
     )
     doc_ref_counter = 0
     batch_counter = 0
+    unprocessed_count = 0
 
     pointer_data: list[list[str]] = []
 
@@ -189,8 +190,8 @@ def _populate_seed_table(
             )
 
             if response.get("UnprocessedItems"):
-                logger.error(
-                    f"Unprocessed items in batch write: {len(response.get('UnprocessedItems'))}"
+                unprocessed_count += len(
+                    response.get("UnprocessedItems").get(table_name, [])
                 )
 
             batch_upsert_items = []
@@ -221,13 +222,13 @@ def _populate_seed_table(
         if px_counter % 1000 == 0:
             print(".", end="", flush=True)
         if px_counter % 100000 == 0:
-            print(f" {px_counter} patients processed")
+            print(f" {px_counter} patients processed ({doc_ref_counter} pointers).")
 
     print(" Done.")
 
     end_time = datetime.now(tz=timezone.utc)
     print(
-        f"Created {doc_ref_counter} pointers in {timedelta.total_seconds(end_time - start_time)} seconds."
+        f"Created {doc_ref_counter} pointers in {timedelta.total_seconds(end_time - start_time)} seconds (unprocessed: {unprocessed_count})."
     )
 
     with open("./dist/seed-nft-pointers.csv", "w") as f:
