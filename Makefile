@@ -16,7 +16,7 @@ APP_ALIAS ?= default
 HOST ?= $(TF_WORKSPACE_NAME).api.record-locator.$(ENV).national.nhs.uk
 ENV_TYPE ?= $(ENV)
 PERFTEST_TABLE_NAME ?= perftest
-PERFTEST_HOST ?= api.perftest.record-locator.national.nhs.uk
+PERFTEST_HOST ?= perftest-1.perftest.record-locator.national.nhs.uk
 
 export PATH := $(PATH):$(PWD)/.venv/bin
 export USE_SHARED_RESOURCES := $(shell poetry run python scripts/are_resources_shared_for_stack.py $(TF_WORKSPACE_NAME))

@@ -58,51 +58,33 @@ function generateValidNHSNumber(start, end) {
 
   while (!nhsNumber) {
     const seedNumber = randomNHSNumberInRange(start, end);
-    const first9Str = String(seedNumber).padStart(9, "0").substring(0, 8);
+    const first9Str = String(seedNumber).padStart(9, "0").substring(0, 9);
 
-    console.log(
-      `Generating NHS number from seed: ${seedNumber}, first 9 digits: ${first9Str}`
-    );
-
-    if (first9Str.match(/^\d{9}$/)) {
+    if (!first9Str.match(/^\d{9}$/)) {
       throw new Error(
         `bad NHS number generated - expected 9 digits: ${first9Str}, ${seedNumber}`
       );
     }
-
-    //parts_list = [
-    //  int(digit) * (10 - index)
-    //  for index, digit in enumerate(identifier_digits)
-    //]
-    //list_sum = sum(parts_list)
-    //checksum = 11 - (list_sum % 11)
-    //if checksum == 11:
-    //    checksum = 0
-    //return checksum
 
     const parts = [];
     const digits = first9Str.split("");
     for (let i = 0; i < digits.length; i++) {
       parts.push(parseInt(digits[i], 10) * (10 - i));
     }
-
     const list_sum = parts.reduce((a, b) => a + b, 0);
-    let checksum = 11 - (list_sum % 11);
-    if (checksum === 11) {
-      checksum = 0;
-    }
 
-    console.log(
-      `Generated NHS number parts: ${parts}, sum: ${list_sum}, checksum: ${checksum}`
-    );
+    let checksum = 11 - (list_sum % 11);
 
     if (checksum === 10) {
       // Checksum of 10 means NHS number is invalid
       continue;
     }
 
+    if (checksum === 11) {
+      checksum = 0;
+    }
+
     nhsNumber = `${first9Str}${checksum}`;
-    console.log(`Generated NHS number: ${nhsNumber}`);
   }
 
   return nhsNumber;
