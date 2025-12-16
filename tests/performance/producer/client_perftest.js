@@ -53,30 +53,68 @@ function randomNHSNumberInRange(start, end) {
   return start + rand;
 }
 
-function generateValidNHSNumber(first9) {
-  const first9Str = String(first9).padStart(9, "0");
+function generateValidNHSNumber(start, end) {
+  let nhsNumber = undefined;
 
-  if (first9Str.match(/^\d{9}$/)) {
-    throw new Error(
-      "bad NHS number generated - expected 9 digits",
-      first9Str,
-      first9
+  while (!nhsNumber) {
+    const seedNumber = randomNHSNumberInRange(start, end);
+    const first9Str = String(seedNumber).padStart(9, "0").substring(0, 8);
+
+    console.log(
+      `Generating NHS number from seed: ${seedNumber}, first 9 digits: ${first9Str}`
     );
+
+    if (first9Str.match(/^\d{9}$/)) {
+      throw new Error(
+        `bad NHS number generated - expected 9 digits: ${first9Str}, ${seedNumber}`
+      );
+    }
+
+    //parts_list = [
+    //  int(digit) * (10 - index)
+    //  for index, digit in enumerate(identifier_digits)
+    //]
+    //list_sum = sum(parts_list)
+    //checksum = 11 - (list_sum % 11)
+    //if checksum == 11:
+    //    checksum = 0
+    //return checksum
+
+    const parts = [];
+    const digits = first9Str.split("");
+    for (let i = 0; i < digits.length; i++) {
+      parts.push(parseInt(digits[i], 10) * (10 - i));
+    }
+
+    const list_sum = parts.reduce((a, b) => a + b, 0);
+    let checksum = 11 - (list_sum % 11);
+    if (checksum === 11) {
+      checksum = 0;
+    }
+
+    console.log(
+      `Generated NHS number parts: ${parts}, sum: ${list_sum}, checksum: ${checksum}`
+    );
+
+    if (checksum === 10) {
+      // Checksum of 10 means NHS number is invalid
+      continue;
+    }
+
+    nhsNumber = `${first9Str}${checksum}`;
+    console.log(`Generated NHS number: ${nhsNumber}`);
   }
 
-  // NHS numbers not validated, checksum doesn't need to be legit
-  return `${first9Str}${"1"}`;
+  return nhsNumber;
 }
 
 function pickNHSNumber() {
   if (Math.random() < ReuseNHSNumbersRatio) {
     // Reuse: pick within [NHSNumberStart, NHSNumberEnd]
-    const first9 = randomNHSNumberInRange(NHSNumberStart, NHSNumberEnd);
-    return generateValidNHSNumber(first9);
+    return generateValidNHSNumber(NHSNumberStart, NHSNumberEnd);
   } else {
     // New: always pick from [NHSNumberEnd + 1, NHS_NUMBER_MAX]
-    const first9 = randomNHSNumberInRange(NHSNumberEnd + 1, NHS_NUMBER_MAX);
-    return generateValidNHSNumber(first9);
+    return generateValidNHSNumber(NHSNumberEnd + 1, NHS_NUMBER_MAX);
   }
 }
 
