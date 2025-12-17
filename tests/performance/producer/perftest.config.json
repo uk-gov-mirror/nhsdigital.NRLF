@@ -1,0 +1,39 @@
+{
+  "profile": "SOAK",
+  "tlsAuth": {
+    "cert": "../../../truststore/client/${ENV_TYPE}.crt",
+    "key": "../../../truststore/client/${ENV_TYPE}.key"
+  },
+  "scenarios": {
+    "createDocumentReference": {
+      "tps": 5,
+      "duration": "5m",
+      "hold": "30m",
+      "rampDown": "1m"
+    },
+    "readDocumentReference": {
+      "tps": 5,
+      "duration": "5m",
+      "hold": "30m",
+      "rampDown": "1m"
+    },
+    "upsertDocumentReference": {
+      "tps": 5,
+      "duration": "5m",
+      "hold": "30m",
+      "rampDown": "1m"
+    },
+    "searchDocumentReference": {
+      "tps": 5,
+      "duration": "5m",
+      "hold": "30m",
+      "rampDown": "1m"
+    },
+    "searchPostDocumentReference": {
+      "tps": 5,
+      "duration": "5m",
+      "hold": "30m",
+      "rampDown": "1m"
+    }
+  }
+}
