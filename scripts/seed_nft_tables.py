@@ -253,15 +253,6 @@ def _set_up_cyclical_iterator(dists: dict[str, int]) -> Iterator[str]:
     return cycle(value_list)
 
 
-# def _get_pointer_count_negbinom_distributions(num_of_patients: int, pointers_per_px: float) -> cycle:
-#    dispersion = 2  # lower = more variance; higher = closer to Poisson
-#    p = dispersion / (dispersion + pointers_per_px)
-#    n = dispersion
-
-#    p_count_distr = np.random.negative_binomial(n=n, p=p, size=num_of_patients)
-#    return cycle(p_count_distr)
-
-
 def _get_pointer_count_poisson_distributions(
     num_of_patients: int, pointers_per_px: float
 ) -> Iterator[int]:
@@ -279,22 +270,6 @@ def _set_up_custodian_iterators(
             custodian_dists[pointer_type]
         )
     return custodian_iters
-
-
-# def _set_up_count_iterator(pointers_per_px: float) -> iter:
-#    """
-#    Given a target average number of pointers per patient,
-#    generates a distribution of counts per individual patient.
-#    """
-#
-#    extra_per_hundred = int(
-#        (pointers_per_px - 1.0) * 100
-#    )  # no patients can have zero pointers
-#    counts = {}
-#    counts["3"] = extra_per_hundred // 10
-#    counts["2"] = extra_per_hundred - 2 * counts["3"]
-#    counts["1"] = 100 - counts[2] - counts[3]
-#    return _set_up_cyclical_iterator(counts)
 
 
 if __name__ == "__main__":
