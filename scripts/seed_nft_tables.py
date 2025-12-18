@@ -1,11 +1,15 @@
+import csv
 from datetime import datetime, timedelta, timezone
 from itertools import cycle
 from math import gcd
 from random import shuffle
-from typing import Any
+from typing import Any, Iterator
 
 import boto3
 import fire
+
+# import json
+import numpy as np
 
 from nrlf.consumer.fhir.r4.model import DocumentReference
 from nrlf.core.constants import (
@@ -145,7 +149,7 @@ def _populate_seed_table(
     px_with_pointers: int,
     pointers_per_px: float = 1.0,
     type_dists: dict[str, int] = DEFAULT_TYPE_DISTRIBUTIONS,
-    custodian_dists: dict[str, int] = DEFAULT_CUSTODIAN_DISTRIBUTIONS,
+    custodian_dists: dict[str, dict[str, int]] = DEFAULT_CUSTODIAN_DISTRIBUTIONS,
 ):
     """
     Seeds a table with example data for non-functional testing.
@@ -155,25 +159,41 @@ def _populate_seed_table(
     # set up iterations
     type_iter = _set_up_cyclical_iterator(type_dists)
     custodian_iters = _set_up_custodian_iterators(custodian_dists)
-    count_iter = _set_up_cyclical_iterator(DEFAULT_COUNT_DISTRIBUTIONS)
+    # count_iter = _set_up_cyclical_iterator(DEFAULT_COUNT_DISTRIBUTIONS)
+    count_iter = _get_pointer_count_poisson_distributions(
+        px_with_pointers, pointers_per_px
+    )
+    # count_iter = _get_pointer_count_negbinom_distributions(px_with_pointers, pointers_per_px)
     testnum_cls = TestNhsNumbersIterator()
     testnum_iter = iter(testnum_cls)
 
     px_counter = 0
     doc_ref_target = int(pointers_per_px * px_with_pointers)
     print(
-        f"Will upsert {doc_ref_target} test pointers for {px_with_pointers} patients."
+        f"Will upsert ~{doc_ref_target} test pointers for {px_with_pointers} patients."
     )
     doc_ref_counter = 0
     batch_counter = 0
+    unprocessed_count = 0
+
+    pointer_data: list[list[str]] = []
 
     start_time = datetime.now(tz=timezone.utc)
 
-    batch_upsert_items = []
-    while px_counter <= px_with_pointers:
+    batch_upsert_items: list[dict[str, Any]] = []
+    while px_counter < px_with_pointers:
         pointers_for_px = int(next(count_iter))
+
         if batch_counter + pointers_for_px > 25 or px_counter == px_with_pointers:
-            resource.batch_write_item(RequestItems={table_name: batch_upsert_items})
+            response = resource.batch_write_item(
+                RequestItems={table_name: batch_upsert_items}
+            )
+
+            if response.get("UnprocessedItems"):
+                unprocessed_count += len(
+                    response.get("UnprocessedItems").get(table_name, [])
+                )
+
             batch_upsert_items = []
             batch_counter = 0
 
@@ -189,15 +209,36 @@ def _populate_seed_table(
             )
             put_req = {"PutRequest": {"Item": pointer.model_dump()}}
             batch_upsert_items.append(put_req)
+            pointer_data.append(
+                [
+                    pointer.id,
+                    pointer.type,
+                    pointer.custodian,
+                    pointer.nhs_number,
+                ]
+            )
         px_counter += 1
+
+        if px_counter % 1000 == 0:
+            print(".", end="", flush=True)
+        if px_counter % 100000 == 0:
+            print(f" {px_counter} patients processed ({doc_ref_counter} pointers).")
+
+    print(" Done.")
 
     end_time = datetime.now(tz=timezone.utc)
     print(
-        f"Created {doc_ref_counter} pointers in {timedelta.total_seconds(end_time - start_time)} seconds."
+        f"Created {doc_ref_counter} pointers in {timedelta.total_seconds(end_time - start_time)} seconds (unprocessed: {unprocessed_count})."
     )
 
+    with open("./dist/seed-nft-pointers.csv", "w") as f:
+        writer = csv.writer(f)
+        writer.writerow(["pointer_id", "pointer_type", "custodian", "nhs_number"])
+        writer.writerows(pointer_data)
+    print(f"Pointer data saved to ./dist/seed-nft-pointers.csv")  # noqa
 
-def _set_up_cyclical_iterator(dists: dict[str, int]) -> iter:
+
+def _set_up_cyclical_iterator(dists: dict[str, int]) -> Iterator[str]:
     """
     Given a dict of values and their relative frequencies,
     returns an iterator that will cycle through a the reduced and shuffled set of values.
@@ -205,38 +246,30 @@ def _set_up_cyclical_iterator(dists: dict[str, int]) -> iter:
     It also means each batch will contain a representative sample of the distribution.
     """
     d = gcd(*dists.values())
-    value_list = []
+    value_list: list[str] = []
     for entry in dists:
         value_list.extend([entry] * (dists[entry] // d))
     shuffle(value_list)
     return cycle(value_list)
 
 
+def _get_pointer_count_poisson_distributions(
+    num_of_patients: int, pointers_per_px: float
+) -> Iterator[int]:
+    p_count_distr = np.random.poisson(lam=pointers_per_px - 1, size=num_of_patients) + 1
+    p_count_distr = np.clip(p_count_distr, a_min=1, a_max=4)
+    return cycle(p_count_distr)
+
+
 def _set_up_custodian_iterators(
-    custodian_dists: dict[dict[str, int]]
-) -> dict[str, iter]:
-    custodian_iters = {}
+    custodian_dists: dict[str, dict[str, int]]
+) -> dict[str, Iterator[str]]:
+    custodian_iters: dict[str, Iterator[str]] = {}
     for pointer_type in custodian_dists:
         custodian_iters[pointer_type] = _set_up_cyclical_iterator(
             custodian_dists[pointer_type]
         )
     return custodian_iters
-
-
-def _set_up_count_iterator(pointers_per_px: float) -> iter:
-    """
-    Given a target average number of pointers per patient,
-    generates a distribution of counts per individual patient.
-    """
-
-    extra_per_hundred = int(
-        (pointers_per_px - 1.0) * 100
-    )  # no patients can have zero pointers
-    counts = {}
-    counts["3"] = extra_per_hundred // 10
-    counts["2"] = extra_per_hundred - 2 * counts["3"]
-    counts["1"] = 100 - counts[2] - counts[3]
-    return _set_up_cyclical_iterator(counts)
 
 
 if __name__ == "__main__":

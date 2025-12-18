@@ -64,3 +64,8 @@ module "perftest-truststore-bucket" {
   name_prefix             = "nhsd-nrlf--perftest"
   server_certificate_file = "../../../truststore/server/perftest.pem"
 }
+
+module "perftest-metadata-bucket" {
+  source      = "../modules/metadata-bucket"
+  name_prefix = "nhsd-nrlf--perftest"
+}
