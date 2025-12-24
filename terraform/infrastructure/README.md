@@ -116,6 +116,8 @@ replacing `{ENV_NAME}` with the environment name (e.g. `dev`, `qa`, `qa-sandbox`
 
 To tear down the infrastructure, you need to use Terraform to destroy the resources in your Terraform workspace.
 
+First `make build-artifacts`. Then assume management and run `make get-s3-perms ENV={ENV_NAME}` in the project root.
+
 To teardown the infrastructure, do the following:
 
 ```

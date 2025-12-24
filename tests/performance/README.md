@@ -1,20 +1,44 @@
 # Performance Testing
 
-some high level context short
+We have performance tests which give us a benchmark of how NRLF performs under load for consumers and producers.
 
-## Run perf tests
+## Run performance tests
 
 ### Prep the environment
 
 Perf tests are generally conducted in the perftest env. There's a selection of tables in the perftest env representing different pointer volume scenarios e.g. perftest-baseline vs perftest-1million (todo: update with real names!).
 
-To reset this table to the expected state for perftests, restore the table from a backup.
+#### Point perftest at a different pointers table
 
-In the steps below, make sure the table name is the table your environment is pointing at. You might need to redeploy NRLF lambdas to point at the desired table.
+We (will) have multiple tables representing different states of NRLF in the future e.g. all patients receiving an IPS (International Patient Summary), onboarding particular high-volume suppliers.
+
+In order to run performance tests to get figures for these different states, we can point the perftest environment at one of these tables.
+
+Currently, this requires tearing down the existing environment and restoring from scratch:
+
+1. Follow instructions in terraform/infrastructure/readme.md to tear down the perf test environment.
+   - Do **not** tear down shared account-wide infrastructure
+2. Update `perftest-pointers-table.name_prefix` in `terraform/account-wide-infrastructure/test/dynamodb__pointers-table.tf` to be the table name you want, minus "-pointers-table"
+   - e.g. to use the baseline table `nhsd-nrlf--perftest-baseline-pointers-table`, set `name_prefix = "nhsd-nrlf--perftest-baseline"`
+3. Update `dynamodb_pointers_table_prefix` in `terraform/infrastructure/etc/perftest.tfvars` same as above.
+   - e.g. to use the baseline table `dynamodb_pointers_table_prefix = "nhsd-nrlf--perftest-baseline"`
+4. Commit changes to a branch & push
+5. Run the [Deploy Account-wide infrastructure](https://github.com/NHSDigital/NRLF/actions/workflows/deploy-account-wide-infra.yml) workflow against your branch & `account-test`.
+   - If you get a terraform failure like "tried to create table but it already exists", you will need to do some fanangaling:
+     1. make sure there is a backup of your chosen table or create one if not. In the AWS console: dynamodb > tables > your perftest table > backups > create backup > Create on-demand backup > leave all settings as defaults > create backup. This might take up to an hour to complete.
+     2. once backed up, delete your table. In the AWS console: dynamodb > tables > your perftest table > actions > delete table
+     3. Rerun the Deploy Account-wide infrastructure action.
+     4. Terraform will create an empty table with the correct name & (most importantly!) read/write IAM policies.
+     5. Delete the empty table created by terraform and restore from the backup, specifying the same table name you've defined in code.
+6. Run the [Persistent Environment Deploy](https://github.com/NHSDigital/NRLF/actions/workflows/persistent-environment.yml) workflow against your branch & `perftest` to restore the environment with lambdas pointed at your chosen table.
+7. You can check this has been successful by checking the table name in the lambdas.
+   - In the AWS console: Lambda > functions > pick any perftest-1 lambda > Configuration > Environment variables > `TABLE_NAME` should be your desired pointer table e.g. `nhsd-nrlf--perftest-baseline-pointers-table`
+
+If you've followed these steps, you will also need to [generate permissions](#generate-permissions) as the organisation permissions will have been lost when the environment was torn down.
 
 ### Prepare to run tests
 
-#### Pull certs for env
+#### Pull certs for perftest
 
 ```sh
 assume management
@@ -26,14 +50,14 @@ make truststore-pull-all ENV=perftest
 You will need to generate pointer permissions the first time performance tests are run in an environment e.g. if the perftest environment is destroyed & recreated.
 
 ```sh
-make generate permissions   # makes a bunch of json permission files
+make generate permissions   # makes a bunch of json permission files for test organisations
 make build  # will take all permissions & create nrlf_permissions.zip file
 
 # apply this new permissions zip file to your environment
 cd ./terraform/infrastructure
-assume test # needed?
+assume test
 make init TF_WORKSPACE_NAME=perftest-1 ENV=perftest
-tf apply
+make ENV=perftest USE_SHARED_RESOURCES=true apply
 ```
 
 #### Generate input files
@@ -49,3 +73,13 @@ make perftest-prepare PERFTEST_TABLE_NAME=perftest-baseline
 make perftest-consumer ENV_TYPE=perftest PERFTEST_HOST=perftest-1.perftest.record-locator.national.nhs.uk
 make perftest-producer ENV_TYPE=perftest PERFTEST_HOST=perftest-1.perftest.record-locator.national.nhs.uk
 ```
+
+## Assumptions / Caveats
+
+- Run performance tests in the perftest environment only\*
+- Both producer & consumer tests are repeatable
+- These tests work on the assumption that all nhs numbers in the test data are serial and lie within a fixed range i.e. picking any number between NHS_NUMBER_MINIMUM & NHS_NUMBER_MAXIMUM will yield a patient with pointer(s).
+- Configure scenarios in the `consumer/perftest.config.json` & `producer/perftest.config.json` files. This does not alter the number of stages per scenario, that's fixed in `perftest.js`.
+- Consider running these tests multiple times to get figures for a warm environment - perftest, unlike prod, is not well-used so you will get cold-start figures on your first run
+
+\*These performance tests are tightly coupled to the seed scripts that populate test data. This means these tests can only be run in an environment containing solely test data created by the seed data scripts. `perftest` is a dedicated environment to do this in, but in theory any environment could be populated with the seed data and used.
