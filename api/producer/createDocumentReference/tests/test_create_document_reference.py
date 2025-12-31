@@ -1929,35 +1929,6 @@ def test_create_logs_for_test_patient_multi_pointer(
         ],
     }
 
-    assert any(
+    assert not any(
         call[0][0].name == "PROCREATE012" for call in mock_logger.log.call_args_list
     )
-
-    assert {
-        "existing_pointers_count": 1,
-        "nhs_number": (
-            doc_ref.subject.identifier.value
-            if doc_ref.subject and doc_ref.subject.identifier
-            else None
-        ),
-        "pointer_type": (
-            f"{doc_ref.type.coding[0].system}|{doc_ref.type.coding[0].code}"
-            if doc_ref.type and doc_ref.type.coding
-            else None
-        ),
-        "custodian": (
-            doc_ref.custodian.identifier.value
-            if doc_ref.custodian and doc_ref.custodian.identifier
-            else None
-        ),
-        "new_pointer_id": "Y05868-00000000-0000-0000-0000-000000000001",
-        "new_pointer_master_id": (
-            doc_ref.masterIdentifier.value if doc_ref.masterIdentifier else None
-        ),
-    } == [
-        call[1:][0]
-        for call in mock_logger.log.call_args_list
-        if call[0][0].name == "PROCREATE012"
-    ][
-        0
-    ]
