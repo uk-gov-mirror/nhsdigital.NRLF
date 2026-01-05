@@ -1,0 +1,6 @@
+{
+  "NHSNumberStart": 9000000000,
+  "NHSNumberEnd": 9000999999,
+  "ReuseNHSNumbersRatio": 0.8,
+  "MinimumFreeNHSNumbers": 100000
+}

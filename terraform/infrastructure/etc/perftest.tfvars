@@ -1,9 +1,11 @@
 account_name     = "perftest"
 aws_account_name = "test"
 
-domain                                = "perftest.record-locator.national.nhs.uk"
-public_domain                         = "perftest.api.service.nhs.uk"
-deletion_protection                   = true
+dynamodb_pointers_table_prefix = "nhsd-nrlf--perftest"
+
+domain        = "perftest.record-locator.national.nhs.uk"
+public_domain = "perftest.api.service.nhs.uk"
+
 log_retention_period                  = 30
 enable_reporting                      = false
 disable_firehose_lambda_subscriptions = true

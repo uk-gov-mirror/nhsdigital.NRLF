@@ -91,7 +91,10 @@ class DocumentPointer(DynamoDBModel):
 
     @classmethod
     def from_document_reference(
-        cls, resource: DocumentReference, created_on: Optional[str] = None
+        cls,
+        resource: DocumentReference,
+        created_on: Optional[str] = None,
+        source: str = "NRLF",
     ) -> "DocumentPointer":
         resource_id = getattr(resource, "id")
 
@@ -144,7 +147,7 @@ class DocumentPointer(DynamoDBModel):
             type_id=type_id,
             category=pointer_category,
             category_id=category_id,
-            source="NRLF",
+            source=source,
             version=1,
             document=resource.model_dump_json(exclude_none=True),
             created_on=created_on or create_fhir_instant(),

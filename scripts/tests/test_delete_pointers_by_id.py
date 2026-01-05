@@ -233,14 +233,15 @@ class TestBatchDeletePointers:
 class TestDeletePointersById:
     def test_missing_params(self):
         with pytest.raises(
-            ValueError, match="Provide either pointers_to_delete or pointers_file"
+            ValueError,
+            match="Must provide either --pointers_to_delete or --pointers_file",
         ):
             _delete_pointers_by_id("t", "G3H9E")
 
     def test_both_params_provided(self):
         with pytest.raises(
             ValueError,
-            match="Provide either pointers_to_delete or pointers_file, not both",
+            match="Cannot provide both --pointers_to_delete and --pointers_file",
         ):
             _delete_pointers_by_id(
                 "t", "G3H9E", pointers_to_delete=["a"], pointers_file="./f"
