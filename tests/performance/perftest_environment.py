@@ -5,6 +5,7 @@ import pathlib
 import re
 
 import boto3
+from seed_data_constants import CHECKSUM_WEIGHTS
 
 DYNAMODB = boto3.resource("dynamodb", region_name="eu-west-2")
 
@@ -53,10 +54,6 @@ def extract_consumer_data(output_dir="."):
     }
     pathlib.Path(out).write_text(json.dumps(data))
     print(f"Consumer data written to {out}")  # noqa: T201
-
-
-# Semi-deterministic NHS number generator (duplicated from seed_nft_tables.py)
-CHECKSUM_WEIGHTS = [i for i in range(10, 1, -1)]
 
 
 class TestNhsNumbersIterator:

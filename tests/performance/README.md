@@ -50,12 +50,13 @@ make truststore-pull-all ENV=perftest
 You will need to generate pointer permissions the first time performance tests are run in an environment e.g. if the perftest environment is destroyed & recreated.
 
 ```sh
+# In project root
 make generate permissions   # makes a bunch of json permission files for test organisations
 make build  # will take all permissions & create nrlf_permissions.zip file
 
 # apply this new permissions zip file to your environment
 cd ./terraform/infrastructure
-assume test
+assume nhsd-nrlf-test
 make init TF_WORKSPACE_NAME=perftest-1 ENV=perftest
 make ENV=perftest USE_SHARED_RESOURCES=true apply
 ```
@@ -63,6 +64,7 @@ make ENV=perftest USE_SHARED_RESOURCES=true apply
 #### Generate input files
 
 ```sh
+assume nhsd-nrlf-test
 # creates 2 csv files and a json file
 make perftest-prepare PERFTEST_TABLE_NAME=perftest-baseline
 ```
