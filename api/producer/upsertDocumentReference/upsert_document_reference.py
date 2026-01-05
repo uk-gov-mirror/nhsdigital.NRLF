@@ -270,7 +270,7 @@ def handler(
             nhs_number, [pointer_type]
         )
 
-        if existing_pointers_count > 0:
+        if existing_pointers_count > 0 and not nhs_number.startswith("9"):
             logger.log(
                 LogReference.PROUPSERT012,
                 new_pointer_id=core_model.id,
