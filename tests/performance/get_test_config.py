@@ -25,7 +25,6 @@ def get_public_mode_config(env_name: str) -> dict:
     try:
         boto_session = get_boto_session(env_name)
 
-        # TODO: Add secret specific to performance tests
         params_secret = f"nhsd-nrlf--{env_name}--smoke-test-parameters"
         params = get_secret(params_secret, boto_session)
 
