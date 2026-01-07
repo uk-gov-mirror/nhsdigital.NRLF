@@ -1,4 +1,5 @@
-import { POINTER_TYPES, ODS_CODE } from "./constants.js";
+import { POINTER_TYPES } from "./constants.js";
+import exec from "k6/execution";
 
 let config = null;
 
@@ -24,7 +25,7 @@ function initConfig() {
       baseUrl: __ENV.TEST_PUBLIC_BASE_URL.replace(/\/$/, ""),
       consumerPath: "/consumer/FHIR/R4",
       producerPath: "/producer/FHIR/R4",
-      odsCode: ODS_CODE,
+      // odsCode: ODS_CODE,
       bearerToken: configData.bearer_token,
     };
 
@@ -40,7 +41,7 @@ function initConfig() {
       baseUrl: `https://${__ENV.HOST}`,
       consumerPath: "/consumer",
       producerPath: "/producer",
-      odsCode: ODS_CODE,
+      // odsCode: ODS_CODE,
       bearerToken: null,
     };
   }
@@ -48,35 +49,35 @@ function initConfig() {
   return config;
 }
 
-export function getHeaders(appId = "K6PerformanceTest") {
+export function getHeaders(odsCode, actorType) {
   const cfg = initConfig();
 
   const baseHeaders = {
     "Content-Type": "application/fhir+json",
-    "X-Request-Id": appId,
-    "NHSD-Correlation-Id": appId,
+    "X-Request-Id": `K6perftest-${actorType}-${exec.scenario.name}-${exec.vu.idInTest}-${exec.vu.iterationInScenario}`,
+    "NHSD-Correlation-Id": `K6perftest-${actorType}-${exec.scenario.name}-${exec.vu.idInTest}-${exec.vu.iterationInScenario}`,
   };
 
   if (cfg.connectMode === "internal") {
     return {
       ...baseHeaders,
       "NHSD-Connection-Metadata": JSON.stringify({
-        "nrl.ods-code": cfg.odsCode,
+        "nrl.ods-code": odsCode,
         "nrl.pointer-types": POINTER_TYPES.map(
           (type) => `http://snomed.info/sct|${type}`
         ),
-        "nrl.app-id": appId,
+        "nrl.app-id": "K6PerformanceTest",
       }),
       "NHSD-Client-RP-Details": JSON.stringify({
-        "developer.app.name": appId,
-        "developer.app.id": appId,
+        "developer.app.name": "K6PerformanceTest",
+        "developer.app.id": "K6PerformanceTest",
       }),
     };
   } else {
     return {
       ...baseHeaders,
       Authorization: `Bearer ${cfg.bearerToken}`,
-      "NHSD-End-User-Organisation-ODS": cfg.odsCode,
+      "NHSD-End-User-Organisation-ODS": odsCode,
     };
   }
 }

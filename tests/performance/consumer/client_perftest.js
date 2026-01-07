@@ -2,6 +2,7 @@ import http from "k6/http";
 import { check } from "k6";
 import exec from "k6/execution";
 import { CATEGORY_TYPE_GROUPS } from "../type-category-mappings.js";
+import { getHeaders, getFullUrl } from "../test-config.js";
 
 const csvPath = __ENV.DIST_PATH
   ? `../../../${__ENV.DIST_PATH}/producer_reference_data.csv`
@@ -22,21 +23,21 @@ function getNextPointer() {
   return { pointer_id, pointer_type, nhs_number };
 }
 
-function getHeaders(odsCode) {
-  return {
-    "Content-Type": "application/fhir+json",
-    "X-Request-Id": `K6perftest-consumer-${exec.scenario.name}-${exec.vu.idInTest}-${exec.vu.iterationInScenario}`,
-    "NHSD-Correlation-Id": `K6perftest-consumer-${exec.scenario.name}-${exec.vu.idInTest}-${exec.vu.iterationInScenario}`,
-    "NHSD-Connection-Metadata": JSON.stringify({
-      "nrl.ods-code": odsCode,
-      "nrl.app-id": "K6PerformanceTest",
-    }),
-    "NHSD-Client-RP-Details": JSON.stringify({
-      "developer.app.name": "K6PerformanceTest",
-      "developer.app.id": "K6PerformanceTest",
-    }),
-  };
-}
+// function getHeaders(odsCode) {
+//   return {
+//     "Content-Type": "application/fhir+json",
+//     "X-Request-Id": `K6perftest-consumer-${exec.scenario.name}-${exec.vu.idInTest}-${exec.vu.iterationInScenario}`,
+//     "NHSD-Correlation-Id": `K6perftest-consumer-${exec.scenario.name}-${exec.vu.idInTest}-${exec.vu.iterationInScenario}`,
+//     "NHSD-Connection-Metadata": JSON.stringify({
+//       "nrl.ods-code": odsCode,
+//       "nrl.app-id": "K6PerformanceTest",
+//     }),
+//     "NHSD-Client-RP-Details": JSON.stringify({
+//       "developer.app.name": "K6PerformanceTest",
+//       "developer.app.id": "K6PerformanceTest",
+//     }),
+//   };
+// }
 
 function getCustodianFromPointerId(pointer_id) {
   // pointer_id format is "CUSTODIAN-XXXX"
@@ -63,26 +64,22 @@ export function countDocumentReference() {
   const identifier = encodeURIComponent(
     `https://fhir.nhs.uk/Id/nhs-number|${nhs_number}`
   );
+  const path = `/DocumentReference?_summary=count&subject:identifier=${identifier}`;
 
-  const res = http.get(
-    `https://${__ENV.HOST}/consumer/DocumentReference?_summary=count&subject:identifier=${identifier}`,
-    {
-      headers: getHeaders(custodian),
-    }
-  );
+  const res = http.get(getFullUrl(path, "consumer"), {
+    headers: getHeaders(custodian, "consumer"),
+  });
   checkResponse(res);
 }
 
 export function readDocumentReference() {
   const { pointer_id } = getNextPointer();
   const custodian = getCustodianFromPointerId(pointer_id);
+  const path = `/DocumentReference/${pointer_id}`;
 
-  const res = http.get(
-    `https://${__ENV.HOST}/consumer/DocumentReference/${pointer_id}`,
-    {
-      headers: getHeaders(custodian),
-    }
-  );
+  const res = http.get(getFullUrl(path, "consumer"), {
+    headers: getHeaders(custodian, "consumer"),
+  });
 
   checkResponse(res);
 }
@@ -95,13 +92,11 @@ export function searchDocumentReference() {
     `https://fhir.nhs.uk/Id/nhs-number|${nhs_number}`
   );
   const type = encodeURIComponent(`http://snomed.info/sct|${pointer_type}`);
+  const path = `/DocumentReference?subject:identifier=${identifier}&type=${type}`;
 
-  const res = http.get(
-    `https://${__ENV.HOST}/consumer/DocumentReference?subject:identifier=${identifier}&type=${type}`,
-    {
-      headers: getHeaders(custodian),
-    }
-  );
+  const res = http.get(getFullUrl(path, "consumer"), {
+    headers: getHeaders(custodian, "consumer"),
+  });
   checkResponse(res);
 }
 
@@ -117,12 +112,10 @@ export function searchDocumentReferenceByCategory() {
     `http://snomed.info/sct|${category_code}`
   );
 
-  const res = http.get(
-    `https://${__ENV.HOST}/consumer/DocumentReference?subject:identifier=${identifier}&category=${category}`,
-    {
-      headers: getHeaders(custodian),
-    }
-  );
+  const path = `/DocumentReference?subject:identifier=${identifier}&category=${category}`;
+  const res = http.get(getFullUrl(path, "consumer"), {
+    headers: getHeaders(custodian, "consumer"),
+  });
   checkResponse(res);
 }
 
@@ -135,13 +128,11 @@ export function searchPostDocumentReference() {
     type: `http://snomed.info/sct|${pointer_type}`,
   });
 
-  const res = http.post(
-    `https://${__ENV.HOST}/consumer/DocumentReference/_search`,
-    body,
-    {
-      headers: getHeaders(custodian),
-    }
-  );
+  const path = `/DocumentReference/_search`;
+
+  const res = http.post(getFullUrl(path, "consumer"), body, {
+    headers: getHeaders(custodian, "consumer"),
+  });
   checkResponse(res);
 }
 
@@ -155,13 +146,11 @@ export function searchPostDocumentReferenceByCategory() {
     category: `http://snomed.info/sct|${category_code}`,
   });
 
-  const res = http.post(
-    `https://${__ENV.HOST}/consumer/DocumentReference/_search`,
-    body,
-    {
-      headers: getHeaders(custodian),
-    }
-  );
+  const path = `/DocumentReference/_search`;
+
+  const res = http.post(getFullUrl(path, "consumer"), body, {
+    headers: getHeaders(custodian, "consumer"),
+  });
   checkResponse(res);
 }
 
@@ -173,13 +162,10 @@ export function countPostDocumentReference() {
     "subject:identifier": `https://fhir.nhs.uk/Id/nhs-number|${nhs_number}`,
   });
 
-  const res = http.post(
-    `https://${__ENV.HOST}/consumer/DocumentReference/_search?_summary=count`,
-    body,
-    {
-      headers: getHeaders(custodian),
-    }
-  );
+  const path = `/DocumentReference/_search?_summary=count`;
+  const res = http.post(getFullUrl(path, "consumer"), body, {
+    headers: getHeaders(custodian, "consumer"),
+  });
   checkResponse(res);
 }
 
@@ -198,14 +184,10 @@ export function searchPostDocumentReferenceAccessDenied() {
     "nrl.ods-code": deniedCustodian,
     "nrl.app-id": "K6PerformanceTest",
   });
-
-  const res = http.post(
-    `https://${__ENV.HOST}/consumer/DocumentReference/_search`,
-    body,
-    {
-      headers: headers,
-    }
-  );
+  const path = `/DocumentReference/_search`;
+  const res = http.post(getFullUrl(path, "consumer"), body, {
+    headers: getHeaders(deniedCustodian, "consumer"),
+  });
 
   const is_denied = check(res, { "status is 403": (r) => r.status === 403 });
   if (!is_denied) {
@@ -215,13 +197,10 @@ export function searchPostDocumentReferenceAccessDenied() {
 
 export function readDocumentReferenceNotFound() {
   const { custodian } = getNextPointer();
-
-  const res = http.get(
-    `https://${__ENV.HOST}/consumer/DocumentReference/NonExistentID`,
-    {
-      headers: getHeaders(custodian),
-    }
-  );
+  const path = `/DocumentReference/NonExistentID`;
+  const res = http.post(getFullUrl(path, "consumer"), body, {
+    headers: getHeaders(custodian, "consumer"),
+  });
 
   // we expect a 404 here
   check(res, { "status is 404": (r) => r.status === 404 });

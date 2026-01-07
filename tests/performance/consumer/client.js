@@ -4,6 +4,7 @@ import {
   CATEGORIES,
   NHS_NUMBERS,
   POINTER_IDS,
+  ODS_CODE,
 } from "../constants.js";
 import http from "k6/http";
 import { check } from "k6";
@@ -25,7 +26,7 @@ export function countDocumentReference() {
 
   const path = `/DocumentReference?_summary=count&subject:identifier=${identifier}`;
   const res = http.get(getFullUrl(path, "consumer"), {
-    headers: getHeaders(),
+    headers: getHeaders(ODS_CODE, "consumer"),
   });
   checkResponse(res);
 }
@@ -36,7 +37,7 @@ export function readDocumentReference() {
 
   const path = `/DocumentReference/${id}`;
   const res = http.get(getFullUrl(path, "consumer"), {
-    headers: getHeaders(),
+    headers: getHeaders(ODS_CODE, "consumer"),
   });
 
   checkResponse(res);
@@ -54,7 +55,7 @@ export function searchDocumentReference() {
 
   const path = `/DocumentReference?subject:identifier=${identifier}&type=${type}`;
   const res = http.get(getFullUrl(path, "consumer"), {
-    headers: getHeaders(),
+    headers: getHeaders(ODS_CODE, "consumer"),
   });
   checkResponse(res);
 }
@@ -73,7 +74,7 @@ export function searchDocumentReferenceByCategory() {
 
   const path = `/DocumentReference?subject:identifier=${identifier}&category=${category}`;
   const res = http.get(getFullUrl(path, "consumer"), {
-    headers: getHeaders(),
+    headers: getHeaders(ODS_CODE, "consumer"),
   });
   checkResponse(res);
 }
@@ -90,7 +91,7 @@ export function searchPostDocumentReference() {
 
   const path = `/DocumentReference/_search`;
   const res = http.post(getFullUrl(path, "consumer"), body, {
-    headers: getHeaders(),
+    headers: getHeaders(ODS_CODE, "consumer"),
   });
   checkResponse(res);
 }
@@ -106,7 +107,7 @@ export function searchPostDocumentReferenceByCategory() {
 
   const path = `/DocumentReference/_search`;
   const res = http.post(getFullUrl(path, "consumer"), body, {
-    headers: getHeaders(),
+    headers: getHeaders(ODS_CODE, "consumer"),
   });
   checkResponse(res);
 }
@@ -121,7 +122,7 @@ export function countPostDocumentReference() {
 
   const path = `/DocumentReference/_search?_summary=count`;
   const res = http.post(getFullUrl(path, "consumer"), body, {
-    headers: getHeaders(),
+    headers: getHeaders(ODS_CODE, "consumer"),
   });
   checkResponse(res);
 }
