@@ -23,6 +23,6 @@ variable "kms_deletion_window_in_days" {
 
 variable "enable_backups" {
   type        = bool
-  description = "Enable AwS cloud backup"
+  description = "Enable AWS cloud backup"
   default     = false
 }

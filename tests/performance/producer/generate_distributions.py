@@ -1,8 +1,10 @@
 import json
 from pathlib import Path
 
-# Import the constants from your seed_nft_tables.py
-from seed_nft_tables import DEFAULT_CUSTODIAN_DISTRIBUTIONS, DEFAULT_TYPE_DISTRIBUTIONS
+from tests.performance.seed_data_constants import (
+    DEFAULT_CUSTODIAN_DISTRIBUTIONS,
+    DEFAULT_TYPE_DISTRIBUTIONS,
+)
 
 
 def expand_distribution(dist):

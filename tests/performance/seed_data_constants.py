@@ -1,11 +1,3 @@
-import boto3
-
-dynamodb = boto3.client("dynamodb")
-resource = boto3.resource("dynamodb")
-
-
-# DOC_REF_TEMPLATE = load_document_reference("NFT-template")
-
 CHECKSUM_WEIGHTS = [i for i in range(10, 1, -1)]
 
 # These are based on the Nov 7th 2025 pointer stats report
@@ -66,3 +58,5 @@ DEFAULT_CUSTODIAN_DISTRIBUTIONS = {
         "TRXT": 1,
     },  # summary record currently has only one supplier
 }
+
+DEFAULT_COUNT_DISTRIBUTIONS = {"1": 91, "2": 8, "3": 1}
