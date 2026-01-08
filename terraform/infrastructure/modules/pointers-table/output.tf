@@ -17,3 +17,8 @@ output "kms_read_write_policy_arn" {
   description = "Policy to encrypt and decrypt the pointers table with the kms key"
   value       = aws_iam_policy.pointers-kms-read-write.arn
 }
+
+output "kms_key_arn" {
+  description = "KMS key arn for the pointers table"
+  value       = aws_kms_key.pointers-table-key.arn
+}

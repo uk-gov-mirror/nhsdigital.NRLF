@@ -22,8 +22,8 @@ from nrlf.core.logger import logger
 from nrlf.tests.data import load_document_reference
 from tests.performance.seed_data_constants import (  # DEFAULT_COUNT_DISTRIBUTIONS,
     CHECKSUM_WEIGHTS,
-    DEFAULT_CUSTODIAN_DISTRIBUTIONS,
-    DEFAULT_TYPE_DISTRIBUTIONS,
+    CUSTODIAN_DISTRIBUTION_PROFILES,
+    TYPE_DISTRIBUTION_PROFILES,
 )
 
 dynamodb = boto3.client("dynamodb")
@@ -87,22 +87,24 @@ def _populate_seed_table(
     table_name: str,
     px_with_pointers: int,
     pointers_per_px: float = 1.0,
-    type_dists: dict[str, int] = DEFAULT_TYPE_DISTRIBUTIONS,
-    custodian_dists: dict[str, dict[str, int]] = DEFAULT_CUSTODIAN_DISTRIBUTIONS,
+    type_dist_profile: str = "default",
+    custodian_dist_profile: str = "default",
 ):
     """
     Seeds a table with example data for non-functional testing.
     """
     if pointers_per_px < 1.0:
         raise ValueError("Cannot populate table with patients with zero pointers")
+
+    type_dists = TYPE_DISTRIBUTION_PROFILES[type_dist_profile]
+    custodian_dists = CUSTODIAN_DISTRIBUTION_PROFILES[custodian_dist_profile]
+
     # set up iterations
     type_iter = _set_up_cyclical_iterator(type_dists)
     custodian_iters = _set_up_custodian_iterators(custodian_dists)
-    # count_iter = _set_up_cyclical_iterator(DEFAULT_COUNT_DISTRIBUTIONS)
     count_iter = _get_pointer_count_poisson_distributions(
         px_with_pointers, pointers_per_px
     )
-    # count_iter = _get_pointer_count_negbinom_distributions(px_with_pointers, pointers_per_px)
     testnum_cls = TestNhsNumbersIterator()
     testnum_iter = iter(testnum_cls)
 
