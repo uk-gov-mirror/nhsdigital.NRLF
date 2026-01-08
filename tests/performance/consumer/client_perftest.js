@@ -23,22 +23,6 @@ function getNextPointer() {
   return { pointer_id, pointer_type, nhs_number };
 }
 
-// function getHeaders(odsCode) {
-//   return {
-//     "Content-Type": "application/fhir+json",
-//     "X-Request-Id": `K6perftest-consumer-${exec.scenario.name}-${exec.vu.idInTest}-${exec.vu.iterationInScenario}`,
-//     "NHSD-Correlation-Id": `K6perftest-consumer-${exec.scenario.name}-${exec.vu.idInTest}-${exec.vu.iterationInScenario}`,
-//     "NHSD-Connection-Metadata": JSON.stringify({
-//       "nrl.ods-code": odsCode,
-//       "nrl.app-id": "K6PerformanceTest",
-//     }),
-//     "NHSD-Client-RP-Details": JSON.stringify({
-//       "developer.app.name": "K6PerformanceTest",
-//       "developer.app.id": "K6PerformanceTest",
-//     }),
-//   };
-// }
-
 function getCustodianFromPointerId(pointer_id) {
   // pointer_id format is "CUSTODIAN-XXXX"
   return pointer_id.split("-")[0];
