@@ -17,9 +17,6 @@ module "consumer__readDocumentReference" {
   }
   additional_policies = [
     local.pointers_table_read_policy_arn,
-    #local.pointers_kms_read_write_arn,
-    #aws_iam_policy.pointers-table-read.arn,
-    #aws_iam_policy.pointers-kms-read-write.arn,
     local.auth_store_read_policy_arn
   ]
   firehose_subscriptions = local.firehose_lambda_subscriptions
@@ -46,9 +43,6 @@ module "consumer__searchDocumentReference" {
   }
   additional_policies = [
     local.pointers_table_read_policy_arn,
-    #local.pointers_kms_read_write_arn,
-    #aws_iam_policy.pointers-table-read.arn,
-    #aws_iam_policy.pointers-kms-read-write.arn,
     local.auth_store_read_policy_arn
   ]
   firehose_subscriptions = local.firehose_lambda_subscriptions
@@ -75,9 +69,6 @@ module "consumer__searchPostDocumentReference" {
   }
   additional_policies = [
     local.pointers_table_read_policy_arn,
-    #local.pointers_kms_read_write_arn,
-    #aws_iam_policy.pointers-table-read.arn,
-    #aws_iam_policy.pointers-kms-read-write.arn,
     local.auth_store_read_policy_arn
   ]
   firehose_subscriptions = local.firehose_lambda_subscriptions
@@ -105,9 +96,6 @@ module "producer__createDocumentReference" {
   additional_policies = [
     local.pointers_table_write_policy_arn,
     local.pointers_table_read_policy_arn,
-    #aws_iam_policy.pointers-table-read.arn,
-    #aws_iam_policy.pointers-table-write.arn,
-    #aws_iam_policy.pointers-table-write.arn,
     local.auth_store_read_policy_arn
   ]
   firehose_subscriptions = local.firehose_lambda_subscriptions
@@ -135,10 +123,6 @@ module "producer__deleteDocumentReference" {
   additional_policies = [
     local.pointers_table_write_policy_arn,
     local.pointers_table_read_policy_arn,
-    #local.pointers_kms_read_write_arn,
-    #aws_iam_policy.pointers-table-read.arn,
-    #aws_iam_policy.pointers-table-write.arn,
-    #aws_iam_policy.pointers-kms-read-write.arn,
     local.auth_store_read_policy_arn
   ]
   firehose_subscriptions = local.firehose_lambda_subscriptions
@@ -165,9 +149,6 @@ module "producer__readDocumentReference" {
   }
   additional_policies = [
     local.pointers_table_read_policy_arn,
-    #local.pointers_kms_read_write_arn,
-    #aws_iam_policy.pointers-table-read.arn,
-    #aws_iam_policy.pointers-kms-read-write.arn,
     local.auth_store_read_policy_arn
   ]
   firehose_subscriptions = local.firehose_lambda_subscriptions
@@ -194,9 +175,6 @@ module "producer__searchDocumentReference" {
   }
   additional_policies = [
     local.pointers_table_read_policy_arn,
-    #local.pointers_kms_read_write_arn,
-    #aws_iam_policy.pointers-table-read.arn,
-    #aws_iam_policy.pointers-kms-read-write.arn,
     local.auth_store_read_policy_arn
   ]
   firehose_subscriptions = local.firehose_lambda_subscriptions
@@ -223,9 +201,6 @@ module "producer__searchPostDocumentReference" {
   }
   additional_policies = [
     local.pointers_table_read_policy_arn,
-    #local.pointers_kms_read_write_arn,
-    #aws_iam_policy.pointers-table-read.arn,
-    #aws_iam_policy.pointers-kms-read-write.arn,
     local.auth_store_read_policy_arn
   ]
   firehose_subscriptions = local.firehose_lambda_subscriptions
@@ -253,10 +228,6 @@ module "producer__updateDocumentReference" {
   additional_policies = [
     local.pointers_table_read_policy_arn,
     local.pointers_table_write_policy_arn,
-    #local.pointers_kms_read_write_arn,
-    #aws_iam_policy.pointers-table-read.arn,
-    #aws_iam_policy.pointers-table-write.arn,
-    #aws_iam_policy.pointers-kms-read-write.arn,
     local.auth_store_read_policy_arn
   ]
   firehose_subscriptions = local.firehose_lambda_subscriptions
@@ -284,10 +255,6 @@ module "producer__upsertDocumentReference" {
   additional_policies = [
     local.pointers_table_write_policy_arn,
     local.pointers_table_read_policy_arn,
-    #local.pointers_kms_read_write_arn,
-    #aws_iam_policy.pointers-table-read.arn,
-    #aws_iam_policy.pointers-table-write.arn,
-    #aws_iam_policy.pointers-kms-read-write.arn,
     local.auth_store_read_policy_arn
   ]
   firehose_subscriptions = local.firehose_lambda_subscriptions
@@ -315,9 +282,6 @@ module "consumer__status" {
   }
   additional_policies = [
     local.pointers_table_read_policy_arn,
-    #local.pointers_kms_read_write_arn,
-    #aws_iam_policy.pointers-table-read.arn,
-    #aws_iam_policy.pointers-kms-read-write.arn,
     local.auth_store_read_policy_arn
   ]
   firehose_subscriptions = local.firehost_lambda_splunk_only_subscription
@@ -346,9 +310,6 @@ module "producer__status" {
   }
   additional_policies = [
     local.pointers_table_read_policy_arn,
-    #local.pointers_kms_read_write_arn,
-    #aws_iam_policy.pointers-table-read.arn,
-    #aws_iam_policy.pointers-kms-read-write.arn,
     local.auth_store_read_policy_arn
   ]
   firehose_subscriptions = local.firehost_lambda_splunk_only_subscription
