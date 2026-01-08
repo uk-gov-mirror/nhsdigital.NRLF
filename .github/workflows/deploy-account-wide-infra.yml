@@ -82,7 +82,7 @@ jobs:
             -var assume_role=terraform \
             -out tfplan
 
-      - name: Save Terraform Plan
+      - name: Save Terraform Plan Artifacts
         env:
           ACCOUNT_NAME: ${{ vars.ACCOUNT_NAME }}
         run: |
@@ -90,6 +90,7 @@ jobs:
 
           aws s3 cp terraform/account-wide-infrastructure/$ACCOUNT_NAME/tfplan s3://nhsd-nrlf--mgmt--github-ci-logging/acc-$ACCOUNT_NAME/${{ github.run_id }}/tfplan
           aws s3 cp terraform/account-wide-infrastructure/$ACCOUNT_NAME/tfplan.txt s3://nhsd-nrlf--mgmt--github-ci-logging/acc-$ACCOUNT_NAME/${{ github.run_id }}/tfplan.txt
+          aws s3 cp terraform/account-wide-infrastructure/modules/glue/files/src.zip s3://nhsd-nrlf--mgmt--github-ci-logging/acc-$ACCOUNT_NAME/${{ github.run_id }}/glue-src.zip
 
   terraform-apply:
     name: Terraform Apply - ${{ inputs.environment }}
@@ -115,10 +116,15 @@ jobs:
           role-to-assume: ${{ secrets.MGMT_ROLE_ARN }}
           role-session-name: github-actions-ci-${{ inputs.environment }}-${{ github.run_id}}
 
-      - name: Download Terraform Plan artifact
+      - name: Download Terraform Plan Artifacts
         env:
           ACCOUNT_NAME: ${{ vars.ACCOUNT_NAME }}
-        run: aws s3 cp s3://nhsd-nrlf--mgmt--github-ci-logging/acc-$ACCOUNT_NAME/${{ github.run_id }}/tfplan terraform/account-wide-infrastructure/${ACCOUNT_NAME}/tfplan
+        run: |
+          aws s3 cp s3://nhsd-nrlf--mgmt--github-ci-logging/acc-$ACCOUNT_NAME/${{ github.run_id }}/tfplan terraform/account-wide-infrastructure/${ACCOUNT_NAME}/tfplan
+          aws s3 cp s3://nhsd-nrlf--mgmt--github-ci-logging/acc-$ACCOUNT_NAME/${{ github.run_id }}/tfplan.txt terraform/account-wide-infrastructure/${ACCOUNT_NAME}/tfplan.txt
+
+          mkdir -p terraform/account-wide-infrastructure/modules/glue/files
+          aws s3 cp s3://nhsd-nrlf--mgmt--github-ci-logging/acc-$ACCOUNT_NAME/${{ github.run_id }}/glue-src.zip terraform/account-wide-infrastructure/modules/glue/files/src.zip
 
       - name: Retrieve Server Certificates
         env:
