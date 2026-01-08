@@ -302,9 +302,17 @@ perftest-consumer-internal:
 	@echo "Running consumer performance tests with HOST=$(PERFTEST_HOST) and ENV_TYPE=$(ENV_TYPE) and DIST_PATH=$(DIST_PATH)"
 	k6 run tests/performance/consumer/perftest.js -e HOST=$(PERFTEST_HOST) -e ENV_TYPE=$(ENV_TYPE) -e DIST_PATH=$(DIST_PATH)
 
-perftest-consumer-public:
-	@echo "Running consumer performance tests with HOST=$(PERFTEST_HOST) and ENV_TYPE=$(ENV_TYPE) and DIST_PATH=$(DIST_PATH)"
-	k6 run tests/performance/consumer/perftest.js -e HOST=$(PERFTEST_HOST) -e ENV_TYPE=$(ENV_TYPE) -e DIST_PATH=$(DIST_PATH)
+perftest-consumer-public: check-warn ## Run the consumer perftests for the external access points
+	@echo "Fetching public mode configuration and bearer token..."
+	@CONFIG_FILE=$$(mktemp /tmp/perf_config_XXXXXX); \
+	trap "rm -f $$CONFIG_FILE" EXIT; \
+	PYTHONPATH=. python3 tests/performance/get_test_config.py $(ENV_TYPE) 2>&1 | tail -n 1 > $$CONFIG_FILE; \
+	PUBLIC_BASE_URL=$$(jq -r '.public_base_url' $$CONFIG_FILE); \
+	echo "Running public consumer perftests with ENV_TYPE=$(ENV_TYPE) and DIST_PATH=$(DIST_PATH)"; \
+	TEST_CONNECT_MODE=public \
+	TEST_PUBLIC_BASE_URL=$$PUBLIC_BASE_URL \
+	TEST_CONFIG_FILE=$$CONFIG_FILE \
+		k6 run tests/performance/consumer/perftest.js -e ENV_TYPE=$(ENV_TYPE) -e DIST_PATH=$(DIST_PATH)
 
 perftest-prep-generate-producer-data:
 	@echo "Generating producer reference with PERFTEST_TABLE_NAME=$(PERFTEST_TABLE_NAME) and DIST_PATH=$(DIST_PATH)"
