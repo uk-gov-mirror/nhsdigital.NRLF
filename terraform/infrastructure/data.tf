@@ -17,22 +17,12 @@ data "aws_iam_policy" "auth-store-read-policy" {
 
 data "aws_dynamodb_table" "pointers-table" {
   count = var.use_shared_resources ? 1 : 0
-  name  = "${local.pointers_table_prefix}-pointers-table"
+  name  = local.shared_pointers_table_name
 }
 
-data "aws_iam_policy" "pointers-table-read" {
-  count = var.use_shared_resources ? 1 : 0
-  name  = "${local.pointers_table_prefix}-pointers-table-read"
-}
-
-data "aws_iam_policy" "pointers-table-write" {
-  count = var.use_shared_resources ? 1 : 0
-  name  = "${local.pointers_table_prefix}-pointers-table-write"
-}
-
-data "aws_iam_policy" "pointers-kms-read-write" {
-  count = var.use_shared_resources ? 1 : 0
-  name  = "${local.pointers_table_prefix}-pointers-kms-read-write"
+data "aws_kms_key" "pointers-table-key" {
+  count  = var.use_shared_resources ? 1 : 0
+  key_id = "alias/${local.shared_pointers_table_name}-key"
 }
 
 data "external" "current-info" {
