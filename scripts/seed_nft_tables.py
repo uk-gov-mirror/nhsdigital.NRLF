@@ -85,15 +85,15 @@ def _make_seed_pointer(
 
 def _populate_seed_table(
     table_name: str,
-    px_with_pointers: int,
-    pointers_per_px: float = 1.0,
+    patients_with_pointers: int,
+    pointers_per_patient: float = 1.0,
     type_dist_profile: str = "default",
     custodian_dist_profile: str = "default",
 ):
     """
     Seeds a table with example data for non-functional testing.
     """
-    if pointers_per_px < 1.0:
+    if pointers_per_patient < 1.0:
         raise ValueError("Cannot populate table with patients with zero pointers")
 
     type_dists = TYPE_DISTRIBUTION_PROFILES[type_dist_profile]
@@ -103,15 +103,15 @@ def _populate_seed_table(
     type_iter = _set_up_cyclical_iterator(type_dists)
     custodian_iters = _set_up_custodian_iterators(custodian_dists)
     count_iter = _get_pointer_count_poisson_distributions(
-        px_with_pointers, pointers_per_px
+        patients_with_pointers, pointers_per_patient
     )
     testnum_cls = TestNhsNumbersIterator()
     testnum_iter = iter(testnum_cls)
 
-    px_counter = 0
-    doc_ref_target = int(pointers_per_px * px_with_pointers)
+    patient_counter = 0
+    doc_ref_target = int(pointers_per_patient * patients_with_pointers)
     print(
-        f"Will upsert ~{doc_ref_target} test pointers for {px_with_pointers} patients."
+        f"Will upsert ~{doc_ref_target} test pointers for {patients_with_pointers} patients."
     )
     doc_ref_counter = 0
     batch_counter = 0
@@ -122,10 +122,13 @@ def _populate_seed_table(
     start_time = datetime.now(tz=timezone.utc)
 
     batch_upsert_items: list[dict[str, Any]] = []
-    while px_counter < px_with_pointers:
-        pointers_for_px = int(next(count_iter))
+    while patient_counter < patients_with_pointers:
+        pointers_for_patient = int(next(count_iter))
 
-        if batch_counter + pointers_for_px > 25 or px_counter == px_with_pointers:
+        if (
+            batch_counter + pointers_for_patient > 25
+            or patient_counter == patients_with_pointers
+        ):
             response = resource.batch_write_item(
                 RequestItems={table_name: batch_upsert_items}
             )
@@ -138,15 +141,15 @@ def _populate_seed_table(
             batch_upsert_items = []
             batch_counter = 0
 
-        new_px = next(testnum_iter)
-        for _ in range(pointers_for_px):
+        new_patient = next(testnum_iter)
+        for _ in range(pointers_for_patient):
             new_type = next(type_iter)
             new_custodian = next(custodian_iters[new_type])
             doc_ref_counter += 1
             batch_counter += 1
 
             pointer = _make_seed_pointer(
-                new_type, new_custodian, new_px, doc_ref_counter
+                new_type, new_custodian, new_patient, doc_ref_counter
             )
             put_req = {"PutRequest": {"Item": pointer.model_dump()}}
             batch_upsert_items.append(put_req)
@@ -158,12 +161,14 @@ def _populate_seed_table(
                     pointer.nhs_number,
                 ]
             )
-        px_counter += 1
+        patient_counter += 1
 
-        if px_counter % 1000 == 0:
+        if patient_counter % 1000 == 0:
             print(".", end="", flush=True)
-        if px_counter % 100000 == 0:
-            print(f" {px_counter} patients processed ({doc_ref_counter} pointers).")
+        if patient_counter % 100000 == 0:
+            print(
+                f" {patient_counter} patients processed ({doc_ref_counter} pointers)."
+            )
 
     print(" Done.")
 
