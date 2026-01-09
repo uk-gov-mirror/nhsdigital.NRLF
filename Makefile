@@ -260,20 +260,7 @@ perftest-consumer:
 	@echo "Running consumer performance tests with HOST=$(PERFTEST_HOST) and ENV_TYPE=$(ENV_TYPE) and DIST_PATH=$(DIST_PATH)"
 	k6 run tests/performance/consumer/perftest.js -e HOST=$(PERFTEST_HOST) -e ENV_TYPE=$(ENV_TYPE) -e DIST_PATH=$(DIST_PATH)
 
-perftest-prep-generate-producer-data:
-	@echo "Generating producer reference with PERFTEST_TABLE_NAME=$(PERFTEST_TABLE_NAME) and DIST_PATH=$(DIST_PATH)"
-	mkdir -p $(DIST_PATH)
-	PYTHONPATH=. poetry run python tests/performance/perftest_environment.py generate_producer_data --output_dir="$(DIST_PATH)"
-
-perftest-prep-extract-consumer-data:
-	@echo "Generating consumer reference with PERFTEST_TABLE_NAME=$(PERFTEST_TABLE_NAME) and DIST_PATH=$(DIST_PATH)"
-	mkdir -p $(DIST_PATH)
-	PYTHONPATH=. poetry run python tests/performance/perftest_environment.py extract_consumer_data --output_dir="$(DIST_PATH)"
-
-perftest-prep-generate-pointer-table-extract:
+perftest-prepare:
 	@echo "Generating pointer table extract with PERFTEST_TABLE_NAME=$(PERFTEST_TABLE_NAME) and DIST_PATH=$(DIST_PATH)"
 	mkdir -p $(DIST_PATH)
 	PYTHONPATH=. poetry run python tests/performance/perftest_environment.py generate_pointer_table_extract --output_dir="$(DIST_PATH)"
-
-perftest-prepare: perftest-prep-generate-producer-data perftest-prep-extract-consumer-data perftest-prep-generate-pointer-table-extract
-	@echo "Prepared performance tests with PERFTEST_TABLE_NAME=$(PERFTEST_TABLE_NAME) and DIST_PATH=$(DIST_PATH)"

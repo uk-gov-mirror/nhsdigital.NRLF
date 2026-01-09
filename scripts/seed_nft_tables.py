@@ -184,21 +184,22 @@ def _populate_seed_table(
         f"Created {doc_ref_counter} pointers in {timedelta.total_seconds(end_time - start_time)} seconds (unprocessed: {unprocessed_count})."
     )
 
-    with open("./dist/seed-nft-pointers.csv", "w") as f:
+    csv_out = "./dist/seed-nft-pointers.csv"
+    with open(csv_out, "w") as f:
         writer = csv.writer(f)
         writer.writerow(["pointer_id", "pointer_type", "custodian", "nhs_number"])
         writer.writerows(pointer_data)
-    print(f"Pointer data saved to ./dist/seed-nft-pointers.csv")  # noqa
+    print(f"Pointer data saved to {csv_out}")  # noqa
 
     s3 = get_s3_client()
     # generate_pointer_table_extract -- producer_reference_data.csv
     s3.put_object(
         Bucket=nrl_performance_test_bucket,
         Key="input/producer_reference_data.csv",
-        Body=open("./dist/seed-nft-pointers.csv", "rb"),
+        Body=open(csv_out, "rb"),
         ContentType="text/csv",
     )
-    print(f"Uploaded seed-nft-pointers.csv to S3 at input/producer_reference_data.csv")
+    print(f"Uploaded {csv_out} to S3 at input/producer_reference_data.csv")
 
 
 def _set_up_cyclical_iterator(dists: dict[str, int]) -> Iterator[str]:
