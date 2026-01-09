@@ -1,7 +1,8 @@
 from pathlib import Path
 
 import fire
-from seed_nft_tables import DEFAULT_CUSTODIAN_DISTRIBUTIONS
+
+from tests.performance.seed_data_constants import DEFAULT_CUSTODIAN_DISTRIBUTIONS
 
 
 def main(permissions_dir="../../dist/nrlf_permissions/K6PerformanceTest"):

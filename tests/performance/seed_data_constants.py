@@ -1,11 +1,3 @@
-import boto3
-
-dynamodb = boto3.client("dynamodb")
-resource = boto3.resource("dynamodb")
-
-
-# DOC_REF_TEMPLATE = load_document_reference("NFT-template")
-
 CHECKSUM_WEIGHTS = [i for i in range(10, 1, -1)]
 
 # These are based on the Nov 7th 2025 pointer stats report
@@ -65,4 +57,26 @@ DEFAULT_CUSTODIAN_DISTRIBUTIONS = {
     "824321000000109": {
         "TRXT": 1,
     },  # summary record currently has only one supplier
+}
+
+VOL_15M_POINTERS_TYPE_DISTRIBUTIONS = {"824321000000109": 1}
+
+VOL_15M_POINTERS_CUSTODIAN_DISTRIBUTIONS = {"16521000000101": {"TD2L9A": 1}}
+
+VOL_55M_POINTERS_TYPE_DISTRIBUTIONS = {"16521000000101": 1}
+
+VOL_55M_POINTERS_CUSTODIAN_DISTRIBUTIONS = {"16521000000101": {"TX26": 1}}
+
+DEFAULT_COUNT_DISTRIBUTIONS = {"1": 91, "2": 8, "3": 1}
+
+TYPE_DISTRIBUTION_PROFILES = {
+    "default": DEFAULT_TYPE_DISTRIBUTIONS,
+    "15m_pointers": VOL_15M_POINTERS_TYPE_DISTRIBUTIONS,
+    "55m_pointers": VOL_55M_POINTERS_TYPE_DISTRIBUTIONS,
+}
+
+CUSTODIAN_DISTRIBUTION_PROFILES = {
+    "default": DEFAULT_CUSTODIAN_DISTRIBUTIONS,
+    "15m_pointers": VOL_15M_POINTERS_CUSTODIAN_DISTRIBUTIONS,
+    "55m_pointers": VOL_55M_POINTERS_CUSTODIAN_DISTRIBUTIONS,
 }
