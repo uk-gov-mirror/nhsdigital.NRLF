@@ -25,7 +25,6 @@ function initConfig() {
       baseUrl: __ENV.TEST_PUBLIC_BASE_URL.replace(/\/$/, ""),
       consumerPath: "/consumer/FHIR/R4",
       producerPath: "/producer/FHIR/R4",
-      // odsCode: ODS_CODE,
       bearerToken: configData.bearer_token,
     };
 
@@ -41,7 +40,6 @@ function initConfig() {
       baseUrl: `https://${__ENV.HOST}`,
       consumerPath: "/consumer",
       producerPath: "/producer",
-      // odsCode: ODS_CODE,
       bearerToken: null,
     };
   }
