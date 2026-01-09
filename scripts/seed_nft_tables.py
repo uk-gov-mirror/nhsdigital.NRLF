@@ -1,4 +1,5 @@
 import csv
+import os
 from datetime import datetime, timedelta, timezone
 from itertools import cycle
 from math import gcd
@@ -11,6 +12,7 @@ import fire
 # import json
 import numpy as np
 
+from nrlf.core.boto import get_s3_client
 from nrlf.core.constants import (
     CATEGORY_ATTRIBUTES,
     SNOMED_SYSTEM_URL,
@@ -24,6 +26,11 @@ from tests.performance.seed_data_constants import (  # DEFAULT_COUNT_DISTRIBUTIO
     CHECKSUM_WEIGHTS,
     CUSTODIAN_DISTRIBUTION_PROFILES,
     TYPE_DISTRIBUTION_PROFILES,
+)
+
+nrl_env = os.getenv("ENV", "perftest")
+nrl_performance_test_bucket = os.getenv(
+    "NRL_PERFORMANCE_TEST_BUCKET_NAME", f"nhsd-nrlf--{nrl_env}-performance-test"
 )
 
 dynamodb = boto3.client("dynamodb")
@@ -182,6 +189,16 @@ def _populate_seed_table(
         writer.writerow(["pointer_id", "pointer_type", "custodian", "nhs_number"])
         writer.writerows(pointer_data)
     print(f"Pointer data saved to ./dist/seed-nft-pointers.csv")  # noqa
+
+    s3 = get_s3_client()
+    # generate_pointer_table_extract -- producer_reference_data.csv
+    s3.put_object(
+        Bucket=nrl_performance_test_bucket,
+        Key="input/producer_reference_data.csv",
+        Body=open("./dist/seed-nft-pointers.csv", "rb"),
+        ContentType="text/csv",
+    )
+    print(f"Uploaded seed-nft-pointers.csv to S3 at input/producer_reference_data.csv")
 
 
 def _set_up_cyclical_iterator(dists: dict[str, int]) -> Iterator[str]:

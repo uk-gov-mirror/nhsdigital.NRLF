@@ -69,3 +69,8 @@ module "perftest-metadata-bucket" {
   source      = "../modules/metadata-bucket"
   name_prefix = "nhsd-nrlf--perftest"
 }
+
+module "perftest-performance-test-bucket" {
+  source      = "../modules/performance-test-bucket"
+  name_prefix = "nhsd-nrlf--perftest"
+}
