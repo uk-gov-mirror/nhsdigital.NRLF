@@ -50,7 +50,7 @@ def generate_pointer_table_extract(
     Generate a CSV file containing all pointer IDs, pointer type, custodian, and nhs_number (patient).
     """
     table_name = _get_pointers_table_name()
-    out = output_dir + f"/pointer-table-extract-{table_name}.csv"
+    out = output_dir + f"/seed-pointers-extract-{table_name}.csv"
     table = DYNAMODB.Table(table_name)
     scan_kwargs = {}
     done = False

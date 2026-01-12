@@ -88,8 +88,8 @@ def _make_seed_pointer(
     return nft_pointer
 
 
-def _write_pointer_extract_to_file(pointer_data):
-    local_csv_out = f"{nft_dist_path}/seed-pointers-extract.csv"
+def _write_pointer_extract_to_file(table_name, pointer_data):
+    local_csv_out = f"{nft_dist_path}/seed-pointers-extract-{table_name}.csv"
     local_meta_out = f"{nft_dist_path}/info.json"
 
     print(f"writing pointer extract to files {local_csv_out} {local_meta_out}")
@@ -183,7 +183,7 @@ def _populate_seed_table(
             pointer_data.append(
                 [
                     pointer.id,
-                    pointer.type,
+                    new_type,  # not full type url
                     pointer.custodian,
                     pointer.nhs_number,
                 ]
@@ -204,7 +204,7 @@ def _populate_seed_table(
         f"Created {doc_ref_counter} pointers in {timedelta.total_seconds(end_time - start_time)} seconds (unprocessed: {unprocessed_count})."
     )
 
-    _write_pointer_extract_to_file(pointer_data)
+    _write_pointer_extract_to_file(table_name, pointer_data)
 
 
 def _set_up_cyclical_iterator(dists: dict[str, int]) -> Iterator[str]:
