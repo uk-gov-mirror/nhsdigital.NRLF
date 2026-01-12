@@ -36,15 +36,6 @@ Currently, this requires tearing down the existing environment and restoring fro
 
 If you've followed these steps, you will also need to [generate permissions](#generate-permissions) as the organisation permissions will have been lost when the environment was torn down.
 
-### Prepare to run tests
-
-#### Pull certs for perftest
-
-```sh
-assume management
-make truststore-pull-all ENV=perftest
-```
-
 #### Generate permissions
 
 You will need to generate pointer permissions the first time performance tests are run in an environment e.g. if the perftest environment is destroyed & recreated.
@@ -61,6 +52,15 @@ make init TF_WORKSPACE_NAME=perftest-1 ENV=perftest
 make ENV=perftest USE_SHARED_RESOURCES=true apply
 ```
 
+### Prepare to run tests
+
+#### Pull certs for perftest
+
+```sh
+assume management
+make truststore-pull-all ENV=perftest
+```
+
 #### Generate input files
 
 ```sh
@@ -74,6 +74,17 @@ make perftest-prepare PERFTEST_TABLE_NAME=perftest-baseline
 ```sh
 make perftest-consumer ENV_TYPE=perftest PERFTEST_HOST=perftest-1.perftest.record-locator.national.nhs.uk
 make perftest-producer ENV_TYPE=perftest PERFTEST_HOST=perftest-1.perftest.record-locator.national.nhs.uk
+```
+
+## Seed data
+
+Must be run on an empty table. Cannot top up an existing set of pointers.
+
+```sh
+make perftest-seed-tables ENV=perftest \
+   PERFTEST_TABLE_NAME=nhsd-nrlf--perftest-anjali-test-2-pointers-table \
+   PERFTEST_PATIENTS_WITH_POINTERS=10 \
+   PERFTEST_POINTERS_PER_PATIENT=2
 ```
 
 ## Assumptions / Caveats

@@ -1,4 +1,4 @@
-# Duplicated by scripts/seed_data_constants.py :( Update both
+# Duplicate of tests/performance/seed_data_constants.py :( Update both
 
 CHECKSUM_WEIGHTS = [i for i in range(10, 1, -1)]
 

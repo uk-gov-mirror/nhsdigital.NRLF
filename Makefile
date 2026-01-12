@@ -260,9 +260,8 @@ perftest-seed-tables:	## Seed tables and upload generated perftest input files t
 	@echo "Seeding performance test pointer tables with ENV=$(ENV) and PERFTEST_TABLE_NAME=$(PERFTEST_TABLE_NAME) and PERFTEST_PATIENTS_WITH_POINTERS=$(PERFTEST_PATIENTS_WITH_POINTERS) and PERFTEST_POINTERS_PER_PATIENT=$(PERFTEST_POINTERS_PER_PATIENT) and PERFTEST_TYPE_DIST_PROFILE=$(PERFTEST_TYPE_DIST_PROFILE) and PERFTEST_CUSTODIAN_DIST_PROFILE=$(PERFTEST_CUSTODIAN_DIST_PROFILE)"
 	mkdir -p "${DIST_PATH}/nft"
 	@poetry run python ./scripts/seed_nft_tables.py --table_name=$(PERFTEST_TABLE_NAME) --patients_with_pointers=$(PERFTEST_PATIENTS_WITH_POINTERS) --pointers_per_patient=$(PERFTEST_POINTERS_PER_PATIENT) --type_dist_profile=$(PERFTEST_TYPE_DIST_PROFILE) --custodian_dist_profile=$(PERFTEST_CUSTODIAN_DIST_PROFILE)
-# 	@./scripts/get-current-info.sh > "${DIST_PATH}/nft/info.json"
-	zip -r "${DIST_PATH}/nft/pointer_extract-${PERFTEST_TABLE_NAME}.zip" "${DIST_PATH}/nft"
-	aws s3 cp "${DIST_PATH}/nft/pointer_extract-${PERFTEST_TABLE_NAME}.zip" "s3://nhsd-nrlf--${ENV}--metadata/performance/seed-pointers-extract-${PERFTEST_TABLE_NAME}.zip"
+	zip -r "${DIST_PATH}/pointer_extract-${PERFTEST_TABLE_NAME}.zip" "${DIST_PATH}/nft"
+	aws s3 cp "${DIST_PATH}/pointer_extract-${PERFTEST_TABLE_NAME}.zip" "s3://nhsd-nrlf--${ENV}-metadata/performance/seed-pointers-extract-${PERFTEST_TABLE_NAME}.zip"
 
 perftest-producer:
 	@echo "Running producer performance tests with HOST=$(PERFTEST_HOST) and ENV_TYPE=$(ENV_TYPE) and DIST_PATH=$(DIST_PATH)"

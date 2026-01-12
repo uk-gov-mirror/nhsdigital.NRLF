@@ -11,6 +11,11 @@ import fire
 
 # import json
 import numpy as np
+from seed_data_constants import (  # DEFAULT_COUNT_DISTRIBUTIONS,
+    CHECKSUM_WEIGHTS,
+    CUSTODIAN_DISTRIBUTION_PROFILES,
+    TYPE_DISTRIBUTION_PROFILES,
+)
 
 from nrlf.core.boto import get_s3_client
 from nrlf.core.constants import (
@@ -22,11 +27,6 @@ from nrlf.core.constants import (
 from nrlf.core.dynamodb.model import DocumentPointer
 from nrlf.core.logger import logger
 from nrlf.tests.data import load_document_reference
-from tests.performance.seed_data_constants import (  # DEFAULT_COUNT_DISTRIBUTIONS,
-    CHECKSUM_WEIGHTS,
-    CUSTODIAN_DISTRIBUTION_PROFILES,
-    TYPE_DISTRIBUTION_PROFILES,
-)
 
 dist_path = os.getenv("DIST_PATH", "./dist")
 nft_dist_path = f"{dist_path}/nft"
@@ -117,6 +117,12 @@ def _populate_seed_table(
     if pointers_per_patient < 1.0:
         raise ValueError("Cannot populate table with patients with zero pointers")
 
+    print(
+        f"Populating table {table_name} with patients_with_pointers={patients_with_pointers} pointers_per_patient={pointers_per_patient}",
+        type_dist_profile,
+        custodian_dist_profile,
+    )
+
     type_dists = TYPE_DISTRIBUTION_PROFILES[type_dist_profile]
     custodian_dists = CUSTODIAN_DISTRIBUTION_PROFILES[custodian_dist_profile]
 
@@ -141,9 +147,9 @@ def _populate_seed_table(
     pointer_data: list[list[str]] = []
 
     start_time = datetime.now(tz=timezone.utc)
-
     batch_upsert_items: list[dict[str, Any]] = []
-    while patient_counter < patients_with_pointers:
+
+    while patient_counter <= patients_with_pointers:
         pointers_for_patient = int(next(count_iter))
 
         if (
@@ -191,7 +197,7 @@ def _populate_seed_table(
                 f" {patient_counter} patients processed ({doc_ref_counter} pointers)."
             )
 
-    print(" Done.")
+    print("Done")
 
     end_time = datetime.now(tz=timezone.utc)
     print(
