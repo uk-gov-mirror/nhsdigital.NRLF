@@ -87,6 +87,17 @@ make perftest-seed-tables ENV=perftest \
    PERFTEST_POINTERS_PER_PATIENT=2
 ```
 
+### Refresh input files in S3
+
+Regenerates the input files from the current state of a given perftest table & uploads files to s3. These files are usually generated at the end of the seed tables make command (above).
+
+> Note: this can be an expensive operation for large table sizes.
+
+```sh
+make perftest-generate-pointer-table-extract \
+   PERFTEST_TABLE_NAME=nhsd-nrlf--perftest-anjali-test-2-pointers-table
+```
+
 ## Assumptions / Caveats
 
 - Run performance tests in the perftest environment only\*

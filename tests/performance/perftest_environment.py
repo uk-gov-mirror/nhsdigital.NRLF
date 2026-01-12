@@ -49,21 +49,18 @@ def generate_pointer_table_extract(
     """
     Generate a CSV file containing all pointer IDs, pointer type, custodian, and nhs_number (patient).
     """
-    out = output_dir + "/producer_reference_data.csv"
     table_name = _get_pointers_table_name()
+    out = output_dir + f"/pointer-table-extract-{table_name}.csv"
     table = DYNAMODB.Table(table_name)
     scan_kwargs = {}
     done = False
     start_key = None
     buffer = []
     buffer_size = 1_000_000  # 10k rows needs ~3MB of RAM, so 1M rows needs ~300MB
-    count = 1
 
     with open(out, "w", newline="") as csv_file:
         writer = csv.writer(csv_file)
-        writer.writerow(
-            ["count", "pointer_id", "pointer_type", "custodian", "nhs_number"]
-        )
+        writer.writerow(["pointer_id", "pointer_type", "custodian", "nhs_number"])
         while not done:
 
             if start_key:
@@ -80,7 +77,6 @@ def generate_pointer_table_extract(
                     [
                         str(field).strip()
                         for field in [
-                            count,
                             pointer_id,
                             pointer_type,
                             custodian,
@@ -88,7 +84,6 @@ def generate_pointer_table_extract(
                         ]
                     ]
                 )
-                count += 1
                 if len(buffer) >= buffer_size:
                     print("Writing buffer to CSV...")  # noqa: T201
                     writer.writerows(buffer)
@@ -98,7 +93,7 @@ def generate_pointer_table_extract(
         # Write any remaining rows in buffer
         if buffer:
             writer.writerows(buffer)
-    print(f"Producer CSV data written to {out}")  # noqa: T201
+    print(f"Pointer extract CSV data written to {out}")  # noqa: T201
 
 
 if __name__ == "__main__":
