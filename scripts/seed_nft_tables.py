@@ -28,10 +28,8 @@ from tests.performance.seed_data_constants import (  # DEFAULT_COUNT_DISTRIBUTIO
     TYPE_DISTRIBUTION_PROFILES,
 )
 
-nrl_env = os.getenv("ENV", "perftest")
-nrl_metadata_bucket = os.getenv(
-    "NRL_METADATA_BUCKET_NAME", f"nhsd-nrlf--{nrl_env}-metadata"
-)
+dist_path = os.getenv("DIST_PATH", "./dist")
+nft_dist_path = f"{dist_path}/nft"
 
 dynamodb = boto3.client("dynamodb")
 resource = boto3.resource("dynamodb")
@@ -88,6 +86,22 @@ def _make_seed_pointer(
     )
     nft_pointer = DocumentPointer.from_document_reference(doc_ref, source="NFT-SEED")
     return nft_pointer
+
+
+def _write_pointer_extract_to_file(pointer_data):
+    local_csv_out = f"{nft_dist_path}/seed-pointers-extract.csv"
+    local_meta_out = f"{nft_dist_path}/info.json"
+
+    print(f"writing pointer extract to files {local_csv_out} {local_meta_out}")
+
+    with open(local_csv_out, "w") as file:
+        writer = csv.writer(file)
+        writer.writerow(["pointer_id", "pointer_type", "custodian", "nhs_number"])
+        writer.writerows(pointer_data)
+    print(f"Pointer data saved to {local_csv_out}")
+
+    os.system(f"./scripts/get-current-info.sh > {local_meta_out}")
+    print(f"Pointer extract metadata saved to {local_meta_out}")
 
 
 def _populate_seed_table(
@@ -184,21 +198,7 @@ def _populate_seed_table(
         f"Created {doc_ref_counter} pointers in {timedelta.total_seconds(end_time - start_time)} seconds (unprocessed: {unprocessed_count})."
     )
 
-    csv_out = "./dist/seed-nft-pointers.csv"
-    with open(csv_out, "w") as f:
-        writer = csv.writer(f)
-        writer.writerow(["pointer_id", "pointer_type", "custodian", "nhs_number"])
-        writer.writerows(pointer_data)
-    print(f"Pointer data saved to {csv_out}")  # noqa
-
-    s3 = get_s3_client()
-    s3.put_object(
-        Bucket=nrl_metadata_bucket,
-        Key="performance/seed-pointers-extract.csv",
-        Body=open(csv_out, "rb"),
-        ContentType="text/csv",
-    )
-    print(f"Uploaded {csv_out} to S3 at performance/seed-pointers-extract.csv")
+    _write_pointer_extract_to_file(pointer_data)
 
 
 def _set_up_cyclical_iterator(dists: dict[str, int]) -> Iterator[str]:
