@@ -29,8 +29,8 @@ from tests.performance.seed_data_constants import (  # DEFAULT_COUNT_DISTRIBUTIO
 )
 
 nrl_env = os.getenv("ENV", "perftest")
-nrl_performance_test_bucket = os.getenv(
-    "NRL_PERFORMANCE_TEST_BUCKET_NAME", f"nhsd-nrlf--{nrl_env}-performance-test"
+nrl_metadata_bucket = os.getenv(
+    "NRL_METADATA_BUCKET_NAME", f"nhsd-nrlf--{nrl_env}-metadata"
 )
 
 dynamodb = boto3.client("dynamodb")
@@ -192,14 +192,13 @@ def _populate_seed_table(
     print(f"Pointer data saved to {csv_out}")  # noqa
 
     s3 = get_s3_client()
-    # generate_pointer_table_extract -- producer_reference_data.csv
     s3.put_object(
-        Bucket=nrl_performance_test_bucket,
-        Key="input/producer_reference_data.csv",
+        Bucket=nrl_metadata_bucket,
+        Key="performance/seed-pointers-extract.csv",
         Body=open(csv_out, "rb"),
         ContentType="text/csv",
     )
-    print(f"Uploaded {csv_out} to S3 at input/producer_reference_data.csv")
+    print(f"Uploaded {csv_out} to S3 at performance/seed-pointers-extract.csv")
 
 
 def _set_up_cyclical_iterator(dists: dict[str, int]) -> Iterator[str]:
