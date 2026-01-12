@@ -263,15 +263,23 @@ perftest-seed-tables:	## Seed tables and upload generated perftest input files t
 	zip -r "${DIST_PATH}/pointer_extract-${PERFTEST_TABLE_NAME}.zip" "${DIST_PATH}/nft"
 	aws s3 cp "${DIST_PATH}/pointer_extract-${PERFTEST_TABLE_NAME}.zip" "s3://nhsd-nrlf--${ENV}-metadata/performance/seed-pointers-extract-${PERFTEST_TABLE_NAME}.zip"
 
-perftest-producer:
+perftest-prepare:	## Prepare input files for producer & consumer perf tests
+	@echo "Preparing performance tests with ENV=$(ENV) and PERFTEST_TABLE_NAME=$(PERFTEST_TABLE_NAME) and DIST_PATH=$(DIST_PATH)"
+	aws s3 cp "s3://nhsd-nrlf--${ENV}-metadata/performance/seed-pointers-extract-${PERFTEST_TABLE_NAME}.zip" "${DIST_PATH}/pointer_extract-${PERFTEST_TABLE_NAME}.zip"
+	unzip "${DIST_PATH}/pointer_extract-${PERFTEST_TABLE_NAME}.zip"
+	cp "${DIST_PATH}/nft/seed-pointers-extract-${PERFTEST_TABLE_NAME}.csv" "${DIST_PATH}/seed-pointers-extract.csv"
+	@poetry run python ./tests/performance/generate_producer_distributions.py
+
+# update these to look for s3 files downloaded by prep step
+perftest-producer:	## Run producer perf tests
 	@echo "Running producer performance tests with HOST=$(PERFTEST_HOST) and ENV_TYPE=$(ENV_TYPE) and DIST_PATH=$(DIST_PATH)"
 	k6 run tests/performance/producer/perftest.js -e HOST=$(PERFTEST_HOST) -e ENV_TYPE=$(ENV_TYPE) -e DIST_PATH=$(DIST_PATH)
 
-perftest-consumer:
+perftest-consumer:	## Run consumer perf tests
 	@echo "Running consumer performance tests with HOST=$(PERFTEST_HOST) and ENV_TYPE=$(ENV_TYPE) and DIST_PATH=$(DIST_PATH)"
 	k6 run tests/performance/consumer/perftest.js -e HOST=$(PERFTEST_HOST) -e ENV_TYPE=$(ENV_TYPE) -e DIST_PATH=$(DIST_PATH)
 
-perftest-generate-pointer-table-extract:
+perftest-generate-pointer-table-extract:	## Refresh the perf test input files in s3. Can be expensive to run on large tables
 	@echo "Generating pointer table extract with PERFTEST_TABLE_NAME=$(PERFTEST_TABLE_NAME) and DIST_PATH=$(DIST_PATH)"
 	mkdir -p "${DIST_PATH}/nft"
 	PYTHONPATH=. poetry run python tests/performance/perftest_environment.py generate_pointer_table_extract --output_dir="${DIST_PATH}/nft"
