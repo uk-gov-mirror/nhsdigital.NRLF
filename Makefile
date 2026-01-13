@@ -288,7 +288,7 @@ generate-models: check-warn ## Generate Pydantic Models
 
 
 generate-perftest-permissions: ## Generate perftest permissions and add to nrlf_permissions
-	poetry run python tests/performance/producer/generate_permissions.py --output_dir="$(DIST_PATH)/nrlf_permissions/K6PerformanceTest"
+	PYTHONPATH=. poetry run python tests/performance/producer/generate_permissions.py --output_dir="$(DIST_PATH)/nrlf_permissions/K6PerformanceTest"
 
 perftest-producer:
 	@echo "Running producer performance tests with HOST=$(PERFTEST_HOST) and ENV_TYPE=$(ENV_TYPE) and DIST_PATH=$(DIST_PATH)"
