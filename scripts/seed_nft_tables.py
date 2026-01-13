@@ -11,11 +11,6 @@ import fire
 
 # import json
 import numpy as np
-from seed_data_constants import (  # DEFAULT_COUNT_DISTRIBUTIONS,
-    CHECKSUM_WEIGHTS,
-    CUSTODIAN_DISTRIBUTION_PROFILES,
-    TYPE_DISTRIBUTION_PROFILES,
-)
 
 from nrlf.core.boto import get_s3_client
 from nrlf.core.constants import (
@@ -27,6 +22,11 @@ from nrlf.core.constants import (
 from nrlf.core.dynamodb.model import DocumentPointer
 from nrlf.core.logger import logger
 from nrlf.tests.data import load_document_reference
+from tests.performance.seed_data_constants import (  # DEFAULT_COUNT_DISTRIBUTIONS,
+    CHECKSUM_WEIGHTS,
+    CUSTODIAN_DISTRIBUTION_PROFILES,
+    TYPE_DISTRIBUTION_PROFILES,
+)
 
 dist_path = os.getenv("DIST_PATH", "./dist")
 nft_dist_path = f"{dist_path}/nft"

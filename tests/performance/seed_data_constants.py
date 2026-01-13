@@ -1,5 +1,3 @@
-# Duplicated by scripts/seed_data_constants.py :( Update both
-
 CHECKSUM_WEIGHTS = [i for i in range(10, 1, -1)]
 
 # These are based on the Nov 7th 2025 pointer stats report

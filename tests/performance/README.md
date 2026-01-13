@@ -8,6 +8,13 @@ We have performance tests which give us a benchmark of how NRLF performs under l
 
 Perf tests are generally conducted in the perftest env. There's a selection of tables in the perftest env representing different pointer volume scenarios e.g. perftest-baseline vs perftest-1million (todo: update with real names!).
 
+#### Pull certs for perftest
+
+```sh
+assume nhsd-nrlf-mgmt
+make truststore-pull-all ENV=perftest
+```
+
 #### Point perftest at a different pointers table
 
 We (will) have multiple tables representing different states of NRLF in the future e.g. all patients receiving an IPS (International Patient Summary), onboarding particular high-volume suppliers.
@@ -42,31 +49,24 @@ You will need to generate pointer permissions the first time performance tests a
 
 ```sh
 # In project root
-make generate permissions   # makes a bunch of json permission files for test organisations
+make perftest-generate-permissions   # makes a bunch of json permission files for test organisations
 make build  # will take all permissions & create nrlf_permissions.zip file
 
 # apply this new permissions zip file to your environment
 cd ./terraform/infrastructure
-assume nhsd-nrlf-test
+assume nhsd-nrlf-mgmt
 make init TF_WORKSPACE_NAME=perftest-1 ENV=perftest
 make ENV=perftest USE_SHARED_RESOURCES=true apply
 ```
 
 ### Prepare to run tests
 
-#### Pull certs for perftest
-
-```sh
-assume management
-make truststore-pull-all ENV=perftest
-```
-
-#### Generate input files
+Prepare input files
 
 ```sh
 assume nhsd-nrlf-test
-# creates 2 csv files and a json file
-make perftest-prepare PERFTEST_TABLE_NAME=perftest-baseline
+# PERFTEST_TABLE_NAME = pointer table currently pointed to by perftest env
+make perftest-prepare PERFTEST_TABLE_NAME=nhsd-nrlf--perftest-baseline-pointers-table ENV=perftest
 ```
 
 ### Run tests

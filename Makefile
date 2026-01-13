@@ -253,24 +253,26 @@ generate-models: check-warn ## Generate Pydantic Models
 		--output-model-type "pydantic_v2.BaseModel"
 
 
-generate-perftest-permissions: ## Generate perftest permissions and add to nrlf_permissions
-	poetry run python tests/performance/producer/generate_permissions.py --output_dir="$(DIST_PATH)/nrlf_permissions/K6PerformanceTest"
+perftest-generate-permissions: ## Generate perftest permissions and add to nrlf_permissions
+	PYTHONPATH=. poetry run python tests/performance/producer/generate_permissions.py --output_dir="$(DIST_PATH)/nrlf_permissions/K6PerformanceTest"
 
 perftest-seed-tables:	## Seed tables and upload generated perftest input files to s3
 	@echo "Seeding performance test pointer tables with ENV=$(ENV) and PERFTEST_TABLE_NAME=$(PERFTEST_TABLE_NAME) and PERFTEST_PATIENTS_WITH_POINTERS=$(PERFTEST_PATIENTS_WITH_POINTERS) and PERFTEST_POINTERS_PER_PATIENT=$(PERFTEST_POINTERS_PER_PATIENT) and PERFTEST_TYPE_DIST_PROFILE=$(PERFTEST_TYPE_DIST_PROFILE) and PERFTEST_CUSTODIAN_DIST_PROFILE=$(PERFTEST_CUSTODIAN_DIST_PROFILE)"
+	rm -rf "${DIST_PATH}/nft"
 	mkdir -p "${DIST_PATH}/nft"
-	@poetry run python ./scripts/seed_nft_tables.py --table_name=$(PERFTEST_TABLE_NAME) --patients_with_pointers=$(PERFTEST_PATIENTS_WITH_POINTERS) --pointers_per_patient=$(PERFTEST_POINTERS_PER_PATIENT) --type_dist_profile=$(PERFTEST_TYPE_DIST_PROFILE) --custodian_dist_profile=$(PERFTEST_CUSTODIAN_DIST_PROFILE)
+	PYTHONPATH=. poetry run python ./scripts/seed_nft_tables.py --table_name=$(PERFTEST_TABLE_NAME) --patients_with_pointers=$(PERFTEST_PATIENTS_WITH_POINTERS) --pointers_per_patient=$(PERFTEST_POINTERS_PER_PATIENT) --type_dist_profile=$(PERFTEST_TYPE_DIST_PROFILE) --custodian_dist_profile=$(PERFTEST_CUSTODIAN_DIST_PROFILE)
 	zip -r "${DIST_PATH}/pointer_extract-${PERFTEST_TABLE_NAME}.zip" "${DIST_PATH}/nft"
 	aws s3 cp "${DIST_PATH}/pointer_extract-${PERFTEST_TABLE_NAME}.zip" "s3://nhsd-nrlf--${ENV}-metadata/performance/seed-pointers-extract-${PERFTEST_TABLE_NAME}.zip"
 
 perftest-prepare:	## Prepare input files for producer & consumer perf tests
 	@echo "Preparing performance tests with ENV=$(ENV) and PERFTEST_TABLE_NAME=$(PERFTEST_TABLE_NAME) and DIST_PATH=$(DIST_PATH)"
+	rm -rf "${DIST_PATH}/nft"
+	mkdir -p "${DIST_PATH}/nft"
 	aws s3 cp "s3://nhsd-nrlf--${ENV}-metadata/performance/seed-pointers-extract-${PERFTEST_TABLE_NAME}.zip" "${DIST_PATH}/pointer_extract-${PERFTEST_TABLE_NAME}.zip"
 	unzip "${DIST_PATH}/pointer_extract-${PERFTEST_TABLE_NAME}.zip"
 	cp "${DIST_PATH}/nft/seed-pointers-extract-${PERFTEST_TABLE_NAME}.csv" "${DIST_PATH}/seed-pointers-extract.csv"
-	@poetry run python ./tests/performance/generate_producer_distributions.py
+	PYTHONPATH=. poetry run python ./tests/performance/generate_producer_distributions.py
 
-# update these to look for s3 files downloaded by prep step
 perftest-producer:	## Run producer perf tests
 	@echo "Running producer performance tests with HOST=$(PERFTEST_HOST) and ENV_TYPE=$(ENV_TYPE) and DIST_PATH=$(DIST_PATH)"
 	k6 run tests/performance/producer/perftest.js -e HOST=$(PERFTEST_HOST) -e ENV_TYPE=$(ENV_TYPE) -e DIST_PATH=$(DIST_PATH)
@@ -281,6 +283,7 @@ perftest-consumer:	## Run consumer perf tests
 
 perftest-generate-pointer-table-extract:	## Refresh the perf test input files in s3. Can be expensive to run on large tables
 	@echo "Generating pointer table extract with PERFTEST_TABLE_NAME=$(PERFTEST_TABLE_NAME) and DIST_PATH=$(DIST_PATH)"
+	rm -rf "${DIST_PATH}/nft"
 	mkdir -p "${DIST_PATH}/nft"
 	PYTHONPATH=. poetry run python tests/performance/perftest_environment.py generate_pointer_table_extract --output_dir="${DIST_PATH}/nft"
 	./scripts/get-current-info.sh > "${DIST_PATH}/nft/info.json"
