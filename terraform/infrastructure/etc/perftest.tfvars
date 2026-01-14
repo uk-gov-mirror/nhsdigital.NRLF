@@ -1,7 +1,7 @@
 account_name     = "perftest"
 aws_account_name = "test"
 
-dynamodb_pointers_table_name = "nhsd-nrlf--perftest-anjali-test-pointers-table"
+dynamodb_pointers_table_name = "nhsd-nrlf--perftest-baseline-pointers-table"
 
 domain        = "perftest.record-locator.national.nhs.uk"
 public_domain = "perftest.api.service.nhs.uk"
