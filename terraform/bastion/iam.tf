@@ -44,7 +44,7 @@ resource "aws_iam_policy" "dynamodb-table-read" {
           "dynamodb:GetItem",
         ],
         Resource = [
-          "${data.aws_dynamodb_table.dynamodb-table[0].arn}*"
+          "${data.aws_dynamodb_table.dynamodb-table[0].arn}"
         ]
       }
     ]
@@ -76,7 +76,7 @@ resource "aws_iam_policy" "dynamodb-table-write" {
           "dynamodb:DeleteItem",
         ],
         Resource = [
-          "${data.aws_dynamodb_table.dynamodb-table[0].arn}*"
+          "${data.aws_dynamodb_table.dynamodb-table[0].arn}"
         ]
       }
     ]
