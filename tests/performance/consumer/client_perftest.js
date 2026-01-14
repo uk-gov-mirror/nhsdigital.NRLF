@@ -17,7 +17,7 @@ function getNextPointer() {
   const iter = exec.vu.iterationInScenario;
   const index = iter % dataLines.length;
   const line = dataLines[index];
-  const [count, pointer_id, pointer_type, custodian, nhs_number] = line
+  const [pointer_id, pointer_type, custodian, nhs_number] = line
     .split(",")
     .map((field) => field.trim());
   return { pointer_id, pointer_type, nhs_number };

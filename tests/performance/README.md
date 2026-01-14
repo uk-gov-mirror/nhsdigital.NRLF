@@ -52,7 +52,8 @@ You will need to generate pointer permissions the first time performance tests a
 ```sh
 # In project root
 make generate permissions   # makes a bunch of json permission files for test organisations
-make build  # will take all permissions & create nrlf_permissions.zip file
+make get-s3-perms ENV=perftest   # will take all permissions & create nrlf_permissions.zip file
+make build
 
 # apply this new permissions zip file to your environment
 cd ./terraform/infrastructure
@@ -74,6 +75,12 @@ make perftest-prepare PERFTEST_TABLE_NAME=perftest-baseline
 ```sh
 make perftest-consumer ENV_TYPE=perftest PERFTEST_HOST=perftest-1.perftest.record-locator.national.nhs.uk
 make perftest-producer ENV_TYPE=perftest PERFTEST_HOST=perftest-1.perftest.record-locator.national.nhs.uk
+```
+
+### Run public tests
+
+```sh
+
 ```
 
 ## Assumptions / Caveats

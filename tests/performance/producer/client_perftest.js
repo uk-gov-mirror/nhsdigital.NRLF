@@ -40,7 +40,7 @@ function getNextPointer() {
   const index = iter % dataLines.length;
   const line = dataLines[index];
   // Adjust field names as per CSV columns: count,pointer_id,pointer_type,custodian,nhs_number
-  const [count, pointer_id, pointer_type, custodian, nhs_number] = line
+  const [pointer_id, pointer_type, custodian, nhs_number] = line
     .split(",")
     .map((field) => field.trim());
   return { pointer_id, pointer_type, custodian, nhs_number };
