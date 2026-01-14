@@ -33,5 +33,5 @@ module "ref-pointers-table" {
 
 module "perftest-pointers-table" {
   source      = "../modules/pointers-table"
-  name_prefix = "nhsd-nrlf--perftest-baseline"
+  name_prefix = "nhsd-nrlf--perftest"
 }
