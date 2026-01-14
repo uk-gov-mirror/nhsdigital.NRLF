@@ -3,8 +3,8 @@ ENV ?= dev
 TF_ARGS ?=
 ENV_ACCOUNT_NAME ?= $(shell ../../scripts/get-account-name-for-env.sh $(ENV))
 ENV_ACCOUNT_ID ?= $(shell aws secretsmanager get-secret-value --secret-id nhsd-nrlf--mgmt--$(ENV_ACCOUNT_NAME)-account-id --query SecretString --output text)
-BASTION_VPC_NAME ?= nhsd-nrlf--$(ENV)-vpc
-BASTION_SUBNET_NAME ?= nhsd-nrlf--$(ENV)-privsubnet
+BASTION_VPC_NAME ?= nhsd-nrlf--$(ENV_ACCOUNT_NAME)-vpc
+BASTION_SUBNET_NAME ?= nhsd-nrlf--$(ENV_ACCOUNT_NAME)-privsubnet
 POINTERS_TABLE_NAME ?= nhsd-nrlf--$(ENV)-pointers-table
 
 export ENV ENV_ACCOUNT_NAME POINTERS_TABLE_NAME
@@ -35,3 +35,18 @@ plan-rw: ## Plan the Terraform changes for a bastion that can perform write oper
 		-var allow_dynamodb_table_write=true \
 		$(TF_ARGS) \
 		-out=./bastion.tfplan
+
+destroy: ## Destroy the bastion
+	terraform destroy \
+		-var assume_account=$(ENV_ACCOUNT_ID) \
+		-var assume_role=terraform \
+		-var vpc_name=$(BASTION_VPC_NAME) \
+		-var subnet_name=$(BASTION_SUBNET_NAME) \
+		-var dynamodb_table_name=$(POINTERS_TABLE_NAME) \
+		$(TF_ARGS)
+
+ssh-connection: ## Connect to the bastion via SSH
+	@echo "Connecting to bastion via SSM connect...."
+	AWS_ACCOUNT_ID=$(ENV_ACCOUNT_ID) \
+	AWS_ROLE_NAME=terraform \
+		./scripts/start-bastion-connection.sh $(shell terraform output -raw instance_id)

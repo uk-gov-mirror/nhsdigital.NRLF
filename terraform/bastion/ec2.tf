@@ -6,6 +6,8 @@ resource "aws_instance" "node" {
   associate_public_ip_address = false
   iam_instance_profile        = aws_iam_instance_profile.instance-profile.name
 
+  user_data = file("./scripts/user-data.sh")
+
   tags = {
     Name = "${local.prefix}-node"
   }
@@ -34,7 +36,7 @@ resource "aws_key_pair" "ec2_key_pair" {
 }
 
 resource "aws_secretsmanager_secret" "bastion_ssh_key_secret" {
-  name        = "${local.prefix}-ssh-key"
+  name_prefix = "${local.prefix}-ssh-key"
   description = "Private SSH key for accessing the bastion host"
 }
 
