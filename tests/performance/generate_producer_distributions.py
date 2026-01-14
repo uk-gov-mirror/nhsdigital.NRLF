@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from seed_data_constants import (
+from tests.performance.seed_data_constants import (
     DEFAULT_CUSTODIAN_DISTRIBUTIONS,
     DEFAULT_TYPE_DISTRIBUTIONS,
 )

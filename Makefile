@@ -270,7 +270,7 @@ perftest-prepare:	## Prepare input files for producer & consumer perf tests
 	mkdir -p "${DIST_PATH}/nft"
 	aws s3 cp "s3://nhsd-nrlf--${ENV}-metadata/performance/seed-pointers-extract-${PERFTEST_TABLE_NAME}.zip" "${DIST_PATH}/pointer_extract-${PERFTEST_TABLE_NAME}.zip"
 	unzip "${DIST_PATH}/pointer_extract-${PERFTEST_TABLE_NAME}.zip"
-	cp "${DIST_PATH}/nft/seed-pointers-extract-${PERFTEST_TABLE_NAME}.csv" "${DIST_PATH}/seed-pointers-extract.csv"
+# 	cp "${DIST_PATH}/nft/seed-pointers-extract-${PERFTEST_TABLE_NAME}.csv" "${DIST_PATH}/seed-pointers-extract.csv"
 	PYTHONPATH=. poetry run python ./tests/performance/generate_producer_distributions.py
 
 perftest-producer:	## Run producer perf tests

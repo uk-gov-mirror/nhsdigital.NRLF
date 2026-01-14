@@ -36,7 +36,7 @@ Currently, this requires tearing down the existing environment and restoring fro
      2. once backed up, delete your table. In the AWS console: dynamodb > tables > your perftest table > actions > delete table
      3. Rerun the Deploy Account-wide infrastructure action.
      4. Terraform will create an empty table with the correct name & (most importantly!) read/write IAM policies.
-     5. Delete the empty table created by terraform and restore from the backup, specifying the same table name you've defined in code.
+     5. Delete the empty table created by terraform and restore from the backup, specifying the same table name you've defined in code & selecting the matching customer managed encryption key.
 6. Run the [Persistent Environment Deploy](https://github.com/NHSDigital/NRLF/actions/workflows/persistent-environment.yml) workflow against your branch & `perftest` to restore the environment with lambdas pointed at your chosen table.
 7. You can check this has been successful by checking the table name in the lambdas.
    - In the AWS console: Lambda > functions > pick any perftest-1 lambda > Configuration > Environment variables > `TABLE_NAME` should be your desired pointer table e.g. `nhsd-nrlf--perftest-baseline-pointers-table`

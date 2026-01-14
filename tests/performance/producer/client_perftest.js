@@ -6,9 +6,8 @@ import { crypto } from "k6/experimental/webcrypto";
 import { createRecord } from "../setup.js";
 import exec from "k6/execution";
 
-const csvPath = __ENV.DIST_PATH
-  ? `../../../${__ENV.DIST_PATH}/seed-pointers-extract.csv`
-  : "../seed-pointers-extract.csv";
+const distPath = __ENV.DIST_PATH || "./dist";
+const csvPath = `../../../${distPath}/nft/seed-pointers-extract.csv`;
 const csv = open(csvPath);
 const lines = csv.trim().split("\n");
 // Skip header

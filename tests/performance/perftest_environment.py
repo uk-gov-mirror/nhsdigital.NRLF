@@ -1,9 +1,11 @@
 import csv
+import json
 import os
 import re
 
 import boto3
-from seed_data_constants import CHECKSUM_WEIGHTS
+
+from tests.performance.seed_data_constants import CHECKSUM_WEIGHTS
 
 DYNAMODB = boto3.resource("dynamodb", region_name="eu-west-2")
 
@@ -17,6 +19,26 @@ def _get_pointers_table_name():
         return perftest_table_name
 
     return f"nhsd-nrlf--{perftest_table_name}-pointers-table"
+
+
+def create_extract_metadata_file(
+    table_name: str,
+    output_dir=".",
+):
+    meta_out = output_dir + f"/info.json"
+
+    os.system(f"./scripts/get-current-info.sh > {meta_out}.temp")
+
+    with open(f"{meta_out}.temp", "r") as temp_f:
+        metadata = json.load(temp_f)
+        # Set any additional metadata fields (e.g. table name) as needed
+        metadata["table_name"] = table_name
+        with open(f"{meta_out}", "w+") as f:
+            json.dump(metadata, f, indent=2)
+
+    os.system(f"rm {meta_out}.temp")
+
+    print(f"Pointer extract metadata saved to {meta_out}")  # noqa: T201
 
 
 class TestNhsNumbersIterator:
@@ -50,7 +72,7 @@ def generate_pointer_table_extract(
     Generate a CSV file containing all pointer IDs, pointer type, custodian, and nhs_number (patient).
     """
     table_name = _get_pointers_table_name()
-    out = output_dir + f"/seed-pointers-extract-{table_name}.csv"
+    out = output_dir + f"/seed-pointers-extract.csv"
     table = DYNAMODB.Table(table_name)
     scan_kwargs = {}
     done = False
@@ -94,6 +116,8 @@ def generate_pointer_table_extract(
         if buffer:
             writer.writerows(buffer)
     print(f"Pointer extract CSV data written to {out}")  # noqa: T201
+
+    create_extract_metadata_file(table_name, output_dir)
 
 
 if __name__ == "__main__":

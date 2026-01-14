@@ -8,8 +8,6 @@ from typing import Any, Iterator
 
 import boto3
 import fire
-
-# import json
 import numpy as np
 
 from nrlf.core.boto import get_s3_client
@@ -22,6 +20,7 @@ from nrlf.core.constants import (
 from nrlf.core.dynamodb.model import DocumentPointer
 from nrlf.core.logger import logger
 from nrlf.tests.data import load_document_reference
+from tests.performance.perftest_environment import create_extract_metadata_file
 from tests.performance.seed_data_constants import (  # DEFAULT_COUNT_DISTRIBUTIONS,
     CHECKSUM_WEIGHTS,
     CUSTODIAN_DISTRIBUTION_PROFILES,
@@ -89,7 +88,7 @@ def _make_seed_pointer(
 
 
 def _write_pointer_extract_to_file(table_name, pointer_data):
-    local_csv_out = f"{nft_dist_path}/seed-pointers-extract-{table_name}.csv"
+    local_csv_out = f"{nft_dist_path}/seed-pointers-extract.csv"
     local_meta_out = f"{nft_dist_path}/info.json"
 
     print(f"writing pointer extract to files {local_csv_out} {local_meta_out}")
@@ -100,8 +99,7 @@ def _write_pointer_extract_to_file(table_name, pointer_data):
         writer.writerows(pointer_data)
     print(f"Pointer data saved to {local_csv_out}")
 
-    os.system(f"./scripts/get-current-info.sh > {local_meta_out}")
-    print(f"Pointer extract metadata saved to {local_meta_out}")
+    create_extract_metadata_file(table_name, nft_dist_path)
 
 
 def _populate_seed_table(
