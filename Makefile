@@ -302,7 +302,7 @@ perftest-consumer-public: check-warn ## Run the consumer perftests for the exter
 	@echo "Fetching public mode configuration and bearer token..."
 	@CONFIG_FILE=$$(mktemp /tmp/perf_config_XXXXXX); \
 	trap "rm -f $$CONFIG_FILE" EXIT; \
-	PYTHONPATH=. python3 tests/performance/get_test_config.py $(ENV_TYPE) 2>&1 | tail -n 1 > $$CONFIG_FILE; \
+	PYTHONPATH=. poetry run python tests/performance/get_test_config.py $(ENV_TYPE) 2>&1 | tail -n 1 > $$CONFIG_FILE; \
 	PUBLIC_BASE_URL=$$(jq -r '.public_base_url' $$CONFIG_FILE); \
 	echo "Running public consumer perftests with ENV_TYPE=$(ENV_TYPE) and DIST_PATH=$(DIST_PATH)"; \
 	TEST_CONNECT_MODE=public \
