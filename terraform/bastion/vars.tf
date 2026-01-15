@@ -38,6 +38,11 @@ variable "allow_dynamodb_table_write" {
   default     = false
 }
 
+variable "s3_metadata_bucket_name" {
+  type        = string
+  description = "The name of the S3 metadata bucket"
+}
+
 variable "ami_name_match" {
   type        = string
   description = "The name or wildecard for the AMI name for the bastion host"
@@ -47,5 +52,5 @@ variable "ami_name_match" {
 variable "instance_type" {
   type        = string
   description = "The EC2 instance type for the bastion"
-  default     = "t3a.micro"
+  default     = "t3a.medium"
 }

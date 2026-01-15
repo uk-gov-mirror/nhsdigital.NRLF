@@ -74,9 +74,35 @@ resource "aws_iam_policy" "dynamodb-table-write" {
           "dynamodb:PutItem",
           "dynamodb:UpdateItem",
           "dynamodb:DeleteItem",
+          "dynamodb:BatchWriteItem"
         ],
         Resource = [
           "${data.aws_dynamodb_table.dynamodb-table[0].arn}"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "s3-metadata-bucket-readwrite" {
+  name        = "${local.prefix}-allow-s3-metadata-bucket-readwrite"
+  description = "Read and write access to the S3 metadata bucket"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:ListBucket",
+          "s3:HeadObject",
+          "s3:PutObject",
+          "s3:PutObjectAcl",
+          "s3:DeleteObject"
+        ],
+        Resource = [
+          "arn:aws:s3:::${var.s3_metadata_bucket_name}",
+          "arn:aws:s3:::${var.s3_metadata_bucket_name}/*"
         ]
       }
     ]
@@ -99,4 +125,9 @@ resource "aws_iam_role_policy_attachment" "dynamodb-table-write-attachment" {
   count      = var.allow_dynamodb_table_write && var.dynamodb_table_name != null ? 1 : 0
   role       = aws_iam_role.instance-role.name
   policy_arn = aws_iam_policy.dynamodb-table-write[0].arn
+}
+
+resource "aws_iam_role_policy_attachment" "s3-metadata-bucket-readwrite-attachment" {
+  role       = aws_iam_role.instance-role.name
+  policy_arn = aws_iam_policy.s3-metadata-bucket-readwrite.arn
 }

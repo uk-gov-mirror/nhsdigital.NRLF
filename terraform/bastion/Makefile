@@ -6,6 +6,7 @@ ENV_ACCOUNT_ID ?= $(shell aws secretsmanager get-secret-value --secret-id nhsd-n
 BASTION_VPC_NAME ?= nhsd-nrlf--$(ENV_ACCOUNT_NAME)-vpc
 BASTION_SUBNET_NAME ?= nhsd-nrlf--$(ENV_ACCOUNT_NAME)-privsubnet
 POINTERS_TABLE_NAME ?= nhsd-nrlf--$(ENV)-pointers-table
+S3_METADATA_BUCKET_NAME ?= nhsd-nrlf--$(ENV)-metadata
 
 export ENV ENV_ACCOUNT_NAME POINTERS_TABLE_NAME
 
@@ -22,6 +23,7 @@ plan-ro: ## Plan the Terraform changes for a bastion that can perform read-only 
 		-var vpc_name=$(BASTION_VPC_NAME) \
 		-var subnet_name=$(BASTION_SUBNET_NAME) \
 		-var dynamodb_table_name=$(POINTERS_TABLE_NAME) \
+		-var s3_metadata_bucket_name=$(S3_METADATA_BUCKET_NAME) \
 		$(TF_ARGS) \
 		-out=./bastion.tfplan
 
@@ -33,6 +35,7 @@ plan-rw: ## Plan the Terraform changes for a bastion that can perform write oper
 		-var subnet_name=$(BASTION_SUBNET_NAME) \
 		-var dynamodb_table_name=$(POINTERS_TABLE_NAME) \
 		-var allow_dynamodb_table_write=true \
+		-var s3_metadata_bucket_name=$(S3_METADATA_BUCKET_NAME) \
 		$(TF_ARGS) \
 		-out=./bastion.tfplan
 
@@ -43,6 +46,7 @@ destroy: ## Destroy the bastion
 		-var vpc_name=$(BASTION_VPC_NAME) \
 		-var subnet_name=$(BASTION_SUBNET_NAME) \
 		-var dynamodb_table_name=$(POINTERS_TABLE_NAME) \
+		-var s3_metadata_bucket_name=$(S3_METADATA_BUCKET_NAME) \
 		$(TF_ARGS)
 
 ssh-connection: ## Connect to the bastion via SSH
