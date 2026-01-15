@@ -109,7 +109,7 @@ def generate_client_assertion(app_secrets: dict):
             "sub": app_secrets["api_key"],
             "aud": app_secrets["oauth_url"],
             "jti": str(uuid4()),
-            "exp": time() + 300,
+            "exp": time() + 300,  # max:312, still times out at just < 10 mins :(
         },
         app_secrets["private_key"],
         algorithm="RS512",

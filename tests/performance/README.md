@@ -72,9 +72,20 @@ make perftest-prepare PERFTEST_TABLE_NAME=nhsd-nrlf--perftest-baseline-pointers-
 
 ### Run tests
 
+#### Internal mode
+
 ```sh
-make perftest-consumer ENV_TYPE=perftest PERFTEST_HOST=perftest-1.perftest.record-locator.national.nhs.uk
-make perftest-producer ENV_TYPE=perftest PERFTEST_HOST=perftest-1.perftest.record-locator.national.nhs.uk
+make perftest-consumer-internal ENV_TYPE=perftest PERFTEST_HOST=perftest-1.perftest.record-locator.national.nhs.uk
+make perftest-producer-internal ENV_TYPE=perftest PERFTEST_HOST=perftest-1.perftest.record-locator.national.nhs.uk
+```
+
+#### Public mode
+
+Via apigee proxies - most similar to a supplier
+
+```sh
+make perftest-consumer-public ENV=perftest
+make perftest-producer-public ENV=perftest
 ```
 
 ## Seed data
