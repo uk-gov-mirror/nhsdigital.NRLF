@@ -90,7 +90,7 @@ su: user some_other does not exist or the user entry does not contain all the re
 $
 ```
 
-If you've just created a new bastion, you may need to wait a little until the cloud-init script has. You can check the status of this process with:
+If you've just created a new bastion, you may need to wait a little until the cloud-init script has finished. You can check the status of this process with:
 
 ```
 sudo tail -f /var/log/cloud-init-output.log
