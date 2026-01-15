@@ -8,6 +8,13 @@ We have performance tests which give us a benchmark of how NRLF performs under l
 
 Perf tests are generally conducted in the perftest env. There's a selection of tables in the perftest env representing different pointer volume scenarios e.g. perftest-baseline vs perftest-1million (todo: update with real names!).
 
+#### Pull certs for perftest
+
+```sh
+assume nhsd-nrlf-mgmt
+make truststore-pull-all ENV=perftest
+```
+
 #### Point perftest at a different pointers table
 
 We (will) have multiple tables representing different states of NRLF in the future e.g. all patients receiving an IPS (International Patient Summary), onboarding particular high-volume suppliers.
@@ -29,21 +36,12 @@ Currently, this requires tearing down the existing environment and restoring fro
      2. once backed up, delete your table. In the AWS console: dynamodb > tables > your perftest table > actions > delete table
      3. Rerun the Deploy Account-wide infrastructure action.
      4. Terraform will create an empty table with the correct name & (most importantly!) read/write IAM policies.
-     5. Delete the empty table created by terraform and restore from the backup, specifying the same table name you've defined in code.
+     5. Delete the empty table created by terraform and restore from the backup, specifying the same table name you've defined in code & selecting the matching customer managed encryption key.
 6. Run the [Persistent Environment Deploy](https://github.com/NHSDigital/NRLF/actions/workflows/persistent-environment.yml) workflow against your branch & `perftest` to restore the environment with lambdas pointed at your chosen table.
 7. You can check this has been successful by checking the table name in the lambdas.
    - In the AWS console: Lambda > functions > pick any perftest-1 lambda > Configuration > Environment variables > `TABLE_NAME` should be your desired pointer table e.g. `nhsd-nrlf--perftest-baseline-pointers-table`
 
 If you've followed these steps, you will also need to [generate permissions](#generate-permissions) as the organisation permissions will have been lost when the environment was torn down.
-
-### Prepare to run tests
-
-#### Pull certs for perftest
-
-```sh
-assume management
-make truststore-pull-all ENV=perftest
-```
 
 #### Generate permissions
 
@@ -51,23 +49,25 @@ You will need to generate pointer permissions the first time performance tests a
 
 ```sh
 # In project root
-make generate permissions   # makes a bunch of json permission files for test organisations
+make perftest-generate-permissions   # makes a bunch of json permission files for test organisations
 make get-s3-perms ENV=perftest   # will take all permissions & create nrlf_permissions.zip file
 make build
 
 # apply this new permissions zip file to your environment
 cd ./terraform/infrastructure
-assume nhsd-nrlf-test
+assume nhsd-nrlf-mgmt
 make init TF_WORKSPACE_NAME=perftest-1 ENV=perftest
 make ENV=perftest USE_SHARED_RESOURCES=true apply
 ```
 
-#### Generate input files
+### Prepare to run tests
+
+Prepare input files
 
 ```sh
 assume nhsd-nrlf-test
-# creates 2 csv files and a json file
-make perftest-prepare PERFTEST_TABLE_NAME=perftest-baseline
+# PERFTEST_TABLE_NAME = pointer table currently pointed to by perftest env
+make perftest-prepare PERFTEST_TABLE_NAME=nhsd-nrlf--perftest-baseline-pointers-table ENV=perftest
 ```
 
 ### Run tests
@@ -77,10 +77,26 @@ make perftest-consumer ENV_TYPE=perftest PERFTEST_HOST=perftest-1.perftest.recor
 make perftest-producer ENV_TYPE=perftest PERFTEST_HOST=perftest-1.perftest.record-locator.national.nhs.uk
 ```
 
-### Run public tests
+## Seed data
+
+Must be run on an empty table. Cannot top up an existing set of pointers.
 
 ```sh
+make perftest-seed-tables ENV=perftest \
+   PERFTEST_TABLE_NAME=nhsd-nrlf--perftest-anjali-test-2-pointers-table \
+   PERFTEST_PATIENTS_WITH_POINTERS=10 \
+   PERFTEST_POINTERS_PER_PATIENT=2
+```
 
+### Refresh input files in S3
+
+Regenerates the input files from the current state of a given perftest table & uploads files to s3. These files are usually generated at the end of the seed tables make command (above).
+
+> Note: this can be an expensive operation for large table sizes.
+
+```sh
+make perftest-generate-pointer-table-extract \
+   PERFTEST_TABLE_NAME=nhsd-nrlf--perftest-anjali-test-2-pointers-table
 ```
 
 ## Assumptions / Caveats

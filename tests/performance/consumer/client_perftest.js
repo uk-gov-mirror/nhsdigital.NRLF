@@ -4,9 +4,8 @@ import exec from "k6/execution";
 import { CATEGORY_TYPE_GROUPS } from "../type-category-mappings.js";
 import { getHeaders, getFullUrl } from "../test-config.js";
 
-const csvPath = __ENV.DIST_PATH
-  ? `../../../${__ENV.DIST_PATH}/producer_reference_data.csv`
-  : "../producer_reference_data.csv";
+const distPath = __ENV.DIST_PATH || "./dist";
+const csvPath = `../../../${distPath}/nft/seed-pointers-extract.csv`;
 const csv = open(csvPath);
 const lines = csv.trim().split("\n");
 // Skip header

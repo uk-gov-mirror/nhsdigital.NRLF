@@ -24,7 +24,7 @@ for type_code, custodian_dist in DEFAULT_CUSTODIAN_DISTRIBUTIONS.items():
 
 output = {"types": expanded_types, "custodians": expanded_custodians}
 
-out_path = Path("./tests/performance/expanded_pointer_distributions.json")
+out_path = Path("./tests/performance/producer/expanded_pointer_distributions.json")
 out_path.parent.mkdir(parents=True, exist_ok=True)
 with out_path.open("w") as f:
     json.dump(output, f, indent=2)

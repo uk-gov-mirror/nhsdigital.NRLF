@@ -79,3 +79,4 @@ allure-report/*
 
 # Performance test ref data
 tests/performance/reference-data.json
+tests/performance/producer/expanded_pointer_distributions.json
