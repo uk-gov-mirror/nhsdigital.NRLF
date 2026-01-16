@@ -1,4 +1,5 @@
 import csv
+import os
 from datetime import datetime, timedelta, timezone
 from itertools import cycle
 from math import gcd
@@ -7,10 +8,9 @@ from typing import Any, Iterator
 
 import boto3
 import fire
-
-# import json
 import numpy as np
 
+from nrlf.core.boto import get_s3_client
 from nrlf.core.constants import (
     CATEGORY_ATTRIBUTES,
     SNOMED_SYSTEM_URL,
@@ -20,11 +20,15 @@ from nrlf.core.constants import (
 from nrlf.core.dynamodb.model import DocumentPointer
 from nrlf.core.logger import logger
 from nrlf.tests.data import load_document_reference
+from tests.performance.perftest_environment import create_extract_metadata_file
 from tests.performance.seed_data_constants import (  # DEFAULT_COUNT_DISTRIBUTIONS,
     CHECKSUM_WEIGHTS,
     CUSTODIAN_DISTRIBUTION_PROFILES,
     TYPE_DISTRIBUTION_PROFILES,
 )
+
+dist_path = os.getenv("DIST_PATH", "./dist")
+nft_dist_path = f"{dist_path}/nft"
 
 dynamodb = boto3.client("dynamodb")
 resource = boto3.resource("dynamodb")
@@ -83,18 +87,39 @@ def _make_seed_pointer(
     return nft_pointer
 
 
+def _write_pointer_extract_to_file(table_name, pointer_data):
+    local_csv_out = f"{nft_dist_path}/seed-pointers-extract.csv"
+    local_meta_out = f"{nft_dist_path}/info.json"
+
+    print(f"writing pointer extract to files {local_csv_out} {local_meta_out}")
+
+    with open(local_csv_out, "w") as file:
+        writer = csv.writer(file)
+        writer.writerow(["pointer_id", "pointer_type", "custodian", "nhs_number"])
+        writer.writerows(pointer_data)
+    print(f"Pointer data saved to {local_csv_out}")
+
+    create_extract_metadata_file(table_name, nft_dist_path)
+
+
 def _populate_seed_table(
     table_name: str,
-    px_with_pointers: int,
-    pointers_per_px: float = 1.0,
+    patients_with_pointers: int,
+    pointers_per_patient: float = 1.0,
     type_dist_profile: str = "default",
     custodian_dist_profile: str = "default",
 ):
     """
     Seeds a table with example data for non-functional testing.
     """
-    if pointers_per_px < 1.0:
+    if pointers_per_patient < 1.0:
         raise ValueError("Cannot populate table with patients with zero pointers")
+
+    print(
+        f"Populating table {table_name} with patients_with_pointers={patients_with_pointers} pointers_per_patient={pointers_per_patient}",
+        type_dist_profile,
+        custodian_dist_profile,
+    )
 
     type_dists = TYPE_DISTRIBUTION_PROFILES[type_dist_profile]
     custodian_dists = CUSTODIAN_DISTRIBUTION_PROFILES[custodian_dist_profile]
@@ -103,15 +128,15 @@ def _populate_seed_table(
     type_iter = _set_up_cyclical_iterator(type_dists)
     custodian_iters = _set_up_custodian_iterators(custodian_dists)
     count_iter = _get_pointer_count_poisson_distributions(
-        px_with_pointers, pointers_per_px
+        patients_with_pointers, pointers_per_patient
     )
     testnum_cls = TestNhsNumbersIterator()
     testnum_iter = iter(testnum_cls)
 
-    px_counter = 0
-    doc_ref_target = int(pointers_per_px * px_with_pointers)
+    patient_counter = 0
+    doc_ref_target = int(pointers_per_patient * patients_with_pointers)
     print(
-        f"Will upsert ~{doc_ref_target} test pointers for {px_with_pointers} patients."
+        f"Will upsert ~{doc_ref_target} test pointers for {patients_with_pointers} patients."
     )
     doc_ref_counter = 0
     batch_counter = 0
@@ -120,12 +145,15 @@ def _populate_seed_table(
     pointer_data: list[list[str]] = []
 
     start_time = datetime.now(tz=timezone.utc)
-
     batch_upsert_items: list[dict[str, Any]] = []
-    while px_counter < px_with_pointers:
-        pointers_for_px = int(next(count_iter))
 
-        if batch_counter + pointers_for_px > 25 or px_counter == px_with_pointers:
+    while patient_counter <= patients_with_pointers:
+        pointers_for_patient = int(next(count_iter))
+
+        if (
+            batch_counter + pointers_for_patient > 25
+            or patient_counter == patients_with_pointers
+        ):
             response = resource.batch_write_item(
                 RequestItems={table_name: batch_upsert_items}
             )
@@ -138,45 +166,43 @@ def _populate_seed_table(
             batch_upsert_items = []
             batch_counter = 0
 
-        new_px = next(testnum_iter)
-        for _ in range(pointers_for_px):
+        new_patient = next(testnum_iter)
+        for _ in range(pointers_for_patient):
             new_type = next(type_iter)
             new_custodian = next(custodian_iters[new_type])
             doc_ref_counter += 1
             batch_counter += 1
 
             pointer = _make_seed_pointer(
-                new_type, new_custodian, new_px, doc_ref_counter
+                new_type, new_custodian, new_patient, doc_ref_counter
             )
             put_req = {"PutRequest": {"Item": pointer.model_dump()}}
             batch_upsert_items.append(put_req)
             pointer_data.append(
                 [
                     pointer.id,
-                    pointer.type,
+                    new_type,  # not full type url
                     pointer.custodian,
                     pointer.nhs_number,
                 ]
             )
-        px_counter += 1
+        patient_counter += 1
 
-        if px_counter % 1000 == 0:
+        if patient_counter % 1000 == 0:
             print(".", end="", flush=True)
-        if px_counter % 100000 == 0:
-            print(f" {px_counter} patients processed ({doc_ref_counter} pointers).")
+        if patient_counter % 100000 == 0:
+            print(
+                f" {patient_counter} patients processed ({doc_ref_counter} pointers)."
+            )
 
-    print(" Done.")
+    print("Done")
 
     end_time = datetime.now(tz=timezone.utc)
     print(
         f"Created {doc_ref_counter} pointers in {timedelta.total_seconds(end_time - start_time)} seconds (unprocessed: {unprocessed_count})."
     )
 
-    with open("./dist/seed-nft-pointers.csv", "w") as f:
-        writer = csv.writer(f)
-        writer.writerow(["pointer_id", "pointer_type", "custodian", "nhs_number"])
-        writer.writerows(pointer_data)
-    print(f"Pointer data saved to ./dist/seed-nft-pointers.csv")  # noqa
+    _write_pointer_extract_to_file(table_name, pointer_data)
 
 
 def _set_up_cyclical_iterator(dists: dict[str, int]) -> Iterator[str]:

@@ -6,9 +6,8 @@ import { crypto } from "k6/experimental/webcrypto";
 import { createRecord } from "../setup.js";
 import exec from "k6/execution";
 
-const csvPath = __ENV.DIST_PATH
-  ? `../../../${__ENV.DIST_PATH}/producer_reference_data.csv`
-  : "../producer_reference_data.csv";
+const distPath = __ENV.DIST_PATH || "./dist";
+const csvPath = `../../../${distPath}/nft/seed-pointers-extract.csv`;
 const csv = open(csvPath);
 const lines = csv.trim().split("\n");
 // Skip header
@@ -40,7 +39,7 @@ function getNextPointer() {
   const index = iter % dataLines.length;
   const line = dataLines[index];
   // Adjust field names as per CSV columns: count,pointer_id,pointer_type,custodian,nhs_number
-  const [count, pointer_id, pointer_type, custodian, nhs_number] = line
+  const [pointer_id, pointer_type, custodian, nhs_number] = line
     .split(",")
     .map((field) => field.trim());
   return { pointer_id, pointer_type, custodian, nhs_number };
