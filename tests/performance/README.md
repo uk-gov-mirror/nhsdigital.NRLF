@@ -81,12 +81,14 @@ make perftest-producer-internal ENV_TYPE=perftest PERFTEST_HOST=perftest-1.perft
 
 #### Public mode
 
-Via apigee proxies - most similar to a supplier
+Via apigee proxies - most similar to a supplier. Spins up a local http server in background responsible for refreshing bearer token (valid for 5 mins each).
 
 ```sh
 make perftest-consumer-public ENV=perftest
 make perftest-producer-public ENV=perftest
 ```
+
+> Troubleshooting: seeing an unprompted message like "Token refreshed at Mon Jan 19 16:43:35 2026" pop up in your terminal after the test run? The background token server is still going. To resolve, kill the server process with `kill $(lsof -t -i :8765)` (replacing 8765 with your custom port if you specified one).
 
 ## Seed data
 

@@ -21,6 +21,7 @@ PERFTEST_PATIENTS_WITH_POINTERS ?= 0
 PERFTEST_POINTERS_PER_PATIENT ?= 0
 PERFTEST_TYPE_DIST_PROFILE ?= default
 PERFTEST_CUSTODIAN_DIST_PROFILE ?= default
+PERFTEST_TOKEN_REFRESH_PORT ?= 8765
 
 export PATH := $(PATH):$(PWD)/.venv/bin
 export USE_SHARED_RESOURCES := $(shell poetry run python scripts/are_resources_shared_for_stack.py $(TF_WORKSPACE_NAME))
@@ -292,6 +293,7 @@ generate-models: check-warn ## Generate Pydantic Models
 
 
 perftest-generate-permissions: ## Generate perftest permissions and add to nrlf_permissions
+	@echo "Generating permissions for performance tests with DIST_PATH=$(DIST_PATH)"
 	PYTHONPATH=. poetry run python tests/performance/producer/generate_permissions.py --output_dir="$(DIST_PATH)/nrlf_permissions/K6PerformanceTest"
 
 perftest-seed-tables:	## Seed tables and upload generated perftest input files to s3
@@ -308,7 +310,6 @@ perftest-prepare:	## Prepare input files for producer & consumer perf tests
 	mkdir -p "${DIST_PATH}/nft"
 	aws s3 cp "s3://nhsd-nrlf--${ENV}-metadata/performance/seed-pointers-extract-${PERFTEST_TABLE_NAME}.zip" "${DIST_PATH}/pointer_extract-${PERFTEST_TABLE_NAME}.zip"
 	unzip "${DIST_PATH}/pointer_extract-${PERFTEST_TABLE_NAME}.zip"
-# 	cp "${DIST_PATH}/nft/seed-pointers-extract-${PERFTEST_TABLE_NAME}.csv" "${DIST_PATH}/seed-pointers-extract.csv"
 	PYTHONPATH=. poetry run python ./tests/performance/generate_producer_distributions.py
 
 perftest-producer-internal:	## Run producer perf tests
@@ -316,7 +317,10 @@ perftest-producer-internal:	## Run producer perf tests
 	k6 run tests/performance/producer/perftest.js -e HOST=$(PERFTEST_HOST) -e ENV_TYPE=$(ENV_TYPE) -e DIST_PATH=$(DIST_PATH)
 
 perftest-producer-public: check-warn ## Run the producer perftests for the external access points
-	@echo "Fetching public mode configuration and bearer token..."
+	@echo "Starting token refresher in background with ENV=$(ENV)"
+	ENV=$(ENV) TOKEN_REFRESH_PORT=$(PERFTEST_TOKEN_REFRESH_PORT) PYTHONPATH=. poetry run python ./tests/performance/token_refresher.py &
+	trap "kill $$(lsof -t -i :$(PERFTEST_TOKEN_REFRESH_PORT)) 2>/dev/null" EXIT
+	@echo "Fetching public mode configuration..."
 	@CONFIG_FILE=$$(mktemp /tmp/perf_config_XXXXXX); \
 	trap "rm -f $$CONFIG_FILE" EXIT; \
 	PYTHONPATH=. poetry run python tests/performance/get_test_config.py $(ENV_TYPE) 2>&1 | tail -n 1 > $$CONFIG_FILE; \
@@ -326,13 +330,17 @@ perftest-producer-public: check-warn ## Run the producer perftests for the exter
 	TEST_PUBLIC_BASE_URL=$$PUBLIC_BASE_URL \
 	TEST_CONFIG_FILE=$$CONFIG_FILE \
 		k6 run tests/performance/producer/perftest.js -e ENV_TYPE=$(ENV_TYPE) -e DIST_PATH=$(DIST_PATH)
+	kill $$(lsof -t -i :$(PERFTEST_TOKEN_REFRESH_PORT))
 
 perftest-consumer-internal:
 	@echo "Running consumer performance tests with HOST=$(PERFTEST_HOST) and ENV_TYPE=$(ENV_TYPE) and DIST_PATH=$(DIST_PATH)"
 	k6 run tests/performance/consumer/perftest.js -e HOST=$(PERFTEST_HOST) -e ENV_TYPE=$(ENV_TYPE) -e DIST_PATH=$(DIST_PATH)
 
 perftest-consumer-public: check-warn ## Run the consumer perftests for the external access points
-	@echo "Fetching public mode configuration and bearer token..."
+	@echo "Starting token refresher with ENV=$(ENV)"
+	ENV=$(ENV) TOKEN_REFRESH_PORT=$(PERFTEST_TOKEN_REFRESH_PORT) PYTHONPATH=. poetry run python ./tests/performance/token_refresher.py &
+	trap "kill $$(lsof -t -i :$(PERFTEST_TOKEN_REFRESH_PORT)) 2>/dev/null" EXIT
+	@echo "Fetching public mode configuration..."
 	@CONFIG_FILE=$$(mktemp /tmp/perf_config_XXXXXX); \
 	trap "rm -f $$CONFIG_FILE" EXIT; \
 	PYTHONPATH=. poetry run python tests/performance/get_test_config.py $(ENV_TYPE) 2>&1 | tail -n 1 > $$CONFIG_FILE; \
@@ -342,16 +350,7 @@ perftest-consumer-public: check-warn ## Run the consumer perftests for the exter
 	TEST_PUBLIC_BASE_URL=$$PUBLIC_BASE_URL \
 	TEST_CONFIG_FILE=$$CONFIG_FILE \
 		k6 run tests/performance/consumer/perftest.js -e ENV_TYPE=$(ENV_TYPE) -e DIST_PATH=$(DIST_PATH)
-
-perftest-prep-generate-producer-data:
-	@echo "Generating producer reference with PERFTEST_TABLE_NAME=$(PERFTEST_TABLE_NAME) and DIST_PATH=$(DIST_PATH)"
-	mkdir -p $(DIST_PATH)
-	PYTHONPATH=. poetry run python tests/performance/perftest_environment.py generate_producer_data --output_dir="$(DIST_PATH)"
-
-perftest-prep-extract-consumer-data:
-	@echo "Generating consumer reference with PERFTEST_TABLE_NAME=$(PERFTEST_TABLE_NAME) and DIST_PATH=$(DIST_PATH)"
-	mkdir -p $(DIST_PATH)
-	PYTHONPATH=. poetry run python tests/performance/perftest_environment.py extract_consumer_data --output_dir="$(DIST_PATH)"
+	kill $$(lsof -t -i :$(PERFTEST_TOKEN_REFRESH_PORT))
 
 perftest-generate-pointer-table-extract:
 	@echo "Generating pointer table extract with PERFTEST_TABLE_NAME=$(PERFTEST_TABLE_NAME) and DIST_PATH=$(DIST_PATH)"
@@ -361,3 +360,11 @@ perftest-generate-pointer-table-extract:
 	./scripts/get-current-info.sh > "${DIST_PATH}/nft/info.json"
 	zip -r "${DIST_PATH}/pointer_extract-${PERFTEST_TABLE_NAME}.zip" "${DIST_PATH}/nft"
 	aws s3 cp "${DIST_PATH}/pointer_extract-${PERFTEST_TABLE_NAME}.zip" "s3://nhsd-nrlf--${ENV}-metadata/performance/seed-pointers-extract-${PERFTEST_TABLE_NAME}.zip"
+
+perftest-run-token-refresher:
+	@echo "Starting token refresher with ENV=$(ENV)"
+	ENV=$(ENV) TOKEN_REFRESH_PORT=$(PERFTEST_TOKEN_REFRESH_PORT) PYTHONPATH=. poetry run python ./tests/performance/token_refresher.py &
+	trap "kill $$(lsof -t -i :$(PERFTEST_TOKEN_REFRESH_PORT)) 2>/dev/null" EXIT
+
+	make perftest-consumer-public
+	kill $$(lsof -t -i :$(PERFTEST_TOKEN_REFRESH_PORT))

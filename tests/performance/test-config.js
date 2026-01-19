@@ -1,23 +1,30 @@
 import { POINTER_TYPES } from "./constants.js";
 import exec from "k6/execution";
+import http from "k6/http";
 
 let config = null;
 
 const connectMode = __ENV.TEST_CONNECT_MODE || "internal";
-let configData = null;
+const configPort = __ENV.TOKEN_REFRESH_PORT || 8765;
 
-if (connectMode === "public") {
-  const configFile = __ENV.TEST_CONFIG_FILE;
-  if (!configFile) {
-    throw new Error("Public mode requires TEST_CONFIG_FILE");
+const fetchConfig = () => {
+  const res = http.get(`http://localhost:${configPort}`);
+  console.log("Fetched latest bearer token", res.status);
+
+  if (res.error) {
+    throw new Error("Bearer token not found in config file", res.error);
   }
-  configData = JSON.parse(open(configFile));
-}
+  return res.json();
+};
 
 function initConfig() {
-  if (config !== null) {
+  const tokenExpired = config?.bearerTokenExpires * 1000 < Date.now();
+
+  if (config !== null && (connectMode === "internal" || !tokenExpired)) {
     return config;
   }
+
+  const configData = fetchConfig();
 
   if (connectMode === "public") {
     config = {
@@ -26,6 +33,7 @@ function initConfig() {
       consumerPath: "/consumer/FHIR/R4",
       producerPath: "/producer/FHIR/R4",
       bearerToken: configData.bearer_token,
+      bearerTokenExpires: configData.bearer_token_expires, // seconds since epoch - valid for 5 mins
     };
 
     if (!config.baseUrl) {
@@ -41,6 +49,7 @@ function initConfig() {
       consumerPath: "/consumer",
       producerPath: "/producer",
       bearerToken: null,
+      bearerTokenExpires: null,
     };
   }
 

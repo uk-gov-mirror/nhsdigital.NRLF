@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import json
 import sys
+from time import time
 
 from botocore.exceptions import ClientError
 
@@ -50,6 +51,7 @@ def get_public_mode_config(env_name: str) -> dict:
             "public_base_url": public_base_url,
             "apigee_app_id": apigee_app_id,
             "bearer_token": bearer_token,
+            "bearer_token_expires": time() + 300,
         }
 
         return config
