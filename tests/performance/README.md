@@ -75,6 +75,7 @@ make perftest-prepare PERFTEST_TABLE_NAME=nhsd-nrlf--perftest-baseline-pointers-
 #### Internal mode
 
 ```sh
+assume nhsd-nrlf-test
 make perftest-consumer-internal ENV_TYPE=perftest PERFTEST_HOST=perftest-1.perftest.record-locator.national.nhs.uk
 make perftest-producer-internal ENV_TYPE=perftest PERFTEST_HOST=perftest-1.perftest.record-locator.national.nhs.uk
 ```
@@ -84,6 +85,7 @@ make perftest-producer-internal ENV_TYPE=perftest PERFTEST_HOST=perftest-1.perft
 Via apigee proxies - most similar to a supplier. Spins up a local http server in background responsible for refreshing bearer token (valid for 5 mins each).
 
 ```sh
+assume nhsd-nrlf-mgmt
 make perftest-consumer-public ENV=perftest
 make perftest-producer-public ENV=perftest
 ```

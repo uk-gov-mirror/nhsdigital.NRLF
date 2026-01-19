@@ -317,7 +317,7 @@ perftest-producer-internal:	## Run producer perf tests
 	k6 run tests/performance/producer/perftest.js -e HOST=$(PERFTEST_HOST) -e ENV_TYPE=$(ENV_TYPE) -e DIST_PATH=$(DIST_PATH)
 
 perftest-producer-public: check-warn ## Run the producer perftests for the external access points
-	@echo "Starting token refresher in background with ENV=$(ENV)"
+	@echo "Starting token refresher in background with ENV=$(ENV) PERFTEST_TOKEN_REFRESH_PORT=$(PERFTEST_TOKEN_REFRESH_PORT)"
 	ENV=$(ENV) TOKEN_REFRESH_PORT=$(PERFTEST_TOKEN_REFRESH_PORT) PYTHONPATH=. poetry run python ./tests/performance/token_refresher.py &
 	trap "kill $$(lsof -t -i :$(PERFTEST_TOKEN_REFRESH_PORT)) 2>/dev/null" EXIT
 	@echo "Fetching public mode configuration..."
@@ -337,7 +337,7 @@ perftest-consumer-internal:
 	k6 run tests/performance/consumer/perftest.js -e HOST=$(PERFTEST_HOST) -e ENV_TYPE=$(ENV_TYPE) -e DIST_PATH=$(DIST_PATH)
 
 perftest-consumer-public: check-warn ## Run the consumer perftests for the external access points
-	@echo "Starting token refresher with ENV=$(ENV)"
+	@echo "Starting token refresher in background with ENV=$(ENV) PERFTEST_TOKEN_REFRESH_PORT=$(PERFTEST_TOKEN_REFRESH_PORT)"
 	ENV=$(ENV) TOKEN_REFRESH_PORT=$(PERFTEST_TOKEN_REFRESH_PORT) PYTHONPATH=. poetry run python ./tests/performance/token_refresher.py &
 	trap "kill $$(lsof -t -i :$(PERFTEST_TOKEN_REFRESH_PORT)) 2>/dev/null" EXIT
 	@echo "Fetching public mode configuration..."
@@ -362,7 +362,7 @@ perftest-generate-pointer-table-extract:
 	aws s3 cp "${DIST_PATH}/pointer_extract-${PERFTEST_TABLE_NAME}.zip" "s3://nhsd-nrlf--${ENV}-metadata/performance/seed-pointers-extract-${PERFTEST_TABLE_NAME}.zip"
 
 perftest-run-token-refresher:
-	@echo "Starting token refresher with ENV=$(ENV)"
+	@echo "Starting token refresher in background with ENV=$(ENV) PERFTEST_TOKEN_REFRESH_PORT=$(PERFTEST_TOKEN_REFRESH_PORT)"
 	ENV=$(ENV) TOKEN_REFRESH_PORT=$(PERFTEST_TOKEN_REFRESH_PORT) PYTHONPATH=. poetry run python ./tests/performance/token_refresher.py &
 	trap "kill $$(lsof -t -i :$(PERFTEST_TOKEN_REFRESH_PORT)) 2>/dev/null" EXIT
 

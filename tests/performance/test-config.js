@@ -24,9 +24,9 @@ function initConfig() {
     return config;
   }
 
-  const configData = fetchConfig();
-
   if (connectMode === "public") {
+    const configData = fetchConfig();
+
     config = {
       connectMode: "public",
       baseUrl: __ENV.TEST_PUBLIC_BASE_URL.replace(/\/$/, ""),
@@ -40,7 +40,10 @@ function initConfig() {
       throw new Error("Public mode requires TEST_PUBLIC_BASE_URL");
     }
     if (!config.bearerToken) {
-      throw new Error("Bearer token not found in config file");
+      throw new Error(
+        "Bearer token not found in config",
+        Object.keys(configData)
+      );
     }
   } else {
     config = {

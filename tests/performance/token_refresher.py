@@ -1,4 +1,11 @@
 #!/usr/bin/env python3
+"""
+Token refresher useful for running perf tests in public mode. Runs in background of test run and spins up two threads:
+    - a looped task which fetches a new bearer token from APIM every 5 mins
+    - http server which returns the most recently fetched token
+
+See makefile perftest-consumer-public & perftest-producer-public for usage
+"""
 import json
 import os
 import threading
