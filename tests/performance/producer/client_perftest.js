@@ -2,7 +2,6 @@ import http from "k6/http";
 import { ODS_CODE } from "../constants.js";
 import { check } from "k6";
 import { randomItem } from "https://jslib.k6.io/k6-utils/1.2.0/index.js";
-import { crypto } from "k6/experimental/webcrypto";
 import { createRecord } from "../setup.js";
 import { getHeaders, getFullUrl } from "../test-config.js";
 import exec from "k6/execution";
