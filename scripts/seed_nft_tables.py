@@ -143,6 +143,7 @@ def _populate_seed_table(
     unprocessed_count = 0
 
     pointer_data: list[list[str]] = []
+    batch_pointer_data: list[list[str]] = []
 
     start_time = datetime.now(tz=timezone.utc)
     batch_upsert_items: list[dict[str, Any]] = []
@@ -158,11 +159,29 @@ def _populate_seed_table(
                 RequestItems={table_name: batch_upsert_items}
             )
 
-            if response.get("UnprocessedItems"):
-                unprocessed_count += len(
-                    response.get("UnprocessedItems").get(table_name, [])
-                )
+            processed_pointers = batch_pointer_data
 
+            if response.get("UnprocessedItems"):
+                unprocessed_items = response.get("UnprocessedItems").get(table_name, [])
+                unprocessed_count += len(unprocessed_items)
+
+                def pointer_is_processed(pointer):
+                    pointer_id = pointer[0]
+                    matches = (
+                        unprocessed_item
+                        for unprocessed_item in unprocessed_items
+                        if unprocessed_item["PutRequest"]["Item"].get("id")
+                        == pointer_id
+                    )
+                    print(f"unprocessed matches:", matches)
+
+                    return len(matches) == 0
+
+                processed_pointers = filter(pointer_is_processed, batch_pointer_data)
+
+            pointer_data.extend(processed_pointers)
+
+            batch_pointer_data = []
             batch_upsert_items = []
             batch_counter = 0
 
@@ -178,7 +197,7 @@ def _populate_seed_table(
             )
             put_req = {"PutRequest": {"Item": pointer.model_dump()}}
             batch_upsert_items.append(put_req)
-            pointer_data.append(
+            batch_pointer_data.append(
                 [
                     pointer.id,
                     new_type,  # not full type url
