@@ -111,7 +111,7 @@ Regenerates the input files from the current state of a given perftest table & u
 
 ```sh
 make perftest-generate-pointer-table-extract \
-   PERFTEST_TABLE_NAME=nhsd-nrlf--perftest-anjali-test-2-pointers-table
+   PERFTEST_TABLE_NAME=nhsd-nrlf--perftest-anjali-test-2-pointers-table ENV=perftest
 ```
 
 ## Assumptions / Caveats

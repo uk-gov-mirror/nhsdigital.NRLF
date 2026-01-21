@@ -353,7 +353,7 @@ perftest-consumer-public: check-warn ## Run the consumer perftests for the exter
 	kill $$(lsof -t -i :$(PERFTEST_TOKEN_REFRESH_PORT))
 
 perftest-generate-pointer-table-extract:
-	@echo "Generating pointer table extract with PERFTEST_TABLE_NAME=$(PERFTEST_TABLE_NAME) and DIST_PATH=$(DIST_PATH)"
+	@echo "Generating pointer table extract with PERFTEST_TABLE_NAME=$(PERFTEST_TABLE_NAME) and ENV=$(ENV) and DIST_PATH=$(DIST_PATH)"
 	rm -rf "${DIST_PATH}/nft"
 	mkdir -p "${DIST_PATH}/nft"
 	PYTHONPATH=. poetry run python tests/performance/perftest_environment.py generate_pointer_table_extract --output_dir="${DIST_PATH}/nft"
