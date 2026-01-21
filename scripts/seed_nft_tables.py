@@ -167,17 +167,21 @@ def _populate_seed_table(
 
                 def pointer_is_processed(pointer):
                     pointer_id = pointer[0]
-                    matches = (
-                        unprocessed_item
-                        for unprocessed_item in unprocessed_items
-                        if unprocessed_item["PutRequest"]["Item"].get("id")
-                        == pointer_id
+                    matches = list(
+                        (
+                            unprocessed_item
+                            for unprocessed_item in unprocessed_items
+                            if unprocessed_item["PutRequest"]["Item"].get("id")
+                            == pointer_id
+                        )
                     )
                     print(f"unprocessed matches:", matches)
 
                     return len(matches) == 0
 
-                processed_pointers = filter(pointer_is_processed, batch_pointer_data)
+                processed_pointers = list(
+                    filter(pointer_is_processed, batch_pointer_data)
+                )
 
             pointer_data.extend(processed_pointers)
 

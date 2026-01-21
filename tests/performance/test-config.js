@@ -9,7 +9,7 @@ const configPort = __ENV.TOKEN_REFRESH_PORT || 8765;
 
 const fetchConfig = () => {
   const res = http.get(`http://localhost:${configPort}`);
-  console.log("Fetched latest bearer token", res.status);
+  // console.log("Fetched latest bearer token", res.status);
 
   if (res.error) {
     throw new Error("Bearer token not found in config file", res.error);
