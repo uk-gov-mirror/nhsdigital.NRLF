@@ -106,13 +106,11 @@ def _write_pointer_extract_to_file(table_name, pointer_data):
 def get_pointer_processor(unprocessed_items):
     def pointer_is_processed(pointer):
         pointer_id = pointer[0]
-        matches = list(
-            (
-                unprocessed_item
-                for unprocessed_item in unprocessed_items
-                if unprocessed_item["PutRequest"]["Item"].get("id") == pointer_id
-            )
-        )
+        matches = [
+            unprocessed_item
+            for unprocessed_item in unprocessed_items
+            if unprocessed_item["PutRequest"]["Item"].get("id") == pointer_id
+        ]
         # print("unprocessed matches:", matches)
 
         return len(matches) == 0
