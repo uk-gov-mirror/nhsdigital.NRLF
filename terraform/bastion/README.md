@@ -81,7 +81,7 @@ $
 
 If you've just created a new bastion, it may be that it hasn't started yet. Log in to the AWS console to see the state of the EC2 instance. Press the "Connect" button in the console and choose the SSM tab to see if things are working ok.
 
-If there is a warning in the Session Manager tab "SSM Agent is not online" when you attempt to connect then it's likely the SSM agent has crashed. Reboot the EC2 instance and the SSM agent should start up with previous cli history preserved. Beware: rebooting the EC2 instance will terminate any ongoing processes.
+If there is a warning in the Session Manager tab "SSM Agent is not online" when you attempt to connect then it's likely the SSM agent has crashed. Reboot the EC2 instance and the SSM agent should start up with previous cli history preserved. To reboot via the CLI, find your EC2 instance > Instance state > Reboot instance. Beware: rebooting the EC2 instance will terminate any ongoing processes.
 
 If the EC2 instance is running and the console looks ok, check you have defined the correct ENV param for the installed bastion.
 
