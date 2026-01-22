@@ -66,6 +66,7 @@ class TestNhsNumbersIterator:
 
 
 def generate_pointer_table_extract(
+    extract_size=1500000,
     output_dir=".",
 ):
     """
@@ -79,6 +80,7 @@ def generate_pointer_table_extract(
     start_key = None
     buffer = []
     buffer_size = 1_000_000  # 10k rows needs ~3MB of RAM, so 1M rows needs ~300MB
+    buffers_written = 0
 
     with open(out, "w", newline="") as csv_file:
         writer = csv.writer(csv_file)
@@ -109,12 +111,20 @@ def generate_pointer_table_extract(
                 if len(buffer) >= buffer_size:
                     print("Writing buffer to CSV...")  # noqa: T201
                     writer.writerows(buffer)
+                    buffers_written += 1
                     buffer.clear()
             start_key = response.get("LastEvaluatedKey", None)
-            done = start_key is None
+
+            no_more_to_read = start_key is None
+            reached_desired_extract_size = (
+                buffers_written * buffer_size
+            ) >= extract_size
+
+            done = no_more_to_read or reached_desired_extract_size
         # Write any remaining rows in buffer
         if buffer:
             writer.writerows(buffer)
+            buffers_written += 1
     print(f"Pointer extract CSV data written to {out}")  # noqa: T201
 
     create_extract_metadata_file(table_name, output_dir)

@@ -11,7 +11,7 @@ Before deploying a bastion, you will need:
 
 ## Deploying a bastion
 
-The bastions are emphemeral resources that should be deploy when you need them.
+The bastions are ephemeral resources that should be deployed when you need them.
 
 To deploy a bastion, you will first need to login to the AWS mgmt account on the CLI.
 
@@ -44,7 +44,7 @@ terraform apply ./bastion.tfplan
 Once the bastion is deployed, you can connect to it via SSH with:
 
 ```
-make ssh-connection
+make ssh-connection ENV=perftest
 ```
 
 Once connected successfully, you will be at the SSM `$` prompt. To switch to the `nrlf_ops` user, run this command:
@@ -102,7 +102,7 @@ If you're trying to access an AWS resource from the bastion and are getting an a
 
 You can check the role in the AWS console to work out if things are missing and can edit it there too for immediate access to the resources you need.
 
-If you want to permenantly grant new access to the bastion, you can add a policy and attach it to the EC2 instance in [iam.tf](iam.tf)
+If you want to permanently grant new access to the bastion, you can add a policy and attach it to the EC2 instance in [iam.tf](iam.tf)
 
 #### A tool I need is missing
 

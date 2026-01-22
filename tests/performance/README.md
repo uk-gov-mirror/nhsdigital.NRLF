@@ -113,6 +113,8 @@ make perftest-generate-pointer-table-extract \
    PERFTEST_TABLE_NAME=nhsd-nrlf--perftest-anjali-test-2-pointers-table ENV=perftest
 ```
 
+This will generate a csv extract of the given pointer table containing a row per pointer. To run the perf tests, you will need an extract larger than the number of test iterations. The default extract size is 1.5 million - this can be changed in the make file command by updating the value of`--extract-size`. Too big and the test runners will take a long time to load the file.
+
 ## Assumptions / Caveats
 
 - Run performance tests in the perftest environment only\*

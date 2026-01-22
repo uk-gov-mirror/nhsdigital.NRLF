@@ -102,6 +102,24 @@ def _write_pointer_extract_to_file(table_name, pointer_data):
     create_extract_metadata_file(table_name, nft_dist_path)
 
 
+# To avoid sonarcube maintainability warning
+def get_pointer_processor(unprocessed_items):
+    def pointer_is_processed(pointer):
+        pointer_id = pointer[0]
+        matches = list(
+            (
+                unprocessed_item
+                for unprocessed_item in unprocessed_items
+                if unprocessed_item["PutRequest"]["Item"].get("id") == pointer_id
+            )
+        )
+        # print("unprocessed matches:", matches)
+
+        return len(matches) == 0
+
+    return pointer_is_processed
+
+
 def _populate_seed_table(
     table_name: str,
     patients_with_pointers: int,
@@ -164,20 +182,7 @@ def _populate_seed_table(
             if response.get("UnprocessedItems"):
                 unprocessed_items = response.get("UnprocessedItems").get(table_name, [])
                 unprocessed_count += len(unprocessed_items)
-
-                def pointer_is_processed(pointer):
-                    pointer_id = pointer[0]
-                    matches = list(
-                        (
-                            unprocessed_item
-                            for unprocessed_item in unprocessed_items
-                            if unprocessed_item["PutRequest"]["Item"].get("id")
-                            == pointer_id
-                        )
-                    )
-                    print(f"unprocessed matches:", matches)
-
-                    return len(matches) == 0
+                pointer_is_processed = get_pointer_processor(unprocessed_items)
 
                 processed_pointers = list(
                     filter(pointer_is_processed, batch_pointer_data)
