@@ -40,7 +40,7 @@ DOC_REF_TEMPLATE = load_document_reference("NFT-template")
 
 class TestNhsNumbersIterator:
     def __iter__(self):
-        self.first9 = 900000000
+        self.first9 = 910000000
         return self
 
     def __next__(self):
