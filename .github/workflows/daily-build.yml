@@ -38,11 +38,6 @@ jobs:
       - name: Run Unit Tests
         run: make test
 
-      - name: Generate SBOM
-        uses: nhs-england-tools/trivy-action/sbom-scan@v1.4.0
-        with:
-          repo-path: "./"
-
       - name: Build Project
         run: make build
 
@@ -72,3 +67,18 @@ jobs:
         with:
           key: ${{ github.run_id }}-nrlf-permissions
           path: dist/nrlf_permissions.zip
+
+  sbom:
+    name: Generate SBOM - ${{ github.ref }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Git clone - ${{ github.ref }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Generate SBOM
+        uses: nhs-england-tools/trivy-action/sbom-scan@v1.4.0
+        with:
+          repo-path: "./"
