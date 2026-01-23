@@ -38,6 +38,11 @@ jobs:
       - name: Run Unit Tests
         run: make test
 
+      - name: Generate SBOM
+        uses: nhs-england-tools/trivy-action/sbom-scan@v1.4.0
+        with:
+          repo-path: "./"
+
       - name: Build Project
         run: make build
 
