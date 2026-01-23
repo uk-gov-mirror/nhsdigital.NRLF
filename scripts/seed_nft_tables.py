@@ -40,7 +40,7 @@ DOC_REF_TEMPLATE = load_document_reference("NFT-template")
 
 class TestNhsNumbersIterator:
     def __iter__(self):
-        self.first9 = 910000000
+        self.first9 = 920000000
         return self
 
     def __next__(self):
@@ -154,7 +154,7 @@ def _populate_seed_table(
     print(
         f"Will upsert ~{doc_ref_target} test pointers for {patients_with_pointers} patients."
     )
-    doc_ref_counter = 0
+    doc_ref_counter = 30000000
     batch_counter = 0
     unprocessed_count = 0
 
