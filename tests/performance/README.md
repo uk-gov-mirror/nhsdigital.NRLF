@@ -50,7 +50,8 @@ You will need to generate pointer permissions the first time performance tests a
 ```sh
 # In project root
 make perftest-generate-permissions   # makes a bunch of json permission files for test organisations
-make build  # will take all permissions & create nrlf_permissions.zip file
+make get-s3-perms ENV=perftest   # will take all permissions & create nrlf_permissions.zip file
+make build
 
 # apply this new permissions zip file to your environment
 cd ./terraform/infrastructure
@@ -71,10 +72,25 @@ make perftest-prepare PERFTEST_TABLE_NAME=nhsd-nrlf--perftest-baseline-pointers-
 
 ### Run tests
 
+#### Internal mode
+
 ```sh
-make perftest-consumer ENV_TYPE=perftest PERFTEST_HOST=perftest-1.perftest.record-locator.national.nhs.uk
-make perftest-producer ENV_TYPE=perftest PERFTEST_HOST=perftest-1.perftest.record-locator.national.nhs.uk
+assume nhsd-nrlf-test
+make perftest-consumer-internal ENV_TYPE=perftest PERFTEST_HOST=perftest-1.perftest.record-locator.national.nhs.uk
+make perftest-producer-internal ENV_TYPE=perftest PERFTEST_HOST=perftest-1.perftest.record-locator.national.nhs.uk
 ```
+
+#### Public mode
+
+Via apigee proxies - most similar to a supplier. Spins up a local http server in background responsible for refreshing bearer token (valid for 5 mins each).
+
+```sh
+assume nhsd-nrlf-mgmt
+make perftest-consumer-public ENV=perftest
+make perftest-producer-public ENV=perftest
+```
+
+> Troubleshooting: seeing an unprompted message like "Token refreshed at Mon Jan 19 16:43:35 2026" pop up in your terminal after the test run? The background token server is still going. To resolve, kill the server process with `kill $(lsof -t -i :8765)` (replacing 8765 with your custom port if you specified one).
 
 ## Seed data
 
