@@ -68,3 +68,15 @@ variable "use_powerbi_gw_custom_ami" {
   description = "Use custom image for PowerBI GW instance"
   default     = true
 }
+
+variable "root_volume_size" {
+  type        = number
+  description = "Size of the root EBS volume in GB"
+  default     = 256
+}
+
+variable "root_volume_iops" {
+  type        = number
+  description = "IOPS for the root EBS volume"
+  default     = 3000
+}
