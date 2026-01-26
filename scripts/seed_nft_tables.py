@@ -154,7 +154,7 @@ def _populate_seed_table(
     print(
         f"Will upsert ~{doc_ref_target} test pointers for {patients_with_pointers} patients."
     )
-    doc_ref_counter = 30000000
+    doc_ref_counter = 45000000
     batch_counter = 0
     unprocessed_count = 0
 
