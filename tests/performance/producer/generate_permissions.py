@@ -3,7 +3,11 @@ from pathlib import Path
 
 import fire
 
-from tests.performance.seed_data_constants import DEFAULT_CUSTODIAN_DISTRIBUTIONS
+from tests.performance.seed_data_constants import (
+    DEFAULT_CUSTODIAN_DISTRIBUTIONS,
+    VOL_15M_POINTERS_CUSTODIAN_DISTRIBUTIONS,
+    VOL_55M_POINTERS_CUSTODIAN_DISTRIBUTIONS,
+)
 
 
 def main(output_dir="../../dist/nrlf_permissions/K6PerformanceTest"):
@@ -13,6 +17,12 @@ def main(output_dir="../../dist/nrlf_permissions/K6PerformanceTest"):
     # Invert the mapping: custodian -> list of pointer types
     custodian_permissions = {}
     for pointer_type, custodians in DEFAULT_CUSTODIAN_DISTRIBUTIONS.items():
+        for custodian, _ in custodians.items():
+            custodian_permissions.setdefault(custodian, []).append(pointer_type)
+    for pointer_type, custodians in VOL_15M_POINTERS_CUSTODIAN_DISTRIBUTIONS.items():
+        for custodian, _ in custodians.items():
+            custodian_permissions.setdefault(custodian, []).append(pointer_type)
+    for pointer_type, custodians in VOL_55M_POINTERS_CUSTODIAN_DISTRIBUTIONS.items():
         for custodian, _ in custodians.items():
             custodian_permissions.setdefault(custodian, []).append(pointer_type)
 
