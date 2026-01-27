@@ -12,7 +12,7 @@ Before deploying a bastion, you will need:
 
 ## Deploying a bastion
 
-The bastions are emphemeral resources that should be deploy when you need them.
+The bastions are ephemeral resources that should be deployed when you need them.
 
 To deploy a bastion, you will first need to login to the AWS mgmt account on the CLI.
 
@@ -46,7 +46,6 @@ terraform apply ./bastion.tfplan
 Once the bastion is deployed, you can connect to it via SSH with:
 
 ```sh
-assume nhsd-nrlf-test
 make ssh-connection ENV={env}
 ```
 

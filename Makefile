@@ -314,7 +314,7 @@ perftest-prepare:	## Prepare input files for producer & consumer perf tests
 
 perftest-producer-internal:	## Run producer perf tests
 	@echo "Running producer performance tests with HOST=$(PERFTEST_HOST) and ENV_TYPE=$(ENV_TYPE) and DIST_PATH=$(DIST_PATH)"
-	k6 run tests/performance/producer/perftest.js -e HOST=$(PERFTEST_HOST) -e ENV_TYPE=$(ENV_TYPE) -e DIST_PATH=$(DIST_PATH)
+	k6 run tests/performance/producer/perftest.js --summary-mode=full --out json=$(DIST_PATH)/producer-internal-$$(date +%Y%m%d%H%M%S).json -e HOST=$(PERFTEST_HOST) -e ENV_TYPE=$(ENV_TYPE) -e DIST_PATH=$(DIST_PATH)
 
 perftest-producer-public: check-warn ## Run the producer perftests for the external access points
 	@echo "Starting token refresher in background with ENV=$(ENV) PERFTEST_TOKEN_REFRESH_PORT=$(PERFTEST_TOKEN_REFRESH_PORT)"
@@ -329,12 +329,12 @@ perftest-producer-public: check-warn ## Run the producer perftests for the exter
 	TEST_CONNECT_MODE=public \
 	TEST_PUBLIC_BASE_URL=$$PUBLIC_BASE_URL \
 	TEST_CONFIG_FILE=$$CONFIG_FILE \
-		k6 run tests/performance/producer/perftest.js -e ENV_TYPE=$(ENV_TYPE) -e DIST_PATH=$(DIST_PATH)
+		k6 run tests/performance/producer/perftest.js --summary-mode=full --out json=$(DIST_PATH)/producer-public-$$(date +%Y%m%d%H%M%S).json -e ENV_TYPE=$(ENV_TYPE) -e DIST_PATH=$(DIST_PATH)
 	kill $$(lsof -t -i :$(PERFTEST_TOKEN_REFRESH_PORT))
 
 perftest-consumer-internal:
 	@echo "Running consumer performance tests with HOST=$(PERFTEST_HOST) and ENV_TYPE=$(ENV_TYPE) and DIST_PATH=$(DIST_PATH)"
-	k6 run tests/performance/consumer/perftest.js -e HOST=$(PERFTEST_HOST) -e ENV_TYPE=$(ENV_TYPE) -e DIST_PATH=$(DIST_PATH)
+	k6 run tests/performance/consumer/perftest.js --summary-mode=full --out json=$(DIST_PATH)/consumer-internal-$$(date +%Y%m%d%H%M%S).json -e HOST=$(PERFTEST_HOST) -e ENV_TYPE=$(ENV_TYPE) -e DIST_PATH=$(DIST_PATH)
 
 perftest-consumer-public: check-warn ## Run the consumer perftests for the external access points
 	@echo "Starting token refresher in background with ENV=$(ENV) PERFTEST_TOKEN_REFRESH_PORT=$(PERFTEST_TOKEN_REFRESH_PORT)"
@@ -349,22 +349,14 @@ perftest-consumer-public: check-warn ## Run the consumer perftests for the exter
 	TEST_CONNECT_MODE=public \
 	TEST_PUBLIC_BASE_URL=$$PUBLIC_BASE_URL \
 	TEST_CONFIG_FILE=$$CONFIG_FILE \
-		k6 run tests/performance/consumer/perftest.js -e ENV_TYPE=$(ENV_TYPE) -e DIST_PATH=$(DIST_PATH)
+		k6 run tests/performance/consumer/perftest.js --summary-mode=full --out json=$(DIST_PATH)/consumer-public-$$(date +%Y%m%d%H%M%S).json -e ENV_TYPE=$(ENV_TYPE) -e DIST_PATH=$(DIST_PATH)
 	kill $$(lsof -t -i :$(PERFTEST_TOKEN_REFRESH_PORT))
 
 perftest-generate-pointer-table-extract:
-	@echo "Generating pointer table extract with PERFTEST_TABLE_NAME=$(PERFTEST_TABLE_NAME) and DIST_PATH=$(DIST_PATH)"
+	@echo "Generating pointer table extract with PERFTEST_TABLE_NAME=$(PERFTEST_TABLE_NAME) and ENV=$(ENV) and DIST_PATH=$(DIST_PATH)"
 	rm -rf "${DIST_PATH}/nft"
 	mkdir -p "${DIST_PATH}/nft"
-	PYTHONPATH=. poetry run python tests/performance/perftest_environment.py generate_pointer_table_extract --output_dir="${DIST_PATH}/nft"
+	PYTHONPATH=. poetry run python tests/performance/perftest_environment.py generate_pointer_table_extract --output_dir="${DIST_PATH}/nft" --extract-size=2000000
 	./scripts/get-current-info.sh > "${DIST_PATH}/nft/info.json"
 	zip -r "${DIST_PATH}/pointer_extract-${PERFTEST_TABLE_NAME}.zip" "${DIST_PATH}/nft"
 	aws s3 cp "${DIST_PATH}/pointer_extract-${PERFTEST_TABLE_NAME}.zip" "s3://nhsd-nrlf--${ENV}-metadata/performance/seed-pointers-extract-${PERFTEST_TABLE_NAME}.zip"
-
-perftest-run-token-refresher:
-	@echo "Starting token refresher in background with ENV=$(ENV) PERFTEST_TOKEN_REFRESH_PORT=$(PERFTEST_TOKEN_REFRESH_PORT)"
-	ENV=$(ENV) TOKEN_REFRESH_PORT=$(PERFTEST_TOKEN_REFRESH_PORT) PYTHONPATH=. poetry run python ./tests/performance/token_refresher.py &
-	trap "kill $$(lsof -t -i :$(PERFTEST_TOKEN_REFRESH_PORT)) 2>/dev/null" EXIT
-
-	make perftest-consumer-public
-	kill $$(lsof -t -i :$(PERFTEST_TOKEN_REFRESH_PORT))
