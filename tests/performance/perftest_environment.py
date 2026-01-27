@@ -66,7 +66,7 @@ class TestNhsNumbersIterator:
 
 
 def generate_pointer_table_extract(
-    extract_size=1500000,
+    extract_size=2000000,  # must be a multiple of buffer_size (1 million)
     output_dir=".",
 ):
     """

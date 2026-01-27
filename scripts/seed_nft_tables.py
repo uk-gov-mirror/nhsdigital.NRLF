@@ -111,7 +111,6 @@ def get_pointer_processor(unprocessed_items):
             for unprocessed_item in unprocessed_items
             if unprocessed_item["PutRequest"]["Item"].get("id") == pointer_id
         ]
-        # print("unprocessed matches:", matches)
 
         return len(matches) == 0
 
