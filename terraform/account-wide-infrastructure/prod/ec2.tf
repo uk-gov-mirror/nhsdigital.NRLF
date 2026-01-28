@@ -19,8 +19,8 @@ module "powerbi_gw_instance" {
   glue_kms_key_arn   = module.prod-glue.aws_kms_key_arn
   athena_kms_key_arn = module.prod-athena[0].kms_key_arn
   athena_bucket_arn  = module.prod-athena[0].bucket_arn
-  root_volume_size   = var.root_volume_size
-  root_volume_iops   = var.root_volume_iops
+  root_volume_size   = var.powerbi_gw_root_volume_size
+  root_volume_iops   = var.powerbi_gw_root_volume_iops
 
   subnet_id       = module.vpc[0].private_subnet_id
   security_groups = [module.vpc[0].powerbi_gw_security_group_id]
