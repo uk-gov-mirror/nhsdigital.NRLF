@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+"""
+Manage organisation pointer type permissions for NRLF apps in a given environment ENV
+"""
 
 import json
 import os
