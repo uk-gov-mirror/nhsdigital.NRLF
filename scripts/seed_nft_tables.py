@@ -102,6 +102,21 @@ def _write_pointer_extract_to_file(table_name, pointer_data):
     create_extract_metadata_file(table_name, nft_dist_path)
 
 
+# To avoid sonarcube maintainability warning
+def get_pointer_processor(unprocessed_items):
+    def pointer_is_processed(pointer):
+        pointer_id = pointer[0]
+        matches = [
+            unprocessed_item
+            for unprocessed_item in unprocessed_items
+            if unprocessed_item["PutRequest"]["Item"].get("id") == pointer_id
+        ]
+
+        return len(matches) == 0
+
+    return pointer_is_processed
+
+
 def _populate_seed_table(
     table_name: str,
     patients_with_pointers: int,
@@ -143,6 +158,7 @@ def _populate_seed_table(
     unprocessed_count = 0
 
     pointer_data: list[list[str]] = []
+    batch_pointer_data: list[list[str]] = []
 
     start_time = datetime.now(tz=timezone.utc)
     batch_upsert_items: list[dict[str, Any]] = []
@@ -158,11 +174,20 @@ def _populate_seed_table(
                 RequestItems={table_name: batch_upsert_items}
             )
 
+            processed_pointers = batch_pointer_data
+
             if response.get("UnprocessedItems"):
-                unprocessed_count += len(
-                    response.get("UnprocessedItems").get(table_name, [])
+                unprocessed_items = response.get("UnprocessedItems").get(table_name, [])
+                unprocessed_count += len(unprocessed_items)
+                pointer_is_processed = get_pointer_processor(unprocessed_items)
+
+                processed_pointers = list(
+                    filter(pointer_is_processed, batch_pointer_data)
                 )
 
+            pointer_data.extend(processed_pointers)
+
+            batch_pointer_data = []
             batch_upsert_items = []
             batch_counter = 0
 
@@ -178,7 +203,7 @@ def _populate_seed_table(
             )
             put_req = {"PutRequest": {"Item": pointer.model_dump()}}
             batch_upsert_items.append(put_req)
-            pointer_data.append(
+            batch_pointer_data.append(
                 [
                     pointer.id,
                     new_type,  # not full type url

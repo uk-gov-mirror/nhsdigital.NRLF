@@ -21,6 +21,7 @@ PERFTEST_PATIENTS_WITH_POINTERS ?= 0
 PERFTEST_POINTERS_PER_PATIENT ?= 0
 PERFTEST_TYPE_DIST_PROFILE ?= default
 PERFTEST_CUSTODIAN_DIST_PROFILE ?= default
+PERFTEST_TOKEN_REFRESH_PORT ?= 8765
 
 export PATH := $(PATH):$(PWD)/.venv/bin
 export USE_SHARED_RESOURCES := $(shell poetry run python scripts/are_resources_shared_for_stack.py $(TF_WORKSPACE_NAME))
@@ -156,19 +157,57 @@ test-performance-prepare:
 	mkdir -p $(DIST_PATH)
 	PYTHONPATH=. poetry run python tests/performance/environment.py setup $(TF_WORKSPACE_NAME)
 
-test-performance: check-warn test-performance-baseline test-performance-stress ## Run the performance tests
+test-performance-internal: check-warn test-performance-baseline-internal test-performance-stress-internal ## Run the performance tests against the internal access points
 
-test-performance-baseline:
-	@echo "Running consumer performance baseline test"
-	k6 run --out csv=$(DIST_PATH)/consumer-baseline.csv tests/performance/consumer/baseline.js -e HOST=$(HOST) -e ENV_TYPE=$(ENV_TYPE)
+test-performance-baseline-internal: check-warn ## Run the performance baseline tests for the internal access points
+	@echo "Running internal consumer performance baseline test"
+	TEST_CONNECT_MODE=internal \
+	TEST_STACK_DOMAIN=$(shell terraform -chdir=terraform/infrastructure output -raw domain 2>/dev/null) \
+		k6 run --out csv=$(DIST_PATH)/consumer-baseline.csv tests/performance/consumer/baseline.js -e HOST=$(HOST) -e ENV_TYPE=$(ENV_TYPE)
 
-test-performance-stress:
-	@echo "Running consumer performance stress test"
+test-performance-baseline-public: check-warn ## Run the baseline performance tests for the external access points
+	@echo "Fetching public mode configuration and bearer token..."
+	@CONFIG_FILE=$$(mktemp /tmp/perf_config_XXXXXX); \
+	trap "rm -f $$CONFIG_FILE" EXIT; \
+	PYTHONPATH=. python3 tests/performance/get_test_config.py $(ENV_TYPE) 2>&1 | tail -n 1 > $$CONFIG_FILE; \
+	PUBLIC_BASE_URL=$$(jq -r '.public_base_url' $$CONFIG_FILE); \
+	echo "Running consumer performance baseline test against the external access points"; \
+	TEST_CONNECT_MODE=public \
+	TEST_PUBLIC_BASE_URL=$$PUBLIC_BASE_URL \
+	TEST_CONFIG_FILE=$$CONFIG_FILE \
+		k6 run --out csv=$(DIST_PATH)/consumer-baseline-public.csv tests/performance/consumer/baseline.js -e ENV_TYPE=$(ENV_TYPE)
+
+test-performance-stress-internal: ## Run the performance stress tests for the internal access points
+	@echo "Running internal consumer performance stress test"
 	k6 run --out csv=$(DIST_PATH)/consumer-stress.csv tests/performance/consumer/stress.js -e HOST=$(HOST) -e ENV_TYPE=$(ENV_TYPE)
 
-test-performance-soak:
-	@echo "Running consumer performance soak test"
+test-performance-stress-public: check-warn ## Run the stress performance tests for the external access points
+	@echo "Fetching public mode configuration and bearer token..."
+	@CONFIG_FILE=$$(mktemp /tmp/perf_config_XXXXXX); \
+	trap "rm -f $$CONFIG_FILE" EXIT; \
+	PYTHONPATH=. python3 tests/performance/get_test_config.py $(ENV_TYPE) 2>&1 | tail -n 1 > $$CONFIG_FILE; \
+	PUBLIC_BASE_URL=$$(jq -r '.public_base_url' $$CONFIG_FILE); \
+	echo "Running consumer performance stress test against the external access points"; \
+	TEST_CONNECT_MODE=public \
+	TEST_PUBLIC_BASE_URL=$$PUBLIC_BASE_URL \
+	TEST_CONFIG_FILE=$$CONFIG_FILE \
+		k6 run --out csv=$(DIST_PATH)/consumer-stress-public.csv tests/performance/consumer/stress.js -e ENV_TYPE=$(ENV_TYPE)
+
+test-performance-soak-internal:
+	@echo "Running internal consumer performance soak test"
 	k6 run --out csv=$(DIST_PATH)/consumer-soak.csv tests/performance/consumer/soak.js -e HOST=$(HOST) -e ENV_TYPE=$(ENV_TYPE)
+
+test-performance-soak-public: check-warn ## Run the soak performance tests for the external access points
+	@echo "Fetching public mode configuration and bearer token..."
+	@CONFIG_FILE=$$(mktemp /tmp/perf_config_XXXXXX); \
+	trap "rm -f $$CONFIG_FILE" EXIT; \
+	PYTHONPATH=. python3 tests/performance/get_test_config.py $(ENV_TYPE) 2>&1 | tail -n 1 > $$CONFIG_FILE; \
+	PUBLIC_BASE_URL=$$(jq -r '.public_base_url' $$CONFIG_FILE); \
+	echo "Running consumer performance soak test against the external access points"; \
+	TEST_CONNECT_MODE=public \
+	TEST_PUBLIC_BASE_URL=$$PUBLIC_BASE_URL \
+	TEST_CONFIG_FILE=$$CONFIG_FILE \
+		k6 run --out csv=$(DIST_PATH)/consumer-soak-public.csv tests/performance/consumer/soak.js -e ENV_TYPE=$(ENV_TYPE)
 
 test-performance-output: ## Process outputs from the performance tests
 	@echo "Processing performance test outputs"
@@ -254,6 +293,7 @@ generate-models: check-warn ## Generate Pydantic Models
 
 
 perftest-generate-permissions: ## Generate perftest permissions and add to nrlf_permissions
+	@echo "Generating permissions for performance tests with DIST_PATH=$(DIST_PATH)"
 	PYTHONPATH=. poetry run python tests/performance/producer/generate_permissions.py --output_dir="$(DIST_PATH)/nrlf_permissions/K6PerformanceTest"
 
 perftest-seed-tables:	## Seed tables and upload generated perftest input files to s3
@@ -270,22 +310,53 @@ perftest-prepare:	## Prepare input files for producer & consumer perf tests
 	mkdir -p "${DIST_PATH}/nft"
 	aws s3 cp "s3://nhsd-nrlf--${ENV}-metadata/performance/seed-pointers-extract-${PERFTEST_TABLE_NAME}.zip" "${DIST_PATH}/pointer_extract-${PERFTEST_TABLE_NAME}.zip"
 	unzip "${DIST_PATH}/pointer_extract-${PERFTEST_TABLE_NAME}.zip"
-# 	cp "${DIST_PATH}/nft/seed-pointers-extract-${PERFTEST_TABLE_NAME}.csv" "${DIST_PATH}/seed-pointers-extract.csv"
 	PYTHONPATH=. poetry run python ./tests/performance/generate_producer_distributions.py
 
-perftest-producer:	## Run producer perf tests
+perftest-producer-internal:	## Run producer perf tests
 	@echo "Running producer performance tests with HOST=$(PERFTEST_HOST) and ENV_TYPE=$(ENV_TYPE) and DIST_PATH=$(DIST_PATH)"
-	k6 run tests/performance/producer/perftest.js -e HOST=$(PERFTEST_HOST) -e ENV_TYPE=$(ENV_TYPE) -e DIST_PATH=$(DIST_PATH)
+	k6 run tests/performance/producer/perftest.js --summary-mode=full --out json=$(DIST_PATH)/producer-internal-$$(date +%Y%m%d%H%M%S).json -e HOST=$(PERFTEST_HOST) -e ENV_TYPE=$(ENV_TYPE) -e DIST_PATH=$(DIST_PATH)
 
-perftest-consumer:	## Run consumer perf tests
+perftest-producer-public: check-warn ## Run the producer perftests for the external access points
+	@echo "Starting token refresher in background with ENV=$(ENV) PERFTEST_TOKEN_REFRESH_PORT=$(PERFTEST_TOKEN_REFRESH_PORT)"
+	ENV=$(ENV) TOKEN_REFRESH_PORT=$(PERFTEST_TOKEN_REFRESH_PORT) PYTHONPATH=. poetry run python ./tests/performance/token_refresher.py &
+	trap "kill $$(lsof -t -i :$(PERFTEST_TOKEN_REFRESH_PORT)) 2>/dev/null" EXIT
+	@echo "Fetching public mode configuration..."
+	@CONFIG_FILE=$$(mktemp /tmp/perf_config_XXXXXX); \
+	trap "rm -f $$CONFIG_FILE" EXIT; \
+	PYTHONPATH=. poetry run python tests/performance/get_test_config.py $(ENV_TYPE) 2>&1 | tail -n 1 > $$CONFIG_FILE; \
+	PUBLIC_BASE_URL=$$(jq -r '.public_base_url' $$CONFIG_FILE); \
+	echo "Running public producer perftests with ENV_TYPE=$(ENV_TYPE) and DIST_PATH=$(DIST_PATH)"; \
+	TEST_CONNECT_MODE=public \
+	TEST_PUBLIC_BASE_URL=$$PUBLIC_BASE_URL \
+	TEST_CONFIG_FILE=$$CONFIG_FILE \
+		k6 run tests/performance/producer/perftest.js --summary-mode=full --out json=$(DIST_PATH)/producer-public-$$(date +%Y%m%d%H%M%S).json -e ENV_TYPE=$(ENV_TYPE) -e DIST_PATH=$(DIST_PATH)
+	kill $$(lsof -t -i :$(PERFTEST_TOKEN_REFRESH_PORT))
+
+perftest-consumer-internal:
 	@echo "Running consumer performance tests with HOST=$(PERFTEST_HOST) and ENV_TYPE=$(ENV_TYPE) and DIST_PATH=$(DIST_PATH)"
-	k6 run tests/performance/consumer/perftest.js -e HOST=$(PERFTEST_HOST) -e ENV_TYPE=$(ENV_TYPE) -e DIST_PATH=$(DIST_PATH)
+	k6 run tests/performance/consumer/perftest.js --summary-mode=full --out json=$(DIST_PATH)/consumer-internal-$$(date +%Y%m%d%H%M%S).json -e HOST=$(PERFTEST_HOST) -e ENV_TYPE=$(ENV_TYPE) -e DIST_PATH=$(DIST_PATH)
 
-perftest-generate-pointer-table-extract:	## Refresh the perf test input files in s3. Can be expensive to run on large tables
-	@echo "Generating pointer table extract with PERFTEST_TABLE_NAME=$(PERFTEST_TABLE_NAME) and DIST_PATH=$(DIST_PATH)"
+perftest-consumer-public: check-warn ## Run the consumer perftests for the external access points
+	@echo "Starting token refresher in background with ENV=$(ENV) PERFTEST_TOKEN_REFRESH_PORT=$(PERFTEST_TOKEN_REFRESH_PORT)"
+	ENV=$(ENV) TOKEN_REFRESH_PORT=$(PERFTEST_TOKEN_REFRESH_PORT) PYTHONPATH=. poetry run python ./tests/performance/token_refresher.py &
+	trap "kill $$(lsof -t -i :$(PERFTEST_TOKEN_REFRESH_PORT)) 2>/dev/null" EXIT
+	@echo "Fetching public mode configuration..."
+	@CONFIG_FILE=$$(mktemp /tmp/perf_config_XXXXXX); \
+	trap "rm -f $$CONFIG_FILE" EXIT; \
+	PYTHONPATH=. poetry run python tests/performance/get_test_config.py $(ENV_TYPE) 2>&1 | tail -n 1 > $$CONFIG_FILE; \
+	PUBLIC_BASE_URL=$$(jq -r '.public_base_url' $$CONFIG_FILE); \
+	echo "Running public consumer perftests with ENV_TYPE=$(ENV_TYPE) and DIST_PATH=$(DIST_PATH)"; \
+	TEST_CONNECT_MODE=public \
+	TEST_PUBLIC_BASE_URL=$$PUBLIC_BASE_URL \
+	TEST_CONFIG_FILE=$$CONFIG_FILE \
+		k6 run tests/performance/consumer/perftest.js --summary-mode=full --out json=$(DIST_PATH)/consumer-public-$$(date +%Y%m%d%H%M%S).json -e ENV_TYPE=$(ENV_TYPE) -e DIST_PATH=$(DIST_PATH)
+	kill $$(lsof -t -i :$(PERFTEST_TOKEN_REFRESH_PORT))
+
+perftest-generate-pointer-table-extract:
+	@echo "Generating pointer table extract with PERFTEST_TABLE_NAME=$(PERFTEST_TABLE_NAME) and ENV=$(ENV) and DIST_PATH=$(DIST_PATH)"
 	rm -rf "${DIST_PATH}/nft"
 	mkdir -p "${DIST_PATH}/nft"
-	PYTHONPATH=. poetry run python tests/performance/perftest_environment.py generate_pointer_table_extract --output_dir="${DIST_PATH}/nft"
+	PYTHONPATH=. poetry run python tests/performance/perftest_environment.py generate_pointer_table_extract --output_dir="${DIST_PATH}/nft" --extract-size=2000000
 	./scripts/get-current-info.sh > "${DIST_PATH}/nft/info.json"
 	zip -r "${DIST_PATH}/pointer_extract-${PERFTEST_TABLE_NAME}.zip" "${DIST_PATH}/nft"
 	aws s3 cp "${DIST_PATH}/pointer_extract-${PERFTEST_TABLE_NAME}.zip" "s3://nhsd-nrlf--${ENV}-metadata/performance/seed-pointers-extract-${PERFTEST_TABLE_NAME}.zip"

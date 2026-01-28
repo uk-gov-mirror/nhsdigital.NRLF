@@ -300,10 +300,10 @@ jobs:
         run: make test-performance-prepare TF_WORKSPACE_NAME=${{ needs.set-environment-id.outputs.environment_id }}
 
       - name: Run Performance Test - Baseline
-        run: make test-performance-baseline HOST=${{ needs.set-environment-id.outputs.environment_id }}.api.record-locator.dev.national.nhs.uk ENV_TYPE=dev
+        run: make test-performance-baseline-internal HOST=${{ needs.set-environment-id.outputs.environment_id }}.api.record-locator.dev.national.nhs.uk ENV_TYPE=dev
 
       - name: Run Performance Test - Stress
-        run: make test-performance-stress HOST=${{ needs.set-environment-id.outputs.environment_id }}.api.record-locator.dev.national.nhs.uk ENV_TYPE=dev
+        run: make test-performance-stress-internal HOST=${{ needs.set-environment-id.outputs.environment_id }}.api.record-locator.dev.national.nhs.uk ENV_TYPE=dev
 
       - name: Process Performance Test Outputs
         run: make test-performance-output

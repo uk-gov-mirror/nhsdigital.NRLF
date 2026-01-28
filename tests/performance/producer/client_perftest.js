@@ -2,8 +2,8 @@ import http from "k6/http";
 import { ODS_CODE } from "../constants.js";
 import { check } from "k6";
 import { randomItem } from "https://jslib.k6.io/k6-utils/1.2.0/index.js";
-import { crypto } from "k6/experimental/webcrypto";
 import { createRecord } from "../setup.js";
+import { getHeaders, getFullUrl } from "../test-config.js";
 import exec from "k6/execution";
 
 const distPath = __ENV.DIST_PATH || "./dist";
@@ -38,7 +38,7 @@ function getNextPointer() {
   const iter = exec.vu.iterationInScenario;
   const index = iter % dataLines.length;
   const line = dataLines[index];
-  // Adjust field names as per CSV columns: count,pointer_id,pointer_type,custodian,nhs_number
+
   const [pointer_id, pointer_type, custodian, nhs_number] = line
     .split(",")
     .map((field) => field.trim());
@@ -115,25 +115,6 @@ pickCustodian = function (typeCode) {
   return randomItem(arr);
 };
 
-function getBaseURL() {
-  return `https://${__ENV.HOST}/producer/DocumentReference`;
-}
-
-function getHeaders(odsCode = ODS_CODE) {
-  return {
-    "Content-Type": "application/fhir+json",
-    "X-Request-Id": `K6perftest-producer-${exec.scenario.name}-${exec.vu.idInTest}-${exec.vu.iterationInScenario}`,
-    "NHSD-Correlation-Id": `K6perftest-producer-${exec.scenario.name}-${exec.vu.idInTest}-${exec.vu.iterationInScenario}`,
-    "NHSD-Connection-Metadata": JSON.stringify({
-      "nrl.ods-code": odsCode,
-      "nrl.app-id": "K6PerformanceTest",
-    }),
-    "NHSD-Client-RP-Details": JSON.stringify({
-      "developer.app.name": "K6PerformanceTest",
-      "developer.app.id": "K6PerformanceTest",
-    }),
-  };
-}
 function checkResponse(res) {
   const is_success = check(res, { "status is 200": (r) => r.status === 200 });
   if (!is_success) {
@@ -146,9 +127,12 @@ export function createDocumentReference() {
   const pointerType = pickPointerType();
   const custodian = pickCustodian(pointerType);
   const record = createRecord(nhsNumber, pointerType, custodian);
-  const res = http.post(getBaseURL(), JSON.stringify(record), {
-    headers: getHeaders(custodian),
+  const path = "/DocumentReference";
+
+  const res = http.post(getFullUrl(path, "producer"), JSON.stringify(record), {
+    headers: getHeaders(custodian, "producer"),
   });
+
   check(res, { "create status is 201": (r) => r.status === 201 });
   if (res.status !== 201) {
     console.warn(
@@ -161,9 +145,12 @@ export function createDocumentReference() {
 
 export function readDocumentReference() {
   const { pointer_id, custodian } = getNextPointer();
-  const res = http.get(`${getBaseURL()}/${pointer_id}`, {
-    headers: getHeaders(custodian),
+  const path = `/DocumentReference/${pointer_id}`;
+
+  const res = http.get(getFullUrl(path, "producer"), {
+    headers: getHeaders(custodian, "producer"),
   });
+
   checkResponse(res);
 }
 
@@ -172,9 +159,14 @@ export function createThenReadDocumentReference() {
   const pointerType = pickPointerType();
   const custodian = pickCustodian(pointerType);
   const record = createRecord(nhsNumber, pointerType, custodian);
-  const createRes = http.post(getBaseURL(), JSON.stringify(record), {
-    headers: getHeaders(custodian),
-  });
+  const createPath = "/DocumentReference";
+
+  const createRes = http.post(
+    getFullUrl(createPath, "producer"),
+    JSON.stringify(record),
+    { headers: getHeaders(custodian, "producer") }
+  );
+
   check(createRes, { "create status is 201": (r) => r.status === 201 });
   if (createRes.status !== 201) {
     console.warn(
@@ -190,9 +182,10 @@ export function createThenReadDocumentReference() {
   const createdId = locationHeader
     ? locationHeader.split("/").pop()
     : record.id;
+  const path = `/DocumentReference/${createdId}`;
 
-  const readRes = http.get(`${getBaseURL()}/${createdId}`, {
-    headers: getHeaders(custodian),
+  const readRes = http.get(getFullUrl(path, "producer"), {
+    headers: getHeaders(custodian, "producer"),
   });
 
   check(readRes, { "create and read status is 200": (r) => r.status === 200 });
@@ -211,9 +204,14 @@ export function upsertThenReadDocumentReference() {
   const custodian = pickCustodian(pointerType);
   const record = createRecord(nhsNumber, pointerType, custodian);
   record.id = `${custodian}-${crypto.randomUUID()}`;
-  const upsertRes = http.put(getBaseURL(), JSON.stringify(record), {
-    headers: getHeaders(custodian),
-  });
+  const upsertPath = "/DocumentReference";
+
+  const upsertRes = http.put(
+    getFullUrl(upsertPath, "producer"),
+    JSON.stringify(record),
+    { headers: getHeaders(custodian, "producer") }
+  );
+
   check(upsertRes, { "upsert status is 201": (r) => r.status === 201 });
   if (upsertRes.status !== 201) {
     console.warn(
@@ -225,9 +223,10 @@ export function upsertThenReadDocumentReference() {
   }
 
   const upsertedId = record.id;
+  const path = `/DocumentReference/${upsertedId}`;
 
-  const readRes = http.get(`${getBaseURL()}/${upsertedId}`, {
-    headers: getHeaders(custodian),
+  const readRes = http.get(getFullUrl(path, "producer"), {
+    headers: getHeaders(custodian, "producer"),
   });
 
   check(readRes, { "upsert and read status is 200": (r) => r.status === 200 });
@@ -245,9 +244,14 @@ export function createThenUpdateDocumentReference() {
   const pointerType = pickPointerType();
   const custodian = pickCustodian(pointerType);
   const record = createRecord(nhsNumber, pointerType, custodian);
-  const createRes = http.post(getBaseURL(), JSON.stringify(record), {
-    headers: getHeaders(custodian),
-  });
+  const path = `/DocumentReference/${upsertedId}`;
+
+  const createRes = http.post(
+    getFullUrl(path, "producer"),
+    JSON.stringify(record),
+    { headers: getHeaders(custodian, "producer") }
+  );
+
   check(createRes, {
     "createThenUpdateDocumentReference: create status is 201": (r) =>
       r.status === 201,
@@ -271,13 +275,12 @@ export function createThenUpdateDocumentReference() {
 
   // Now update the record
   record.content[0].attachment.url = "https://example.com/k6-updated-url.pdf";
+  const updatePath = `/DocumentReference/${createdId}`;
 
   const updateRes = http.put(
-    `${getBaseURL()}/${createdId}`,
+    getFullUrl(updatePath, "producer"),
     JSON.stringify(record),
-    {
-      headers: getHeaders(custodian),
-    }
+    { headers: getHeaders(custodian, "producer") }
   );
 
   check(updateRes, {
@@ -299,9 +302,14 @@ export function upsertThenUpdateDocumentReference() {
   const custodian = pickCustodian(pointerType);
   const record = createRecord(nhsNumber, pointerType, custodian);
   record.id = `${custodian}-${crypto.randomUUID()}`;
-  const upsertRes = http.put(getBaseURL(), JSON.stringify(record), {
-    headers: getHeaders(custodian),
-  });
+  const path = "/DocumentReference";
+
+  const upsertRes = http.put(
+    getFullUrl(path, "producer"),
+    JSON.stringify(record),
+    { headers: getHeaders(custodian, "producer") }
+  );
+
   check(upsertRes, { "upsert status is 201": (r) => r.status === 201 });
   if (upsertRes.status !== 201) {
     console.warn(
@@ -317,12 +325,12 @@ export function upsertThenUpdateDocumentReference() {
   // Now update the record
   record.content[0].attachment.url = "https://example.com/k6-updated-url.pdf";
 
+  const updatePath = `/DocumentReference/${upsertedId}`;
+
   const updateRes = http.put(
-    `${getBaseURL()}/${upsertedId}`,
+    getFullUrl(updatePath, "producer"),
     JSON.stringify(record),
-    {
-      headers: getHeaders(custodian),
-    }
+    { headers: getHeaders(custodian, "producer") }
   );
 
   check(updateRes, {
@@ -344,9 +352,12 @@ export function upsertDocumentReference() {
   const custodian = pickCustodian(pointerType);
   const record = createRecord(nhsNumber, pointerType, custodian);
   record.id = `${custodian}-k6perf-${crypto.randomUUID()}`;
-  const res = http.put(getBaseURL(), JSON.stringify(record), {
-    headers: getHeaders(custodian),
+  const path = "/DocumentReference";
+
+  const res = http.put(getFullUrl(path, "producer"), JSON.stringify(record), {
+    headers: getHeaders(custodian, "producer"),
   });
+
   check(res, { "create status is 201": (r) => r.status === 201 });
   if (res.status !== 201) {
     console.warn(
@@ -363,10 +374,12 @@ export function searchDocumentReference() {
     `https://fhir.nhs.uk/Id/nhs-number|${nhs_number}`
   );
   const type = encodeURIComponent(`http://snomed.info/sct|${pointer_type}`);
-  const url = `${getBaseURL()}?subject:identifier=${identifier}&type=${type}`;
-  const res = http.get(url, {
-    headers: getHeaders(custodian),
+  const path = `/DocumentReference?subject:identifier=${identifier}&type=${type}`;
+
+  const res = http.get(getFullUrl(path, "producer"), {
+    headers: getHeaders(custodian, "producer"),
   });
+
   check(res, {
     "searchDocumentReference status is 200": (r) => r.status === 200,
   });
@@ -383,9 +396,12 @@ export function searchPostDocumentReference() {
     "subject:identifier": `https://fhir.nhs.uk/Id/nhs-number|${nhs_number}`,
     type: `http://snomed.info/sct|${pointer_type}`,
   });
-  const res = http.post(`${getBaseURL()}/_search`, body, {
-    headers: getHeaders(custodian),
+  const path = `/DocumentReference/_search`;
+
+  const res = http.post(getFullUrl(path, "producer"), body, {
+    headers: getHeaders(custodian, "producer"),
   });
+
   check(res, {
     "searchPostDocumentReference status is 200": (r) => r.status === 200,
   });
