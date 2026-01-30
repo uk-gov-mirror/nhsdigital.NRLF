@@ -40,7 +40,7 @@ DOC_REF_TEMPLATE = load_document_reference("NFT-template")
 
 class TestNhsNumbersIterator:
     def __iter__(self):
-        self.first9 = 920000000
+        self.first9 = 900000000
         return self
 
     def __next__(self):
@@ -111,7 +111,6 @@ def get_pointer_processor(unprocessed_items):
             for unprocessed_item in unprocessed_items
             if unprocessed_item["PutRequest"]["Item"].get("id") == pointer_id
         ]
-        # print("unprocessed matches:", matches)
 
         return len(matches) == 0
 
@@ -154,7 +153,7 @@ def _populate_seed_table(
     print(
         f"Will upsert ~{doc_ref_target} test pointers for {patients_with_pointers} patients."
     )
-    doc_ref_counter = 45000000
+    doc_ref_counter = 0
     batch_counter = 0
     unprocessed_count = 0
 

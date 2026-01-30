@@ -356,7 +356,7 @@ perftest-generate-pointer-table-extract:
 	@echo "Generating pointer table extract with PERFTEST_TABLE_NAME=$(PERFTEST_TABLE_NAME) and ENV=$(ENV) and DIST_PATH=$(DIST_PATH)"
 	rm -rf "${DIST_PATH}/nft"
 	mkdir -p "${DIST_PATH}/nft"
-	PYTHONPATH=. poetry run python tests/performance/perftest_environment.py generate_pointer_table_extract --output_dir="${DIST_PATH}/nft" --extract-size=1500000
+	PYTHONPATH=. poetry run python tests/performance/perftest_environment.py generate_pointer_table_extract --output_dir="${DIST_PATH}/nft" --extract-size=2000000
 	./scripts/get-current-info.sh > "${DIST_PATH}/nft/info.json"
 	zip -r "${DIST_PATH}/pointer_extract-${PERFTEST_TABLE_NAME}.zip" "${DIST_PATH}/nft"
 	aws s3 cp "${DIST_PATH}/pointer_extract-${PERFTEST_TABLE_NAME}.zip" "s3://nhsd-nrlf--${ENV}-metadata/performance/seed-pointers-extract-${PERFTEST_TABLE_NAME}.zip"
