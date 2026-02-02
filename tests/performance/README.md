@@ -45,6 +45,8 @@ make ENV=perftest USE_SHARED_RESOURCES=true apply
 
 You will need to generate pointer permissions the first time performance tests are run in an environment e.g. if the perftest environment is destroyed & recreated.
 
+##### Internal permissions
+
 ```sh
 assume nhsd-nrlf-mgmt
 
@@ -57,6 +59,26 @@ make build
 cd ./terraform/infrastructure
 make init TF_WORKSPACE_NAME=perftest-1 ENV=perftest
 make ENV=perftest USE_SHARED_RESOURCES=true apply
+```
+
+This will set up permissions for the `K6PerformanceTest` organisation, which is used for internal testing.
+
+##### Public permissions
+
+To set additional permissions for public testing, you will need to update the permissions for the default app (currently: `X26-NRL-6981ad7d-cff4-4613-93d0-df60e5e2fc52`) which you can do using [./scripts/manage_permissions.py](./scripts/manage_permissions.py).
+
+You can find the pointer types each ODS code will need permissions for in [tests/performance/seed_data_constants.py](tests/performance/seed_data_constants.py) under `*_POINTERS_CUSTODIAN_DISTRIBUTIONS`. These are used to seed the test data.
+
+For example: while running perf tests, the following failure occurred:
+
+```sh
+WARN[0484] {"issue":[{"severity":"error","code":"forbidden","details":{"coding":[{"system":"https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode","code":"ACCESS DENIED","display":"Access has been denied to process this request"}]},"diagnostics":"Your organisation 'TD2L9A' does not have permission to access this resource. Contact the onboarding team."}],"resourceType":"OperationOutcome"}  source=console
+```
+
+To resolve this, we can give the organisation `TD2L9A` permission to access the pointer type `824321000000109` on the default app:
+
+```sh
+ENV=perftest poetry run python ./scripts/manage_permissions.py set_perms X26-NRL-6981ad7d-cff4-4613-93d0-df60e5e2fc52 TD2L9A http://snomed.info/sct\|824321000000109
 ```
 
 ### Prepare to run tests
