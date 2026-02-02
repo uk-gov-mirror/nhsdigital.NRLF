@@ -7,3 +7,13 @@ variable "athena_kms_key_arn" {}
 variable "target_bucket_arn" {}
 variable "athena_bucket_arn" {}
 variable "use_custom_ami" {}
+variable "root_volume_size" {
+  type        = number
+  description = "Size of the root EBS volume in GB"
+  default     = 40
+}
+variable "root_volume_iops" {
+  type        = number
+  description = "IOPS for the root EBS volume if using io1 or gp3 volume type"
+  default     = 3000
+}

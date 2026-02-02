@@ -8,8 +8,9 @@ resource "aws_instance" "powerbi_gw" {
   vpc_security_group_ids      = var.security_groups
 
   root_block_device {
-    volume_size = 40
-    volume_type = "gp2"
+    volume_size = var.root_volume_size
+    volume_type = "gp3"
+    iops        = var.root_volume_iops
   }
 
   user_data = file("${path.module}/scripts/user_data.tpl")
