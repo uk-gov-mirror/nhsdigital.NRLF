@@ -41,28 +41,4 @@ data "aws_iam_policy_document" "vault_policy" {
       resources = ["*"]
     }
   }
-
-  dynamic "statement" {
-    for_each = var.enable_vault_protection ? [1] : []
-    content {
-      sid    = "DenyBackupCopyExceptToSourceAccount"
-      effect = "Deny"
-
-      principals {
-        type        = "AWS"
-        identifiers = ["arn:aws:iam::${var.account_id}:root"]
-      }
-      actions = [
-        "backup:CopyFromBackupVault"
-      ]
-      resources = ["*"]
-      condition {
-        test     = "StringNotEquals"
-        variable = "backup:CopyTargets"
-        values = [
-          "arn:aws:backup:${var.region}:${var.source_account_id}:backup-vault:${var.region}-${var.source_account_id}-backup-vault"
-        ]
-      }
-    }
-  }
 }

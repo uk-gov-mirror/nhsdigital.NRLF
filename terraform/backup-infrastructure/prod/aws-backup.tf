@@ -28,7 +28,8 @@ module "destination" {
   account_id              = local.destination_account_id
   source_account_id       = local.source_account_id
   kms_key                 = aws_kms_key.destination_backup_key.arn
-  enable_vault_protection = false
+  enable_vault_protection = true
+  vault_lock_type         = "compliance"
 }
 
 ###
