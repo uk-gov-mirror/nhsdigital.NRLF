@@ -41,7 +41,7 @@ jobs:
 
       - name: Terraform Init
         run: |
-          terraform -chdir=terraform/backup-infrastructure init
+          terraform -chdir=terraform/backup-infrastructure/test init
 
       - name: Set architecture variable
         id: os-arch
