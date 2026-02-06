@@ -19,7 +19,7 @@ on:
 jobs:
   sbom:
     name: Generate Software Bill of Materials - ${{ github.event.release.name }}
-    runs-on: ubuntu-latest
+    runs-on: codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
 
     steps:
       - name: Git clone - ${{ github.ref }}
