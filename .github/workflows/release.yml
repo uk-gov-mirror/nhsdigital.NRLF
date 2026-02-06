@@ -41,7 +41,14 @@ jobs:
 
       - name: Terraform Init
         run: |
+          terraform -chdir=terraform/account-wide-infrastructure/mgmt init
+          terraform -chdir=terraform/account-wide-infrastructure/dev init
+          terraform -chdir=terraform/account-wide-infrastructure/test init
+          terraform -chdir=terraform/account-wide-infrastructure/prod init
           terraform -chdir=terraform/backup-infrastructure/test init
+          terraform -chdir=terraform/backup-infrastructure/prod init
+          terraform -chdir=terraform/bastion init
+          terraform -chdir=terraform/infrastructure init
 
       - name: Set architecture variable
         id: os-arch
