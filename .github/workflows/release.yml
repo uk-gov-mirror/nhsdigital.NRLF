@@ -27,6 +27,11 @@ jobs:
         with:
           ref: ${{ github.ref }}
 
+      - name: Setup environment
+        run: |
+          echo "${HOME}/.asdf/bin" >> $GITHUB_PATH
+          poetry install --no-root
+
       - name: Set architecture variable
         id: os-arch
         run: |
