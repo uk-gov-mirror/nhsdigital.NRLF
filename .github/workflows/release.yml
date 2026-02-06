@@ -5,6 +5,9 @@ permissions:
   contents: read
   actions: write
 
+env:
+  SYFT_VERSION: "1.27.1"
+
 on:
   release:
     types: [published]
@@ -15,7 +18,7 @@ on:
 
 jobs:
   sbom:
-    name: Generate SBOM - ${{ github.ref }}
+    name: Generate Software Bill of Materials - ${{ github.event.release.name }}
     runs-on: ubuntu-latest
 
     steps:
@@ -23,3 +26,65 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.ref }}
+
+      - name: Set architecture variable
+        id: os-arch
+        run: |
+          case "${{ runner.arch }}" in
+            X64) ARCH="amd64" ;;
+            ARM64) ARCH="arm64" ;;
+          esac
+          echo "arch=${ARCH}" >> $GITHUB_OUTPUT
+
+      - name: Download and setup Syft
+        run: |
+          DOWNLOAD_URL="https://github.com/anchore/syft/releases/download/v${{ env.SYFT_VERSION }}/syft_${{ env.SYFT_VERSION }}_linux_${{ steps.os-arch.outputs.arch }}.tar.gz"
+          echo "Downloading: ${DOWNLOAD_URL}"
+          curl -L -o syft.tar.gz "${DOWNLOAD_URL}"
+          tar -xzf syft.tar.gz
+          chmod +x syft
+          # Add to PATH for subsequent steps
+          echo "$(pwd)" >> $GITHUB_PATH
+
+      - name: Create SBOM
+        run: bash scripts/sbom-create.sh
+
+      - name: Upload SBOM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-${{ github.sha }}
+          path: sbom.spdx.json
+
+      - name: Append SBOM inventory to summary
+        if: always()
+        shell: bash
+        run: |
+          cat > sbom_to_summary.jq <<'JQ'
+          def clean: (.|tostring) | gsub("\\|"; "\\|") | gsub("\r?\n"; " ");
+          def purl: ((.externalRefs[]? | select(.referenceType=="purl") | .referenceLocator) // "");
+          def license: (.licenseConcluded // .licenseDeclared // "");
+          def supplier: ((.supplier // "") | sub("^Person: *|^Organization: *";""));
+          if (has("spdxVersion") | not) then
+            "### SBOM Inventory (SPDX)\n\nSBOM is not SPDX JSON."
+          else
+            .packages as $pkgs
+            | "### SBOM Inventory (SPDX)\n\n"
+            + "| Metric | Value |\n|---|---|\n"
+            + "| Packages | " + ($pkgs|length|tostring) + " |\n\n"
+            + "<details><summary>Full inventory</summary>\n\n"
+            + "| Package | Version | Supplier | License | PURL |\n|---|---|---|---|---|\n"
+            + (
+                $pkgs
+                | map("| "
+                      + ((.name // .SPDXID) | clean)
+                      + " | " + ((.versionInfo // "") | clean)
+                      + " | " + (supplier | clean)
+                      + " | " + (license | clean)
+                      + " | " + (purl | clean)
+                      + " |")
+                | join("\n")
+              )
+            + "\n\n</details>\n"
+          end
+          JQ
+          jq -r -f sbom_to_summary.jq sbom.spdx.json >> "$GITHUB_STEP_SUMMARY"
