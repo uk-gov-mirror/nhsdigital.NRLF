@@ -1,0 +1,25 @@
+name: Release
+run-name: Release NRL ${{ github.event.release.name }}
+permissions:
+  id-token: write
+  contents: read
+  actions: write
+
+on:
+  release:
+    types: [published]
+  # push:
+  #   tags:
+  #     - v*
+  workflow_dispatch:
+
+jobs:
+  sbom:
+    name: Generate SBOM - ${{ github.ref }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Git clone - ${{ github.ref }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
