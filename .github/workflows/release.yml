@@ -40,9 +40,8 @@ jobs:
           role-session-name: github-actions-ci-release-tag-${{ github.run_id }}
 
       - name: Terraform Init
-        env:
-          ENVIRONMENT: dev
-        run: terraform -chdir=terraform/infrastructure init
+        run: |
+          terraform -chdir=terraform/backup-infrastructure init
 
       - name: Set architecture variable
         id: os-arch
