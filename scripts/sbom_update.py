@@ -1,19 +1,26 @@
+#!/usr/bin/env python3
+"""
+Merge two SBOMs together
+
+packages, files, and relationships from new_sbom will be merged into existing_sbom
+"""
+
 import json
-import sys
 from pathlib import Path
 
 import fire
 
 
-def update_sbom(existing_sbom="sbom.spdx.json") -> None:
+def update_sbom(new_sbom, existing_sbom="sbom.spdx.json") -> None:
+    with Path(new_sbom).open("r") as f:
+        updates = json.load(f)
+
     with Path(existing_sbom).open("r") as f:
         sbom = json.load(f)
 
-    tool = json.loads(sys.stdin.read())
-
-    sbom.setdefault("packages", []).extend(tool.setdefault("packages", []))
-    sbom.setdefault("files", []).extend(tool.setdefault("files", []))
-    sbom.setdefault("relationships", []).extend(tool.setdefault("relationships", []))
+    sbom.setdefault("packages", []).extend(updates.setdefault("packages", []))
+    sbom.setdefault("files", []).extend(updates.setdefault("files", []))
+    sbom.setdefault("relationships", []).extend(updates.setdefault("relationships", []))
 
     with Path(existing_sbom).open("w") as f:
         json.dump(sbom, f)

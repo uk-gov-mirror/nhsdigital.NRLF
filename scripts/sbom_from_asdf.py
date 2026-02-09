@@ -2,7 +2,6 @@
 """Generate an SBOM-looking document for our asdf dependencies"""
 
 import json
-import re
 from pathlib import Path
 
 
@@ -25,30 +24,6 @@ def parse_tool_versions(file_path=".tool-versions"):
                 tools.append({"name": tool_name, "version": version})
 
     return tools
-
-
-# def create_spdx_package(tool, index):
-#     package_id = f"SPDXRef-Package-asdf-{tool['name']}-{index}"
-
-#     return {
-#         "name": tool["name"],
-#         "SPDXID": package_id,
-#         "versionInfo": tool["version"],
-#         "supplier": "NOASSERTION",
-#         "downloadLocation": "NOASSERTION",
-#         "filesAnalyzed": False,
-#         "sourceInfo": "ASDF-managed tool: acquired package info from /.tool-versions",
-#         "licenseConcluded": "NOASSERTION",
-#         "licenseDeclared": "NOASSERTION",
-#         "copyrightText": "NOASSERTION",
-#         "externalRefs": [
-#             {
-#                 "referenceCategory": "PACKAGE-MANAGER",
-#                 "referenceType": "purl",
-#                 "referenceLocator": f"pkg:generic/{tool['name']}@{tool['version']}",
-#             }
-#         ],
-#     }
 
 
 def generate_asdf_sbom(output_file="sbom-asdf.spdx.json"):
@@ -83,7 +58,6 @@ def generate_asdf_sbom(output_file="sbom-asdf.spdx.json"):
             }
             for index, tool in enumerate(tools)
         ],
-        # "packages": [create_spdx_package(tool, idx) for idx, tool in enumerate(tools)],
         "relationships": [
             {
                 "spdxElementId": "SPDXRef-DOCUMENT",
