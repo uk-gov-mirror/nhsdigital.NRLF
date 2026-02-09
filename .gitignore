@@ -84,3 +84,6 @@ producer-internal-*.json
 producer-public-*.json
 consumer-internal-*.json
 consumer-public-*.json
+
+# SBOM files
+sbom*.spdx.json

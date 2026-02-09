@@ -72,6 +72,10 @@ jobs:
       - name: Create SBOM
         run: bash scripts/sbom-create.sh
 
+      - name: Generate ASDF SBOM
+        working-directory: ./main-repo
+        run: poetry run python scripts/asdf_to_sbom.py
+
       - name: Upload SBOM artifact
         uses: actions/upload-artifact@v4
         with:
