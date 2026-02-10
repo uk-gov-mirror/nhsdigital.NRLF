@@ -111,3 +111,17 @@ jobs:
           end
           JQ
           jq -r -f sbom_to_summary.jq sbom.spdx.json >> "$GITHUB_STEP_SUMMARY"
+
+      # - name: Upload SBOM to release
+      #   run: |
+      #     gh release upload ${{ github.event.release.tag_name }} sbom.spdx.json
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload SBOM to release but better
+        if: ${{ github.event.release.tag_name }}
+        uses: svenstaro/upload-release-action@v2
+        with:
+          file: sbom.spdx.json
+          asset_name: sbom-${{ github.ref }}
+          tag: ${{ github.ref }}
