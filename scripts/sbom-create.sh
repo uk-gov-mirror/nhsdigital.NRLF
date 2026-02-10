@@ -1,7 +1,5 @@
 REPO_ROOT=$(git rev-parse --show-toplevel)
 
-echo REPO_ROOT: $REPO_ROOT
-
 syft -o spdx-json . > sbom.spdx.json
 
 ASDF_SBOM="sbom-asdf.spdx.json"

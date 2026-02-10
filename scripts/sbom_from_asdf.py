@@ -4,6 +4,8 @@
 import json
 from pathlib import Path
 
+import fire
+
 
 def parse_tool_versions(file_path=".tool-versions"):
     tools = []
@@ -76,4 +78,4 @@ def generate_asdf_sbom(output_file="sbom-asdf.spdx.json"):
 
 
 if __name__ == "__main__":
-    generate_asdf_sbom()
+    fire.Fire(generate_asdf_sbom)
