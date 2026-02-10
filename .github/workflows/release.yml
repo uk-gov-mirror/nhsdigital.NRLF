@@ -1,8 +1,8 @@
-name: Release
+name: Release Published
 run-name: Release NRL ${{ github.event.release.name }}
 permissions:
   id-token: write
-  contents: read
+  contents: write
   actions: write
 
 env:
@@ -112,16 +112,11 @@ jobs:
           JQ
           jq -r -f sbom_to_summary.jq sbom.spdx.json >> "$GITHUB_STEP_SUMMARY"
 
-      # - name: Upload SBOM to release
-      #   run: |
-      #     gh release upload ${{ github.event.release.tag_name }} sbom.spdx.json
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload SBOM to release but better
+      - name: Upload SBOM to release
         if: ${{ github.event.release.tag_name }}
         uses: svenstaro/upload-release-action@v2
         with:
           file: sbom.spdx.json
-          asset_name: sbom-${{ github.ref }}
+          asset_name: sbom-${{ github.event.release.tag_name }}
           tag: ${{ github.ref }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
