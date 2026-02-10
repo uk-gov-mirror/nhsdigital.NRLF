@@ -52,7 +52,7 @@ def generate_asdf_sbom(output_file="sbom-asdf.spdx.json"):
                     {
                         "referenceCategory": "PACKAGE-MANAGER",
                         "referenceType": "purl",
-                        "referenceLocator": f"pkg:generic/{tool['name']}@{tool['version']}",
+                        "referenceLocator": f"pkg:asdf/{tool['name']}@{tool['version']}",
                     }
                 ],
             }
