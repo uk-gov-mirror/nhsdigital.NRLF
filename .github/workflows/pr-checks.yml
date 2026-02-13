@@ -5,9 +5,6 @@ on:
   pull_request:
     types: [opened, reopened, synchronize]
 
-concurrency:
-  cancel-in-progress: false
-
 permissions:
   id-token: write
   contents: read
@@ -45,7 +42,7 @@ jobs:
   sonar:
     name: SonarQube analysis and quality gate check
     runs-on: ubuntu-latest
-    after: build
+    needs: build
     steps:
       - uses: actions/checkout@v4
         with:
