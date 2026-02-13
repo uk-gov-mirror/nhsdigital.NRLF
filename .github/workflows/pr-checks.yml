@@ -37,7 +37,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: build-artifacts
-        path: dist
+          path: dist
 
   sonar:
     name: SonarQube analysis and quality gate check
@@ -52,7 +52,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: build-artifacts
-        path: dist
+          path: dist
 
       # Triggering SonarQube analysis as results of it are required by Quality Gate check.
       - name: SonarQube Scan
