@@ -83,6 +83,17 @@ resource "aws_iam_policy" "github_ci_policy" {
       },
       {
         Action = [
+          "s3:GetObject",
+          "s3:ListBucket"
+        ]
+        Effect = "Allow"
+        Resource = [
+          data.aws_s3_bucket.truststore.arn,
+          "${data.aws_s3_bucket.truststore.arn}/*"
+        ]
+      },
+      {
+        Action = [
           "s3:PutObject",
           "s3:DeleteObject",
           "s3:GetObject",

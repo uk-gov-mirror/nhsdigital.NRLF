@@ -2,15 +2,6 @@ resource "aws_s3_bucket" "ci_data" {
   bucket = "${local.prefix}--ci-data"
 }
 
-resource "aws_s3_bucket_acl" "ci_data" {
-  bucket = aws_s3_bucket.ci_data.id
-  acl    = "private"
-
-  depends_on = [
-    aws_s3_bucket.ci_data
-  ]
-}
-
 resource "aws_s3_bucket_public_access_block" "ci_data" {
   bucket = aws_s3_bucket.ci_data.id
 
