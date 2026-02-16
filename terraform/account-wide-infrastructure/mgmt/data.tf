@@ -2,16 +2,19 @@ data "aws_caller_identity" "current" {}
 
 data "aws_region" "current" {}
 
+data "external" "current-info" {
+  program = [
+    "bash",
+    "../../../scripts/get-current-info.sh",
+  ]
+}
+
 data "aws_dynamodb_table" "terraform_state_lock" {
   name = "${local.project}--terraform-state-lock"
 }
 
 data "aws_s3_bucket" "terraform_state" {
   bucket = "${local.project}--terraform-state"
-}
-
-data "aws_s3_bucket" "ci_logging" {
-  bucket = "${local.project}--mgmt--github-ci-logging"
 }
 
 data "aws_s3_bucket" "truststore" {
@@ -52,4 +55,8 @@ data "aws_secretsmanager_secret_version" "test_backup_account_id" {
 
 data "aws_secretsmanager_secret_version" "test_restore_account_id" {
   secret_id = data.aws_secretsmanager_secret.test_restore_account_id.name
+}
+
+data "aws_secretsmanager_secret_version" "prod_account_id" {
+  secret_id = data.aws_secretsmanager_secret.prod_account_id.name
 }

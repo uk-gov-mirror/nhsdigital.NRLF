@@ -220,8 +220,8 @@ jobs:
           ENVIRONMENT: ${{ inputs.environment }}
         run: |
           terraform -chdir=terraform/infrastructure show -no-color tfplan > terraform/infrastructure/tfplan.txt
-          aws s3 cp terraform/infrastructure/tfplan s3://nhsd-nrlf--mgmt--github-ci-logging/$ENVIRONMENT/${{ github.run_id }}/tfplan
-          aws s3 cp terraform/infrastructure/tfplan.txt s3://nhsd-nrlf--mgmt--github-ci-logging/$ENVIRONMENT/${{ github.run_id }}/tfplan.txt
+          aws s3 cp terraform/infrastructure/tfplan s3://nhsd-nrlf--mgmt--ci-data/$ENVIRONMENT/${{ github.run_id }}/tfplan
+          aws s3 cp terraform/infrastructure/tfplan.txt s3://nhsd-nrlf--mgmt--ci-data/$ENVIRONMENT/${{ github.run_id }}/tfplan.txt
 
   terraform-apply:
     name: Apply permissions
@@ -265,7 +265,7 @@ jobs:
       - name: Download Terraform Plan artifact
         env:
           ENVIRONMENT: ${{ inputs.environment }}
-        run: aws s3 cp s3://nhsd-nrlf--mgmt--github-ci-logging/$ENVIRONMENT/${{ github.run_id }}/tfplan terraform/infrastructure/tfplan
+        run: aws s3 cp s3://nhsd-nrlf--mgmt--ci-data/$ENVIRONMENT/${{ github.run_id }}/tfplan terraform/infrastructure/tfplan
 
       - name: Terraform Init
         env:
