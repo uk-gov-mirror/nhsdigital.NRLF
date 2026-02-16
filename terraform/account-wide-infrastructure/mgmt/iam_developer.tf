@@ -1,0 +1,117 @@
+resource "aws_iam_policy" "developer_policy" {
+  name = "${local.prefix}--developer-policy"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:GetObject",
+          "dynamodb:PutItem",
+          "dynamodb:GetItem",
+          "dynamodb:DeleteItem",
+          "s3:ListBucket"
+        ]
+        Effect = "Allow"
+        Resource = [
+          data.aws_dynamodb_table.terraform_state_lock.arn,
+          data.aws_s3_bucket.terraform_state.arn,
+          "${data.aws_s3_bucket.terraform_state.arn}/*"
+        ]
+      },
+      {
+        Action = [
+          "s3:PutObject",
+          "s3:GetObject",
+          "s3:DeleteObject"
+        ]
+        Effect = "Deny"
+        Resource = [
+          "${data.aws_s3_bucket.terraform_state.arn}/${local.project}/prod/*",
+          "${data.aws_s3_bucket.terraform_state.arn}/${local.project}/mgmt/*",
+        ]
+      },
+      {
+        Action = [
+          "s3:DeleteObject"
+        ]
+        Effect = "Deny"
+        Resource = [
+          "${data.aws_s3_bucket.terraform_state.arn}/${local.project}/dev/*"
+        ]
+      },
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Resource = [
+          "arn:aws:iam::${data.aws_secretsmanager_secret_version.dev_account_id.secret_string}:role/terraform",
+          "arn:aws:iam::${data.aws_secretsmanager_secret_version.test_account_id.secret_string}:role/terraform",
+          "arn:aws:iam::${data.aws_secretsmanager_secret_version.test_backup_account_id.secret_string}:role/terraform",
+          "arn:aws:iam::${data.aws_secretsmanager_secret_version.test_restore_account_id.secret_string}:role/terraform"
+        ]
+      },
+      {
+        Action = [
+          "secretsmanager:GetResourcePolicy",
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret",
+          "secretsmanager:ListSecretVersionIds"
+        ]
+        Effect = "Allow"
+        Resource = [
+          data.aws_secretsmanager_secret.dev_account_id.arn,
+          data.aws_secretsmanager_secret.test_account_id.arn
+        ]
+      },
+      {
+        Action = [
+          "s3:ListAllMyBuckets"
+        ]
+        Effect = "Allow"
+        Resource = [
+          "arn:aws:s3:::*"
+        ]
+      },
+      {
+        Action = [
+          "s3:GetObject",
+          "s3:ListBucket"
+        ]
+        Effect = "Allow"
+        Resource = [
+          aws_s3_bucket.ci_data.arn,
+          "${aws_s3_bucket.ci_data.arn}/*"
+        ]
+      },
+      {
+        Action = [
+          "s3:PutObject",
+          "s3:GetObject",
+          "s3:DeleteObject"
+        ]
+        Effect = "Deny"
+        Resource = [
+          "${data.aws_s3_bucket.truststore.arn}/ca/prod*",
+          "${data.aws_s3_bucket.truststore.arn}/client/prod*",
+          "${data.aws_s3_bucket.truststore.arn}/server/prod*"
+        ]
+      },
+      {
+        Action = [
+          "s3:GetObject"
+        ]
+        Effect = "Allow"
+        Resource = [
+          "${data.aws_s3_bucket.truststore.arn}/*"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "developer_policy_attachment" {
+  role       = var.developer_role_name
+  policy_arn = aws_iam_policy.developer_policy.arn
+}

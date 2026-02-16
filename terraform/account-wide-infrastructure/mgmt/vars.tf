@@ -1,3 +1,9 @@
+variable "developer_role_name" {
+  description = "Name of the IAM role for developers"
+  type        = string
+  default     = "AWSReservedSSO_NHSDDeveloperRole_fa10ba0474290a64"
+}
+
 variable "private_subnet_cidr_blocks" {
   description = "Available CIDR blocks for private subnets"
   type        = list(string)

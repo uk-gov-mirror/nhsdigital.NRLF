@@ -63,7 +63,9 @@ data "aws_iam_policy_document" "codebuild_policy" {
   statement {
     effect = "Allow"
     actions = [
-      "ecr:*"
+      "ecr:GetDownloadUrlForLayer",
+      "ecr:BatchGetImage",
+      "ecr:BatchCheckLayerAvailability"
     ]
     resources = [
       "${aws_ecr_repository.repository.arn}",

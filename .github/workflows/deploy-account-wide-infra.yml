@@ -88,9 +88,9 @@ jobs:
         run: |
           terraform -chdir=terraform/account-wide-infrastructure/${ACCOUNT_NAME} show -no-color tfplan > terraform/account-wide-infrastructure/$ACCOUNT_NAME/tfplan.txt
 
-          aws s3 cp terraform/account-wide-infrastructure/$ACCOUNT_NAME/tfplan s3://nhsd-nrlf--mgmt--github-ci-logging/acc-$ACCOUNT_NAME/${{ github.run_id }}/tfplan
-          aws s3 cp terraform/account-wide-infrastructure/$ACCOUNT_NAME/tfplan.txt s3://nhsd-nrlf--mgmt--github-ci-logging/acc-$ACCOUNT_NAME/${{ github.run_id }}/tfplan.txt
-          aws s3 cp terraform/account-wide-infrastructure/modules/glue/files/src.zip s3://nhsd-nrlf--mgmt--github-ci-logging/acc-$ACCOUNT_NAME/${{ github.run_id }}/glue-src.zip
+          aws s3 cp terraform/account-wide-infrastructure/$ACCOUNT_NAME/tfplan s3://nhsd-nrlf--mgmt--ci-data/acc-$ACCOUNT_NAME/${{ github.run_id }}/tfplan
+          aws s3 cp terraform/account-wide-infrastructure/$ACCOUNT_NAME/tfplan.txt s3://nhsd-nrlf--mgmt--ci-data/acc-$ACCOUNT_NAME/${{ github.run_id }}/tfplan.txt
+          aws s3 cp terraform/account-wide-infrastructure/modules/glue/files/src.zip s3://nhsd-nrlf--mgmt--ci-data/acc-$ACCOUNT_NAME/${{ github.run_id }}/glue-src.zip
 
   terraform-apply:
     name: Terraform Apply - ${{ inputs.environment }}
@@ -120,11 +120,11 @@ jobs:
         env:
           ACCOUNT_NAME: ${{ vars.ACCOUNT_NAME }}
         run: |
-          aws s3 cp s3://nhsd-nrlf--mgmt--github-ci-logging/acc-$ACCOUNT_NAME/${{ github.run_id }}/tfplan terraform/account-wide-infrastructure/${ACCOUNT_NAME}/tfplan
-          aws s3 cp s3://nhsd-nrlf--mgmt--github-ci-logging/acc-$ACCOUNT_NAME/${{ github.run_id }}/tfplan.txt terraform/account-wide-infrastructure/${ACCOUNT_NAME}/tfplan.txt
+          aws s3 cp s3://nhsd-nrlf--mgmt--ci-data/acc-$ACCOUNT_NAME/${{ github.run_id }}/tfplan terraform/account-wide-infrastructure/${ACCOUNT_NAME}/tfplan
+          aws s3 cp s3://nhsd-nrlf--mgmt--ci-data/acc-$ACCOUNT_NAME/${{ github.run_id }}/tfplan.txt terraform/account-wide-infrastructure/${ACCOUNT_NAME}/tfplan.txt
 
           mkdir -p terraform/account-wide-infrastructure/modules/glue/files
-          aws s3 cp s3://nhsd-nrlf--mgmt--github-ci-logging/acc-$ACCOUNT_NAME/${{ github.run_id }}/glue-src.zip terraform/account-wide-infrastructure/modules/glue/files/src.zip
+          aws s3 cp s3://nhsd-nrlf--mgmt--ci-data/acc-$ACCOUNT_NAME/${{ github.run_id }}/glue-src.zip terraform/account-wide-infrastructure/modules/glue/files/src.zip
 
       - name: Retrieve Server Certificates
         env:
