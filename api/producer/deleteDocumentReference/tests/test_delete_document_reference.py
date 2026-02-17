@@ -16,7 +16,9 @@ from nrlf.tests.events import (
 
 @mock_aws
 @mock_repository
-def test_delete_document_reference_happy_path(repository: DocumentPointerRepository):
+def test_beefy_delete_document_reference_happy_path(
+    repository: DocumentPointerRepository,
+):
     doc_ref = load_document_reference("Y05868-736253002-Valid")
     doc_pointer = DocumentPointer.from_document_reference(doc_ref)
     repository.create(doc_pointer)
@@ -131,7 +133,9 @@ def test_delete_document_reference_invalid_producer_id():
 
 @mock_aws
 @mock_repository
-def test_delete_document_reference_not_exists(repository: DocumentPointerRepository):
+def test_beefy_delete_document_reference_not_exists(
+    repository: DocumentPointerRepository,
+):
     event = create_test_api_gateway_event(
         headers=create_headers(), path_parameters={"id": "Y05868-99999-99999-999999"}
     )

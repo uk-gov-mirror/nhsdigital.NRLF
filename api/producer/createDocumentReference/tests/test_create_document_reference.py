@@ -31,7 +31,9 @@ from nrlf.tests.events import (
 @mock_repository
 @freeze_time("2024-03-21T12:34:56.789")
 @freeze_uuid("00000000-0000-0000-0000-000000000001")
-def test_create_document_reference_happy_path(repository: DocumentPointerRepository):
+def test_beefy_create_document_reference_happy_path(
+    repository: DocumentPointerRepository,
+):
     doc_ref_data = load_document_reference_data("Y05868-736253002-Valid")
 
     event = create_test_api_gateway_event(
@@ -93,7 +95,7 @@ def test_create_document_reference_happy_path(repository: DocumentPointerReposit
 @mock_repository
 @freeze_time("2024-03-21T12:34:56.789")
 @freeze_uuid("00000000-0000-0000-0000-000000000001")
-def test_create_document_reference_happy_path_with_ssp(
+def test_beefy_create_document_reference_happy_path_with_ssp(
     repository: DocumentPointerRepository,
 ):
     doc_ref_data = load_document_reference_data(
@@ -159,7 +161,7 @@ def test_create_document_reference_happy_path_with_ssp(
 @mock_repository
 @freeze_time("2024-03-21T12:34:56.789")
 @freeze_uuid("00000000-0000-0000-0000-000000000001")
-def test_create_document_reference_without_related_value_exception(
+def test_beefy_create_document_reference_without_related_value_exception(
     repository: DocumentPointerRepository,
 ):
     doc_ref = load_document_reference("Y05868-736253002-Valid-with-ssp-content")
@@ -683,7 +685,7 @@ def test_create_document_reference_invalid_pointer_type():
 @mock_aws
 @mock_repository
 @patch("nrlf.core.decorators.parse_permissions_file")
-def test_create_document_reference_pointer_type_not_allowed(
+def test_beefy_create_document_reference_pointer_type_not_allowed(
     parse_permissions_mock, repository: DocumentPointerRepository
 ):
     doc_ref = load_document_reference("Y05868-736253002-Valid")
@@ -776,7 +778,7 @@ def test_create_document_reference_invalid_category_type():
 
 @mock_aws
 @mock_repository
-def test_create_document_reference_cannot_set_status_to_not_current(repository):
+def test_beefy_create_document_reference_cannot_set_status_to_not_current(repository):
     doc_ref = load_document_reference("Y05868-736253002-Valid")
     doc_pointer = DocumentPointer.from_document_reference(doc_ref)
     repository.create(doc_pointer)
@@ -915,7 +917,7 @@ def test_create_document_reference_invalid_relatesto_target_producer_id():
 
 @mock_aws
 @mock_repository
-def test_create_document_reference_invalid_relatesto_not_exists(repository):
+def test_beefy_create_document_reference_invalid_relatesto_not_exists(repository):
     doc_ref = load_document_reference("Y05868-736253002-Valid")
     doc_ref.relatesTo = [
         DocumentReferenceRelatesTo(
@@ -966,7 +968,7 @@ def test_create_document_reference_invalid_relatesto_not_exists(repository):
 
 @mock_aws
 @mock_repository
-def test_create_document_reference_invalid_relatesto_nhs_number(
+def test_beefy_create_document_reference_invalid_relatesto_nhs_number(
     repository: DocumentPointerRepository,
 ):
     doc_ref = load_document_reference("Y05868-736253002-Valid")
@@ -1025,7 +1027,7 @@ def test_create_document_reference_invalid_relatesto_nhs_number(
 
 @mock_aws
 @mock_repository
-def test_create_document_reference_invalid_relatesto_type(
+def test_beefy_create_document_reference_invalid_relatesto_type(
     repository: DocumentPointerRepository,
 ):
     doc_ref = load_document_reference("Y05868-736253002-Valid")
@@ -1087,7 +1089,7 @@ def test_create_document_reference_invalid_relatesto_type(
 
 @mock_aws
 @mock_repository
-def test_create_document_reference_with_no_context_related_for_ssp_url(
+def test_beefy_create_document_reference_with_no_context_related_for_ssp_url(
     repository: DocumentPointerRepository,
 ):
     doc_ref = load_document_reference("Y05868-736253002-Valid-with-ssp-content")
@@ -1134,7 +1136,7 @@ def test_create_document_reference_with_no_context_related_for_ssp_url(
 
 @mock_aws
 @mock_repository
-def test_create_document_reference_with_no_asid_in_for_ssp_url(
+def test_beefy_create_document_reference_with_no_asid_in_for_ssp_url(
     repository: DocumentPointerRepository,
 ):
     doc_ref = load_document_reference("Y05868-736253002-Valid-with-ssp-content")
@@ -1188,7 +1190,7 @@ def test_create_document_reference_with_no_asid_in_for_ssp_url(
 
 @mock_aws
 @mock_repository
-def test_create_document_reference_with_invalid_asid_for_ssp_url(
+def test_beefy_create_document_reference_with_invalid_asid_for_ssp_url(
     repository: DocumentPointerRepository,
 ):
     doc_ref = load_document_reference("Y05868-736253002-Valid-with-ssp-content")
@@ -1243,7 +1245,7 @@ def test_create_document_reference_with_invalid_asid_for_ssp_url(
 @mock_aws
 @mock_repository
 @freeze_uuid("00000000-0000-0000-0000-000000000001")
-def test_create_document_reference_supersede_deletes_old_pointers_replace(
+def test_beefy_create_document_reference_supersede_deletes_old_pointers_replace(
     repository: DocumentPointerRepository,
 ):
     doc_ref = load_document_reference("Y05868-736253002-Valid")
@@ -1305,7 +1307,7 @@ def test_create_document_reference_supersede_deletes_old_pointers_replace(
 @mock_aws
 @mock_repository
 @freeze_uuid("00000000-0000-0000-0000-000000000001")
-def test_create_document_reference_supersede_succeeds_with_toggle(
+def test_beefy_create_document_reference_supersede_succeeds_with_toggle(
     repository: DocumentPointerRepository,
 ):
     doc_ref = load_document_reference("Y05868-736253002-Valid")
@@ -1363,7 +1365,7 @@ def test_create_document_reference_supersede_succeeds_with_toggle(
 
 @mock_aws
 @mock_repository
-def test_create_document_reference_supersede_fails_without_toggle(
+def test_beefy_create_document_reference_supersede_fails_without_toggle(
     repository: DocumentPointerRepository,
 ):
     doc_ref = load_document_reference("Y05868-736253002-Valid")
@@ -1417,7 +1419,7 @@ def test_create_document_reference_supersede_fails_without_toggle(
 @mock_aws
 @mock_repository
 @freeze_uuid("00000000-0000-0000-0000-000000000001")
-def test_create_document_reference_create_relatesto_not_replaces(
+def test_beefy_create_document_reference_create_relatesto_not_replaces(
     repository: DocumentPointerRepository,
 ):
     doc_ref = load_document_reference("Y05868-736253002-Valid")
@@ -1480,7 +1482,7 @@ def test_create_document_reference_create_relatesto_not_replaces(
 @mock_repository
 @freeze_time("2024-03-21T12:34:56.789")
 @freeze_uuid("00000000-0000-0000-0000-000000000001")
-def test_create_document_reference_with_date_ignored(
+def test_beefy_create_document_reference_with_date_ignored(
     repository: DocumentPointerRepository,
 ):
     doc_ref_data = load_document_reference_data("Y05868-736253002-Valid-with-date")
@@ -1544,7 +1546,7 @@ def test_create_document_reference_with_date_ignored(
 @mock_repository
 @freeze_time("2024-03-21T12:34:56.789")
 @freeze_uuid("00000000-0000-0000-0000-000000000001")
-def test_create_document_reference_with_date_and_meta_lastupdated_ignored(
+def test_beefy_create_document_reference_with_date_and_meta_lastupdated_ignored(
     repository: DocumentPointerRepository,
 ):
     doc_ref_data = load_document_reference_data(
@@ -1610,7 +1612,7 @@ def test_create_document_reference_with_date_and_meta_lastupdated_ignored(
 @mock_repository
 @freeze_time("2024-03-21T12:34:56.789")
 @freeze_uuid("00000000-0000-0000-0000-000000000001")
-def test_create_document_reference_with_date_overidden(
+def test_beefy_create_document_reference_with_date_overridden(
     repository: DocumentPointerRepository,
 ):
     doc_ref_data = load_document_reference_data("Y05868-736253002-Valid-with-date")
@@ -1740,7 +1742,7 @@ def test__set_create_time_fields_when_no_date_but_perms():
 @mock_repository
 @freeze_uuid("00000000-0000-0000-0000-000000000001")
 @patch("api.producer.createDocumentReference.create_document_reference.logger")
-def test_create_logs_for_unexpected_multi_pointer(
+def test_beefy_create_logs_for_unexpected_multi_pointer(
     mock_logger: Mock,
     repository: DocumentPointerRepository,
 ):
@@ -1825,7 +1827,7 @@ def test_create_logs_for_unexpected_multi_pointer(
 @mock_repository
 @freeze_uuid("00000000-0000-0000-0000-000000000001")
 @patch("api.producer.createDocumentReference.create_document_reference.logger")
-def test_create_logs_for_expected_multi_pointer(
+def test_beefy_create_logs_for_expected_multi_pointer(
     mock_logger: Mock,
     repository: DocumentPointerRepository,
 ):
@@ -1881,7 +1883,7 @@ def test_create_logs_for_expected_multi_pointer(
 @mock_repository
 @freeze_uuid("00000000-0000-0000-0000-000000000001")
 @patch("api.producer.createDocumentReference.create_document_reference.logger")
-def test_create_logs_for_test_patient_multi_pointer(
+def test_beefy_create_logs_for_test_patient_multi_pointer(
     mock_logger: Mock,
     repository: DocumentPointerRepository,
 ):

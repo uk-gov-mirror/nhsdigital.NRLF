@@ -23,7 +23,9 @@ from nrlf.tests.events import (
 @mock_aws
 @mock_repository
 @freeze_time("2024-03-21T12:34:56.789")
-def test_update_document_reference_happy_path(repository: DocumentPointerRepository):
+def test_beefy_update_document_reference_happy_path(
+    repository: DocumentPointerRepository,
+):
     doc_ref = load_document_reference("Y05868-736253002-Valid")
     doc_pointer = DocumentPointer.from_document_reference(doc_ref)
     repository.create(doc_pointer)
@@ -89,7 +91,7 @@ def test_update_document_reference_happy_path(repository: DocumentPointerReposit
 @mock_aws
 @mock_repository
 @freeze_time("2024-03-21T12:34:56.789")
-def test_update_document_reference_happy_path_with_ssp(
+def test_beefy_update_document_reference_happy_path_with_ssp(
     repository: DocumentPointerRepository,
 ):
     doc_ref = load_document_reference("Y05868-736253002-Valid-with-ssp-content")
@@ -531,7 +533,7 @@ def test_update_document_reference_invalid_producer_id():
 
 @mock_aws
 @mock_repository
-def test_update_document_reference_no_existing_pointer(repository):
+def test_beefy_update_document_reference_no_existing_pointer(repository):
     doc_ref = load_document_reference("Y05868-736253002-Valid")
     event = create_test_api_gateway_event(
         headers=create_headers(),
@@ -573,7 +575,7 @@ def test_update_document_reference_no_existing_pointer(repository):
 
 @mock_aws
 @mock_repository
-def test_update_document_reference_immutable_fields(repository):
+def test_beefy_update_document_reference_immutable_fields(repository):
     doc_ref = load_document_reference("Y05868-736253002-Valid")
     doc_pointer = DocumentPointer.from_document_reference(doc_ref)
     repository.create(doc_pointer)
@@ -629,7 +631,9 @@ def test_update_document_reference_immutable_fields(repository):
 
 @mock_aws
 @mock_repository
-def test_update_document_reference_cannot_change_status_to_not_current(repository):
+def test_beefy_update_document_reference_cannot_change_status_to_not_current(
+    repository,
+):
     doc_ref = load_document_reference("Y05868-736253002-Valid")
     doc_pointer = DocumentPointer.from_document_reference(doc_ref)
     repository.create(doc_pointer)
@@ -677,7 +681,9 @@ def test_update_document_reference_cannot_change_status_to_not_current(repositor
 
 @mock_aws
 @mock_repository
-def test_update_document_reference_with_no_context_related_for_ssp_url(repository):
+def test_beefy_update_document_reference_with_no_context_related_for_ssp_url(
+    repository,
+):
     doc_ref = load_document_reference("Y05868-736253002-Valid-with-ssp-content")
     doc_pointer = DocumentPointer.from_document_reference(doc_ref)
     repository.create(doc_pointer)
@@ -725,7 +731,7 @@ def test_update_document_reference_with_no_context_related_for_ssp_url(repositor
 
 @mock_aws
 @mock_repository
-def test_create_document_reference_with_no_asid_in_for_ssp_url(
+def test_beefy_create_document_reference_with_no_asid_in_for_ssp_url(
     repository: DocumentPointerRepository,
 ):
     doc_ref = load_document_reference("Y05868-736253002-Valid-with-ssp-content")
@@ -780,7 +786,7 @@ def test_create_document_reference_with_no_asid_in_for_ssp_url(
 
 @mock_aws
 @mock_repository
-def test_create_document_reference_with_invalid_asid_for_ssp_url(
+def test_beefy_create_document_reference_with_invalid_asid_for_ssp_url(
     repository: DocumentPointerRepository,
 ):
     doc_ref = load_document_reference("Y05868-736253002-Valid-with-ssp-content")
@@ -836,7 +842,7 @@ def test_create_document_reference_with_invalid_asid_for_ssp_url(
 @mock_aws
 @mock_repository
 @freeze_time("2024-03-21T12:34:56.789")
-def test_update_document_reference_with_meta_lastupdated_ignored(
+def test_beefy_update_document_reference_with_meta_lastupdated_ignored(
     repository: DocumentPointerRepository,
 ):
     doc_ref = load_document_reference("Y05868-736253002-Valid-with-meta-lastupdated")
@@ -904,7 +910,7 @@ def test_update_document_reference_with_meta_lastupdated_ignored(
 @mock_aws
 @mock_repository
 @freeze_time("2024-03-21T12:34:56.789")
-def test_update_document_reference_with_invalid_date_ignored(
+def test_beefy_update_document_reference_with_invalid_date_ignored(
     repository: DocumentPointerRepository,
 ):
     doc_ref = load_document_reference("Y05868-736253002-Valid-with-date")
@@ -970,7 +976,7 @@ def test_update_document_reference_with_invalid_date_ignored(
 
 @mock_aws
 @mock_repository
-def test_update_document_reference_existing_invalid_json(
+def test_beefy_update_document_reference_existing_invalid_json(
     repository: DocumentPointerRepository,
 ):
     doc_ref = load_document_reference("Y05868-736253002-Valid")
