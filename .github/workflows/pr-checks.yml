@@ -56,6 +56,11 @@ jobs:
           name: build-artifacts
           path: dist
 
+      - name: DEBUG - Check things are set up correctly
+        run: |
+          find . -name "test-coverage.xml"
+          ls -la dist
+
       - name: SonarQube scan
         uses: sonarsource/sonarqube-scan-action@a31c9398be7ace6bbfaf30c0bd5d415f843d45e9 #v7.0.0
         env:
