@@ -38,7 +38,7 @@ jobs:
           path: dist
 
   sonar:
-    name: SonarQube analysis and quality gate check
+    name: SonarQube scan
     runs-on: ubuntu-latest
     needs: build
     environment: pull-request
@@ -56,12 +56,12 @@ jobs:
           name: build-artifacts
           path: dist
 
-      - name: SonarQube Scan
+      - name: SonarQube scan
         uses: sonarsource/sonarqube-scan-action@a31c9398be7ace6bbfaf30c0bd5d415f843d45e9 #v7.0.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      - name: SonarQube Quality Gate check
+      - name: SonarQube quality gate check
         id: sonarqube-quality-gate-check
         uses: sonarsource/sonarqube-quality-gate-action@cf038b0e0cdecfa9e56c198bbb7d21d751d62c3b #v1.2.0
         with:
