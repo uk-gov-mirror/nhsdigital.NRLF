@@ -11,7 +11,11 @@ from aws_lambda_powertools.utilities.data_classes import (
 from aws_lambda_powertools.utilities.typing import LambdaContext
 from pydantic import BaseModel
 
-from nrlf.core.authoriser import get_pointer_types, parse_permissions_file
+from nrlf.core.authoriser import (
+    get_permissions,
+    get_pointer_types,
+    parse_permissions_file,
+)
 from nrlf.core.codes import SpineErrorConcept
 from nrlf.core.config import Config
 from nrlf.core.constants import (
@@ -139,7 +143,7 @@ def logger_initialiser(
 RepositoryType = Union[Type[DocumentPointerRepository], None]
 
 
-def use_new_permissions_model(headers: Dict[str, str], config: Config) -> bool:
+def _use_new_permissions_model(headers: Dict[str, str], config: Config) -> bool:
     case_insensitive_headers = {key.lower(): value for key, value in headers.items()}
     # if either or both headers are missing
     return (
@@ -148,18 +152,29 @@ def use_new_permissions_model(headers: Dict[str, str], config: Config) -> bool:
     )
 
 
-def load_connection_metadata(headers: Dict[str, str], config: Config):
-    use_new_permissions = use_new_permissions_model(headers, config)
-
-    metadata = parse_headers(headers, use_new_permissions)
+def _load_new_connection_metadata(headers: Dict[str, str], config: Config, path: str):
+    metadata = parse_headers(headers, use_new_permissions=True)
     if PERMISSION_ALLOW_ALL_POINTER_TYPES in metadata.nrl_permissions:
         metadata.pointer_types = PointerTypes.list()
         return metadata
 
-    # parse pointer types from somewhere else? our new place
-    if not use_new_permissions:
-        pointer_types = parse_permissions_file(metadata)
+    if not metadata.is_test_event:
+        metadata.pointer_types = get_permissions(metadata, config, path)
 
+    return metadata
+
+
+def load_connection_metadata(headers: Dict[str, str], config: Config, path=""):
+
+    if _use_new_permissions_model(headers, config):
+        return _load_new_connection_metadata(headers, config, path)
+
+    metadata = parse_headers(headers, use_new_permissions=False)
+    if PERMISSION_ALLOW_ALL_POINTER_TYPES in metadata.nrl_permissions:
+        metadata.pointer_types = PointerTypes.list()
+        return metadata
+
+    pointer_types = parse_permissions_file(metadata)
     if not pointer_types and not metadata.is_test_event:
         pointer_types = get_pointer_types(metadata, config)
 
@@ -272,7 +287,7 @@ def request_handler(
 
             config = Config()
             logger.log(LogReference.HANDLER001, config=config.model_dump())
-            metadata = load_connection_metadata(event.headers, config)
+            metadata = load_connection_metadata(event.headers, config, event.path)
 
             if metadata.pointer_types == []:
                 logger.log(

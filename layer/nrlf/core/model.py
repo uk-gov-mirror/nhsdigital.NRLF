@@ -50,6 +50,7 @@ class ClientRpDetails(BaseModel):
     developer_app_id: StrictStr = Field(alias="developer.app.id")
 
 
+# expand with other permissions types: pointer_types, etc
 class ConnectionMetadata(BaseModel):
     pointer_types: list[str] = Field(alias="nrl.pointer-types", default_factory=list)
     ods_code: str = Field(alias="nrl.ods-code")

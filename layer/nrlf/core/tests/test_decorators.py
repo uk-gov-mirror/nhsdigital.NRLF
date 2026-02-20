@@ -828,7 +828,9 @@ def test_request_load_connection_with_missing_headers_gets_new_permissions(
     for header_name in headers_missing_from_request:
         headers.pop(header_name)
 
-    expected_metadata = load_connection_metadata(headers=headers, config=Config())
+    expected_metadata = load_connection_metadata(
+        headers=headers, config=Config(), path="/producer/DocumentReference"
+    )
 
     assert expected_metadata.pointer_types == []
 

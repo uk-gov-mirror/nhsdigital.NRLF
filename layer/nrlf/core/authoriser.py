@@ -1,4 +1,5 @@
 import json
+import re
 import sys
 from os import path
 
@@ -8,6 +9,42 @@ from nrlf.core.boto import get_s3_client
 from nrlf.core.config import Config
 from nrlf.core.logger import LogReference, logger
 from nrlf.core.model import ConnectionMetadata
+
+
+def get_permissions(connection_metadata: ConnectionMetadata, config: Config, path: str):
+    producer_or_consumer = re.search("^/(producer|consumer)/", path).group().strip("/")
+
+    key = f"{producer_or_consumer}/{connection_metadata.nrl_app_id}/{connection_metadata.ods_code}.json"
+    print(f"New permissions will be fetched from: {key}")  # noqa
+
+    s3_client = get_s3_client()
+    try:
+        response = s3_client.get_object(Bucket=config.AUTH_STORE, Key=key)
+        org_permissions = json.loads(response["Body"].read())
+        logger.log(LogReference.S3PERMISSIONS002, org_permissions=org_permissions)
+        return org_permissions
+
+    except ClientError as exc:
+        if exc.response.get("Error", {}).get("Code") == "NoSuchKey":
+            logger.log(LogReference.S3PERMISSIONS003, error=str(exc))
+            return []
+
+        logger.log(
+            LogReference.S3PERMISSIONS004,
+            exc_info=sys.exc_info(),
+            stacklevel=5,
+            error=str(exc),
+        )
+        raise exc
+
+    except Exception as exc:
+        logger.log(
+            LogReference.S3PERMISSIONS004,
+            exc_info=sys.exc_info(),
+            stacklevel=5,
+            error=str(exc),
+        )
+        raise exc
 
 
 def get_pointer_types(
