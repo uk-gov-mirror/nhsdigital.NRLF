@@ -127,6 +127,36 @@ def test_parse_headers_case_insensitive():
     assert metadata.client_rp_details.developer_app_id == "12345"
 
 
+def test_parse_headers_valid_headers_new_permissions():
+    headers = {
+        "nhsd-connection-metadata": json.dumps(
+            {
+                "nrl.pointer-types": ["pointer_type"],
+                "nrl.ods-code": "overwrite me",
+                "nrl.permissions": ["permission1", "permission2"],
+                "nrl.app-id": "overwrite me",
+            }
+        ),
+        "nhsd-client-rp-details": json.dumps(
+            {
+                "developer.app.name": "TestApp",
+                "developer.app.id": "12345",
+            }
+        ),
+        "nhsd-end-user-organisation-ods": "X26",
+        "nhsd-nrl-app-id": "X26-TestApp-12345",
+    }
+
+    metadata = parse_headers(headers, use_new_permissions=True)
+
+    assert metadata.pointer_types == ["pointer_type"]
+    assert metadata.ods_code == "X26"
+    assert metadata.nrl_app_id == "X26-TestApp-12345"
+    assert metadata.nrl_permissions == ["permission1", "permission2"]
+    assert metadata.client_rp_details.developer_app_name == "X26-TestApp-12345"
+    assert metadata.client_rp_details.developer_app_id == "X26-TestApp-12345"
+
+
 def test_parse_body_no_model_no_body():
     body = None
     model = None

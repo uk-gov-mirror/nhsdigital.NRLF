@@ -11,20 +11,50 @@ from nrlf.core.logger import LogReference, logger
 from nrlf.core.model import ClientRpDetails, ConnectionMetadata
 
 
-def parse_headers(headers: Dict[str, str]) -> ConnectionMetadata:
+# from proxy code
+def fetch_ods_app_id_headers(headers: dict[str, str]):
+    ods_code = headers.get("nhsd-end-user-organisation-ods")
+
+    if not ods_code or len(ods_code.strip()) == 0:
+        # throw bad outcome?
+        logger.log(f"Missing nhsd-end-user-organisation-ods header: {headers.keys()}")
+        return
+
+    # where should this come from now? soln: https://nhsd-confluence.digital.nhs.uk/spaces/clp/pages/1288189142/nrlf+access+permission+model#nrlf_access_permission_model-proposed_approach
+    nrl_app_id = headers.get("nhsd-nrl-app-id")
+    if not nrl_app_id or len(nrl_app_id.strip()) == 0:
+        # throw bad outcome?
+        logger.log(f"Missing nhsd-nrl-app-id header: {headers.keys()}")
+        return
+
+    return ods_code, nrl_app_id
+
+
+def parse_headers(
+    headers: Dict[str, str], use_new_permissions=False
+) -> ConnectionMetadata:
     """
     Parses the connection metadata and client rp details from the headers passed from Apigee
     """
     case_insensitive_headers = {key.lower(): value for key, value in headers.items()}
 
     try:
-        raw_connection_metadata = json.loads(
-            case_insensitive_headers.get(CONNECTION_METADATA, "{}")
-        )
         raw_client_rp_details = json.loads(
             case_insensitive_headers.get(CLIENT_RP_DETAILS, "{}")
         )
+        raw_connection_metadata = json.loads(
+            case_insensitive_headers.get(CONNECTION_METADATA, "{}")
+        )
 
+        if use_new_permissions:
+            # top up new perms to pass validation? feels bad? or no?
+            ods_code, nrl_app_id = fetch_ods_app_id_headers(headers)
+            raw_connection_metadata["nrl.ods-code"] = ods_code
+            raw_connection_metadata["nrl.app-id"] = nrl_app_id
+            raw_client_rp_details["developer.app.id"] = nrl_app_id
+            raw_client_rp_details["developer.app.name"] = nrl_app_id
+
+        # then validate
         client_rp_details = ClientRpDetails.model_validate(raw_client_rp_details)
         return ConnectionMetadata.model_validate(
             {**raw_connection_metadata, "client_rp_details": client_rp_details}

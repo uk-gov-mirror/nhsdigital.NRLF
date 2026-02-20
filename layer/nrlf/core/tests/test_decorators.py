@@ -807,6 +807,32 @@ def test_request_load_connection_metadata_with_no_permission_lookup_or_file():
     assert expected_metadata.pointer_types == []
 
 
+missing_headers = [
+    ["nhsd-connection-metadata"],
+    ["nhsd-connection-metadata", "nhsd-client-rp-details"],
+    ["nhsd-client-rp-details"],
+]
+
+
+# ????? RuntimeError: Credentials were refreshed, but the refreshed credentials are still expired.
+@pytest.mark.parametrize("headers_missing_from_request", missing_headers)
+def test_request_load_connection_with_missing_headers_gets_new_permissions(
+    headers_missing_from_request,
+):
+    headers = create_headers(
+        additional_headers={
+            "nhsd-end-user-organisation-ods": "Y05868",
+            "nhsd-nrl-app-id": "Y05868-TestApp-12345678",
+        }
+    )
+    for header_name in headers_missing_from_request:
+        headers.pop(header_name)
+
+    expected_metadata = load_connection_metadata(headers=headers, config=Config())
+
+    assert expected_metadata.pointer_types == []
+
+
 def test_request_parse_permission_file_with_no_permission_file():
     expected_metadata = parse_permissions_file(
         connection_metadata=parse_headers(create_headers(ods_code="SomeCode")),

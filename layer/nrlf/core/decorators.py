@@ -15,6 +15,8 @@ from nrlf.core.authoriser import get_pointer_types, parse_permissions_file
 from nrlf.core.codes import SpineErrorConcept
 from nrlf.core.config import Config
 from nrlf.core.constants import (
+    CLIENT_RP_DETAILS,
+    CONNECTION_METADATA,
     NHSD_CORRELATION_ID_HEADER,
     PERMISSION_ALLOW_ALL_POINTER_TYPES,
     X_CORRELATION_ID_HEADER,
@@ -137,23 +139,31 @@ def logger_initialiser(
 RepositoryType = Union[Type[DocumentPointerRepository], None]
 
 
+def use_new_permissions_model(headers: Dict[str, str], config: Config) -> bool:
+    case_insensitive_headers = {key.lower(): value for key, value in headers.items()}
+    # if either or both headers are missing
+    return (
+        CLIENT_RP_DETAILS not in case_insensitive_headers.keys()
+        or CONNECTION_METADATA not in case_insensitive_headers.keys()
+    )
+
+
 def load_connection_metadata(headers: Dict[str, str], config: Config):
-    logger.log(LogReference.HANDLER002, headers=headers)
-    metadata = parse_headers(headers)
-    logger.log(LogReference.HANDLER003, metadata=metadata.model_dump())
+    use_new_permissions = use_new_permissions_model(headers, config)
+
+    metadata = parse_headers(headers, use_new_permissions)
     if PERMISSION_ALLOW_ALL_POINTER_TYPES in metadata.nrl_permissions:
-        logger.log(LogReference.HANDLER004a)
         metadata.pointer_types = PointerTypes.list()
         return metadata
 
-    logger.log(LogReference.HANDLER004b)
-    pointer_types = parse_permissions_file(metadata)
+    # parse pointer types from somewhere else? our new place
+    if not use_new_permissions:
+        pointer_types = parse_permissions_file(metadata)
+
     if not pointer_types and not metadata.is_test_event:
-        logger.log(LogReference.HANDLER004)
         pointer_types = get_pointer_types(metadata, config)
 
     metadata.pointer_types = pointer_types
-    logger.log(LogReference.HANDLER004c, pointer_types=pointer_types)
 
     return metadata
 
