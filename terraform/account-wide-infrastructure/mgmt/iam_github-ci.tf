@@ -102,7 +102,9 @@ resource "aws_iam_policy" "github_ci_policy" {
         Effect = "Allow"
         Resource = [
           aws_s3_bucket.ci_data.arn,
-          "${aws_s3_bucket.ci_data.arn}/*"
+          "${aws_s3_bucket.ci_data.arn}/*",
+          data.aws_s3_bucket.legacy_ci_data.arn,
+          "${data.aws_s3_bucket.legacy_ci_data.arn}/*"
         ]
       }
     ]
