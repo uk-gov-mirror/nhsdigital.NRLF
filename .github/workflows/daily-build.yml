@@ -1,9 +1,5 @@
 name: Build NRL Project on Environment
 run-name: Build NRL Project on ${{ inputs.environment || 'dev' }}
-permissions:
-  id-token: write
-  contents: read
-  actions: write
 
 on:
   push:
@@ -23,6 +19,10 @@ jobs:
   build:
     name: Build and test - ${{ github.ref }}
     runs-on: codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
+    permissions:
+      contents: read
+      actions: write
+      id-token: write
 
     steps:
       - name: Git clone - ${{ github.ref }}
