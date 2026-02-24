@@ -12,7 +12,7 @@ from aws_lambda_powertools.utilities.typing import LambdaContext
 from pydantic import BaseModel
 
 from nrlf.core.authoriser import (
-    get_permissions,
+    get_pointer_permissions,
     get_pointer_types,
     parse_permissions_file,
 )
@@ -154,12 +154,22 @@ def _use_new_permissions_model(headers: Dict[str, str], config: Config) -> bool:
 
 def _load_new_connection_metadata(headers: Dict[str, str], config: Config, path: str):
     metadata = parse_headers(headers, use_new_permissions=True)
+
     if PERMISSION_ALLOW_ALL_POINTER_TYPES in metadata.nrl_permissions:
+        logger.log(LogReference.HANDLER004a)
         metadata.pointer_types = PointerTypes.list()
         return metadata
 
+    logger.log(LogReference.HANDLER004d)
     if not metadata.is_test_event:
-        metadata.pointer_types = get_permissions(metadata, config, path)
+        logger.log(LogReference.HANDLER004)
+        pointer_permissions = get_pointer_permissions(metadata, config, path)
+
+        metadata.pointer_types = pointer_permissions.get("types", [])
+
+    logger.log(
+        LogReference.HANDLER004e, pointer_types=metadata.pointer_types
+    )  # TODO: log other permissions as they're added
 
     return metadata
 
@@ -171,14 +181,18 @@ def load_connection_metadata(headers: Dict[str, str], config: Config, path=""):
 
     metadata = parse_headers(headers, use_new_permissions=False)
     if PERMISSION_ALLOW_ALL_POINTER_TYPES in metadata.nrl_permissions:
+        logger.log(LogReference.HANDLER004b)
         metadata.pointer_types = PointerTypes.list()
         return metadata
 
+    logger.log(LogReference.HANDLER004b)
     pointer_types = parse_permissions_file(metadata)
     if not pointer_types and not metadata.is_test_event:
+        logger.log(LogReference.HANDLER004)
         pointer_types = get_pointer_types(metadata, config)
 
     metadata.pointer_types = pointer_types
+    logger.log(LogReference.HANDLER004c, pointer_types=pointer_types)
 
     return metadata
 

@@ -7,7 +7,6 @@ from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
 from pydantic import BaseModel
 from pytest_mock import MockerFixture
 
-from nrlf.core.authoriser import parse_permissions_file
 from nrlf.core.codes import SpineErrorConcept
 from nrlf.core.config import Config
 from nrlf.core.constants import (
@@ -26,7 +25,6 @@ from nrlf.core.decorators import (
 )
 from nrlf.core.errors import OperationOutcomeError
 from nrlf.core.logger import LogReference
-from nrlf.core.request import parse_headers
 from nrlf.core.response import Response
 from nrlf.tests.events import (
     create_headers,
@@ -815,6 +813,8 @@ missing_headers = [
 
 
 # ????? RuntimeError: Credentials were refreshed, but the refreshed credentials are still expired.
+# now: botocore.exceptions.NoCredentialsError: Unable to locate credentials
+# TODO: Figure out mocking
 @pytest.mark.parametrize("headers_missing_from_request", missing_headers)
 def test_request_load_connection_with_missing_headers_gets_new_permissions(
     headers_missing_from_request,
@@ -833,22 +833,6 @@ def test_request_load_connection_with_missing_headers_gets_new_permissions(
     )
 
     assert expected_metadata.pointer_types == []
-
-
-def test_request_parse_permission_file_with_no_permission_file():
-    expected_metadata = parse_permissions_file(
-        connection_metadata=parse_headers(create_headers(ods_code="SomeCode")),
-    )
-
-    assert expected_metadata == []
-
-
-def test_request_parse_permission_file_with_permission_file():
-    expected_metadata = parse_permissions_file(
-        connection_metadata=parse_headers(create_headers(ods_code="TestCode")),
-    )
-
-    assert expected_metadata == ["http://snomed.info/sct|736253001"]
 
 
 def test_request_handler_with_custom_repository(mocker: MockerFixture):

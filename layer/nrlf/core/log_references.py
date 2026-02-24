@@ -26,6 +26,8 @@ class LogReference(Enum):
     HANDLER004a = _Reference("INFO", "Authorisation lookup skipped for sync request")
     HANDLER004b = _Reference("INFO", "Parsing embedded permissions file from S3")
     HANDLER004c = _Reference("INFO", "Parsed embedded permissions file from S3")
+    HANDLER004d = _Reference("INFO", "Parsing new permissions file from S3")
+    HANDLER004e = _Reference("INFO", "Parsed new permissions file from S3")
     HANDLER005 = _Reference("WARN", "Rejecting request due to missing pointer types")
     HANDLER006 = _Reference("DEBUG", "Attempting to parse request parameters")
     HANDLER007 = _Reference("INFO", "Parsed request parameters")
@@ -58,7 +60,7 @@ class LogReference(Enum):
         "WARN", "An ParseError occurred whilst processing the request"
     )
     ERROR003 = _Reference(
-        "WARN", "An unhandler exception occurred whilst handling response headers"
+        "WARN", "An unhandled exception occurred whilst handling response headers"
     )
 
     # S3 Permissions Lookup Logs
@@ -70,7 +72,17 @@ class LogReference(Enum):
     )
     S3PERMISSIONS005 = _Reference(
         "EXCEPTION",
-        "An error occurred whilst pasrsing embedded permissions files from S3",
+        "An error occurred whilst parsing embedded permissions files from S3",
+    )
+    # S3 Permissions Lookup Logs - new permissions
+    S3PERMISSIONS011 = _Reference(
+        "INFO", "Retrieving new pointer permissions from S3 bucket"
+    )
+    S3PERMISSIONS012 = _Reference("INFO", "Retrieved new pointer permissions from S3")
+    S3PERMISSIONS013 = _Reference("WARN", "No new permissions file found in S3")
+    S3PERMISSIONS014 = _Reference(
+        "EXCEPTION",
+        "An error occurred whilst retrieving new pointer permissions from S3",
     )
 
     # Parse Logs
