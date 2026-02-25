@@ -22,14 +22,19 @@ class LogReference(Enum):
     HANDLER001 = _Reference("DEBUG", "Loaded config from environment variables")
     HANDLER002 = _Reference("DEBUG", "Attempting to parse request headers")
     HANDLER003 = _Reference("INFO", "Parsed metadata from request headers")
-    HANDLER003a = _Reference("ERROR", "Missing nhsd-end-user-organisation-ods header")
-    HANDLER003b = _Reference("ERROR", "Missing nhsd-nrl-app-id header")
+    HANDLER003a = _Reference(
+        "WARN", "Missing nhsd-end-user-organisation-ods header for new permissions"
+    )
+    HANDLER003b = _Reference(
+        "WARN", "Missing nhsd-nrl-app-id header for new permissions"
+    )
     HANDLER004 = _Reference("INFO", "Authorisation lookup enabled")
     HANDLER004a = _Reference("INFO", "Authorisation lookup skipped for sync request")
     HANDLER004b = _Reference("INFO", "Parsing embedded permissions file from S3")
     HANDLER004c = _Reference("INFO", "Parsed embedded permissions file from S3")
-    HANDLER004d = _Reference("INFO", "Parsing new permissions file from S3")
-    HANDLER004e = _Reference("INFO", "Parsed new permissions file from S3")
+    HANDLER004d = _Reference("INFO", "Using NEW permissions model")
+    HANDLER004e = _Reference("INFO", "Parsing new permissions file from S3")
+    HANDLER004f = _Reference("INFO", "Parsed new permissions file from S3")
     HANDLER005 = _Reference("WARN", "Rejecting request due to missing pointer types")
     HANDLER006 = _Reference("DEBUG", "Attempting to parse request parameters")
     HANDLER007 = _Reference("INFO", "Parsed request parameters")

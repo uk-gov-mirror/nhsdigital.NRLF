@@ -153,6 +153,7 @@ def _use_new_permissions_model(headers: Dict[str, str], config: Config) -> bool:
 
 
 def _load_new_connection_metadata(headers: Dict[str, str], config: Config, path: str):
+    logger.log(LogReference.HANDLER004d)
     metadata = parse_headers(headers, use_new_permissions=True)
 
     if PERMISSION_ALLOW_ALL_POINTER_TYPES in metadata.nrl_permissions:
@@ -160,7 +161,7 @@ def _load_new_connection_metadata(headers: Dict[str, str], config: Config, path:
         metadata.pointer_types = PointerTypes.list()
         return metadata
 
-    logger.log(LogReference.HANDLER004d)
+    logger.log(LogReference.HANDLER004e)
     if not metadata.is_test_event:
         logger.log(LogReference.HANDLER004)
         pointer_permissions = get_pointer_permissions(metadata, config, path)
@@ -168,7 +169,7 @@ def _load_new_connection_metadata(headers: Dict[str, str], config: Config, path:
         metadata.pointer_types = pointer_permissions.get("types", [])
 
     logger.log(
-        LogReference.HANDLER004e, pointer_types=metadata.pointer_types
+        LogReference.HANDLER004f, pointer_types=metadata.pointer_types
     )  # TODO: log other permissions as they're added
 
     return metadata
