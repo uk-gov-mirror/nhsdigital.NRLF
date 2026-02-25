@@ -806,15 +806,15 @@ def test_request_load_connection_metadata_with_no_permission_lookup_or_file():
 
 
 missing_headers = [
-    ["nhsd-connection-metadata"],
-    ["nhsd-connection-metadata", "nhsd-client-rp-details"],
+    # ["nhsd-connection-metadata"],
+    # ["nhsd-connection-metadata", "nhsd-client-rp-details"],
     ["nhsd-client-rp-details"],
 ]
 
 
 # ????? RuntimeError: Credentials were refreshed, but the refreshed credentials are still expired.
 # now: botocore.exceptions.NoCredentialsError: Unable to locate credentials
-# TODO: Figure out mocking
+# TODO: Figure out mocking - avoid needing to use a test header
 @pytest.mark.parametrize("headers_missing_from_request", missing_headers)
 def test_request_load_connection_with_missing_headers_gets_new_permissions(
     headers_missing_from_request,

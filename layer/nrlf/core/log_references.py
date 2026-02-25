@@ -22,6 +22,8 @@ class LogReference(Enum):
     HANDLER001 = _Reference("DEBUG", "Loaded config from environment variables")
     HANDLER002 = _Reference("DEBUG", "Attempting to parse request headers")
     HANDLER003 = _Reference("INFO", "Parsed metadata from request headers")
+    HANDLER003a = _Reference("ERROR", "Missing nhsd-end-user-organisation-ods header")
+    HANDLER003b = _Reference("ERROR", "Missing nhsd-nrl-app-id header")
     HANDLER004 = _Reference("INFO", "Authorisation lookup enabled")
     HANDLER004a = _Reference("INFO", "Authorisation lookup skipped for sync request")
     HANDLER004b = _Reference("INFO", "Parsing embedded permissions file from S3")

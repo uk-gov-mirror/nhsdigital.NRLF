@@ -12,17 +12,17 @@ from nrlf.core.model import ClientRpDetails, ConnectionMetadata
 
 
 # from consumer proxy code - producer has extra bits
-def fetch_ods_app_id_headers(headers: dict[str, str]):
+def _fetch_ods_app_id_headers(headers: dict[str, str]):
     ods_code = headers.get("nhsd-end-user-organisation-ods")
 
     if not ods_code or len(ods_code.strip()) == 0:
-        logger.log(f"Missing nhsd-end-user-organisation-ods header: {headers.keys()}")
+        logger.log(LogReference.HANDLER003a, headers_names=headers.keys())
         return
 
     # where should this come from now? soln: https://nhsd-confluence.digital.nhs.uk/spaces/clp/pages/1288189142/nrlf+access+permission+model#nrlf_access_permission_model-proposed_approach
     nrl_app_id = headers.get("nhsd-nrl-app-id")
     if not nrl_app_id or len(nrl_app_id.strip()) == 0:
-        logger.log(f"Missing nhsd-nrl-app-id header: {headers.keys()}")
+        logger.log(LogReference.HANDLER003b, headers_names=headers.keys())
         return
 
     return ods_code, nrl_app_id
@@ -46,7 +46,7 @@ def parse_headers(
 
         if use_new_permissions:
             # top up new perms to pass validation? feels bad? or no?
-            ods_code, nrl_app_id = fetch_ods_app_id_headers(headers)
+            ods_code, nrl_app_id = _fetch_ods_app_id_headers(headers)
             raw_connection_metadata["nrl.ods-code"] = ods_code
             raw_connection_metadata["nrl.app-id"] = nrl_app_id
             raw_client_rp_details["developer.app.id"] = nrl_app_id
