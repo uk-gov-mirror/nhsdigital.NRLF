@@ -25,7 +25,7 @@ from nrlf.tests.events import (
 
 @mock_aws
 @mock_repository
-def test_beefy_search_post_document_reference_happy_path(
+def test_search_post_document_reference_happy_path(
     repository: DocumentPointerRepository,
 ):
     doc_ref = load_document_reference("Y05868-736253002-Valid")
@@ -67,7 +67,7 @@ def test_beefy_search_post_document_reference_happy_path(
 
 @mock_aws
 @mock_repository
-def test_beefy_search_post_document_reference_happy_path_with_custodian(
+def test_search_post_document_reference_happy_path_with_custodian(
     repository: DocumentPointerRepository,
 ):
     doc_ref = load_document_reference("Y05868-736253002-Valid")
@@ -110,7 +110,7 @@ def test_beefy_search_post_document_reference_happy_path_with_custodian(
 
 @mock_aws
 @mock_repository
-def test_beefy_search_post_document_reference_happy_path_with_type(
+def test_search_post_document_reference_happy_path_with_type(
     repository: DocumentPointerRepository,
 ):
     doc_ref = load_document_reference("Y05868-736253002-Valid")
@@ -153,7 +153,7 @@ def test_beefy_search_post_document_reference_happy_path_with_type(
 
 @mock_aws
 @mock_repository
-def test_beefy_search_post_document_reference_happy_path_with_category(
+def test_search_post_document_reference_happy_path_with_category(
     repository: DocumentPointerRepository,
 ):
     doc_ref = load_document_reference("Y05868-736253002-Valid")
@@ -209,7 +209,7 @@ def test_beefy_search_post_document_reference_happy_path_with_category(
 
 @mock_aws
 @mock_repository
-def test_beefy_search_post_document_reference_happy_path_with_multiple_categories(
+def test_search_post_document_reference_happy_path_with_multiple_categories(
     repository: DocumentPointerRepository,
 ):
     doc_ref = load_document_reference("Y05868-736253002-Valid")
@@ -268,7 +268,7 @@ def test_beefy_search_post_document_reference_happy_path_with_multiple_categorie
 
 @mock_aws
 @mock_repository
-def test_beefy_search_document_reference_no_results(
+def test_search_document_reference_no_results(
     repository: DocumentPointerRepository,
 ):
     event = create_test_api_gateway_event(
@@ -306,7 +306,7 @@ def test_beefy_search_document_reference_no_results(
 
 @mock_aws
 @mock_repository
-def test_beefy_search_post_document_reference_missing_nhs_number(
+def test_search_post_document_reference_missing_nhs_number(
     repository: DocumentPointerRepository,
 ):
     event = create_test_api_gateway_event(headers=create_headers(), body="{}")
@@ -345,7 +345,7 @@ def test_beefy_search_post_document_reference_missing_nhs_number(
 
 @mock_aws
 @mock_repository
-def test_beefy_search_post_document_reference_invalid_nhs_number(
+def test_search_post_document_reference_invalid_nhs_number(
     repository: DocumentPointerRepository,
 ):
     event = create_test_api_gateway_event(
@@ -389,7 +389,7 @@ def test_beefy_search_post_document_reference_invalid_nhs_number(
 
 @mock_aws
 @mock_repository
-def test_beefy_search_post_document_reference_invalid_type(
+def test_search_post_document_reference_invalid_type(
     repository: DocumentPointerRepository,
 ):
     event = create_test_api_gateway_event(
@@ -436,7 +436,7 @@ def test_beefy_search_post_document_reference_invalid_type(
 
 @mock_aws
 @mock_repository
-def test_beefy_search_document_reference_invalid_category(
+def test_search_document_reference_invalid_category(
     repository: DocumentPointerRepository,
 ):
     event = create_test_api_gateway_event(
@@ -483,7 +483,7 @@ def test_beefy_search_document_reference_invalid_category(
 
 @mock_aws
 @mock_repository
-def test_beefy_search_document_reference_filters_by_summary_count(
+def test_search_document_reference_filters_by_summary_count(
     repository: DocumentPointerRepository,
 ):
     doc_ref = load_document_reference("Y05868-736253002-Valid")
@@ -526,7 +526,7 @@ def test_beefy_search_document_reference_filters_by_summary_count(
 @mock_aws
 @mock_repository
 @patch("api.consumer.searchPostDocumentReference.search_post_document_reference.logger")
-def test_beefy_search_post_document_reference_invalid_json_adds_operation_outcome(
+def test_search_post_document_reference_invalid_json_adds_operation_outcome(
     mock_logger, repository: DocumentPointerRepository
 ):
     doc_ref = load_document_reference("Y05868-736253002-Valid")

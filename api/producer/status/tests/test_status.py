@@ -14,7 +14,7 @@ from nrlf.tests.events import (
 
 @mock_aws
 @mock_repository
-def test_beefy_status_happy_path(repository):
+def test_status_happy_path(repository):
     event = create_test_api_gateway_event(headers=create_headers())
 
     result = handler(event, create_mock_context())
@@ -29,7 +29,7 @@ def test_beefy_status_happy_path(repository):
 
 @mock_aws
 @mock_repository
-def test_beefy_status_unhandled_exception(repository):
+def test_status_unhandled_exception(repository):
     region = os.environ.pop("AWS_REGION")
 
     event = create_test_api_gateway_event(headers=create_headers())

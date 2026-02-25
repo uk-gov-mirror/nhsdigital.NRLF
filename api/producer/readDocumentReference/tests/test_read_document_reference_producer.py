@@ -16,7 +16,7 @@ from nrlf.tests.events import (
 
 @mock_aws
 @mock_repository
-def test_beefy_read_document_reference_happy_path(
+def test_read_document_reference_happy_path(
     repository: DocumentPointerRepository,
 ):
     # Create the document pointer
@@ -43,7 +43,7 @@ def test_beefy_read_document_reference_happy_path(
 
 @mock_aws
 @mock_repository
-def test_beefy_read_document_reference_not_found(repository: DocumentPointerRepository):
+def test_read_document_reference_not_found(repository: DocumentPointerRepository):
     event = create_test_api_gateway_event(
         headers=create_headers(), path_parameters={"id": "Y05868-99999-99999-999999"}
     )
@@ -153,7 +153,7 @@ def test_read_document_reference_incorrect_ods_code():
 
 @mock_aws
 @mock_repository
-def test_beefy_read_document_reference_invalid_json(
+def test_read_document_reference_invalid_json(
     repository: DocumentPointerRepository,
 ):
     doc_ref = load_document_reference("Y05868-736253002-Valid")
