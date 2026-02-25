@@ -86,6 +86,7 @@ docstring-code-format = true
 docstring-code-line-length = 80
 
 [tool.coverage.run]
+relative_files = true
 branch = true
 omit = [
     "*/tests/*",
