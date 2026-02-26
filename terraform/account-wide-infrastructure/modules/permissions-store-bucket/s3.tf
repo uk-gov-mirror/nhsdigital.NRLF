@@ -60,3 +60,13 @@ resource "aws_s3_bucket_versioning" "authorization-store" {
     status = "Enabled"
   }
 }
+
+resource "aws_s3_object" "consumer-object" {
+  bucket = aws_s3_bucket.authorization-store.id
+  key    = "consumer/"
+}
+
+resource "aws_s3_object" "producer-object" {
+  bucket = aws_s3_bucket.authorization-store.id
+  key    = "producer/"
+}
