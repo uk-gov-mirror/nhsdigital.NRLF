@@ -9,13 +9,6 @@ concurrency:
   group: environment-${{ github.event.pull_request.number }}
   cancel-in-progress: false
 
-permissions:
-  id-token: write
-  contents: read
-  actions: write
-  issues: write
-  pull-requests: write
-
 jobs:
   set-environment-id:
     name: Set Environment ID
@@ -48,6 +41,13 @@ jobs:
     name: Build Application
     runs-on: codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
     environment: pull-request
+    permissions:
+      id-token: write
+      contents: read
+      actions: write
+      issues: write
+      pull-requests: write
+
     steps:
       - name: Git Clone - ${{ github.event.pull_request.head.ref }}
         uses: actions/checkout@v4
@@ -110,6 +110,12 @@ jobs:
     runs-on: codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
     environment: pull-request
     needs: [set-environment-id, build]
+    permissions:
+      id-token: write
+      contents: read
+      actions: write
+      issues: write
+      pull-requests: write
 
     steps:
       - name: Git Clone - ${{ github.event.pull_request.head.ref }}
@@ -194,6 +200,9 @@ jobs:
     needs: [set-environment-id, deploy]
     environment: pull-request
     runs-on: codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
+    permissions:
+      id-token: write
+      contents: read
 
     steps:
       - name: Git Clone - ${{ github.event.pull_request.head.ref }}
@@ -232,6 +241,10 @@ jobs:
     needs: [set-environment-id, integration-test]
     environment: pull-request
     runs-on: codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
+    permissions:
+      id-token: write
+      contents: read
+
     steps:
       - name: Git Clone - ${{ github.event.pull_request.head.ref }}
         uses: actions/checkout@v4
@@ -266,6 +279,10 @@ jobs:
     needs: [set-environment-id, integration-test]
     environment: pull-request
     runs-on: codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
+    permissions:
+      id-token: write
+      contents: read
+      actions: write
 
     steps:
       - name: Git Clone - ${{ github.event.pull_request.head.ref }}
