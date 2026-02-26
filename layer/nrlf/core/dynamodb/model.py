@@ -230,7 +230,7 @@ class DocumentPointer(DynamoDBModel):
         Validate the type of the DocumentPointer
         The type should be in the format <system>|<code>
         """
-        if not re.match(r"^[A-Za-z0-9]+|[A-Za-z0-9]+$", type):
+        if not re.match(r"^[A-Za-z0-9:/\.]+\|[A-Za-z0-9]+$", type):
             raise ValueError("type must be in the format <system>|<code>")
 
         return type
