@@ -38,7 +38,7 @@ def test_authoriser_get_v2_permissions_with_pointer_types(mocker):
 
     assert result.get("types") == ["http://snomed.info/sct|736253001"]
 
-    spy.assert_called_with(LogReference.S3PERMISSIONS011, key=expected_lookup_key)
+    spy.assert_called_with(LogReference.V2PERMISSIONS011, key=expected_lookup_key)
 
 
 def test_authoriser_parse_v2_permission_file_with_no_permission_file(mocker):
@@ -55,4 +55,4 @@ def test_authoriser_parse_v2_permission_file_with_no_permission_file(mocker):
 
     assert metadata_result == {}
 
-    spy.assert_any_call(LogReference.S3PERMISSIONS011, key=expected_lookup_key)
+    spy.assert_any_call(LogReference.V2PERMISSIONS011, key=expected_lookup_key)

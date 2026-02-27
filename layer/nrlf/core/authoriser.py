@@ -26,7 +26,7 @@ def get_pointer_permissions_v2(
     app_id = connection_metadata.nrl_app_id
 
     key = f"{producer_or_consumer}/{app_id}/{ods_code}.json"
-    logger.log(LogReference.S3PERMISSIONS011, key=key)
+    logger.log(LogReference.V2PERMISSIONS011, key=key)
 
     file_path = f"{lookup_path}/{key}"
 
@@ -36,7 +36,7 @@ def get_pointer_permissions_v2(
             pointer_permissions = json.load(file)
     except Exception as exc:
         logger.log(
-            LogReference.S3PERMISSIONS014,
+            LogReference.V2PERMISSIONS014,
             exc_info=sys.exc_info(),
             stacklevel=5,
             error=str(exc),
@@ -107,7 +107,7 @@ def parse_permissions_file(
             pointer_types = json.load(file)
     except Exception as exc:
         logger.log(
-            LogReference.S3PERMISSIONS005,  # not s3 tho?
+            LogReference.S3PERMISSIONS005,
             exc_info=sys.exc_info(),
             stacklevel=5,
             error=str(exc),

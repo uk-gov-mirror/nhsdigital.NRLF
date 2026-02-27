@@ -70,7 +70,7 @@ class LogReference(Enum):
         "WARN", "An unhandled exception occurred whilst handling response headers"
     )
 
-    # S3 Permissions Lookup Logs
+    # S3 / Embedded Permissions Lookup Logs
     S3PERMISSIONS001 = _Reference("INFO", "Retrieving pointer types from S3 bucket")
     S3PERMISSIONS002 = _Reference("INFO", "Retrieved list of pointer types from S3")
     S3PERMISSIONS003 = _Reference("WARN", "No permissions file found in S3")
@@ -79,21 +79,22 @@ class LogReference(Enum):
     )
     S3PERMISSIONS005 = _Reference(
         "EXCEPTION",
-        "An error occurred whilst parsing embedded permissions files from S3",
+        "An error occurred whilst parsing embedded permissions files",
     )
-    # S3 Permissions Lookup Logs - v2 permissions
-    S3PERMISSIONS011 = _Reference(
+
+    # V2 Embedded Permissions Lookup Logs
+    V2PERMISSIONS011 = _Reference(
         "INFO", "Retrieving v2 pointer permissions from lambda layer"
     )
-    S3PERMISSIONS012 = _Reference(
+    V2PERMISSIONS012 = _Reference(
         "INFO", "Retrieved v2 pointer permissions from lambda layer"
     )
-    S3PERMISSIONS013 = _Reference(
+    V2PERMISSIONS013 = _Reference(
         "WARN", "No v2 permissions file found in lambda layer"
     )
-    S3PERMISSIONS014 = _Reference(
+    V2PERMISSIONS014 = _Reference(
         "EXCEPTION",
-        "An error occurred whilst retrieving v2 pointer permissions ",
+        "An error occurred whilst retrieving v2 pointer permissions",
     )
 
     # Parse Logs
