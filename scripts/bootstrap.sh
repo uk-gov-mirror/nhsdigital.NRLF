@@ -32,6 +32,7 @@ function _check_mgmt() {
     echo "Please log in as the mgmt account" >&2
     return 1
   fi
+  return 0
 }
 
 function _check_non_mgmt() {
@@ -39,6 +40,7 @@ function _check_non_mgmt() {
     echo "Please log in as a non-mgmt account" >&2
     return 1
   fi
+  return 0
 }
 
 function _bootstrap() {
@@ -129,7 +131,7 @@ function _bootstrap() {
       local workspace
       workspace=$2
       # Fetch the resources using the AWS CLI command
-      aws resourcegroupstaggingapi get-resources --tag-filters Key=workspace,Values="$2" | jq -c '.ResourceTagMappingList[]' |
+      aws resourcegroupstaggingapi get-resources --tag-filters Key=workspace,Values="${workspace}" | jq -c '.ResourceTagMappingList[]' |
       while IFS= read -r item; do
           arn=$(jq -r '.ResourceARN' <<< "$item")
 
@@ -206,6 +208,8 @@ function _bootstrap() {
     #----------------
     *) _bootstrap_help ;;
     esac
+
+    return 0
 }
 
 _bootstrap "${@:1}"

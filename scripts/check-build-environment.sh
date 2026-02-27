@@ -10,11 +10,13 @@ function success() {
 
   local message="$1"
   echo "  ✅  ${message}"
+  return 0
 }
 
 function warning() {
   local message="$1"
   echo -e "  ⚠️  \e[31m${message}\e[39m"
+  return 0
 }
 
 echo
@@ -38,7 +40,7 @@ for dep in ${BUILD_DEPENDENCIES}; do
         dep_path="$(which ${dep} 2> /dev/null)"
     set -e
 
-    if [[ -n "${dep_path}" -a -x "${dep_path}" ]]
+    if [[ -n "${dep_path}" && -x "${dep_path}" ]]
     then
         success "${dep} found at ${dep_path}"
     else

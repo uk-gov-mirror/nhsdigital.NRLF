@@ -22,7 +22,9 @@ function pull_lambda_code(){
     echo -n "- Downloading code for lambda ${lambda_name}.... "
     code_url="$(aws lambda get-function  --function-name "${lambda_name}" | jq -r .Code.Location)"
     curl "${code_url}" 2>/dev/null > "${DIST_DIR}/${api_name}-${endpoint_name}.zip"
+
     echo "✅"
+    return 0
 }
 
 function pull_layer_code(){
@@ -35,7 +37,9 @@ function pull_layer_code(){
     echo -n "- Downloading code for layer ${layer_name} version ${layer_version}.... "
     code_url="$(aws lambda get-layer-version --layer-name "${layer_name}" --version-number "${layer_version}" | jq -r .Content.Location)"
     curl "${code_url}" 2>/dev/null > "${DIST_DIR}/${layer_pkg_name}"
+
     echo "✅"
+    return 0
 }
 
 mkdir -p "${DIST_DIR}"
