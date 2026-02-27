@@ -28,7 +28,7 @@ def get_pointer_permissions(
     file_path = f"/opt/python/nrlf_permissions/{key}"
 
     if connection_metadata.is_test_event:
-        file_path = path.abspath(f"layer/test_permissions/{key}")
+        file_path = path.abspath(f"layer/test_permissions/v2/{key}")
 
     pointer_permissions = {}
     try:
