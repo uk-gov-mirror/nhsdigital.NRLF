@@ -19,13 +19,15 @@ def _fetch_ods_app_id_headers(headers: dict[str, str]):
 
     if not ods_code or len(ods_code.strip()) == 0:
         logger.log(
-            LogReference.HANDLER003a, headers_names=case_insensitive_headers.keys()
+            code=LogReference.HANDLER003a,
+            headers_names=list(case_insensitive_headers.keys()),
         )
 
     nrl_app_id = case_insensitive_headers.get("nhsd-nrl-app-id")
     if not nrl_app_id or len(nrl_app_id.strip()) == 0:
         logger.log(
-            LogReference.HANDLER003b, headers_names=case_insensitive_headers.keys()
+            code=LogReference.HANDLER003b,
+            headers_names=list(case_insensitive_headers.keys()),
         )
 
     return ods_code, nrl_app_id
