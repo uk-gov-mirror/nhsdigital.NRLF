@@ -11,7 +11,6 @@ from nrlf.core.logger import LogReference, logger
 from nrlf.core.model import ClientRpDetails, ConnectionMetadata
 
 
-# from consumer proxy code - producer has extra bits
 def _fetch_ods_app_id_headers(headers: dict[str, str]):
 
     case_insensitive_headers = {key.lower(): value for key, value in headers.items()}
@@ -23,7 +22,6 @@ def _fetch_ods_app_id_headers(headers: dict[str, str]):
             LogReference.HANDLER003a, headers_names=case_insensitive_headers.keys()
         )
 
-    # where should this come from now? soln: https://nhsd-confluence.digital.nhs.uk/spaces/clp/pages/1288189142/nrlf+access+permission+model#nrlf_access_permission_model-proposed_approach
     nrl_app_id = case_insensitive_headers.get("nhsd-nrl-app-id")
     if not nrl_app_id or len(nrl_app_id.strip()) == 0:
         logger.log(

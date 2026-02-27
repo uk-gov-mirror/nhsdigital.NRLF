@@ -12,7 +12,7 @@ from aws_lambda_powertools.utilities.typing import LambdaContext
 from pydantic import BaseModel
 
 from nrlf.core.authoriser import (
-    get_pointer_permissions,
+    get_pointer_permissions_v2,
     get_pointer_types,
     parse_permissions_file,
 )
@@ -143,7 +143,7 @@ def logger_initialiser(
 RepositoryType = Union[Type[DocumentPointerRepository], None]
 
 
-def _use_v2_permissions_model(headers: Dict[str, str], config: Config) -> bool:
+def _use_v2_permissions_model(headers: Dict[str, str]) -> bool:
     case_insensitive_headers = {key.lower(): value for key, value in headers.items()}
     # if either or both headers are missing
     return (
@@ -152,21 +152,14 @@ def _use_v2_permissions_model(headers: Dict[str, str], config: Config) -> bool:
     )
 
 
-def _load_v2_connection_metadata(headers: Dict[str, str], config: Config, path: str):
+def _load_v2_connection_metadata(headers: Dict[str, str], path: str):
     logger.log(LogReference.HANDLER004d)
     metadata = parse_headers(headers, use_v2_permissions=True)
 
-    if PERMISSION_ALLOW_ALL_POINTER_TYPES in metadata.nrl_permissions:
-        logger.log(LogReference.HANDLER004a)
-        metadata.pointer_types = PointerTypes.list()
-        return metadata
-
     logger.log(LogReference.HANDLER004e)
-    if not metadata.is_test_event:
-        logger.log(LogReference.HANDLER004)
-        pointer_permissions = get_pointer_permissions(metadata, config, path)
+    pointer_permissions = get_pointer_permissions_v2(metadata, path)
 
-        metadata.pointer_types = pointer_permissions.get("types", [])
+    metadata.pointer_types = pointer_permissions.get("types", [])
 
     logger.log(
         LogReference.HANDLER004f, pointer_types=metadata.pointer_types
@@ -177,8 +170,8 @@ def _load_v2_connection_metadata(headers: Dict[str, str], config: Config, path: 
 
 def load_connection_metadata(headers: Dict[str, str], config: Config, path=""):
 
-    if _use_v2_permissions_model(headers, config):
-        return _load_v2_connection_metadata(headers, config, path)
+    if _use_v2_permissions_model(headers):
+        return _load_v2_connection_metadata(headers, path)
 
     metadata = parse_headers(headers, use_v2_permissions=False)
     if PERMISSION_ALLOW_ALL_POINTER_TYPES in metadata.nrl_permissions:

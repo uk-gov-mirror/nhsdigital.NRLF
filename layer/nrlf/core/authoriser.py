@@ -10,11 +10,14 @@ from nrlf.core.config import Config
 from nrlf.core.logger import LogReference, logger
 from nrlf.core.model import ConnectionMetadata
 
+default_lookup_path = "/opt/python/nrlf_permissions"
 
-def get_pointer_permissions(
-    connection_metadata: ConnectionMetadata, config: Config, request_path: str
+
+def get_pointer_permissions_v2(
+    connection_metadata: ConnectionMetadata,
+    request_path: str,
+    lookup_path=default_lookup_path,
 ):
-    # This a good place for this?
     producer_or_consumer = (
         re.search("^/(producer|consumer)/", request_path).group().strip("/")
     )
@@ -25,10 +28,7 @@ def get_pointer_permissions(
     key = f"{producer_or_consumer}/{app_id}/{ods_code}.json"
     logger.log(LogReference.S3PERMISSIONS011, key=key)
 
-    file_path = f"/opt/python/nrlf_permissions/{key}"
-
-    if connection_metadata.is_test_event:
-        file_path = path.abspath(f"layer/test_permissions/v2/{key}")
+    file_path = f"{lookup_path}/{key}"
 
     pointer_permissions = {}
     try:
