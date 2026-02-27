@@ -6,7 +6,7 @@ MAKEFLAGS := --no-print-directory
 SHELL := /bin/bash
 
 DIST_PATH ?= ./dist
-TEST_ARGS ?= --cov --cov-report=term-missing
+TEST_ARGS ?= --cov --cov-report=term-missing --cov-report=xml:$(DIST_PATH)/test-coverage.xml
 SMOKE_TEST_ARGS ?=
 FEATURE_TEST_ARGS ?= ./tests/features --format progress2
 TF_WORKSPACE_NAME ?= $(shell terraform -chdir=terraform/infrastructure workspace show)
