@@ -4,7 +4,7 @@ set -o errexit -o nounset -o pipefail
 
 : "${DIST_DIR:="./dist"}"
 
-if [ $# -ne 1 ]
+if [[ $# -ne 1 ]]
 then
     echo "Error: stack-name argument is missing" 1>&2
     echo "Usage: $0 <stack-name>" 1>&2
@@ -44,7 +44,7 @@ echo
 echo "Pulling code for consumer API lambdas...."
 for endpoint_path in api/consumer/*
 do
-    if [ ! -d "${endpoint_path}" ]
+    if [[ ! -d "${endpoint_path}" ]]
     then
         continue
     fi
@@ -57,7 +57,7 @@ echo
 echo "Pulling code for producer API lambdas...."
 for endpoint_path in api/producer/*
 do
-    if [ ! -d "${endpoint_path}" ]
+    if [[ ! -d "${endpoint_path}" ]]
     then
         continue
     fi

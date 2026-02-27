@@ -28,7 +28,7 @@ function _bootstrap_help() {
 }
 
 function _check_mgmt() {
-  if [ "$(aws iam list-account-aliases --query 'AccountAliases[0]' --output text)" != "nhsd-ddc-spine-nrlf-mgmt" ]; then
+  if [[ "$(aws iam list-account-aliases --query 'AccountAliases[0]' --output text)" != "nhsd-ddc-spine-nrlf-mgmt" ]]; then
     echo "Please log in as the mgmt account" >&2
     return 1
   fi
@@ -98,7 +98,7 @@ function _bootstrap() {
       set +e
         mgmt_account_id=$(aws secretsmanager get-secret-value --secret-id "${MGMT_ACCOUNT_ID_LOCATION}" --query SecretString --output text)
 
-        if [ "${mgmt_account_id}" == "" ]; then
+        if [[ "${mgmt_account_id}" == "" ]]; then
           aws secretsmanager create-secret --name "${MGMT_ACCOUNT_ID_LOCATION}"
           echo "Please set ${MGMT_ACCOUNT_ID_LOCATION} in the Secrets Manager and rerun the script"
           exit 1
