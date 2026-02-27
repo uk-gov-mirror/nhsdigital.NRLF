@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+import os
+
 import boto3
 
 _AWS_ACCOUNT_FOR_ENV = {
@@ -13,6 +15,8 @@ _AWS_ACCOUNT_FOR_ENV = {
     "prod": "prod",
 }
 
+AWS_REGION = os.getenv("AWS_REGION", "eu-west-2")
+
 
 def get_account_name(env: str):
     if env not in _AWS_ACCOUNT_FOR_ENV:
@@ -23,7 +27,7 @@ def get_account_name(env: str):
 
 def get_account_id(env: str):
     account_name = get_account_name(env)
-    secretsmanager = boto3.client("secretsmanager", region_name="eu-west-2")
+    secretsmanager = boto3.client("secretsmanager", region_name=AWS_REGION)
     secret_id = f"nhsd-nrlf--mgmt--{account_name}-account-id"
     result = secretsmanager.get_secret_value(SecretId=secret_id)
     account_id = result["SecretString"]
@@ -34,7 +38,7 @@ def get_account_id(env: str):
 def get_boto_session(env: str) -> boto3.Session:
     account_id = get_account_id(env)
 
-    sts = boto3.client("sts", region_name="eu-west-2")
+    sts = boto3.client("sts", region_name=AWS_REGION)
     result = sts.assume_role(
         RoleArn=f"arn:aws:iam::{account_id}:role/terraform",
         RoleSessionName="get-account-id",

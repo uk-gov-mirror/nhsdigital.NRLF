@@ -122,12 +122,6 @@ function _bootstrap() {
     #----------------
     "destroy-non-mgmt")
       _check_non_mgmt || return 1
-      # TODO: Reintroduce the admin check - but should be fine for all developers
-      # if [[ "$(aws sts get-caller-identity)" != *dev* || "$(aws sts get-caller-identity)" != *NHSDAdminRole* ]]; then
-      #     echo "Please log in as dev with an Admin account" >&2
-      #     return 1
-      # fi
-
       local workspace
       workspace=$2
       # Fetch the resources using the AWS CLI command
@@ -148,7 +142,7 @@ function _bootstrap() {
                   ;;
               arn:aws:logs* )
                   echo "Deleting... : $arn"
-                  new_var=$(echo "$arn" | awk -F':' '{print $NF}')
+                  new_var=$(echo "$arn" | awk -F':' '{print $NF}') # NOSONAR (S1192) NF is not a env var
                   aws logs delete-log-group --log-group-name $new_var
                   ;;
               arn:aws:secretsmanager* )
@@ -164,13 +158,13 @@ function _bootstrap() {
                   ;;
               arn:aws:dynamodb* )
                   echo "Deleting... : $arn"
-                  new_var=$(echo "$arn" | awk -F':' '{print $NF}')
-                  table=$(echo "$arn" | awk -F'/' '{print $NF}')
+                  new_var=$(echo "$arn" | awk -F':' '{print $NF}')  # NOSONAR (S1192) NF is not a env var
+                  table=$(echo "$arn" | awk -F'/' '{print $NF}')  # NOSONAR (S1192) NF is not a env var
                   aws dynamodb delete-table --table-name $table
                   ;;
               arn:aws:s3* )
                   echo "Deleting... : $arn"
-                  new_var=$(echo "$arn" | awk -F':' '{print $NF}')
+                  new_var=$(echo "$arn" | awk -F':' '{print $NF}') # NOSONAR (S1192) NF is not a env var
                   local versioned_objects
                   versioned_objects=$(aws s3api list-object-versions \
                                       --bucket "${new_var}" \
@@ -184,9 +178,9 @@ function _bootstrap() {
                   ;;
               arn:aws:ssm* )
                   echo "Deleting... : $arn"
-                  new_var=$(echo "$arn" | awk -F':' '{print $NF}')
-                  suffix=$(echo "$arn" | awk -F'/' '{print $NF}')
-                  name=$(echo "$new_var" | awk -F'/' '{print $(NF-1)}')
+                  new_var=$(echo "$arn" | awk -F':' '{print $NF}')  # NOSONAR (S1192) NF is not a env var
+                  suffix=$(echo "$arn" | awk -F'/' '{print $NF}')  # NOSONAR (S1192) NF is not a env var
+                  name=$(echo "$new_var" | awk -F'/' '{print $(NF-1)}')  # NOSONAR (S1192) NF is not a env var
                   aws ssm delete-parameter --name $name/$suffix
                   ;;
               arn:aws:acm* )
@@ -195,8 +189,8 @@ function _bootstrap() {
                   ;;
               arn:aws:firehose* )
                   echo "Deleting... : $arn"
-                  new_var=$(echo "$arn" | awk -F':' '{print $NF}')
-                  name=$(echo "$new_var" | awk -F'/' '{print $NF}')
+                  new_var=$(echo "$arn" | awk -F':' '{print $NF}')  # NOSONAR (S1192) NF is not a env var
+                  name=$(echo "$new_var" | awk -F'/' '{print $NF}')  # NOSONAR (S1192) NF is not a env var
                   aws firehose delete-delivery-stream --delivery-stream-name $name
                   ;;
               * )

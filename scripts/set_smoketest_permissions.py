@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 import json
+import os
 
 import fire
 from aws_session_assume import get_boto_session
+
+AWS_REGION = os.getenv("AWS_REGION", "eu-west-2")
 
 
 def main(secret_env_name: str = "dev", bucket_env_name: str = "dev", env: str = "dev"):
@@ -10,7 +13,7 @@ def main(secret_env_name: str = "dev", bucket_env_name: str = "dev", env: str = 
 
     print("Getting smoke test parameters from AWS....")  # noqa
     smoke_test_params_name = f"nhsd-nrlf--{secret_env_name}--smoke-test-parameters"
-    secretsmanager = boto_session.client("secretsmanager", region_name="eu-west-2")
+    secretsmanager = boto_session.client("secretsmanager", region_name=AWS_REGION)
     smoke_test_params_value = secretsmanager.get_secret_value(
         SecretId=smoke_test_params_name
     )
