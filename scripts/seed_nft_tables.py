@@ -217,7 +217,7 @@ def _set_up_cyclical_iterator(dists: dict[str, int]) -> Iterator[str]:
     value_list: list[str] = []
     for entry in dists:
         value_list.extend([entry] * (dists[entry] // d))
-    shuffle(value_list)
+    shuffle(value_list)  # NOSONAR (S2245) - psuedorandom shuffle is ok
     return cycle(value_list)
 
 
