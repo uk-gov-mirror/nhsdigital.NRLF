@@ -18,17 +18,17 @@ sys.stdin = open("/dev/tty")  # Ensure that input can be taken by hook
 MSG_FILE = sys.argv[1]  # commit-msg hook provides file name as first arg
 
 
-def appendToCommitMessage(jiraId):
-    print("Appended {0} to commit message.".format(jiraId))
+def append_to_commit_message(jira_id):
+    print("Appended {0} to commit message.".format(jira_id))
     with open(MSG_FILE, "a") as f:
-        f.write("{0}".format(jiraId))
+        f.write("{0}".format(jira_id))
 
 
-def prependToCommitMessage(jiraId):
-    print("Prepended {} to commit message.".format(jiraId))
+def prepend_to_commit_message(jira_id):
+    print("Prepended {} to commit message.".format(jira_id))
     with open(MSG_FILE, "r") as f:
         text = f.read()
-        text = "{} {}".format(jiraId, text)
+        text = "{} {}".format(jira_id, text)
         with open(MSG_FILE, "w") as f:
             f.write(text)
 
@@ -65,23 +65,23 @@ if branchMatch:
         )
     )
     if response.strip().lower().startswith("y"):
-        prependToCommitMessage(branchMatch.group(1))
+        prepend_to_commit_message(branchMatch.group(1))
         sys.exit(0)
 oldBranchMatch = re.search(OLD_FEATURE_REGEX, str(branch))
 if oldBranchMatch:
-    jiraId = "SPII-{}".format(oldBranchMatch.group(1))
+    jira_id = "SPII-{}".format(oldBranchMatch.group(1))
     response = input(
-        "Use {0}{1}{2} from branch name? (y/n) ".format(OK_C, jiraId, END_C)
+        "Use {0}{1}{2} from branch name? (y/n) ".format(OK_C, jira_id, END_C)
     )
     if response.strip().lower().startswith("y"):
-        prependToCommitMessage(jiraId)
+        prepend_to_commit_message(jira_id)
         sys.exit(0)
 
 # All else fails ask what they want to use
-jiraId = input("Please enter the JIRA ID (for example SPII-1234 or NEMS-123): ")
-if not re.search(JIRA_REGEX, jiraId):
+jira_id = input("Please enter the JIRA ID (for example SPII-1234 or NEMS-123): ")
+if not re.search(JIRA_REGEX, jira_id):
     print(FAIL_C + "Did not provide valid JIRA ID. Commit Aborted." + END_C)
     sys.exit(1)
 else:
-    prependToCommitMessage(jiraId)
+    prepend_to_commit_message(jira_id)
     sys.exit(0)
