@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 import json
-from os import path
-from pathlib import Path
 
 import fire
 from aws_session_assume import get_boto_session
@@ -29,6 +27,9 @@ def main(secret_env_name: str = "dev", bucket_env_name: str = "dev", env: str = 
         Bucket=bucket,
         Key=f"{nrlf_app_id}/{ods_code}.json",
         Body=open(f"./tests/smoke/permissions/{ods_code}.json", "rb"),
+        ExpectedBucketOwner=boto_session.client("sts")
+        .get_caller_identity()
+        .get("Account"),
     )
 
 
