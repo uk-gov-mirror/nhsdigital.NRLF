@@ -224,7 +224,13 @@ def _set_up_cyclical_iterator(dists: dict[str, int]) -> Iterator[str]:
 def _get_pointer_count_poisson_distributions(
     num_of_patients: int, pointers_per_px: float
 ) -> Iterator[int]:
-    p_count_distr = np.random.poisson(lam=pointers_per_px - 1, size=num_of_patients) + 1
+    rng_seed = int(datetime.now().timestamp())
+    p_count_distr = (
+        np.random.default_rng(rng_seed).poisson(
+            lam=pointers_per_px - 1, size=num_of_patients
+        )
+        + 1
+    )
     p_count_distr = np.clip(p_count_distr, a_min=1, a_max=4)
     return cycle(p_count_distr)
 
