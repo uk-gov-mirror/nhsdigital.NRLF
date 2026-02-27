@@ -816,7 +816,7 @@ missing_headers = [
 # now: botocore.exceptions.NoCredentialsError: Unable to locate credentials
 # TODO: Figure out mocking - avoid needing to use a test header
 @pytest.mark.parametrize("headers_missing_from_request", missing_headers)
-def test_request_load_connection_with_missing_headers_gets_new_permissions(
+def test_request_load_connection_with_missing_headers_gets_v2_permissions(
     headers_missing_from_request,
 ):
     headers = create_headers(

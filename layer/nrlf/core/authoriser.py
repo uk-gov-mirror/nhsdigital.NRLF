@@ -23,32 +23,17 @@ def get_pointer_permissions(
     app_id = connection_metadata.nrl_app_id
 
     key = f"{producer_or_consumer}/{app_id}/{ods_code}.json"
-
     logger.log(LogReference.S3PERMISSIONS011, key=key)
 
-    # nothing to retrieve yet!
-    s3_client = get_s3_client()
+    file_path = f"/opt/python/nrlf_permissions/{key}"
+
+    if connection_metadata.is_test_event:
+        file_path = path.abspath(f"layer/test_permissions/{key}")
+
+    pointer_permissions = {}
     try:
-        response = s3_client.get_object(Bucket=config.AUTH_STORE, Key=key)
-        pointer_permissions = json.loads(response["Body"].read())
-        logger.log(
-            LogReference.S3PERMISSIONS012, pointer_permissions=pointer_permissions
-        )
-        return pointer_permissions
-
-    except ClientError as exc:
-        if exc.response.get("Error", {}).get("Code") == "NoSuchKey":
-            logger.log(LogReference.S3PERMISSIONS013, error=str(exc), key=key)
-            return {}
-
-        logger.log(
-            LogReference.S3PERMISSIONS014,
-            exc_info=sys.exc_info(),
-            stacklevel=5,
-            error=str(exc),
-        )
-        raise exc
-
+        with open(file_path) as file:
+            pointer_permissions = json.load(file)
     except Exception as exc:
         logger.log(
             LogReference.S3PERMISSIONS014,
@@ -56,7 +41,7 @@ def get_pointer_permissions(
             stacklevel=5,
             error=str(exc),
         )
-        raise exc
+    return pointer_permissions
 
 
 def get_pointer_types(

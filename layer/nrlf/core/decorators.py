@@ -143,7 +143,7 @@ def logger_initialiser(
 RepositoryType = Union[Type[DocumentPointerRepository], None]
 
 
-def _use_new_permissions_model(headers: Dict[str, str], config: Config) -> bool:
+def _use_v2_permissions_model(headers: Dict[str, str], config: Config) -> bool:
     case_insensitive_headers = {key.lower(): value for key, value in headers.items()}
     # if either or both headers are missing
     return (
@@ -152,9 +152,9 @@ def _use_new_permissions_model(headers: Dict[str, str], config: Config) -> bool:
     )
 
 
-def _load_new_connection_metadata(headers: Dict[str, str], config: Config, path: str):
+def _load_v2_connection_metadata(headers: Dict[str, str], config: Config, path: str):
     logger.log(LogReference.HANDLER004d)
-    metadata = parse_headers(headers, use_new_permissions=True)
+    metadata = parse_headers(headers, use_v2_permissions=True)
 
     if PERMISSION_ALLOW_ALL_POINTER_TYPES in metadata.nrl_permissions:
         logger.log(LogReference.HANDLER004a)
@@ -177,10 +177,10 @@ def _load_new_connection_metadata(headers: Dict[str, str], config: Config, path:
 
 def load_connection_metadata(headers: Dict[str, str], config: Config, path=""):
 
-    if _use_new_permissions_model(headers, config):
-        return _load_new_connection_metadata(headers, config, path)
+    if _use_v2_permissions_model(headers, config):
+        return _load_v2_connection_metadata(headers, config, path)
 
-    metadata = parse_headers(headers, use_new_permissions=False)
+    metadata = parse_headers(headers, use_v2_permissions=False)
     if PERMISSION_ALLOW_ALL_POINTER_TYPES in metadata.nrl_permissions:
         logger.log(LogReference.HANDLER004b)
         metadata.pointer_types = PointerTypes.list()

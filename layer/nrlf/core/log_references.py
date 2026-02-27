@@ -23,18 +23,18 @@ class LogReference(Enum):
     HANDLER002 = _Reference("DEBUG", "Attempting to parse request headers")
     HANDLER003 = _Reference("INFO", "Parsed metadata from request headers")
     HANDLER003a = _Reference(
-        "WARN", "Missing nhsd-end-user-organisation-ods header for new permissions"
+        "WARN", "Missing nhsd-end-user-organisation-ods header for v2 permissions"
     )
     HANDLER003b = _Reference(
-        "WARN", "Missing nhsd-nrl-app-id header for new permissions"
+        "WARN", "Missing nhsd-nrl-app-id header for v2 permissions"
     )
     HANDLER004 = _Reference("INFO", "Authorisation lookup enabled")
     HANDLER004a = _Reference("INFO", "Authorisation lookup skipped for sync request")
     HANDLER004b = _Reference("INFO", "Parsing embedded permissions file from S3")
     HANDLER004c = _Reference("INFO", "Parsed embedded permissions file from S3")
-    HANDLER004d = _Reference("INFO", "Using NEW permissions model")
-    HANDLER004e = _Reference("INFO", "Parsing new permissions file from S3")
-    HANDLER004f = _Reference("INFO", "Parsed new permissions file from S3")
+    HANDLER004d = _Reference("INFO", "Using v2 permissions model")
+    HANDLER004e = _Reference("INFO", "Parsing v2 permissions file from lambda layer")
+    HANDLER004f = _Reference("INFO", "Parsed v2 permissions file from lambda layer")
     HANDLER005 = _Reference("WARN", "Rejecting request due to missing pointer types")
     HANDLER006 = _Reference("DEBUG", "Attempting to parse request parameters")
     HANDLER007 = _Reference("INFO", "Parsed request parameters")
@@ -81,15 +81,19 @@ class LogReference(Enum):
         "EXCEPTION",
         "An error occurred whilst parsing embedded permissions files from S3",
     )
-    # S3 Permissions Lookup Logs - new permissions
+    # S3 Permissions Lookup Logs - v2 permissions
     S3PERMISSIONS011 = _Reference(
-        "INFO", "Retrieving new pointer permissions from S3 bucket"
+        "INFO", "Retrieving v2 pointer permissions from lambda layer"
     )
-    S3PERMISSIONS012 = _Reference("INFO", "Retrieved new pointer permissions from S3")
-    S3PERMISSIONS013 = _Reference("WARN", "No new permissions file found in S3")
+    S3PERMISSIONS012 = _Reference(
+        "INFO", "Retrieved v2 pointer permissions from lambda layer"
+    )
+    S3PERMISSIONS013 = _Reference(
+        "WARN", "No v2 permissions file found in lambda layer"
+    )
     S3PERMISSIONS014 = _Reference(
         "EXCEPTION",
-        "An error occurred whilst retrieving new pointer permissions from S3",
+        "An error occurred whilst retrieving v2 pointer permissions ",
     )
 
     # Parse Logs

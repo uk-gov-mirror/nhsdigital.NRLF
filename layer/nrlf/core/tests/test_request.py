@@ -127,7 +127,7 @@ def test_parse_headers_case_insensitive():
     assert metadata.client_rp_details.developer_app_id == "12345"
 
 
-def test_parse_headers_valid_headers_new_permissions():
+def test_parse_headers_valid_headers_v2_permissions():
     headers = {
         "nhsd-connection-metadata": json.dumps(
             {
@@ -147,7 +147,7 @@ def test_parse_headers_valid_headers_new_permissions():
         "nhsd-nrl-app-id": "X26-TestApp-12345",
     }
 
-    metadata = parse_headers(headers, use_new_permissions=True)
+    metadata = parse_headers(headers, use_v2_permissions=True)
 
     assert metadata.pointer_types == ["pointer_type"]
     assert metadata.ods_code == "X26"
