@@ -73,7 +73,7 @@ class PointerTypes(Enum):
 
     @staticmethod
     def list():
-        return list(map(lambda type: type.value, PointerTypes))
+        return [type.value for type in PointerTypes]
 
     def coding_system(self):
         return self.value.split(TYPE_SEPARATOR)[0]
@@ -93,7 +93,7 @@ class Categories(Enum):
 
     @staticmethod
     def list():
-        return list(map(lambda category: category.value, Categories))
+        return [category.value for category in Categories]
 
     def coding_system(self):
         return self.value.split(TYPE_SEPARATOR)[0]
