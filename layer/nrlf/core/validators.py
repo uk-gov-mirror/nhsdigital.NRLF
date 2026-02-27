@@ -395,7 +395,7 @@ class DocumentReferenceValidator:
                 issue_code="business-rule",
                 error_code="UNPROCESSABLE_ENTITY",
                 diagnostics=f"Invalid category length: {len(model.category)} Category must only contain a single value",
-                field=f"category",
+                field="category",
             )
             return
 
@@ -406,7 +406,7 @@ class DocumentReferenceValidator:
                 issue_code="business-rule",
                 error_code="UNPROCESSABLE_ENTITY",
                 diagnostics=f"Invalid category coding length: {len(model.category[0].coding)} Category Coding must only contain a single value",
-                field=f"category[0].coding",
+                field="category[0].coding",
             )
             return
 

@@ -1,6 +1,5 @@
 import sys
-from abc import ABC
-from typing import Generic, Iterator, List, Optional, Type, TypeVar
+from typing import Iterator, List, Optional, Type
 
 from botocore.exceptions import ClientError
 from pydantic import ValidationError
@@ -8,11 +7,9 @@ from pydantic import ValidationError
 from nrlf.core.boto import get_dynamodb_resource, get_dynamodb_table
 from nrlf.core.codes import SpineErrorConcept
 from nrlf.core.constants import SYSTEM_SHORT_IDS, TYPE_CATEGORIES
-from nrlf.core.dynamodb.model import DocumentPointer, DynamoDBModel
+from nrlf.core.dynamodb.model import DocumentPointer, DynamoDBModel  # noqa: F401
 from nrlf.core.errors import OperationOutcomeError
 from nrlf.core.logger import LogReference, logger
-
-RepositoryModel = TypeVar("RepositoryModel", bound=DynamoDBModel)
 
 
 def _get_sk_ids_for_type(pointer_type: str) -> tuple:
@@ -33,8 +30,8 @@ def _get_sk_ids_for_type(pointer_type: str) -> tuple:
     return category_id, type_id
 
 
-class Repository(ABC, Generic[RepositoryModel]):
-    ITEM_TYPE: Type[RepositoryModel]
+class Repository[T: DynamoDBModel]:
+    ITEM_TYPE: Type[T]
 
     def __init__(self, table_name: str):
         self.dynamodb = get_dynamodb_resource()
