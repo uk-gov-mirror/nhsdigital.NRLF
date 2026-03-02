@@ -5,6 +5,7 @@ class Source(Enum):
     NRLF = "NRLF"
     LEGACY = "NRL"  # not actually used
     PERFTEST = "NFT-SEED"
+    SANDBOX = "SANDBOX-SEED"
 
 
 VALID_SOURCES = frozenset(item.value for item in Source.__members__.values())

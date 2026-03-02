@@ -375,8 +375,7 @@ In order to deploy to a sandbox environment (`dev-sandbox`, `qa-sandbox`, `int-s
 
 ### Sandbox database clear and reseed
 
-Any workspace suffixed with `-sandbox` has a small amount of additional infrastructure deployed to clear and reseed the DynamoDB tables (auth and document pointers) using a Lambda running
-on a cron schedule that can be found in the `cron/seed_sandbox` directory in the root of this project. The data used to seed the DynamoDB tables can found in the `cron/seed_sandbox/data` directory.
+The dev and test environments have a small amount of additional infrastructure deployed to clear and reseed specified DynamoDB sandbox tables with realistic data using a Lambda running on an Eventbridge schedule. You can specify the tables to be reseeded in `terraform/account-wide-infrastructure/{env}/lambda\__seed-sandbox.tf.` If you want to perform this manually on an adhoc basis, you can use `./scripts/reset_sandbox_table.py`.
 
 ### Sandbox authorisation
 

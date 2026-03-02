@@ -1,0 +1,8 @@
+{
+  "dist_directory": "dist",
+  "layer_filenames": {
+    "nrlf": "nrlf.zip",
+    "third_party": "dependency_layer.zip",
+    "nrlf_permissions": "nrlf_permissions.zip"
+  }
+}
