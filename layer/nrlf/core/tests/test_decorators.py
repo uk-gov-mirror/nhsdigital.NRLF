@@ -830,6 +830,8 @@ def test_request_load_connection_with_missing_headers_gets_v2_permissions(
     )
 
     assert expected_metadata.pointer_types == []
+    assert expected_metadata.ods_code == "Y05868"
+    assert expected_metadata.nrl_app_id == "Y05868-TestApp-12345678"
 
 
 def test_request_handler_with_custom_repository(mocker: MockerFixture):
