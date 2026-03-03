@@ -146,7 +146,7 @@ class DocumentReferenceValidator:
             self._validate_content(resource)
             self._validate_content_format(resource)
             self._validate_content_extension(resource)
-            self._validate_practiceSetting(resource)
+            self._validate_practice_setting(resource)
 
         except StopValidationError:
             logger.log(LogReference.VALIDATOR003)
@@ -287,7 +287,6 @@ class DocumentReferenceValidator:
                 diagnostics=f"Invalid ASID value '{asid_value}'. A single ASID consisting of 12 digits can be provided in the context.related field.",
                 field=f"context.related[{idx}].identifier.value",
             )
-            return
 
     def _validate_ssp_asid(self, model: DocumentReference):
         """
@@ -295,11 +294,9 @@ class DocumentReferenceValidator:
         """
 
         ssp_content = any(
-            [
-                content
-                for content in model.content
-                if content.attachment.url.startswith("ssp://")
-            ]
+            content
+            for content in model.content
+            if content.attachment.url.startswith("ssp://")
         )
 
         logger.log(LogReference.VALIDATOR001, step="ssp_content_and_asid_exists")
@@ -338,7 +335,6 @@ class DocumentReferenceValidator:
                 diagnostics="Missing ASID identifier. context.related must contain a single valid ASID identifier when content contains an SSP URL",
                 field="context.related",
             )
-            return
 
     def _validate_type(self, model: DocumentReference):
         """
@@ -395,7 +391,7 @@ class DocumentReferenceValidator:
                 issue_code="business-rule",
                 error_code="UNPROCESSABLE_ENTITY",
                 diagnostics=f"Invalid category length: {len(model.category)} Category must only contain a single value",
-                field=f"category",
+                field="category",
             )
             return
 
@@ -406,7 +402,7 @@ class DocumentReferenceValidator:
                 issue_code="business-rule",
                 error_code="UNPROCESSABLE_ENTITY",
                 diagnostics=f"Invalid category coding length: {len(model.category[0].coding)} Category Coding must only contain a single value",
-                field=f"category[0].coding",
+                field="category[0].coding",
             )
             return
 
@@ -652,9 +648,8 @@ class DocumentReferenceValidator:
                 diagnostics=f"Invalid author value: '{identifier.value}' Author value must be less than 13 characters",
                 field="author[0].identifier.value",
             )
-            return
 
-    def _validate_practiceSetting(self, model: DocumentReference):
+    def _validate_practice_setting(self, model: DocumentReference):
         """
         Validate the practice setting field contains an appropriate coding system and code.
         """
@@ -716,7 +711,6 @@ class DocumentReferenceValidator:
                 diagnostics=f"Invalid practice setting coding: display {practice_setting_display} does not match the expected display for {practice_setting_value} Practice Setting coding is bound to value set {PRACTICE_SETTING_VALUE_SET_URL}",
                 field="context.practiceSetting.coding[0]",
             )
-            return
 
     def _validate_content(self, model: DocumentReference):
         """

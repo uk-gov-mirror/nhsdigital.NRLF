@@ -10,13 +10,6 @@ concurrency:
   group: environment-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
-permissions:
-  id-token: write
-  contents: read
-  actions: write
-  issues: write
-  pull-requests: write
-
 jobs:
   set-environment-id:
     name: Set Environment ID
@@ -50,6 +43,11 @@ jobs:
     needs: [set-environment-id]
     environment: pull-request
     runs-on: codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
+    permissions:
+      id-token: write
+      contents: read
+      issues: write
+      pull-requests: write
 
     steps:
       - name: Git Clone - ${{ github.event.pull_request.head.ref }}

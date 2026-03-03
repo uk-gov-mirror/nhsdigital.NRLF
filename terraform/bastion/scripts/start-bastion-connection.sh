@@ -5,7 +5,7 @@ set -o errexit -o nounset -o pipefail
 : "${AWS_ACCOUNT_ID:=""}"
 : "${AWS_ROLE_NAME:=""}"
 
-if [ "$#" -ne 1 ]; then
+if [[ "$#" -ne 1 ]]; then
   echo "Usage: $0 <bastion-instance-id>"
   exit 1
 fi

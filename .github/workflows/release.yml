@@ -1,9 +1,5 @@
 name: Release Published
 run-name: Release NRL ${{ github.event.release.name }}
-permissions:
-  id-token: write
-  contents: write
-  actions: write
 
 env:
   SYFT_VERSION: "1.27.1"
@@ -11,15 +7,16 @@ env:
 on:
   release:
     types: [published]
-  # push:
-  #   tags:
-  #     - v*
   workflow_dispatch:
 
 jobs:
   sbom:
     name: Generate Software Bill of Materials - ${{ github.event.release.name }}
     runs-on: codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
+    permissions:
+      id-token: write
+      contents: write
+      actions: write
 
     steps:
       - name: Git clone - ${{ github.ref }}

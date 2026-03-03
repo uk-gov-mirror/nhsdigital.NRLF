@@ -15,16 +15,15 @@ on:
         required: true
         type: string
 
-permissions:
-  id-token: write
-  contents: read
-  actions: write
-
 jobs:
   activate-stack:
     name: Activate ${{ inputs.stack_name }} for ${{ inputs.environment }}
     runs-on: codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
     environment: ${{ inputs.environment }}
+    permissions:
+      contents: read
+      id-token: write
+      actions: write
 
     steps:
       - name: Git clone - ${{ github.ref }}

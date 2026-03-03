@@ -14,15 +14,14 @@ on:
         description: Branch to deploy
         required: true
 
-permissions:
-  id-token: write
-  contents: read
-  actions: write
-
 jobs:
   build:
     name: Build - ${{ inputs.branch_name }}
     runs-on: codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
+    permissions:
+      id-token: write
+      contents: read
+      actions: write
 
     steps:
       - name: Git clone - ${{ inputs.branch_name }}
@@ -78,6 +77,10 @@ jobs:
     needs: [build]
     environment: ${{ inputs.environment }}
     runs-on: codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
+    permissions:
+      contents: read
+      id-token: write
+      actions: write
 
     steps:
       - name: Git clone - ${{ inputs.branch_name }}
@@ -151,6 +154,10 @@ jobs:
     needs: [terraform-plan]
     runs-on: codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
     environment: ${{ inputs.environment }}
+    permissions:
+      contents: read
+      id-token: write
+      actions: write
 
     steps:
       - name: Git clone - ${{ inputs.branch_name }}
@@ -227,6 +234,10 @@ jobs:
     needs: [terraform-apply]
     runs-on: codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
     environment: ${{ inputs.environment }}
+    permissions:
+      contents: read
+      id-token: write
+      actions: write
 
     steps:
       - name: Git clone - ${{ inputs.branch_name }}
@@ -258,6 +269,9 @@ jobs:
     needs: [activate-stack]
     runs-on: codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
     environment: ${{ inputs.environment }}
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
       - name: Git clone - ${{ inputs.branch_name }}
@@ -289,6 +303,9 @@ jobs:
     if: always() && ( needs.post-release-verify.result == 'failure' )
     runs-on: codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
     environment: ${{ inputs.environment }}
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
       - name: Git clone - ${{ inputs.branch_name }}

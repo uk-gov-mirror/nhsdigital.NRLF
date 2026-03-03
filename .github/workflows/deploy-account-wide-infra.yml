@@ -13,11 +13,6 @@ on:
         description: Branch to deploy
         required: true
 
-permissions:
-  id-token: write
-  contents: read
-  actions: write
-
 jobs:
   check-selected-environment:
     name: Check Workflow Env
@@ -39,6 +34,10 @@ jobs:
     environment: ${{ inputs.environment }}
     needs: [check-selected-environment]
     runs-on: codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
+    permissions:
+      contents: read
+      id-token: write
+      actions: write
 
     steps:
       - name: Git clone - ${{ inputs.branch_name }}
@@ -116,6 +115,10 @@ jobs:
     needs: [terraform-plan]
     runs-on: codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
     environment: ${{ inputs.environment }}
+    permissions:
+      contents: read
+      id-token: write
+      actions: write
 
     steps:
       - name: Git clone - ${{ inputs.branch_name }}

@@ -9,15 +9,17 @@ set -o errexit -o pipefail -o nounset
 : "${TF_WORKSPACE_NAME:=""}"
 
 function success() {
-  [ "${SHOULD_WARN_ONLY}" == "true" ] && return
+  [[ "${SHOULD_WARN_ONLY}" == "true" ]] && return
 
   local message="$1"
   echo "  ✅  ${message}"
+  return 0
 }
 
 function warning() {
   local message="$1"
   echo -e "  ⚠️  \e[31m${message}\e[39m"
+  return 0
 }
 
 echo
@@ -33,7 +35,7 @@ for dep in ${DEPLOY_DEPENDENCIES}; do
         dep_path="$(which ${dep} 2> /dev/null)"
     set -e
 
-    if [ -n "${dep_path}" -a -x "${dep_path}" ]
+    if [[ -n "${dep_path}" -a -x "${dep_path}" ]]
     then
         success "${dep} found at ${dep_path}"
     else
@@ -45,7 +47,7 @@ done
 set +e
 env_account_id="$(aws secretsmanager get-secret-value --secret-id nhsd-nrlf--mgmt--${ENV_ACCOUNT_NAME}-account-id --query SecretString --output text)"
 set -e
-if [ -n "${env_account_id}" ]
+if [[ -n "${env_account_id}" ]]
 then
     success "${ENV_ACCOUNT_NAME} account id found in mgmt account"
 else
@@ -59,7 +61,7 @@ tf_workspace="$(cd terraform/infrastructure && terraform workspace show)"
 set -e
 
 is_using_shared_resources="$(poetry run python ./scripts/are_resources_shared_for_stack.py ${tf_workspace})"
-if [ "${is_using_shared_resources}" == "true" ]
+if [[ "${is_using_shared_resources}" == "true" ]]
 then
     warning "Will use shared resources for stack '${tf_workspace}'"
 else

@@ -21,15 +21,13 @@ on:
         type: boolean
         default: true
 
-permissions:
-  id-token: write
-  contents: read
-  actions: write
-
 jobs:
   check-versions:
     name: Check versions
     runs-on: codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
+    permissions:
+      id-token: write
+      contents: read
 
     steps:
       - name: Git clone - ${{ github.ref }}
@@ -80,6 +78,10 @@ jobs:
     name: Build permissions
     runs-on: codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
     environment: ${{ inputs.environment }}
+    permissions:
+      id-token: write
+      contents: read
+      actions: write
 
     needs: [check-versions]
 
@@ -119,8 +121,11 @@ jobs:
     name: Pull deployed lambdas
     runs-on: codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
     environment: ${{ inputs.environment }}
-
     needs: [check-versions]
+    permissions:
+      id-token: write
+      contents: read
+      actions: write
 
     steps:
       - name: Git clone - ${{ github.ref }}
@@ -161,8 +166,11 @@ jobs:
     name: Plan changes
     runs-on: codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
     environment: ${{ inputs.environment }}
-
     needs: [build-permissions, pull-deployed-lambdas]
+    permissions:
+      id-token: write
+      contents: read
+      actions: write
 
     steps:
       - name: Git clone - ${{ github.ref }}
@@ -227,8 +235,11 @@ jobs:
     name: Apply permissions
     runs-on: codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
     environment: ${{ inputs.environment }}
-
     needs: terraform-plan
+    permissions:
+      id-token: write
+      contents: read
+      actions: read
 
     steps:
       - name: Git clone - ${{ github.ref }}

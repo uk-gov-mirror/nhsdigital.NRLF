@@ -1,5 +1,3 @@
-from typing import Union
-
 from nhs_number import is_valid as is_valid_nhs_number
 from pydantic import BaseModel, Field, StrictStr
 
@@ -9,7 +7,7 @@ import nrlf.producer.fhir.r4.model as producer_model
 
 class _NhsNumberMixin:
     @property
-    def nhs_number(self) -> Union[str, None]:
+    def nhs_number(self) -> str | None:
         if self.subject_identifier is None:
             return None
 

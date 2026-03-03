@@ -34,6 +34,7 @@ function _truststore_help() {
     echo "  restore-archived-ca <env>       - restore an archived certificate authority"
     echo "  restore-archived-cert <env>     - restore an archived client certificate"
     echo
+    return 0
 }
 
 # read an input file and substitute all the ${} entries
@@ -400,6 +401,8 @@ function _truststore() {
         "restore-archived-cert") _restore_archived_cert $args ;;
         *) _truststore_help $args ;;
     esac
+
+    return 0
 }
 
 _truststore $@

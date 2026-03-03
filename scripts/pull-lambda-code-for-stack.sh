@@ -4,7 +4,7 @@ set -o errexit -o nounset -o pipefail
 
 : "${DIST_DIR:="./dist"}"
 
-if [ $# -ne 1 ]
+if [[ $# -ne 1 ]]
 then
     echo "Error: stack-name argument is missing" 1>&2
     echo "Usage: $0 <stack-name>" 1>&2
@@ -22,7 +22,9 @@ function pull_lambda_code(){
     echo -n "- Downloading code for lambda ${lambda_name}.... "
     code_url="$(aws lambda get-function  --function-name "${lambda_name}" | jq -r .Code.Location)"
     curl "${code_url}" 2>/dev/null > "${DIST_DIR}/${api_name}-${endpoint_name}.zip"
+
     echo "✅"
+    return 0
 }
 
 function pull_layer_code(){
@@ -35,7 +37,9 @@ function pull_layer_code(){
     echo -n "- Downloading code for layer ${layer_name} version ${layer_version}.... "
     code_url="$(aws lambda get-layer-version --layer-name "${layer_name}" --version-number "${layer_version}" | jq -r .Content.Location)"
     curl "${code_url}" 2>/dev/null > "${DIST_DIR}/${layer_pkg_name}"
+
     echo "✅"
+    return 0
 }
 
 mkdir -p "${DIST_DIR}"
@@ -44,7 +48,7 @@ echo
 echo "Pulling code for consumer API lambdas...."
 for endpoint_path in api/consumer/*
 do
-    if [ ! -d "${endpoint_path}" ]
+    if [[ ! -d "${endpoint_path}" ]]
     then
         continue
     fi
@@ -57,7 +61,7 @@ echo
 echo "Pulling code for producer API lambdas...."
 for endpoint_path in api/producer/*
 do
-    if [ ! -d "${endpoint_path}" ]
+    if [[ ! -d "${endpoint_path}" ]]
     then
         continue
     fi
