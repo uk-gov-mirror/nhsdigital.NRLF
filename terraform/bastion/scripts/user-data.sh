@@ -4,12 +4,14 @@ set -o errexit -o nounset -o pipefail
 
 ASDF_VERSION="v0.18.0"
 
+export DEBIAN_FRONTEND=noninteractive
+
 sudo apt update && \
-    sudo apt upgrade -y && \
-    sudo apt install -y \
+    sudo -E apt upgrade -y && \
+    sudo -E apt install -y \
         git \
         jq \
-        wget \
+        curl \
         build-essential \
         unzip \
         gnupg \
@@ -42,11 +44,12 @@ output = json
 " >> /home/nrlf_ops/.aws/config'
 
 # Install ASDF
-wget https://github.com/asdf-vm/asdf/releases/download/${ASDF_VERSION}/asdf-${ASDF_VERSION}-linux-amd64.tar.gz -O asdf.tar.gz && \
-    tar -xzf asdf.tar.gz && \
-    mv asdf /usr/bin/asdf && \
-    chmod 755 /usr/bin/asdf && \
-    rm asdf.tar.gz
+curl --location --silent --show-error --fail --output asdf.tar.gz \
+    https://github.com/asdf-vm/asdf/releases/download/${ASDF_VERSION}/asdf-${ASDF_VERSION}-linux-amd64.tar.gz && \
+        tar -xzf asdf.tar.gz && \
+        mv asdf /usr/bin/asdf && \
+        chmod 755 /usr/bin/asdf && \
+        rm asdf.tar.gz
 
 # Clone NRLF into nrlf_ops home directory
 sudo -u nrlf_ops git clone https://github.com/NHSDigital/NRLF.git /home/nrlf_ops/NRLF
