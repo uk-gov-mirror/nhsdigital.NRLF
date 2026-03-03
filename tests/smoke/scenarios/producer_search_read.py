@@ -36,7 +36,9 @@ def test_data(
         producer_client.delete(test_pointer.id)
 
 
-def test_producer_search_read(producer_client: ProducerTestClient, test_data: dict):
+def test_smoke_producer_search_read(
+    producer_client: ProducerTestClient, test_data: dict
+):
     """
     Smoke test scenario for a producer search and read behaviour
     """

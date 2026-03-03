@@ -23,7 +23,9 @@ from nrlf.tests.events import (
 
 @mock_aws
 @mock_repository
-def test_search_document_reference_happy_path(repository: DocumentPointerRepository):
+def test_search_document_reference_happy_path(
+    repository: DocumentPointerRepository,
+):
     doc_ref = load_document_reference("Y05868-736253002-Valid")
     doc_pointer = DocumentPointer.from_document_reference(doc_ref)
     repository.create(doc_pointer)
@@ -55,7 +57,9 @@ def test_search_document_reference_happy_path(repository: DocumentPointerReposit
 
 @mock_aws
 @mock_repository
-def test_search_document_reference_no_results(repository: DocumentPointerRepository):
+def test_search_document_reference_no_results(
+    repository: DocumentPointerRepository,
+):
     event = create_test_api_gateway_event(
         headers=create_headers(),
         query_string_parameters={
@@ -168,7 +172,9 @@ def test_search_document_reference_invalid_nhs_number(
 
 @mock_aws
 @mock_repository
-def test_search_document_reference_invalid_type(repository: DocumentPointerRepository):
+def test_search_document_reference_invalid_type(
+    repository: DocumentPointerRepository,
+):
     event = create_test_api_gateway_event(
         headers=create_headers(),
         query_string_parameters={

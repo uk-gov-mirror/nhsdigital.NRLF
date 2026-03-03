@@ -16,7 +16,9 @@ from nrlf.tests.events import (
 
 @mock_aws
 @mock_repository
-def test_read_document_reference_happy_path(repository: DocumentPointerRepository):
+def test_read_document_reference_happy_path(
+    repository: DocumentPointerRepository,
+):
     # Create the document pointer
     doc_ref = load_document_reference("Y05868-736253002-Valid")
     doc_pointer = DocumentPointer.from_document_reference(doc_ref)

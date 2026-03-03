@@ -11,19 +11,50 @@ from nrlf.core.logger import LogReference, logger
 from nrlf.core.model import ClientRpDetails, ConnectionMetadata
 
 
-def parse_headers(headers: Dict[str, str]) -> ConnectionMetadata:
+def _fetch_ods_app_id_headers(headers: dict[str, str]):
+
+    case_insensitive_headers = {key.lower(): value for key, value in headers.items()}
+
+    ods_code = case_insensitive_headers.get("nhsd-end-user-organisation-ods")
+
+    if not ods_code or len(ods_code.strip()) == 0:
+        logger.log(
+            LogReference.HANDLER003a,
+            headers_names=list(case_insensitive_headers.keys()),
+        )
+
+    nrl_app_id = case_insensitive_headers.get("nhsd-nrl-app-id")
+    if not nrl_app_id or len(nrl_app_id.strip()) == 0:
+        logger.log(
+            LogReference.HANDLER003b,
+            headers_names=list(case_insensitive_headers.keys()),
+        )
+
+    return ods_code, nrl_app_id
+
+
+def parse_headers(
+    headers: Dict[str, str], use_v2_permissions=False
+) -> ConnectionMetadata:
     """
     Parses the connection metadata and client rp details from the headers passed from Apigee
     """
     case_insensitive_headers = {key.lower(): value for key, value in headers.items()}
 
     try:
-        raw_connection_metadata = json.loads(
-            case_insensitive_headers.get(CONNECTION_METADATA, "{}")
-        )
         raw_client_rp_details = json.loads(
             case_insensitive_headers.get(CLIENT_RP_DETAILS, "{}")
         )
+        raw_connection_metadata = json.loads(
+            case_insensitive_headers.get(CONNECTION_METADATA, "{}")
+        )
+
+        if use_v2_permissions:
+            ods_code, nrl_app_id = _fetch_ods_app_id_headers(case_insensitive_headers)
+            raw_connection_metadata["nrl.ods-code"] = ods_code
+            raw_connection_metadata["nrl.app-id"] = nrl_app_id
+            raw_client_rp_details["developer.app.id"] = nrl_app_id
+            raw_client_rp_details["developer.app.name"] = nrl_app_id
 
         client_rp_details = ClientRpDetails.model_validate(raw_client_rp_details)
         return ConnectionMetadata.model_validate(

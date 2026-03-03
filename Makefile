@@ -109,7 +109,7 @@ publish-ci-image: ## Publish the CI image
 
 test: check-warn ## Run the unit tests
 	@echo "Running unit tests"
-	pytest --ignore=tests/smoke $(TEST_ARGS)
+	PYTHONPATH=. poetry run pytest --ignore tests/smoke $(TEST_ARGS)
 
 test-features-integration: check-warn ## Run the BDD feature tests in the integration environment
 	@echo "Running feature tests in the integration environment ${TF_WORKSPACE_NAME}"

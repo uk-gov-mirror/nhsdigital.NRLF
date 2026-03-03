@@ -21,7 +21,7 @@ def producer_client_1dsync(
     return ProducerTestClient(config=client_config)
 
 
-def test_1dsync_upsert_delete(
+def test_smoke_1dsync_upsert_delete(
     producer_client_1dsync: ProducerTestClient,
     smoke_test_parameters: SmokeTestParameters,
     test_nhs_numbers: list[str],

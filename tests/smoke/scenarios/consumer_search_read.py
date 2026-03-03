@@ -36,7 +36,9 @@ def test_data(
         producer_client.delete(test_pointer.id)
 
 
-def test_consumer_search_read(consumer_client: ConsumerTestClient, test_data: dict):
+def test_smoke_consumer_search_read(
+    consumer_client: ConsumerTestClient, test_data: dict
+):
     """
     Smoke test scenario for a consumer search and read behaviour
     """

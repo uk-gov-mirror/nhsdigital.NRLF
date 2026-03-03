@@ -7,7 +7,6 @@ from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
 from pydantic import BaseModel
 from pytest_mock import MockerFixture
 
-from nrlf.core.authoriser import parse_permissions_file
 from nrlf.core.codes import SpineErrorConcept
 from nrlf.core.config import Config
 from nrlf.core.constants import (
@@ -26,7 +25,6 @@ from nrlf.core.decorators import (
 )
 from nrlf.core.errors import OperationOutcomeError
 from nrlf.core.logger import LogReference
-from nrlf.core.request import parse_headers
 from nrlf.core.response import Response
 from nrlf.tests.events import (
     create_headers,
@@ -807,20 +805,33 @@ def test_request_load_connection_metadata_with_no_permission_lookup_or_file():
     assert expected_metadata.pointer_types == []
 
 
-def test_request_parse_permission_file_with_no_permission_file():
-    expected_metadata = parse_permissions_file(
-        connection_metadata=parse_headers(create_headers(ods_code="SomeCode")),
+missing_headers = [
+    ["nhsd-connection-metadata"],
+    ["nhsd-connection-metadata", "nhsd-client-rp-details"],
+    ["nhsd-client-rp-details"],
+]
+
+
+@pytest.mark.parametrize("headers_missing_from_request", missing_headers)
+def test_request_load_connection_with_missing_headers_gets_v2_permissions(
+    headers_missing_from_request,
+):
+    headers = create_headers(
+        additional_headers={
+            "nhsd-end-user-organisation-ods": "Y05868",
+            "nhsd-nrl-app-id": "Y05868-TestApp-12345678",
+        }
+    )
+    for header_name in headers_missing_from_request:
+        headers.pop(header_name)
+
+    expected_metadata = load_connection_metadata(
+        headers=headers, config=Config(), path="/producer/DocumentReference"
     )
 
-    assert expected_metadata == []
-
-
-def test_request_parse_permission_file_with_permission_file():
-    expected_metadata = parse_permissions_file(
-        connection_metadata=parse_headers(create_headers(ods_code="TestCode")),
-    )
-
-    assert expected_metadata == ["http://snomed.info/sct|736253001"]
+    assert expected_metadata.pointer_types == []
+    assert expected_metadata.ods_code == "Y05868"
+    assert expected_metadata.nrl_app_id == "Y05868-TestApp-12345678"
 
 
 def test_request_handler_with_custom_repository(mocker: MockerFixture):

@@ -22,10 +22,19 @@ class LogReference(Enum):
     HANDLER001 = _Reference("DEBUG", "Loaded config from environment variables")
     HANDLER002 = _Reference("DEBUG", "Attempting to parse request headers")
     HANDLER003 = _Reference("INFO", "Parsed metadata from request headers")
+    HANDLER003a = _Reference(
+        "WARN", "Missing nhsd-end-user-organisation-ods header for v2 permissions"
+    )
+    HANDLER003b = _Reference(
+        "WARN", "Missing nhsd-nrl-app-id header for v2 permissions"
+    )
     HANDLER004 = _Reference("INFO", "Authorisation lookup enabled")
     HANDLER004a = _Reference("INFO", "Authorisation lookup skipped for sync request")
     HANDLER004b = _Reference("INFO", "Parsing embedded permissions file from S3")
     HANDLER004c = _Reference("INFO", "Parsed embedded permissions file from S3")
+    HANDLER004d = _Reference("INFO", "Using v2 permissions model")
+    HANDLER004e = _Reference("INFO", "Parsing v2 permissions file from lambda layer")
+    HANDLER004f = _Reference("INFO", "Parsed v2 permissions file from lambda layer")
     HANDLER005 = _Reference("WARN", "Rejecting request due to missing pointer types")
     HANDLER006 = _Reference("DEBUG", "Attempting to parse request parameters")
     HANDLER007 = _Reference("INFO", "Parsed request parameters")
@@ -58,10 +67,10 @@ class LogReference(Enum):
         "WARN", "An ParseError occurred whilst processing the request"
     )
     ERROR003 = _Reference(
-        "WARN", "An unhandler exception occurred whilst handling response headers"
+        "WARN", "An unhandled exception occurred whilst handling response headers"
     )
 
-    # S3 Permissions Lookup Logs
+    # S3 / Embedded Permissions Lookup Logs
     S3PERMISSIONS001 = _Reference("INFO", "Retrieving pointer types from S3 bucket")
     S3PERMISSIONS002 = _Reference("INFO", "Retrieved list of pointer types from S3")
     S3PERMISSIONS003 = _Reference("WARN", "No permissions file found in S3")
@@ -70,7 +79,22 @@ class LogReference(Enum):
     )
     S3PERMISSIONS005 = _Reference(
         "EXCEPTION",
-        "An error occurred whilst pasrsing embedded permissions files from S3",
+        "An error occurred whilst parsing embedded permissions files",
+    )
+
+    # V2 Embedded Permissions Lookup Logs
+    V2PERMISSIONS011 = _Reference(
+        "INFO", "Retrieving v2 pointer permissions from lambda layer"
+    )
+    V2PERMISSIONS012 = _Reference(
+        "INFO", "Retrieved v2 pointer permissions from lambda layer"
+    )
+    V2PERMISSIONS013 = _Reference(
+        "WARN", "No v2 permissions file found in lambda layer"
+    )
+    V2PERMISSIONS014 = _Reference(
+        "EXCEPTION",
+        "An error occurred whilst retrieving v2 pointer permissions",
     )
 
     # Parse Logs

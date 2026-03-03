@@ -1,4 +1,5 @@
 import json
+import re
 import sys
 from os import path
 
@@ -8,6 +9,36 @@ from nrlf.core.boto import get_s3_client
 from nrlf.core.config import Config
 from nrlf.core.logger import LogReference, logger
 from nrlf.core.model import ConnectionMetadata
+
+
+def get_pointer_permissions_v2(
+    connection_metadata: ConnectionMetadata,
+    request_path: str,
+):
+    producer_or_consumer = (
+        re.search("^/(producer|consumer)/", request_path).group().strip("/")
+    )
+
+    ods_code = connection_metadata.ods_code
+    app_id = connection_metadata.nrl_app_id
+
+    key = f"{producer_or_consumer}/{app_id}/{ods_code}.json"
+    logger.log(LogReference.V2PERMISSIONS011, key=key)
+
+    file_path = f"/opt/python/nrlf_permissions/{key}"
+
+    pointer_permissions = {}
+    try:
+        with open(file_path) as file:
+            pointer_permissions = json.load(file)
+    except Exception as exc:
+        logger.log(
+            LogReference.V2PERMISSIONS014,
+            exc_info=sys.exc_info(),
+            stacklevel=5,
+            error=str(exc),
+        )
+    return pointer_permissions
 
 
 def get_pointer_types(
