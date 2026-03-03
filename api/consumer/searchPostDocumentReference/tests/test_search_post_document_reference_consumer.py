@@ -268,7 +268,9 @@ def test_search_post_document_reference_happy_path_with_multiple_categories(
 
 @mock_aws
 @mock_repository
-def test_search_document_reference_no_results(repository: DocumentPointerRepository):
+def test_search_document_reference_no_results(
+    repository: DocumentPointerRepository,
+):
     event = create_test_api_gateway_event(
         headers=create_headers(),
         body=json.dumps(

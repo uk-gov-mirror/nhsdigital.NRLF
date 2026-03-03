@@ -3,9 +3,69 @@ import json
 import pytest
 
 from nrlf.core.errors import OperationOutcomeError, ParseError
-from nrlf.core.request import parse_body, parse_headers
+from nrlf.core.logger import LogReference, logger
+from nrlf.core.request import _fetch_ods_app_id_headers, parse_body, parse_headers
 from nrlf.producer.fhir.r4.model import DocumentReference
 from nrlf.tests.data import load_document_reference_data
+
+test_cases = [
+    (
+        {
+            "NHSD-end-USER-organISAtion-oDs": "ODS123",
+            "nhsd-nrl-app-id": "This-is-an-app-id",
+        },
+        "ODS123",
+        "This-is-an-app-id",
+        None,
+    ),
+    (
+        {
+            "NHSD-end-USER-organISAtion-oDs": "ODS123",
+        },
+        "ODS123",
+        None,
+        {
+            "code": LogReference.HANDLER003b,
+            "headers_names": ["nhsd-end-user-organisation-ods"],
+        },
+    ),
+    (
+        {
+            "nHSd-nrL-aPp-Id": "This-is-an-app-id",
+        },
+        None,
+        "This-is-an-app-id",
+        {
+            "code": LogReference.HANDLER003a,
+            "headers_names": ["nhsd-nrl-app-id"],
+        },
+    ),
+    (
+        {},
+        None,
+        None,
+        {
+            "code": LogReference.HANDLER003b,
+            "headers_names": [],
+        },
+    ),
+]
+
+
+@pytest.mark.parametrize(
+    "headers,expected_ods,expected_app_id,expected_log", test_cases
+)
+def test_fetch_ods_app_id_headers(
+    headers, expected_ods, expected_app_id, expected_log, mocker
+):
+    spy = mocker.spy(logger, "log")
+    ods_code, nrl_app_id = _fetch_ods_app_id_headers(headers)
+
+    assert ods_code == expected_ods
+    assert nrl_app_id == expected_app_id
+
+    if expected_log:
+        spy.assert_called_with(**expected_log)
 
 
 def test_parse_headers_empty_headers():
@@ -125,6 +185,36 @@ def test_parse_headers_case_insensitive():
     assert metadata.nrl_permissions == ["permission1", "permission2"]
     assert metadata.client_rp_details.developer_app_name == "TestApp"
     assert metadata.client_rp_details.developer_app_id == "12345"
+
+
+def test_parse_headers_valid_headers_v2_permissions():
+    headers = {
+        "nhsd-connection-metadata": json.dumps(
+            {
+                "nrl.pointer-types": ["pointer_type"],
+                "nrl.ods-code": "overwrite me",
+                "nrl.permissions": ["permission1", "permission2"],
+                "nrl.app-id": "overwrite me",
+            }
+        ),
+        "nhsd-client-rp-details": json.dumps(
+            {
+                "developer.app.name": "TestApp",
+                "developer.app.id": "12345",
+            }
+        ),
+        "nhsd-end-user-organisation-ods": "X26",
+        "nhsd-nrl-app-id": "X26-TestApp-12345",
+    }
+
+    metadata = parse_headers(headers, use_v2_permissions=True)
+
+    assert metadata.pointer_types == ["pointer_type"]
+    assert metadata.ods_code == "X26"
+    assert metadata.nrl_app_id == "X26-TestApp-12345"
+    assert metadata.nrl_permissions == ["permission1", "permission2"]
+    assert metadata.client_rp_details.developer_app_name == "X26-TestApp-12345"
+    assert metadata.client_rp_details.developer_app_id == "X26-TestApp-12345"
 
 
 def test_parse_body_no_model_no_body():

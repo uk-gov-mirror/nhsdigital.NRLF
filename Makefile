@@ -58,7 +58,11 @@ check-deploy: ## check the deploy environment is setup correctly
 check-deploy-warn:
 	@SHOULD_WARN_ONLY=true ./scripts/check-deploy-environment.sh
 
-build: check-warn build-api-packages build-layers build-dependency-layer ## Build the project
+build: check-warn build-api-packages build-layers build-dependency-layer build-seed-sandbox-lambda ## Build the project
+
+build-seed-sandbox-lambda:
+	@echo "Building seed_sandbox Lambda"
+	@cd lambdas/seed_sandbox && make build
 
 build-dependency-layer:
 	@echo "Building Lambda dependency layer"
@@ -105,7 +109,7 @@ publish-ci-image: ## Publish the CI image
 
 test: check-warn ## Run the unit tests
 	@echo "Running unit tests"
-	pytest --ignore=tests/smoke $(TEST_ARGS)
+	PYTHONPATH=. poetry run pytest --ignore tests/smoke $(TEST_ARGS)
 
 test-features-integration: check-warn ## Run the BDD feature tests in the integration environment
 	@echo "Running feature tests in the integration environment ${TF_WORKSPACE_NAME}"

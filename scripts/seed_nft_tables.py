@@ -9,6 +9,7 @@ from typing import Any, Iterator
 import boto3
 import fire
 import numpy as np
+from seed_utils import CHECKSUM_WEIGHTS, TestNhsNumbersIterator
 
 from nrlf.core.boto import get_s3_client
 from nrlf.core.constants import (
@@ -22,7 +23,6 @@ from nrlf.core.logger import logger
 from nrlf.tests.data import load_document_reference
 from tests.performance.perftest_environment import create_extract_metadata_file
 from tests.performance.seed_data_constants import (  # DEFAULT_COUNT_DISTRIBUTIONS,
-    CHECKSUM_WEIGHTS,
     CUSTODIAN_DISTRIBUTION_PROFILES,
     TYPE_DISTRIBUTION_PROFILES,
 )
@@ -36,30 +36,6 @@ resource = boto3.resource("dynamodb")
 logger.setLevel("ERROR")
 
 DOC_REF_TEMPLATE = load_document_reference("NFT-template")
-
-
-class TestNhsNumbersIterator:
-    def __iter__(self):
-        self.first9 = 900000000
-        return self
-
-    def __next__(self):
-        if self.first9 > 999999999:
-            raise StopIteration
-        checksum = 10
-        while checksum == 10:
-            self.first9 += 1
-            nhs_no_digits = list(map(int, str(self.first9)))
-            checksum = (
-                sum(
-                    weight * digit
-                    for weight, digit in zip(CHECKSUM_WEIGHTS, nhs_no_digits)
-                )
-                * -1
-                % 11
-            )
-        nhs_no = str(self.first9) + str(checksum)
-        return nhs_no
 
 
 def _make_seed_pointer(

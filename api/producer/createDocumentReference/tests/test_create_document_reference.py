@@ -31,7 +31,9 @@ from nrlf.tests.events import (
 @mock_repository
 @freeze_time("2024-03-21T12:34:56.789")
 @freeze_uuid("00000000-0000-0000-0000-000000000001")
-def test_create_document_reference_happy_path(repository: DocumentPointerRepository):
+def test_create_document_reference_happy_path(
+    repository: DocumentPointerRepository,
+):
     doc_ref_data = load_document_reference_data("Y05868-736253002-Valid")
 
     event = create_test_api_gateway_event(
@@ -1610,7 +1612,7 @@ def test_create_document_reference_with_date_and_meta_lastupdated_ignored(
 @mock_repository
 @freeze_time("2024-03-21T12:34:56.789")
 @freeze_uuid("00000000-0000-0000-0000-000000000001")
-def test_create_document_reference_with_date_overidden(
+def test_create_document_reference_with_date_overridden(
     repository: DocumentPointerRepository,
 ):
     doc_ref_data = load_document_reference_data("Y05868-736253002-Valid-with-date")

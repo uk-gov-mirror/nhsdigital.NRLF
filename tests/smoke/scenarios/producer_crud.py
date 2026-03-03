@@ -3,7 +3,7 @@ from tests.smoke.setup import build_document_reference
 from tests.utilities.api_clients import ProducerTestClient
 
 
-def test_producer_crud(
+def test_smoke_producer_crud(
     producer_client: ProducerTestClient,
     smoke_test_parameters: SmokeTestParameters,
     test_nhs_numbers: list[str],

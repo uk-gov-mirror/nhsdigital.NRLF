@@ -1,7 +1,7 @@
 from tests.utilities.api_clients import ConsumerTestClient, ProducerTestClient
 
 
-def test_read_api_capability_statements(
+def test_smoke_read_api_capability_statements(
     consumer_client: ConsumerTestClient, producer_client: ProducerTestClient
 ):
     """

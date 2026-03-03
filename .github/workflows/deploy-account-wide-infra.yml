@@ -51,12 +51,26 @@ jobs:
           echo "${HOME}/.asdf/bin" >> $GITHUB_PATH
           poetry install --no-root
 
+      - name: Build Lambda Layers
+        run: |
+          make build-layers
+          make build-dependency-layer
+
+      - name: Build Seed Sandbox Lambda
+        run: make build-seed-sandbox-lambda
+
       - name: Configure Management Credentials
         uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a #v4.3.1
         with:
           aws-region: eu-west-2
           role-to-assume: ${{ secrets.MGMT_ROLE_ARN }}
           role-session-name: github-actions-ci-${{ inputs.environment }}-${{ github.run_id }}
+
+      - name: Add S3 Permissions to Lambda Layer
+        env:
+          ACCOUNT_NAME: ${{ vars.ACCOUNT_NAME }}
+        run: |
+          make get-s3-perms ENV=${ACCOUNT_NAME}
 
       - name: Retrieve Server Certificates
         env:
@@ -92,6 +106,11 @@ jobs:
           aws s3 cp terraform/account-wide-infrastructure/$ACCOUNT_NAME/tfplan.txt s3://nhsd-nrlf--mgmt--ci-data/acc-$ACCOUNT_NAME/${{ github.run_id }}/tfplan.txt
           aws s3 cp terraform/account-wide-infrastructure/modules/glue/files/src.zip s3://nhsd-nrlf--mgmt--ci-data/acc-$ACCOUNT_NAME/${{ github.run_id }}/glue-src.zip
 
+          aws s3 cp dist/nrlf.zip s3://nhsd-nrlf--mgmt--ci-data/acc-$ACCOUNT_NAME/${{ github.run_id }}/nrlf.zip
+          aws s3 cp dist/dependency_layer.zip s3://nhsd-nrlf--mgmt--ci-data/acc-$ACCOUNT_NAME/${{ github.run_id }}/dependency_layer.zip
+          aws s3 cp dist/nrlf_permissions.zip s3://nhsd-nrlf--mgmt--ci-data/acc-$ACCOUNT_NAME/${{ github.run_id }}/nrlf_permissions.zip
+          aws s3 cp dist/seed_sandbox.zip s3://nhsd-nrlf--mgmt--ci-data/acc-$ACCOUNT_NAME/${{ github.run_id }}/seed_sandbox.zip
+
   terraform-apply:
     name: Terraform Apply - ${{ inputs.environment }}
     needs: [terraform-plan]
@@ -125,6 +144,12 @@ jobs:
 
           mkdir -p terraform/account-wide-infrastructure/modules/glue/files
           aws s3 cp s3://nhsd-nrlf--mgmt--ci-data/acc-$ACCOUNT_NAME/${{ github.run_id }}/glue-src.zip terraform/account-wide-infrastructure/modules/glue/files/src.zip
+
+          mkdir -p dist
+          aws s3 cp s3://nhsd-nrlf--mgmt--ci-data/acc-$ACCOUNT_NAME/${{ github.run_id }}/nrlf.zip dist/nrlf.zip
+          aws s3 cp s3://nhsd-nrlf--mgmt--ci-data/acc-$ACCOUNT_NAME/${{ github.run_id }}/dependency_layer.zip dist/dependency_layer.zip
+          aws s3 cp s3://nhsd-nrlf--mgmt--ci-data/acc-$ACCOUNT_NAME/${{ github.run_id }}/nrlf_permissions.zip dist/nrlf_permissions.zip
+          aws s3 cp s3://nhsd-nrlf--mgmt--ci-data/acc-$ACCOUNT_NAME/${{ github.run_id }}/seed_sandbox.zip dist/seed_sandbox.zip
 
       - name: Retrieve Server Certificates
         env:

@@ -23,7 +23,9 @@ from nrlf.tests.events import (
 @mock_aws
 @mock_repository
 @freeze_time("2024-03-21T12:34:56.789")
-def test_update_document_reference_happy_path(repository: DocumentPointerRepository):
+def test_update_document_reference_happy_path(
+    repository: DocumentPointerRepository,
+):
     doc_ref = load_document_reference("Y05868-736253002-Valid")
     doc_pointer = DocumentPointer.from_document_reference(doc_ref)
     repository.create(doc_pointer)
@@ -629,7 +631,9 @@ def test_update_document_reference_immutable_fields(repository):
 
 @mock_aws
 @mock_repository
-def test_update_document_reference_cannot_change_status_to_not_current(repository):
+def test_update_document_reference_cannot_change_status_to_not_current(
+    repository,
+):
     doc_ref = load_document_reference("Y05868-736253002-Valid")
     doc_pointer = DocumentPointer.from_document_reference(doc_ref)
     repository.create(doc_pointer)
@@ -677,7 +681,9 @@ def test_update_document_reference_cannot_change_status_to_not_current(repositor
 
 @mock_aws
 @mock_repository
-def test_update_document_reference_with_no_context_related_for_ssp_url(repository):
+def test_update_document_reference_with_no_context_related_for_ssp_url(
+    repository,
+):
     doc_ref = load_document_reference("Y05868-736253002-Valid-with-ssp-content")
     doc_pointer = DocumentPointer.from_document_reference(doc_ref)
     repository.create(doc_pointer)

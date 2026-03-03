@@ -56,13 +56,15 @@ First, build the NRLF artifacts that will be deployed by Terraform:
 $ make build-artifacts
 ```
 
-### Init your local workspace
+### Init your local workspace / deploy a feature branch
 
 On the first deployment, you will need to initialise and create your workspace. To create a new ephemeral dev workspace, run:
 
 ```shell
 $ make init
 ```
+
+### Use an existing workspace / deploy to a persistent environment
 
 If you want to use an existing workspace, or if you want to use the workspace of a persistent environment, do the following:
 
