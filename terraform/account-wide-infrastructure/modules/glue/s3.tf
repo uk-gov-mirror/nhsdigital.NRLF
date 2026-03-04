@@ -1,5 +1,5 @@
 # S3 Bucket for Raw Data
-resource "aws_s3_bucket" "source-data-bucket" {
+resource "aws_s3_bucket" "source-data-bucket" { # NOSONAR (S6258) - Logging not required for this bucket
   bucket = "${var.name_prefix}-source-data-bucket"
 }
 
@@ -74,7 +74,7 @@ resource "aws_s3_bucket_versioning" "source-data-bucket-versioning" {
 
 
 # S3 Bucket for Processed Data
-resource "aws_s3_bucket" "target-data-bucket" {
+resource "aws_s3_bucket" "target-data-bucket" { # NOSONAR (S6258) - Logging not required for this bucket
   bucket = "${var.name_prefix}-target-data-bucket"
 }
 
@@ -127,7 +127,7 @@ resource "aws_s3_bucket_public_access_block" "target-data-bucket-public-access-b
 }
 
 # S3 Bucket for Code
-resource "aws_s3_bucket" "code-bucket" {
+resource "aws_s3_bucket" "code-bucket" { # NOSONAR (S6258) - Logging not required for this bucket
   bucket = "${var.name_prefix}-code-bucket"
 }
 

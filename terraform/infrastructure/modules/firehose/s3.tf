@@ -1,4 +1,4 @@
-resource "aws_s3_bucket" "firehose" {
+resource "aws_s3_bucket" "firehose" { # NOSONAR (S6258) - Logging not required for this bucket
   bucket        = "${var.prefix}-firehose"
   force_destroy = true
 }

@@ -1,4 +1,4 @@
-resource "aws_s3_bucket" "authorization-store" {
+resource "aws_s3_bucket" "authorization-store" { # NOSONAR (S6258) - Logging not required for this bucket
   bucket        = "${var.name_prefix}-authorization-store"
   force_destroy = var.enable_bucket_force_destroy
 

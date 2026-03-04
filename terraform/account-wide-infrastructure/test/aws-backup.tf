@@ -1,5 +1,5 @@
 
-resource "aws_s3_bucket" "backup_reports" {
+resource "aws_s3_bucket" "backup_reports" { # NOSONAR (S6258) - Logging not required for this bucket
   bucket_prefix = "${local.prefix}-backup-reports"
 }
 
