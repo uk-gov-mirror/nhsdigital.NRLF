@@ -68,7 +68,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "source-data-bucket-lifecycle" 
 resource "aws_s3_bucket_versioning" "source-data-bucket-versioning" {
   bucket = aws_s3_bucket.source-data-bucket.id
   versioning_configuration {
-    status = "Disabled"
+    status = "Disabled" # NOSONAR (S6252) - Versioning is not required for this bucket
   }
 }
 

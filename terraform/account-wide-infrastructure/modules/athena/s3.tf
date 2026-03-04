@@ -1,4 +1,4 @@
-resource "aws_s3_bucket" "athena" {
+resource "aws_s3_bucket" "athena" { # NOSONAR (S6258) - Logging not required for this bucket
   bucket = "${var.name_prefix}-athena"
 }
 
