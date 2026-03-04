@@ -1,5 +1,6 @@
 FROM ubuntu:22.04
 
+
 RUN apt update && \
     apt upgrade -y && \
     DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt install -y \
@@ -30,7 +31,8 @@ RUN apt update && \
         zip \
         zlib1g-dev && \
     apt clean && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* # NOSONAR (S6500) - Auto installing the defined packages is acceptable here
+
 
 WORKDIR /root
 RUN git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.13.1 && \
