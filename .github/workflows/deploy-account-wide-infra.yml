@@ -102,7 +102,6 @@ jobs:
 
           aws s3 cp dist/nrlf.zip s3://nhsd-nrlf--mgmt--ci-data/acc-$ACCOUNT_NAME/${{ github.run_id }}/nrlf.zip
           aws s3 cp dist/dependency_layer.zip s3://nhsd-nrlf--mgmt--ci-data/acc-$ACCOUNT_NAME/${{ github.run_id }}/dependency_layer.zip
-          aws s3 cp dist/nrlf_permissions.zip s3://nhsd-nrlf--mgmt--ci-data/acc-$ACCOUNT_NAME/${{ github.run_id }}/nrlf_permissions.zip
           aws s3 cp dist/seed_sandbox.zip s3://nhsd-nrlf--mgmt--ci-data/acc-$ACCOUNT_NAME/${{ github.run_id }}/seed_sandbox.zip
 
   terraform-apply:
@@ -142,7 +141,6 @@ jobs:
           mkdir -p dist
           aws s3 cp s3://nhsd-nrlf--mgmt--ci-data/acc-$ACCOUNT_NAME/${{ github.run_id }}/nrlf.zip dist/nrlf.zip
           aws s3 cp s3://nhsd-nrlf--mgmt--ci-data/acc-$ACCOUNT_NAME/${{ github.run_id }}/dependency_layer.zip dist/dependency_layer.zip
-          aws s3 cp s3://nhsd-nrlf--mgmt--ci-data/acc-$ACCOUNT_NAME/${{ github.run_id }}/nrlf_permissions.zip dist/nrlf_permissions.zip
           aws s3 cp s3://nhsd-nrlf--mgmt--ci-data/acc-$ACCOUNT_NAME/${{ github.run_id }}/seed_sandbox.zip dist/seed_sandbox.zip
 
       - name: Retrieve Server Certificates
