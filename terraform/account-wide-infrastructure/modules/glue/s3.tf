@@ -4,7 +4,7 @@ resource "aws_s3_bucket" "source-data-bucket" { # NOSONAR (S6258) - Logging not 
 }
 
 resource "aws_s3_bucket_policy" "source-data-bucket" {
-  bucket = "${var.name_prefix}-source-data-bucket"
+  bucket = aws_s3_bucket.source-data-bucket.id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -79,7 +79,7 @@ resource "aws_s3_bucket" "target-data-bucket" { # NOSONAR (S6258) - Logging not 
 }
 
 resource "aws_s3_bucket_policy" "target-data-bucket" {
-  bucket = "${var.name_prefix}-target-data-bucket"
+  bucket = aws_s3_bucket.target-data-bucket.id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -132,7 +132,7 @@ resource "aws_s3_bucket" "code-bucket" { # NOSONAR (S6258) - Logging not require
 }
 
 resource "aws_s3_bucket_policy" "code-bucket" {
-  bucket = "${var.name_prefix}-code-bucket"
+  bucket = aws_s3_bucket.code-bucket.id
 
   policy = jsonencode({
     Version = "2012-10-17"

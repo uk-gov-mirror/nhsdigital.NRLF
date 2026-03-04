@@ -8,6 +8,32 @@ resource "aws_s3_bucket" "authorization-store" { # NOSONAR (S6258) - Logging not
   }
 }
 
+resource "aws_s3_bucket_policy" "authorization_store_https_only" {
+  bucket = aws_s3_bucket.authorization-store.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Id      = "authorization_store_https_only_policy"
+    Statement = [
+      {
+        Sid       = "HTTPSOnly"
+        Effect    = "Deny"
+        Principal = "*"
+        Action    = "s3:*"
+        Resource = [
+          aws_s3_bucket.authorization-store.arn,
+          "${aws_s3_bucket.authorization-store.arn}/*",
+        ]
+        Condition = {
+          Bool = {
+            "aws:SecureTransport" = "false"
+          }
+        }
+      },
+    ]
+  })
+}
+
 resource "aws_s3_bucket_public_access_block" "authorization-store-public-access-block" {
   bucket = aws_s3_bucket.authorization-store.id
 

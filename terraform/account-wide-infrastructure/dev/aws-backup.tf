@@ -3,37 +3,20 @@ resource "aws_s3_bucket" "backup_reports" { # NOSONAR (S6258) - Logging not requ
   bucket_prefix = "${local.prefix}-backup-reports"
 }
 
-resource "aws_s3_bucket_public_access_block" "backup_reports" {
-  bucket = aws_s3_bucket.backup_reports.id
-
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
-resource "aws_s3_bucket_server_side_encryption_configuration" "backup_reports" {
-  bucket = aws_s3_bucket.backup_reports.bucket
-
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-  }
-}
-
-resource "aws_s3_bucket_policy" "backup_reports_bucket_policy" {
+resource "aws_s3_bucket_policy" "backup_reports_https_only" {
   bucket = aws_s3_bucket.backup_reports.id
 
   policy = jsonencode({
     Version = "2012-10-17"
-    Id      = "backup_reports_bucket_policy"
+    Id      = "backup_reports_https_only_policy"
     Statement = [
       {
-        Sid       = "HTTPSOnly"
-        Effect    = "Deny"
-        Principal = "*"
-        Action    = "s3:*"
+        Sid    = "HTTPSOnly"
+        Effect = "Deny"
+        Principal = {
+          "AWS" : "*"
+        }
+        Action = "s3:*"
         Resource = [
           aws_s3_bucket.backup_reports.arn,
           "${aws_s3_bucket.backup_reports.arn}/*",
@@ -43,7 +26,18 @@ resource "aws_s3_bucket_policy" "backup_reports_bucket_policy" {
             "aws:SecureTransport" = "false"
           }
         }
-      },
+      }
+    ]
+  })
+}
+
+resource "aws_s3_bucket_policy" "backup_reports_write_access" {
+  bucket = aws_s3_bucket.backup_reports.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Id      = "backup_reports_write_access_policy"
+    Statement = [
       {
         Sid    = "AllowBackupReportsWrite"
         Effect = "Allow"
@@ -64,6 +58,24 @@ resource "aws_s3_bucket_policy" "backup_reports_bucket_policy" {
   })
 }
 
+resource "aws_s3_bucket_public_access_block" "backup_reports" {
+  bucket = aws_s3_bucket.backup_reports.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "backup_reports" {
+  bucket = aws_s3_bucket.backup_reports.bucket
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
 
 resource "aws_s3_bucket_ownership_controls" "backup_reports" {
   bucket = aws_s3_bucket.backup_reports.id

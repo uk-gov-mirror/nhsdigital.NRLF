@@ -9,25 +9,6 @@ resource "aws_s3_bucket" "authorization-store" { # NOSONAR (S6258) - Logging not
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "authorization-store-public-access-block" {
-  bucket = aws_s3_bucket.authorization-store.id
-
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
-resource "aws_s3_bucket_server_side_encryption_configuration" "authorization-store" {
-  bucket = aws_s3_bucket.authorization-store.bucket
-
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-  }
-}
-
 resource "aws_s3_bucket_policy" "authorization_store_bucket_policy" {
   bucket = aws_s3_bucket.authorization-store.id
 
@@ -52,6 +33,25 @@ resource "aws_s3_bucket_policy" "authorization_store_bucket_policy" {
       },
     ]
   })
+}
+
+resource "aws_s3_bucket_public_access_block" "authorization-store-public-access-block" {
+  bucket = aws_s3_bucket.authorization-store.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "authorization-store" {
+  bucket = aws_s3_bucket.authorization-store.bucket
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
 }
 
 resource "aws_s3_bucket_versioning" "authorization-store" {
