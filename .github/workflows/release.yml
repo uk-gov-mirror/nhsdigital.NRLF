@@ -111,7 +111,7 @@ jobs:
 
       - name: Upload SBOM to release
         if: ${{ github.event.release.tag_name }}
-        uses: svenstaro/upload-release-action@v2.11.3
+        uses: svenstaro/upload-release-action@b98a3b12e86552593f3e4e577ca8a62aa2f3f22b # v2.11.4
         with:
           file: sbom.spdx.json
           asset_name: sbom-${{ github.event.release.tag_name }}
