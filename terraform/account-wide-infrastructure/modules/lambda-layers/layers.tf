@@ -23,11 +23,3 @@ resource "aws_lambda_layer_version" "third_party" {
   compatible_runtimes = ["python3.12"]
   description         = "Third party dependencies layer (account-wide)"
 }
-
-resource "aws_lambda_layer_version" "nrlf_permissions" {
-  layer_name          = "${var.name_prefix}--nrlf-permissions-layer"
-  filename            = "${local.dist_dir}/${local.layer_zips.nrlf_permissions}"
-  source_code_hash    = filebase64sha256("${local.dist_dir}/${local.layer_zips.nrlf_permissions}")
-  compatible_runtimes = ["python3.12"]
-  description         = "NRLF permissions library layer (account-wide)"
-}

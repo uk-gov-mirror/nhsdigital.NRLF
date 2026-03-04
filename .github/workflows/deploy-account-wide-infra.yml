@@ -65,12 +65,6 @@ jobs:
           role-to-assume: ${{ secrets.MGMT_ROLE_ARN }}
           role-session-name: github-actions-ci-${{ inputs.environment }}-${{ github.run_id }}
 
-      - name: Add S3 Permissions to Lambda Layer
-        env:
-          ACCOUNT_NAME: ${{ vars.ACCOUNT_NAME }}
-        run: |
-          make get-s3-perms ENV=${ACCOUNT_NAME}
-
       - name: Retrieve Server Certificates
         env:
           ACCOUNT_NAME: ${{ vars.ACCOUNT_NAME }}
