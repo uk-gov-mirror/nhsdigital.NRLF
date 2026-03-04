@@ -7,8 +7,3 @@ output "third_party_layer_arn" {
   description = "ARN of the third party dependencies Lambda layer"
   value       = aws_lambda_layer_version.third_party.arn
 }
-
-output "nrlf_permissions_layer_arn" {
-  description = "ARN of the NRLF permissions Lambda layer"
-  value       = aws_lambda_layer_version.nrlf_permissions.arn
-}
