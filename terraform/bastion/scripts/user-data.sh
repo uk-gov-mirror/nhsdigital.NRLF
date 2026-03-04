@@ -5,6 +5,7 @@ set -o errexit -o nounset -o pipefail
 ASDF_VERSION="v0.18.0"
 
 export DEBIAN_FRONTEND=noninteractive
+export TZ=Etc/UTC
 
 sudo apt update && \
     sudo -E apt upgrade -y && \
