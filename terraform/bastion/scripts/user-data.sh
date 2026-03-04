@@ -44,7 +44,8 @@ output = json
 " >> /home/nrlf_ops/.aws/config'
 
 # Install ASDF
-curl --location --silent --show-error --fail --output asdf.tar.gz \
+curl --silent --show-error --fail \
+    --location --proto '=https' --tlsv1.2 --output asdf.tar.gz \
     https://github.com/asdf-vm/asdf/releases/download/${ASDF_VERSION}/asdf-${ASDF_VERSION}-linux-amd64.tar.gz && \
         tar -xzf asdf.tar.gz && \
         mv asdf /usr/bin/asdf && \
