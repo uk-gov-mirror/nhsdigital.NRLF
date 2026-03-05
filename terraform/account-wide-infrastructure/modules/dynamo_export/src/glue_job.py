@@ -197,7 +197,7 @@ def process_full_export(df: DataFrame) -> None:
     )
 
     df.write.format("delta").mode("append").partitionBy("date").save(
-        f"s3://{ARGS['TARGET_BUCKET']}/processed/dynamo_export_flags"
+        f"s3://{ARGS['TARGET_BUCKET']}/processed/dynamo_export_pointers"
     )
 
     run_crawler(ARGS["GLUE_CRAWLER_NAME"])
@@ -257,7 +257,7 @@ def process_incremental_export(df: DataFrame) -> None:
 
     delta_table = DeltaTable.forPath(
         session,
-        f"s3://{ARGS['TARGET_BUCKET']}/processed/dynamo_export_flags",
+        f"s3://{ARGS['TARGET_BUCKET']}/processed/dynamo_export_pointers",
     )
 
     if not upserted.isEmpty():
