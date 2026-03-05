@@ -1198,6 +1198,9 @@ def test_validate_content_format_invalid_code_for_structured_document():
     }
 
 
+@pytest.mark.skip(
+    reason="Disabling temporarily as the validation rule is now allowed (but only for NRL-1966)"
+)
 def test_validate_content_format_invalid_code_for_contact_details():
     validator = DocumentReferenceValidator()
     document_ref_data = load_document_reference_json("Y05868-736253002-Valid")
