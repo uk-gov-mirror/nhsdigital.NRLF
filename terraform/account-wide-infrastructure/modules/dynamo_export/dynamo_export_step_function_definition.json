@@ -1,0 +1,87 @@
+{
+  "Comment": "execute lambdas",
+  "StartAt": "DynamoExport",
+  "States": {
+    "DynamoExport": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "FunctionName": "${lambda_export_trigger_function_name}",
+        "Payload.$": "$"
+      },
+      "Next": "DynamoExportStatusCheck"
+    },
+    "DynamoExportStatusCheck": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "FunctionName": "${lambda_export_poll_function_name}",
+        "Payload.$": "$"
+      },
+      "Next": "Choice"
+    },
+    "Choice": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.status",
+          "StringEquals": "COMPLETED",
+          "Next": "SSMPut"
+        },
+        {
+          "Variable": "$.status",
+          "StringEquals": "IN_PROGRESS",
+          "Next": "WaitState"
+        },
+        {
+          "Variable": "$.status",
+          "StringEquals": "FAILED",
+          "Next": "ExportFailure"
+        }
+      ],
+      "Default": "FailState"
+    },
+    "FailState": {
+      "Type": "Fail",
+      "Error": "UnhandledStatus",
+      "Cause": "Status not recognised"
+    },
+    "ExportFailure": {
+      "Type": "Fail",
+      "Error": "DynamoExportFailed",
+      "Cause": "DynamoDB Export Failed"
+    },
+    "WaitState": {
+      "Type": "Wait",
+      "Seconds": 120,
+      "Next": "DynamoExportStatusCheck"
+    },
+    "SSMPut": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "FunctionName": "${lambda_ssm_put_param_function_name}",
+        "Payload.$": "$"
+      },
+      "Next": "GlueJobTrigger"
+    },
+    "GlueJobTrigger": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::glue:startJobRun.sync",
+      "Parameters": {
+        "JobName": "${glue_job_name}",
+        "Arguments": {
+          "--SOURCE_BUCKET": "${dynamo_export_s3_bucket_name}",
+          "--TARGET_BUCKET": "${dynamo_export_processed_s3_bucket_name}",
+          "--DDB_TABLE_ARN": "${ddb_table_arn}",
+          "--GLUE_CRAWLER_NAME": "${glue_crawler_name}",
+          "--EXPORT_TYPE.$": "$.export_type"
+        }
+      },
+      "End": true
+    }
+  }
+}
