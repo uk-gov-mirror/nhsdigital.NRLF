@@ -473,7 +473,11 @@ class DocumentReferenceValidator:
             if (
                 content.attachment.contentType == "text/html"
                 and content.format.code
-                not in ["urn:nhs-ic:record-contact", "urn:nhs-ic:structured"]
+                not in [
+                    "urn:nhs-ic:record-contact",
+                    "urn:nhs-ic:structured",
+                    "urn:nhs-ic:unstructured",
+                ]
             ):
                 self.result.add_error(
                     issue_code="business-rule",
