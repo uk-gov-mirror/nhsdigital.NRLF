@@ -24,9 +24,11 @@ def consumer_count_document_references_step(context: Context, ods_code: str):
     context.response = client.count(items)
 
 
-@when("consumer '{ods_code}' searches for DocumentReferences with parameters")
-def consumer_search_document_reference_step(context: Context, ods_code: str):
-    client = consumer_client_from_context(context, ods_code)
+@when("consumer {version} '{ods_code}' searches for DocumentReferences with parameters")
+def consumer_search_document_reference_step(
+    context: Context, version: str, ods_code: str
+):
+    client = consumer_client_from_context(context, ods_code, v2=(version == "v2"))
 
     if not context.table:
         raise ValueError("No search query table provided")
@@ -46,10 +48,12 @@ def consumer_search_document_reference_step(context: Context, ods_code: str):
 
 
 @when(
-    "consumer '{ods_code}' searches for DocumentReferences using POST with request body"
+    "consumer {version} '{ods_code}' searches for DocumentReferences using POST with request body"
 )
-def consumer_search_post_document_reference_step(context: Context, ods_code: str):
-    client = consumer_client_from_context(context, ods_code)
+def consumer_search_post_document_reference_step(
+    context: Context, version: str, ods_code: str
+):
+    client = consumer_client_from_context(context, ods_code, v2=(version == "v2"))
 
     if not context.table:
         raise ValueError("No search query table provided")
@@ -68,11 +72,13 @@ def consumer_search_post_document_reference_step(context: Context, ods_code: str
     )
 
 
-@when("consumer '{ods_code}' reads a DocumentReference with ID '{doc_ref_id}'")
+@when(
+    "consumer {version} '{ods_code}' reads a DocumentReference with ID '{doc_ref_id}'"
+)
 def consumer_read_document_reference_step(
-    context: Context, ods_code: str, doc_ref_id: str
+    context: Context, version: str, ods_code: str, doc_ref_id: str
 ):
-    client = consumer_client_from_context(context, ods_code)
+    client = consumer_client_from_context(context, ods_code, v2=(version == "v2"))
     context.response = client.read(doc_ref_id)
 
 

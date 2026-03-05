@@ -209,6 +209,38 @@ class ConsumerTestClient:
         )
 
 
+class ConsumerV2TestClient(ConsumerTestClient):
+    """
+    Consumer test client that uses the v2 permissions model.
+
+    Sends NHSD-End-User-Organisation-ODS and NHSD-NRL-App-Id instead of
+    NHSD-Connection-Metadata / NHSD-Client-RP-Details, triggering the
+    _use_v2_permissions_model path in the request handler.
+    """
+
+    def __init__(self, config: ClientConfig):
+        self.config = config
+        self.api_url = f"{self.config.base_url}consumer{self.config.api_path}"
+
+        self.request_headers = {
+            "Authorization": f"Bearer {self.config.auth_token}",
+            "X-Request-Id": "test-request-id",
+        }
+
+        if self.config.client_cert:
+            ods_code = self.config.connection_metadata.ods_code
+            app_id = self.config.connection_metadata.nrl_app_id
+            self.request_headers.update(
+                {
+                    "NHSD-End-User-Organisation-ODS": ods_code,
+                    "NHSD-NRL-App-Id": app_id,
+                    "NHSD-Correlation-Id": "test-correlation-id",
+                }
+            )
+
+        self.request_headers.update(self.config.custom_headers)
+
+
 class ProducerTestClient:
     def __init__(self, config: ClientConfig):
         self.config = config

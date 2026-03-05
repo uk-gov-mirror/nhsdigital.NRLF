@@ -49,6 +49,29 @@ def add_test_files(folder, file_name, local_path):
         json.dump(PointerTypes.list(), f)
 
 
+def add_feature_test_files(local_path):
+    """Bake in v2 permissions for the feature test application so that the
+    v2 permissions model can be proven via feature tests without
+    requiring a dynamic layer rebuild between test setup and test execution.
+    """
+
+    # TODO NEED TO ADD PRODUCER PERMS
+    print("Adding feature test v2 permissions to temporary directory...")
+    feature_test_app_id = "z00z-y11y-x22x"
+    consumer_entries = [
+        (
+            "RX898",
+            [PointerTypes.MENTAL_HEALTH_PLAN.value],
+        ),  # http://snomed.info/sct|736253002
+    ]
+    for ods_code, pointer_types in consumer_entries:
+        folder_path = Path.joinpath(local_path, "consumer", feature_test_app_id)
+        folder_path.mkdir(parents=True, exist_ok=True)
+        file_path = folder_path / f"{ods_code}.json"
+        with open(file_path, "w") as f:
+            json.dump({"types": pointer_types}, f)
+
+
 def download_files(s3_client, bucket_name, local_path, file_names, folders):
     print(f"Downloading {len(file_names)} S3 files to temporary directory...")
     local_path = Path(local_path)
@@ -65,6 +88,7 @@ def download_files(s3_client, bucket_name, local_path, file_names, folders):
         s3_client.download_file(bucket_name, file_name, str(file_path))
 
     add_test_files("K6PerformanceTest", "Y05868.json", local_path)
+    add_feature_test_files(local_path)
 
 
 def main(use_shared_resources: str, env: str, workspace: str, path_to_store: str):

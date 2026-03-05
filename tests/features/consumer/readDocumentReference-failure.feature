@@ -6,7 +6,7 @@ Feature: Consumer - readDocumentReference - Failure Scenarios
     And the organisation 'RX898' is authorised to access pointer types:
       | system                 | value     |
       | http://snomed.info/sct | 736253002 |
-    When consumer 'RX898' reads a DocumentReference with ID 'X26-000000000-000000000'
+    When consumer v1 'RX898' reads a DocumentReference with ID 'X26-000000000-000000000'
     Then the response status code is 404
     And the response is an OperationOutcome with 1 issue
     And the OperationOutcome contains the issue:
@@ -33,7 +33,7 @@ Feature: Consumer - readDocumentReference - Failure Scenarios
     And the organisation 'RX898' is authorised to access pointer types:
       | system                 | value     |
       | http://snomed.info/sct | 736253002 |
-    When consumer 'RX898' reads a DocumentReference with ID 'X26`DROP TABLE 'pointers';--Something-000000000-000000000'
+    When consumer v1 'RX898' reads a DocumentReference with ID 'X26`DROP TABLE 'pointers';--Something-000000000-000000000'
     Then the response status code is 404
     And the response is an OperationOutcome with 1 issue
     And the OperationOutcome contains the issue:
@@ -58,7 +58,7 @@ Feature: Consumer - readDocumentReference - Failure Scenarios
     Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
     And the organisation 'RX898' is authorised to access pointer types:
       | system | value |
-    When consumer 'RX898' reads a DocumentReference with ID 'X26-000000000-000000000'
+    When consumer v1 'RX898' reads a DocumentReference with ID 'X26-000000000-000000000'
     Then the response status code is 403
     And the response is an OperationOutcome with 1 issue
     And the OperationOutcome contains the issue:
@@ -95,7 +95,7 @@ Feature: Consumer - readDocumentReference - Failure Scenarios
       | url         | https://example.org/my-doc.pdf         |
       | custodian   | 02V                                    |
       | author      | 02V                                    |
-    When consumer 'RX898' reads a DocumentReference with ID '02V-1111111111-ReadDocRefNoAuthForType'
+    When consumer v1 'RX898' reads a DocumentReference with ID '02V-1111111111-ReadDocRefNoAuthForType'
     Then the response status code is 403
     And the response is an OperationOutcome with 1 issue
     And the OperationOutcome contains the issue:
@@ -120,7 +120,7 @@ Feature: Consumer - readDocumentReference - Failure Scenarios
     Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
     And the organisation 'RX898' is authorised to access pointer types:
       | system | value |
-    When consumer 'RX898' reads a DocumentReference with ID 'X26-000000000-000000000'
+    When consumer v1 'RX898' reads a DocumentReference with ID 'X26-000000000-000000000'
     Then the response status code is 403
     And the response is an OperationOutcome with 1 issue
     And the OperationOutcome contains the issue:
@@ -157,7 +157,7 @@ Feature: Consumer - readDocumentReference - Failure Scenarios
       | url         | https://example.org/my-doc.pdf           |
       | custodian   | 02V                                      |
       | author      | 02V                                      |
-    When consumer 'RX898' reads a DocumentReference with ID '02V-1111111111-ReadDocRefNoAuthForTypeS3'
+    When consumer v1 'RX898' reads a DocumentReference with ID '02V-1111111111-ReadDocRefNoAuthForTypeS3'
     Then the response status code is 403
     And the response is an OperationOutcome with 1 issue
     And the OperationOutcome contains the issue:

@@ -4,6 +4,7 @@ from nrlf.core.model import ConnectionMetadata
 from tests.utilities.api_clients import (
     ClientConfig,
     ConsumerTestClient,
+    ConsumerV2TestClient,
     ProducerTestClient,
 )
 
@@ -33,9 +34,13 @@ def _config_from_context(context: Context, ods_code: str):
     )
 
 
-def consumer_client_from_context(context: Context, ods_code: str):
+def consumer_client_from_context(context: Context, ods_code: str, v2: bool = False):
     client_config = _config_from_context(context, ods_code)
-    return ConsumerTestClient(config=client_config)
+    return (
+        ConsumerV2TestClient(config=client_config)
+        if v2
+        else ConsumerTestClient(config=client_config)
+    )
 
 
 def producer_client_from_context(context: Context, ods_code: str):
