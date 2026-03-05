@@ -1,4 +1,4 @@
-Feature: Consumer readDocumentReference - v2 Permissions Model - Success and Failure Scenarios
+Feature: Consumer v2 permissions by pointer type - Success and Failure Scenarios
   For the v2 permissions model, permissions are resolved from a JSON file stored in the
   nrlf_permissions Lambda layer at the path
   {actorType}/{app_id}/{ods_code}.json, which must contain a "types" array.

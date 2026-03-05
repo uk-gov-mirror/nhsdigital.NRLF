@@ -6,6 +6,7 @@ from tests.utilities.api_clients import (
     ConsumerTestClient,
     ConsumerV2TestClient,
     ProducerTestClient,
+    ProducerV2TestClient,
 )
 
 
@@ -43,6 +44,10 @@ def consumer_client_from_context(context: Context, ods_code: str, v2: bool = Fal
     )
 
 
-def producer_client_from_context(context: Context, ods_code: str):
+def producer_client_from_context(context: Context, ods_code: str, v2: bool = False):
     client_config = _config_from_context(context, ods_code)
-    return ProducerTestClient(config=client_config)
+    return (
+        ProducerV2TestClient(config=client_config)
+        if v2
+        else ProducerTestClient(config=client_config)
+    )
