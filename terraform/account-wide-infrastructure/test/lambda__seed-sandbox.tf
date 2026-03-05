@@ -21,7 +21,6 @@ module "seed_sandbox_lambda" {
   layers = [
     module.shared_lambda_layers.nrlf_layer_arn,
     module.shared_lambda_layers.third_party_layer_arn,
-    module.shared_lambda_layers.nrlf_permissions_layer_arn
   ]
 
   table_names = local.seed_table_names
