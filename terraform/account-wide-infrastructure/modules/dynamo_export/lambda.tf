@@ -81,11 +81,6 @@ resource "aws_iam_role_policy" "lambda_policy" {
   policy = data.aws_iam_policy_document.lambda_policy.json
 }
 
-data "aws_s3_object" "dynamo_export_trigger_zip" {
-  bucket = var.asset_bucket
-  key    = "${var.asset_version}/dynamo_export_trigger.zip"
-}
-
 resource "aws_lambda_function" "dynamo_export_trigger" {
   function_name = "${var.name_prefix}-dynamo-export-trigger"
   role          = aws_iam_role.lambda_role.arn
@@ -93,9 +88,8 @@ resource "aws_lambda_function" "dynamo_export_trigger" {
   runtime       = "python3.13"
   timeout       = 30
 
-  s3_bucket         = data.aws_s3_object.dynamo_export_trigger_zip.bucket
-  s3_key            = data.aws_s3_object.dynamo_export_trigger_zip.key
-  s3_object_version = data.aws_s3_object.dynamo_export_trigger_zip.version_id
+  filename         = "${path.module}/../../../../dist/dynamo_export_trigger.zip"
+  source_code_hash = filebase64sha256("${path.module}/../../../../dist/dynamo_export_trigger.zip")
 
   logging_config {
     log_format = "JSON"
@@ -112,11 +106,6 @@ resource "aws_lambda_function" "dynamo_export_trigger" {
   }
 }
 
-data "aws_s3_object" "dynamo_export_poll_zip" {
-  bucket = var.asset_bucket
-  key    = "${var.asset_version}/dynamo_export_poll.zip"
-}
-
 resource "aws_lambda_function" "dynamo_export_poll" {
   function_name = "${var.name_prefix}-dynamo-export-poll"
   role          = aws_iam_role.lambda_role.arn
@@ -124,9 +113,8 @@ resource "aws_lambda_function" "dynamo_export_poll" {
   runtime       = "python3.13"
   timeout       = 30
 
-  s3_bucket         = data.aws_s3_object.dynamo_export_poll_zip.bucket
-  s3_key            = data.aws_s3_object.dynamo_export_poll_zip.key
-  s3_object_version = data.aws_s3_object.dynamo_export_poll_zip.version_id
+  filename         = "${path.module}/../../../../dist/dynamo_export_poll.zip"
+  source_code_hash = filebase64sha256("${path.module}/../../../../dist/dynamo_export_poll.zip")
 
   logging_config {
     log_format = "JSON"
@@ -186,11 +174,6 @@ resource "aws_iam_role_policy" "ssm_put_param_policy" {
   policy = data.aws_iam_policy_document.ssm_put_param_policy.json
 }
 
-data "aws_s3_object" "ssm_put_param_zip" {
-  bucket = var.asset_bucket
-  key    = "${var.asset_version}/ssm_put_param.zip"
-}
-
 resource "aws_lambda_function" "ssm_put_param" {
   function_name = "${var.name_prefix}-ssm-put-param"
   role          = aws_iam_role.ssm_put_param_role.arn
@@ -198,9 +181,8 @@ resource "aws_lambda_function" "ssm_put_param" {
   runtime       = "python3.13"
   timeout       = 30
 
-  s3_bucket         = data.aws_s3_object.ssm_put_param_zip.bucket
-  s3_key            = data.aws_s3_object.ssm_put_param_zip.key
-  s3_object_version = data.aws_s3_object.ssm_put_param_zip.version_id
+  filename         = "${path.module}/../../../../dist/ssm_put_param.zip"
+  source_code_hash = filebase64sha256("${path.module}/../../../../dist/ssm_put_param.zip")
 
   logging_config {
     log_format = "JSON"
