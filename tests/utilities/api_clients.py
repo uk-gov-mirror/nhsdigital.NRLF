@@ -68,7 +68,7 @@ def retry_if(status_codes: list[int]) -> Callable[..., Any]:
 
 class ConsumerTestClient:
 
-    def __init__(self, config: ClientConfig):
+    def __init__(self, config: ClientConfig, use_v2: bool = False):
         self.config = config
         self.api_url = f"{self.config.base_url}consumer{self.config.api_path}"
 
@@ -78,17 +78,26 @@ class ConsumerTestClient:
         }
 
         if self.config.client_cert:
-            connection_metadata = self.config.connection_metadata.model_dump(
-                by_alias=True
-            )
-            client_rp_details = connection_metadata.pop("client_rp_details")
-            self.request_headers.update(
-                {
-                    "NHSD-Connection-Metadata": json.dumps(connection_metadata),
-                    "NHSD-Client-RP-Details": json.dumps(client_rp_details),
-                    "NHSD-Correlation-Id": "test-correlation-id",
-                }
-            )
+            if use_v2:
+                self.request_headers.update(
+                    {
+                        "NHSD-End-User-Organisation-ODS": self.config.connection_metadata.ods_code,
+                        "NHSD-NRL-App-Id": self.config.connection_metadata.nrl_app_id,
+                        "NHSD-Correlation-Id": "test-correlation-id",
+                    }
+                )
+            else:
+                connection_metadata = self.config.connection_metadata.model_dump(
+                    by_alias=True
+                )
+                client_rp_details = connection_metadata.pop("client_rp_details")
+                self.request_headers.update(
+                    {
+                        "NHSD-Connection-Metadata": json.dumps(connection_metadata),
+                        "NHSD-Client-RP-Details": json.dumps(client_rp_details),
+                        "NHSD-Correlation-Id": "test-correlation-id",
+                    }
+                )
 
         self.request_headers.update(self.config.custom_headers)
 
@@ -209,41 +218,8 @@ class ConsumerTestClient:
         )
 
 
-class ConsumerV2TestClient(ConsumerTestClient):
-    """
-    Consumer test client that uses the v2 permissions model.
-
-    Sends NHSD-End-User-Organisation-ODS and NHSD-NRL-App-Id instead of
-    NHSD-Connection-Metadata / NHSD-Client-RP-Details, triggering the
-    _use_v2_permissions_model path in the request handler.
-    """
-
-    def __init__(self, config: ClientConfig):
-        self.config = config
-        self.api_url = f"{self.config.base_url}consumer{self.config.api_path}"
-
-        self.request_headers = {
-            "Authorization": f"Bearer {self.config.auth_token}",
-            "X-Request-Id": "test-request-id",
-        }
-
-        if self.config.client_cert:
-            ods_code = self.config.connection_metadata.ods_code
-            app_id = self.config.connection_metadata.nrl_app_id
-            self.request_headers.update(
-                {
-                    "NHSD-End-User-Organisation-ODS": ods_code,
-                    "NHSD-NRL-App-Id": app_id,
-                    "NHSD-Correlation-Id": "test-correlation-id",
-                }
-            )
-
-        self.request_headers.update(self.config.custom_headers)
-
-
-#   TODO MAKE THIS NEATER
 class ProducerTestClient:
-    def __init__(self, config: ClientConfig):
+    def __init__(self, config: ClientConfig, use_v2: bool = False):
         self.config = config
         self.api_url = f"{self.config.base_url}producer{self.config.api_path}"
 
@@ -253,17 +229,26 @@ class ProducerTestClient:
         }
 
         if self.config.client_cert:
-            connection_metadata = self.config.connection_metadata.model_dump(
-                by_alias=True
-            )
-            client_rp_details = connection_metadata.pop("client_rp_details")
-            self.request_headers.update(
-                {
-                    "NHSD-Connection-Metadata": json.dumps(connection_metadata),
-                    "NHSD-Client-RP-Details": json.dumps(client_rp_details),
-                    "NHSD-Correlation-Id": "test-correlation-id",
-                }
-            )
+            if use_v2:
+                self.request_headers.update(
+                    {
+                        "NHSD-End-User-Organisation-ODS": self.config.connection_metadata.ods_code,
+                        "NHSD-NRL-App-Id": self.config.connection_metadata.nrl_app_id,
+                        "NHSD-Correlation-Id": "test-correlation-id",
+                    }
+                )
+            else:
+                connection_metadata = self.config.connection_metadata.model_dump(
+                    by_alias=True
+                )
+                client_rp_details = connection_metadata.pop("client_rp_details")
+                self.request_headers.update(
+                    {
+                        "NHSD-Connection-Metadata": json.dumps(connection_metadata),
+                        "NHSD-Client-RP-Details": json.dumps(client_rp_details),
+                        "NHSD-Correlation-Id": "test-correlation-id",
+                    }
+                )
 
         self.request_headers.update(self.config.custom_headers)
 
@@ -418,35 +403,3 @@ class ProducerTestClient:
             headers=headers,
             cert=self.config.client_cert,
         )
-
-
-class ProducerV2TestClient(ProducerTestClient):
-    """
-    Producer test client that uses the v2 permissions model.
-
-    Sends NHSD-End-User-Organisation-ODS and NHSD-NRL-App-Id instead of
-    NHSD-Connection-Metadata / NHSD-Client-RP-Details, triggering the
-    _use_v2_permissions_model path in the request handler.
-    """
-
-    def __init__(self, config: ClientConfig):
-        self.config = config
-        self.api_url = f"{self.config.base_url}producer{self.config.api_path}"
-
-        self.request_headers = {
-            "Authorization": f"Bearer {self.config.auth_token}",
-            "X-Request-Id": "test-request-id",
-        }
-
-        if self.config.client_cert:
-            ods_code = self.config.connection_metadata.ods_code
-            app_id = self.config.connection_metadata.nrl_app_id
-            self.request_headers.update(
-                {
-                    "NHSD-End-User-Organisation-ODS": ods_code,
-                    "NHSD-NRL-App-Id": app_id,
-                    "NHSD-Correlation-Id": "test-correlation-id",
-                }
-            )
-
-        self.request_headers.update(self.config.custom_headers)
