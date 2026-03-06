@@ -221,10 +221,12 @@ def update_put_document_reference_step(
 
 
 @when(
-    "producer '{ods_code}' requests to delete DocumentReference with id '{doc_ref_id}'"
+    "producer {version} '{ods_code}' requests to delete DocumentReference with id '{doc_ref_id}'"
 )
-def delete_document_reference_step(context: Context, ods_code: str, doc_ref_id: str):
-    client = producer_client_from_context(context, ods_code)
+def delete_document_reference_step(
+    context: Context, version: str, ods_code: str, doc_ref_id: str
+):
+    client = producer_client_from_context(context, ods_code, v2=(version == "v2"))
     context.response = client.delete(doc_ref_id)
 
 
@@ -236,9 +238,11 @@ def producer_read_document_reference_step(
     context.response = client.read(doc_ref_id)
 
 
-@when("producer '{ods_code}' searches for DocumentReferences with parameters")
-def producer_search_document_reference_step(context: Context, ods_code: str):
-    client = producer_client_from_context(context, ods_code)
+@when("producer {version} '{ods_code}' searches for DocumentReferences with parameters")
+def producer_search_document_reference_step(
+    context: Context, version: str, ods_code: str
+):
+    client = producer_client_from_context(context, ods_code, v2=(version == "v2"))
 
     if not context.table:
         raise ValueError("No search query table provided")
