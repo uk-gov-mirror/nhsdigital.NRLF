@@ -49,7 +49,12 @@ def add_test_files(folder, file_name, local_path):
         json.dump(PointerTypes.list(), f)
 
 
-#  TODO MAKE THIS NEATER
+def _write_permission_file(folder_path, ods_code, pointer_types):
+    folder_path.mkdir(parents=True, exist_ok=True)
+    with open(folder_path / f"{ods_code}.json", "w") as f:
+        json.dump({"types": pointer_types}, f)
+
+
 def add_feature_test_files(local_path):
     """Bake in v2 permissions for the feature test application so that the
     v2 permissions model can be proven via feature tests without
@@ -57,31 +62,29 @@ def add_feature_test_files(local_path):
     """
 
     print("Adding feature test v2 permissions to temporary directory...")
-    feature_test_app_id = "z00z-y11y-x22x"
-    consumer_entries = [
-        (
-            "RX898",
-            [PointerTypes.MENTAL_HEALTH_PLAN.value],
-        ),  # http://snomed.info/sct|736253002
+    permissions = {
+        "consumer": [
+            (
+                "z00z-y11y-x22x",
+                "RX898",
+                [PointerTypes.MENTAL_HEALTH_PLAN.value],
+            ),  # http://snomed.info/sct|736253002
+        ],
+        "producer": [
+            (
+                "z00z-y11y-x22x",
+                "RX898",
+                [PointerTypes.MENTAL_HEALTH_PLAN.value],
+            ),  # http://snomed.info/sct|736253002
+        ],
+    }
+    [
+        _write_permission_file(
+            Path.joinpath(local_path, actor_type, app_id), ods_code, pointer_types
+        )
+        for actor_type, entries in permissions.items()
+        for app_id, ods_code, pointer_types in entries
     ]
-    producer_entries = [
-        (
-            "RX898",
-            [PointerTypes.MENTAL_HEALTH_PLAN.value],
-        ),  # http://snomed.info/sct|736253002
-    ]
-    for ods_code, pointer_types in consumer_entries:
-        folder_path = Path.joinpath(local_path, "consumer", feature_test_app_id)
-        folder_path.mkdir(parents=True, exist_ok=True)
-        file_path = folder_path / f"{ods_code}.json"
-        with open(file_path, "w") as f:
-            json.dump({"types": pointer_types}, f)
-    for ods_code, pointer_types in producer_entries:
-        folder_path = Path.joinpath(local_path, "producer", feature_test_app_id)
-        folder_path.mkdir(parents=True, exist_ok=True)
-        file_path = folder_path / f"{ods_code}.json"
-        with open(file_path, "w") as f:
-            json.dump({"types": pointer_types}, f)
 
 
 def download_files(s3_client, bucket_name, local_path, file_names, folders):
