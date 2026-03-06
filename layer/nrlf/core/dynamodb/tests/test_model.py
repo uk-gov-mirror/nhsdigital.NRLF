@@ -2,6 +2,7 @@ import json
 
 import pytest
 from freezegun import freeze_time
+from pydantic import ValidationError
 
 from nrlf.core.constants import PointerTypes
 from nrlf.core.dynamodb.model import DocumentPointer, DynamoDBModel
@@ -153,6 +154,16 @@ def test_document_pointer_from_document_reference_invalid():
         DocumentPointer.from_document_reference(doc_ref)
 
     assert str(error.value) == "'NoneType' object has no attribute 'coding'"
+
+
+def test_document_pointer_from_document_reference_invalid_type_code():
+    doc_ref = load_document_reference("Y05868-736253002-Valid")
+    doc_ref.type.coding[0].code = "INVALID_CODE"
+
+    with pytest.raises(ValidationError) as error:
+        DocumentPointer.from_document_reference(doc_ref)
+
+    assert "type must be in the format <system>|<code>" in str(error.value)
 
 
 def test_document_pointer_inject_producer_id():

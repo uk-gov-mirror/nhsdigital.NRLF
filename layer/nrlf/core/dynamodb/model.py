@@ -199,7 +199,7 @@ class DocumentPointer(DynamoDBModel):
         The id should be in the format <producer_id|producer_suffix>-<document_id>
         """
         if not re.match(
-            r"^(?=.{1,64}$)[A-Za-z0-9|\\.]+-[A-Za-z0-9]+[A-Za-z0-9\\_\\-]*$", id_
+            r"^(?=.{1,64}$)[A-Za-z0-9|\\.]+-[A-Za-z0-9]+[A-Za-z0-9_\\-]*$", id_
         ):
             raise ValueError("id must be in the format <producer_id>-<document_id>")
 
@@ -230,7 +230,7 @@ class DocumentPointer(DynamoDBModel):
         Validate the type of the DocumentPointer
         The type should be in the format <system>|<code>
         """
-        if not re.match(r"^[A-Za-z0-9]+|[A-Za-z0-9]+$", type):
+        if not re.match(r"^[A-Za-z0-9:/\.]+\|[A-Za-z0-9]+$", type):
             raise ValueError("type must be in the format <system>|<code>")
 
         return type

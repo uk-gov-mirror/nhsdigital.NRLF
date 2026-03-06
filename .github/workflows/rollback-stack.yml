@@ -10,16 +10,15 @@ on:
         default: "dev"
         type: environment
 
-permissions:
-  id-token: write
-  contents: read
-  actions: write
-
 jobs:
   rollback-stack:
     name: Rollback to inactive stack for ${{ inputs.environment }}
     runs-on: codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
     environment: ${{ inputs.environment }}
+    permissions:
+      id-token: write
+      contents: read
+      actions: write
 
     steps:
       - name: Git clone - ${{ github.ref }}
