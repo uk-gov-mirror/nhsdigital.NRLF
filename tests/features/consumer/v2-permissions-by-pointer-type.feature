@@ -1,10 +1,7 @@
 Feature: Consumer v2 permissions by pointer type - Success and Failure Scenarios
   For the v2 permissions model, permissions are resolved from a JSON file stored in the
-  nrlf_permissions Lambda layer at the path
-  {actorType}/{app_id}/{ods_code}.json, which must contain a "types" array.
-  Permissions for the feature test application (ID 'z00z-y11y-x22x') and
-  ODS code 'RX898' are baked into the layer by `scripts/get_s3_permissions.py`
-  at build time, so no dynamic seeding step is required for
+  nrlf_permissions Lambda layer.  Permissions for the feature tests are baked into the layer
+  by `scripts/get_s3_permissions.py` at build time, so no dynamic seeding step is required for
   success scenarios.
 
   Background:
