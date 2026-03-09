@@ -12,7 +12,7 @@ Feature: Producer v2 permissions by pointer type - Success and Failure Scenarios
       | property        | value                          |
       | subject         | 9278693472                     |
       | status          | current                        |
-      | type            | 736253002                      |
+      | type            | 736373009                      |
       | category        | 734163000                      |
       | custodian       | RX898                          |
       | author          | HAR1                           |
@@ -43,12 +43,46 @@ Feature: Producer v2 permissions by pointer type - Success and Failure Scenarios
       | property        | value                          |
       | subject         | 9278693472                     |
       | status          | current                        |
+      | type            | 736373009                      |
+      | category        | 734163000                      |
+      | custodian       | RX898                          |
+      | author          | HAR1                           |
+      | url             | https://example.org/my-doc.pdf |
+      | practiceSetting | 788002001                      |
+
+  Scenario: V2 Permissions with no access for pointer type - createDocumentReference
+    When producer v2 'RX898' creates a DocumentReference with values:
+      | property        | value                          |
+      | subject         | 9278693472                     |
+      | status          | current                        |
       | type            | 736253002                      |
       | category        | 734163000                      |
       | custodian       | RX898                          |
       | author          | HAR1                           |
       | url             | https://example.org/my-doc.pdf |
       | practiceSetting | 788002001                      |
+    Then the response status code is 403
+    And the response is an OperationOutcome with 1 issue
+    And the OperationOutcome contains the issue:
+      """
+      {
+        "severity": "error",
+        "code": "forbidden",
+        "details": {
+          "coding": [
+            {
+              "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
+              "code": "AUTHOR_CREDENTIALS_ERROR",
+              "display": "Author credentials error"
+            }
+          ]
+        },
+        "diagnostics": "The type of the provided DocumentReference is not in the list of allowed types for this organisation",
+        "expression": [
+          "type.coding[0].code"
+        ]
+      }
+      """
 
   Scenario: V2 Permissions with access for pointer type - deleteDocumentReference
     Given a DocumentReference resource exists with values
@@ -56,7 +90,7 @@ Feature: Producer v2 permissions by pointer type - Success and Failure Scenarios
       | id          | RX898-111-DeleteDocRefTest1    |
       | subject     | 9278693472                     |
       | status      | current                        |
-      | type        | 736253002                      |
+      | type        | 736373009                      |
       | category    | 734163000                      |
       | contentType | application/pdf                |
       | url         | https://example.org/my-doc.pdf |
@@ -82,7 +116,7 @@ Feature: Producer v2 permissions by pointer type - Success and Failure Scenarios
         "diagnostics": "The requested DocumentReference has been deleted"
       }
       """
-    And the resource with id 'DK94-111-DeleteDocRefTest1' does not exist
+    And the resource with id 'RX898-111-DeleteDocRefTest1' does not exist
 
   Scenario: V2 Permissions with no access for pointer type - searchDocumentReference
     Given a DocumentReference resource exists with values:
@@ -90,7 +124,7 @@ Feature: Producer v2 permissions by pointer type - Success and Failure Scenarios
       | id          | RX898-1111111111-SearchNHSDocRefTest1 |
       | subject     | 9999999999                            |
       | status      | current                               |
-      | type        | 736253002                             |
+      | type        | 736373009                             |
       | category    | 734163000                             |
       | contentType | application/pdf                       |
       | url         | https://example.org/my-doc.pdf        |
@@ -119,10 +153,45 @@ Feature: Producer v2 permissions by pointer type - Success and Failure Scenarios
       | id          | RX898-1111111111-SearchNHSDocRefTest1 |
       | subject     | 9999999999                            |
       | status      | current                               |
-      | type        | 736253002                             |
+      | type        | 736373009                             |
       | category    | 734163000                             |
       | contentType | application/pdf                       |
       | url         | https://example.org/my-doc.pdf        |
       | custodian   | RX898                                 |
       | author      | X26                                   |
     And the Bundle does not contain a DocumentReference with ID 'SG4-1111111111-SearchNHSDocRefTest3'
+
+  Scenario: V2 Permissions with no access for org - searchDocumentReference
+    Given a DocumentReference resource exists with values:
+      | property    | value                                 |
+      | id          | RX898-1111111111-SearchNHSDocRefTest1 |
+      | subject     | 9999999999                            |
+      | status      | current                               |
+      | type        | 736373009                             |
+      | category    | 734163000                             |
+      | contentType | application/pdf                       |
+      | url         | https://example.org/my-doc.pdf        |
+      | custodian   | RX898                                 |
+      | author      | X26                                   |
+    When producer v2 'N00RG1' searches for DocumentReferences with parameters:
+      | parameter | value      |
+      | subject   | 9999999999 |
+    Then the response status code is 403
+    And the response is an OperationOutcome with 1 issue
+    And the OperationOutcome contains the issue:
+      """
+      {
+        "severity": "error",
+        "code": "forbidden",
+        "details": {
+          "coding": [
+            {
+              "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
+              "code": "ACCESS DENIED",
+              "display": "Access has been denied to process this request"
+            }
+          ]
+        },
+        "diagnostics": "Your organisation 'N00RG1' does not have permission to access this resource. Contact the onboarding team."
+      }
+      """

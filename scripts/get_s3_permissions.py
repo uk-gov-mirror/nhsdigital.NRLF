@@ -74,8 +74,8 @@ def add_feature_test_files(local_path):
             (
                 "z00z-y11y-x22x",
                 "RX898",
-                [PointerTypes.MENTAL_HEALTH_PLAN.value],
-            ),  # http://snomed.info/sct|736253002
+                [PointerTypes.EOL_CARE_PLAN.value],
+            ),  # http://snomed.info/sct|736373009
         ],
     }
     [
