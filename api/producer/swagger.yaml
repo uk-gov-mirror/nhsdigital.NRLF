@@ -72,7 +72,7 @@ paths:
           "subject": {
             "identifier": {
               "system": "https://fhir.nhs.uk/Id/nhs-number",
-              "value": "3495456481"
+              "value": "9999999999"
             }
           },
           ```
@@ -231,7 +231,7 @@ paths:
                       subject:
                         identifier:
                           system: https://fhir.nhs.uk/Id/nhs-number
-                          value: "3495456481"
+                          value: "9999999999"
                       date: "2022-12-22T11:45:41+11:00"
                       author:
                         - identifier:
@@ -308,7 +308,7 @@ paths:
                       subject:
                         identifier:
                           system: https://fhir.nhs.uk/Id/nhs-number
-                          value: "3495456481"
+                          value: "9999999999"
                       date: "2022-12-21T10:45:41+11:00"
                       author:
                         - identifier:
@@ -513,7 +513,7 @@ paths:
                       subject:
                         identifier:
                           system: https://fhir.nhs.uk/Id/nhs-number
-                          value: "3495456481"
+                          value: "9999999999"
                       date: "2022-12-22T11:45:41+11:00"
                       author:
                         - identifier:
@@ -590,7 +590,7 @@ paths:
                       subject:
                         identifier:
                           system: https://fhir.nhs.uk/Id/nhs-number
-                          value: "3495456481"
+                          value: "9999999999"
                       date: "2022-12-21T10:45:41+11:00"
                       author:
                         - identifier:
@@ -708,7 +708,7 @@ paths:
                 subject:
                   identifier:
                     system: https://fhir.nhs.uk/Id/nhs-number
-                    value: "4409815415"
+                    value: "9000000017"
                 date: "2022-12-22T11:45:41+11:00"
                 author:
                   - identifier:
@@ -1951,7 +1951,7 @@ components:
     RequestQuerySubject:
       type: string
       pattern: ^https\:\/\/fhir\.nhs\.uk\/Id\/nhs-number\|(\d+)$
-      example: "https://fhir.nhs.uk/Id/nhs-number|4409815415"
+      example: "https://fhir.nhs.uk/Id/nhs-number|9000000017"
     RequestQueryType:
       type: string
       example: "http://snomed.info/sct|736253002"
@@ -1997,13 +1997,13 @@ components:
           value: ""
         valid_1:
           summary: "Valid #1"
-          value: https://fhir.nhs.uk/Id/nhs-number|4409815415
+          value: https://fhir.nhs.uk/Id/nhs-number|9000000017
         valid_2:
           summary: "Valid #2"
-          value: https://fhir.nhs.uk/Id/nhs-number|3495456481
+          value: https://fhir.nhs.uk/Id/nhs-number|9999999999
         invalid:
           summary: Unknown
-          value: https://fhir.nhs.uk/Id/nhs-number|3495456001
+          value: https://fhir.nhs.uk/Id/nhs-number|9000000001
     type:
       name: type
       in: query
