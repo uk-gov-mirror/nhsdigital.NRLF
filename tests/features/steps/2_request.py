@@ -78,7 +78,7 @@ def consumer_read_document_reference_step(
 
 @when("producer {version} '{ods_code}' creates a DocumentReference with values")
 def create_post_document_reference_step(context: Context, version: str, ods_code: str):
-    client = producer_client_from_context(context, ods_code, v2=(version == "v2"))
+    client = producer_client_from_context(context, ods_code, use_v2=(version == "v2"))
 
     if not context.table:
         raise ValueError("No document reference data table provided")
