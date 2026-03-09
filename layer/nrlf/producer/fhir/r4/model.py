@@ -467,7 +467,7 @@ class RequestQuerySubject(RootModel[str]):
     root: Annotated[
         str,
         Field(
-            examples=["https://fhir.nhs.uk/Id/nhs-number|4409815415"],
+            examples=["https://fhir.nhs.uk/Id/nhs-number|9000000017"],
             pattern="^https\\:\\/\\/fhir\\.nhs\\.uk\\/Id\\/nhs-number\\|(\\d+)$",
         ),
     ]
