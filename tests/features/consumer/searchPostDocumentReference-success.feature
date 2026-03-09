@@ -232,7 +232,7 @@ Feature: Consumer - searchDocumentReference - Success Scenarios
       | url         | https://example.org/my-doc.pdf |
       | custodian   | DK94                           |
       | author      | N64                            |
-    When producer 'DK94' requests to delete DocumentReference with id 'DK94-111-DeleteDocRefTest1'
+    When producer v1 'DK94' requests to delete DocumentReference with id 'DK94-111-DeleteDocRefTest1'
     And consumer 'RX898' searches for DocumentReferences using POST with request body:
       | key       | value      |
       | subject   | 9278693472 |

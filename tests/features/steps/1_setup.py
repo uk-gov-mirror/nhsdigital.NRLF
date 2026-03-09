@@ -1,4 +1,5 @@
 import json
+from typing import Optional
 
 from behave import *  # noqa
 from behave.runner import Context
