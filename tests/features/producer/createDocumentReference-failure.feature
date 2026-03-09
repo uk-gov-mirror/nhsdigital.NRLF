@@ -88,7 +88,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
     And the organisation 'TSTCUS' is authorised to access pointer types:
       | system                 | value     |
       | http://snomed.info/sct | 736253002 |
-    When producer v1 'TSTCUS' requests creation of a DocumentReference with default test values except 'subject' is:
+    When producer 'TSTCUS' requests creation of a DocumentReference with default test values except 'subject' is:
       """
       "subject": {
         "identifier": {
@@ -125,7 +125,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
     And the organisation 'TSTCUS' is authorised to access pointer types:
       | system                 | value     |
       | http://snomed.info/sct | 736253002 |
-    When producer v1 'TSTCUS' requests creation of a DocumentReference with default test values except 'author' is:
+    When producer 'TSTCUS' requests creation of a DocumentReference with default test values except 'author' is:
       """
       "author":[{
         "identifier": {
@@ -162,7 +162,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
     And the organisation 'TSTCUS' is authorised to access pointer types:
       | system                 | value     |
       | http://snomed.info/sct | 736253002 |
-    When producer v1 'TSTCUS' requests creation of a DocumentReference with default test values except 'author' is:
+    When producer 'TSTCUS' requests creation of a DocumentReference with default test values except 'author' is:
       """
       "author":[{
         "identifier": {
@@ -481,7 +481,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
       | system                 | value            |
       | http://snomed.info/sct | 1363501000000100 |
       | http://snomed.info/sct | 736253002        |
-    When producer v1 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
+    When producer 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
       """
       "content": [
         {
@@ -540,7 +540,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
       | system                 | value            |
       | http://snomed.info/sct | 1363501000000100 |
       | http://snomed.info/sct | 736253002        |
-    When producer v1 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
+    When producer 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
       """
       "content": [
         {
@@ -772,7 +772,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
       | system                 | value            |
       | http://snomed.info/sct | 1363501000000100 |
       | http://snomed.info/sct | 736253002        |
-    When producer v1 'TSTCUS' requests creation of a DocumentReference with default test values except 'context' is:
+    When producer 'TSTCUS' requests creation of a DocumentReference with default test values except 'context' is:
       """
       "context": {
       "practiceSetting": {
@@ -794,7 +794,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
     And the organisation 'TSTCUS' is authorised to access pointer types:
       | system                 | value     |
       | http://snomed.info/sct | 736253002 |
-    When producer v1 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
+    When producer 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
       """
       "content": []
       """
@@ -826,7 +826,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
     And the organisation 'TSTCUS' is authorised to access pointer types:
       | system                 | value     |
       | http://snomed.info/sct | 736253002 |
-    When producer v1 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
+    When producer 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
       """
       "content": [
         {
@@ -922,7 +922,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
     And the organisation 'TSTCUS' is authorised to access pointer types:
       | system                 | value     |
       | http://snomed.info/sct | 736253002 |
-    When producer v1 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
+    When producer 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
       """
       "content": [
         {
@@ -981,7 +981,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
       | system                 | value            |
       | http://snomed.info/sct | 1363501000000100 |
       | http://snomed.info/sct | 736253002        |
-    When producer v1 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
+    When producer 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
       """
       "content": [
         {
@@ -1040,7 +1040,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
     And the organisation 'TSTCUS' is authorised to access pointer types:
       | system                 | value     |
       | http://snomed.info/sct | 736253002 |
-    When producer v1 'TSTCUS' requests creation of a DocumentReference with default test values except 'context' is:
+    When producer 'TSTCUS' requests creation of a DocumentReference with default test values except 'context' is:
       """
       "context": {
         "practiceSetting": {
@@ -1090,7 +1090,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
     And the organisation 'TSTCUS' is authorised to access pointer types:
       | system                 | value     |
       | http://snomed.info/sct | 736253002 |
-    When producer v1 'TSTCUS' requests creation of a DocumentReference with default test values except 'author' is:
+    When producer 'TSTCUS' requests creation of a DocumentReference with default test values except 'author' is:
       """
       "author": []
       """
@@ -1120,7 +1120,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
     And the organisation 'TSTCUS' is authorised to access pointer types:
       | system                 | value     |
       | http://snomed.info/sct | 736253002 |
-    When producer v1 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
+    When producer 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
       """
       "content": [
         {
@@ -1165,7 +1165,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
     And the organisation 'TSTCUS' is authorised to access pointer types:
       | system                 | value     |
       | http://snomed.info/sct | 736253002 |
-    When producer v1 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
+    When producer 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
       """
       "content": [
         {
@@ -1245,7 +1245,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
     And the organisation 'TSTCUS' is authorised to access pointer types:
       | system                 | value     |
       | http://snomed.info/sct | 736253002 |
-    When producer v1 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
+    When producer 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
       """
       "content": [
         {
@@ -1313,7 +1313,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
     And the organisation 'TSTCUS' is authorised to access pointer types:
       | system                 | value     |
       | http://snomed.info/sct | 736253002 |
-    When producer v1 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
+    When producer 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
       """
       "content": [
         {
@@ -1381,7 +1381,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
     And the organisation 'TSTCUS' is authorised to access pointer types:
       | system                 | value     |
       | http://snomed.info/sct | 736253002 |
-    When producer v1 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
+    When producer 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
       """
       "content": [
         {
@@ -1449,7 +1449,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
     And the organisation 'TSTCUS' is authorised to access pointer types:
       | system                 | value     |
       | http://snomed.info/sct | 736253002 |
-    When producer v1 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
+    When producer 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
       """
       "content": [
         {
@@ -1516,7 +1516,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
     And the organisation 'TSTCUS' is authorised to access pointer types:
       | system                 | value     |
       | http://snomed.info/sct | 736253002 |
-    When producer v1 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
+    When producer 'TSTCUS' requests creation of a DocumentReference with default test values except 'content' is:
       """
       "content": [
         {
