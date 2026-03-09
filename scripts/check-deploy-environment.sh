@@ -35,7 +35,7 @@ for dep in ${DEPLOY_DEPENDENCIES}; do
         dep_path="$(which ${dep} 2> /dev/null)"
     set -e
 
-    if [[ -n "${dep_path}" -a -x "${dep_path}" ]]
+    if [[ -n "${dep_path}" && -x "${dep_path}" ]]
     then
         success "${dep} found at ${dep_path}"
     else
