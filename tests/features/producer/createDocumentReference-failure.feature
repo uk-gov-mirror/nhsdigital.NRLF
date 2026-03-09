@@ -292,6 +292,76 @@ Feature: Producer - createDocumentReference - Failure Scenarios
       }
       """
 
+  # Credentials - type not allowed at application level (v2 permissions)
+  Scenario: Producer lacks permissions to create specified type at the application level
+    Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
+    And the application has 'producer' permissions for pointer types:
+      | system                 | value     |
+      | http://snomed.info/sct | 736253002 |
+    When producer v2 'ANGY1' creates a DocumentReference with values:
+      | property  | value                          |
+      | subject   | 9999999999                     |
+      | status    | current                        |
+      | type      | 887701000000100                |
+      | category  | 734163000                      |
+      | custodian | ANGY1                          |
+      | author    | HAR1                           |
+      | url       | https://example.org/my-doc.pdf |
+    Then the response status code is 403
+    And the response is an OperationOutcome with 1 issue
+    And the OperationOutcome contains the issue:
+      """
+      {
+        "severity": "error",
+        "code": "forbidden",
+        "details": {
+          "coding": [
+            {
+              "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
+              "code": "ACCESS DENIED",
+              "display": "Access has been denied to process this request"
+            }
+          ]
+        },
+        "diagnostics": "Your organisation 'ANGY1' does not have permission to access this resource. Contact the onboarding team."
+      }
+      """
+
+  # Credentials - type not allowed at org level (v2 permissions)
+  Scenario: Producer lacks permissions to create specified type at the org level
+    Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
+    And the organisation 'ANGY1' is authorised as a Producer for pointer types:
+      | system                 | value     |
+      | http://snomed.info/sct | 736253002 |
+    When producer v2 'ANGY1' creates a DocumentReference with values:
+      | property  | value                          |
+      | subject   | 9999999999                     |
+      | status    | current                        |
+      | type      | 887701000000100                |
+      | category  | 734163000                      |
+      | custodian | ANGY1                          |
+      | author    | HAR1                           |
+      | url       | https://example.org/my-doc.pdf |
+    Then the response status code is 403
+    And the response is an OperationOutcome with 1 issue
+    And the OperationOutcome contains the issue:
+      """
+      {
+        "severity": "error",
+        "code": "forbidden",
+        "details": {
+          "coding": [
+            {
+              "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
+              "code": "ACCESS DENIED",
+              "display": "Access has been denied to process this request"
+            }
+          ]
+        },
+        "diagnostics": "Your organisation 'ANGY1' does not have permission to access this resource. Contact the onboarding team."
+      }
+      """
+
   Scenario: Invalid status
     Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
     And the organisation 'X26' is authorised to access pointer types:

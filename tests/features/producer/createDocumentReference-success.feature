@@ -47,6 +47,100 @@ Feature: Producer - createDocumentReference - Success Scenarios
       | url             | https://example.org/my-doc.pdf |
       | practiceSetting | 788002001                      |
 
+  Scenario: Successfully create a Document Pointer with org-level permissions (v2 permissions model)
+    Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
+    And the organisation 'ANGY1' is authorised as a Producer for pointer types:
+      | system                 | value     |
+      | http://snomed.info/sct | 736253002 |
+    When producer v2 'ANGY1' creates a DocumentReference with values:
+      | property        | value                          |
+      | subject         | 9278693472                     |
+      | status          | current                        |
+      | type            | 736253002                      |
+      | category        | 734163000                      |
+      | custodian       | ANGY1                          |
+      | author          | HAR1                           |
+      | url             | https://example.org/my-doc.pdf |
+      | practiceSetting | 788002001                      |
+    Then the response status code is 201
+    And the response is an OperationOutcome with 1 issue
+    And the OperationOutcome contains the issue:
+      """
+      {
+      "severity": "information",
+      "code": "informational",
+      "details": {
+      "coding": [
+      {
+      "system": "https://fhir.nhs.uk/ValueSet/NRL-ResponseCode",
+      "code": "RESOURCE_CREATED",
+      "display": "Resource created"
+      }
+      ]
+      },
+      "diagnostics": "The document has been created"
+      }
+      """
+    And the response has a Location header
+    And the Location header starts with '/DocumentReference/ANGY1-'
+    And the resource in the Location header exists with values:
+      | property        | value                          |
+      | subject         | 9278693472                     |
+      | status          | current                        |
+      | type            | 736253002                      |
+      | category        | 734163000                      |
+      | custodian       | ANGY1                          |
+      | author          | HAR1                           |
+      | url             | https://example.org/my-doc.pdf |
+      | practiceSetting | 788002001                      |
+
+  Scenario: Successfully create a Document Pointer with app-level permissions (v2 permissions model)
+    Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
+    And the application has 'producer' permissions for pointer types:
+      | system                 | value     |
+      | http://snomed.info/sct | 736253002 |
+    When producer v2 'ANGY1' creates a DocumentReference with values:
+      | property        | value                          |
+      | subject         | 9278693472                     |
+      | status          | current                        |
+      | type            | 736253002                      |
+      | category        | 734163000                      |
+      | custodian       | ANGY1                          |
+      | author          | HAR1                           |
+      | url             | https://example.org/my-doc.pdf |
+      | practiceSetting | 788002001                      |
+    Then the response status code is 201
+    And the response is an OperationOutcome with 1 issue
+    And the OperationOutcome contains the issue:
+      """
+      {
+      "severity": "information",
+      "code": "informational",
+      "details": {
+      "coding": [
+      {
+      "system": "https://fhir.nhs.uk/ValueSet/NRL-ResponseCode",
+      "code": "RESOURCE_CREATED",
+      "display": "Resource created"
+      }
+      ]
+      },
+      "diagnostics": "The document has been created"
+      }
+      """
+    And the response has a Location header
+    And the Location header starts with '/DocumentReference/ANGY1-'
+    And the resource in the Location header exists with values:
+      | property        | value                          |
+      | subject         | 9278693472                     |
+      | status          | current                        |
+      | type            | 736253002                      |
+      | category        | 734163000                      |
+      | custodian       | ANGY1                          |
+      | author          | HAR1                           |
+      | url             | https://example.org/my-doc.pdf |
+      | practiceSetting | 788002001                      |
+
   # # NRL-766 Resolve custodian suffix issues
   # Scenario: Successfully create a Document Pointer (care plan) with custodian suffix
   # Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API

@@ -25,6 +25,24 @@ class Application(BaseModel):
         s3_client.put_object(Bucket=bucket, Key=key, Body=json.dumps(pointer_types))
         context.add_cleanup(lambda: s3_client.delete_object(Bucket=bucket, Key=key))
 
+    def add_v2_permissions(
+        self, api_side: str, context: Context, ods_code: Optional[str] = None
+    ):
+        if not context.table:
+            raise ValueError("No permissions table provided")
+
+        pointer_types = [f"{system}|{value}" for system, value in context.table]
+        perms_body = {"types": pointer_types}
+        bucket = f"nhsd-nrlf--{context.stack_name}-authorization-store"
+        if ods_code:  # org-level permissions
+            key = f"{api_side}/{self.app_id}/{ods_code}.json"
+        else:  # app-level permissions
+            key = f"{api_side}/{self.app_id}.json"
+
+        s3_client = get_s3_client()
+        s3_client.put_object(Bucket=bucket, Key=key, Body=json.dumps(pointer_types))
+        context.add_cleanup(lambda: s3_client.delete_object(Bucket=bucket, Key=key))
+
 
 @given("the application '{app_name}' (ID '{app_id}') is registered to access the API")
 def register_application_step(context: Context, app_name: str, app_id: str):
@@ -37,6 +55,31 @@ def register_org_permissions_step(context: Context, ods_code: str):
         raise ValueError("No permissions table provided")
 
     context.application.add_pointer_types(ods_code, context)
+
+
+@given("the organisation '{ods_code}' is authorised as a Producer for pointer types")
+def register_v2_producer_org_permissions_step(context: Context, ods_code: str):
+    if not context.table:
+        raise ValueError("No permissions table provided")
+
+    context.application.add_v2_permissions("producer", context, ods_code)
+
+
+@given("the organisation '{ods_code}' is authorised as a Consumer for pointer types")
+def register_v2_consumer_org_permissions_step(context: Context, ods_code: str):
+    if not context.table:
+        raise ValueError("No permissions table provided")
+
+    context.application.add_v2_permissions("consumer", context, ods_code)
+
+
+@given("the application has '{use_type}' permissions for pointer types")
+def register_app_level_permissions_step(context: Context, use_type: str):
+    if not context.table:
+        raise ValueError("No permissions table provided")
+    if use_type not in {"producer", "consumer"}:
+        raise ValueError("Producer or Consumer side must be specified")
+    context.application.add_v2_permissions(use_type, context)
 
 
 @given("a DocumentReference resource exists with values")
