@@ -16,7 +16,7 @@ Feature: Consumer - searchDocumentReference - Success Scenarios
       | url         | https://example.org/my-doc.pdf    |
       | custodian   | 8FW23                             |
       | author      | 8FW23                             |
-    When consumer 'RX898' searches for DocumentReferences using POST with request body:
+    When consumer v1 'RX898' searches for DocumentReferences using POST with request body:
       | key     | value      |
       | subject | 9278693472 |
     Then the response status code is 200
@@ -52,7 +52,7 @@ Feature: Consumer - searchDocumentReference - Success Scenarios
       | url         | https://example.org/my-doc.pdf        |
       | custodian   | RX898                                 |
       | author      | RX898                                 |
-    When consumer 'RX898' searches for DocumentReferences using POST with request body:
+    When consumer v1 'RX898' searches for DocumentReferences using POST with request body:
       | key       | value      |
       | subject   | 9278693472 |
       | custodian | RX898      |
@@ -111,7 +111,7 @@ Feature: Consumer - searchDocumentReference - Success Scenarios
       | url         | https://example.org/my-doc-3.pdf                  |
       | custodian   | X26                                               |
       | author      | X26                                               |
-    When consumer 'RX898' searches for DocumentReferences using POST with request body:
+    When consumer v1 'RX898' searches for DocumentReferences using POST with request body:
       | key     | value      |
       | subject | 9278693472 |
     Then the response status code is 200
@@ -180,7 +180,7 @@ Feature: Consumer - searchDocumentReference - Success Scenarios
       | url         | https://example.org/my-doc-3.pdf                  |
       | custodian   | X26                                               |
       | author      | X26                                               |
-    When consumer 'RX898' searches for DocumentReferences using POST with request body:
+    When consumer v1 'RX898' searches for DocumentReferences using POST with request body:
       | key     | value      |
       | subject | 9278693472 |
     Then the response status code is 200
@@ -232,8 +232,8 @@ Feature: Consumer - searchDocumentReference - Success Scenarios
       | url         | https://example.org/my-doc.pdf |
       | custodian   | DK94                           |
       | author      | N64                            |
-    When producer 'DK94' requests to delete DocumentReference with id 'DK94-111-DeleteDocRefTest1'
-    And consumer 'RX898' searches for DocumentReferences using POST with request body:
+    When producer v1 'DK94' requests to delete DocumentReference with id 'DK94-111-DeleteDocRefTest1'
+    And consumer v1 'RX898' searches for DocumentReferences using POST with request body:
       | key       | value      |
       | subject   | 9278693472 |
       | custodian | RX898      |
@@ -282,7 +282,7 @@ Feature: Consumer - searchDocumentReference - Success Scenarios
       | url         | https://example.org/my-doc-3.pdf      |
       | custodian   | x26                                   |
       | author      | x26                                   |
-    When consumer 'RX898' searches for DocumentReferences using POST with request body:
+    When consumer v1 'RX898' searches for DocumentReferences using POST with request body:
       | key      | value                             |
       | subject  | 9278693472                        |
       | category | http://snomed.info/sct\|734163000 |
@@ -353,7 +353,7 @@ Feature: Consumer - searchDocumentReference - Success Scenarios
       | url         | https://example.org/my-doc-3.pdf      |
       | custodian   | x26                                   |
       | author      | x26                                   |
-    When consumer 'RX898' searches for DocumentReferences using POST with request body:
+    When consumer v1 'RX898' searches for DocumentReferences using POST with request body:
       | key      | value      |
       | subject  | 9278693472 |
       | _summary | count      |
@@ -412,7 +412,7 @@ Feature: Consumer - searchDocumentReference - Success Scenarios
       | url         | https://example.org/my-doc-4.pdf      |
       | custodian   | X26                                   |
       | author      | X26                                   |
-    When consumer 'RX898' searches for DocumentReferences using POST with request body:
+    When consumer v1 'RX898' searches for DocumentReferences using POST with request body:
       | key      | value                                                                     |
       | subject  | 9278693472                                                                |
       | category | http://snomed.info/sct\|734163000,http://snomed.info/sct\|823651000000106 |
