@@ -834,6 +834,76 @@ def test_request_load_connection_with_missing_headers_gets_v2_permissions(
     assert expected_metadata.nrl_app_id == "Y05868-TestApp-12345678"
 
 
+def _create_v2_headers() -> dict:
+    """Create headers that trigger the v2 permissions model (missing nhsd-client-rp-details)."""
+    headers = create_headers(
+        additional_headers={
+            "nhsd-end-user-organisation-ods": "Y05868",
+            "nhsd-nrl-app-id": "Y05868-TestApp-12345678",
+        }
+    )
+    headers.pop("nhsd-client-rp-details")
+    return headers
+
+
+def test_load_v2_connection_metadata_allow_all_types(mocker: MockerFixture):
+    mocker.patch(
+        "nrlf.core.decorators.get_pointer_permissions_v2",
+        return_value={
+            "access_controls": ["allow_all_types"],
+            "types": [],
+        },
+    )
+
+    metadata = load_connection_metadata(
+        headers=_create_v2_headers(),
+        config=Config(),
+        path="/producer/DocumentReference",
+    )
+
+    assert metadata.nrl_permissions_policy.types == PointerTypes.list()
+
+
+def test_load_v2_connection_metadata_specific_types(mocker: MockerFixture):
+    specific_types = [
+        "http://snomed.info/sct|736253002",
+        "http://snomed.info/sct|735324008",
+    ]
+    mocker.patch(
+        "nrlf.core.decorators.get_pointer_permissions_v2",
+        return_value={
+            "access_controls": [],
+            "types": specific_types,
+        },
+    )
+
+    metadata = load_connection_metadata(
+        headers=_create_v2_headers(),
+        config=Config(),
+        path="/producer/DocumentReference",
+    )
+
+    assert metadata.nrl_permissions_policy.types == specific_types
+
+
+def test_load_v2_connection_metadata_missing_access_controls(mocker: MockerFixture):
+    specific_types = ["http://snomed.info/sct|736253002"]
+    mocker.patch(
+        "nrlf.core.decorators.get_pointer_permissions_v2",
+        return_value={
+            "types": specific_types,
+        },
+    )
+
+    metadata = load_connection_metadata(
+        headers=_create_v2_headers(),
+        config=Config(),
+        path="/producer/DocumentReference",
+    )
+
+    assert metadata.nrl_permissions_policy.types == specific_types
+
+
 def test_request_handler_with_custom_repository(mocker: MockerFixture):
     repository_mock = mocker.Mock()
 

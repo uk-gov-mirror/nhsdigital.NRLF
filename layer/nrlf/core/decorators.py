@@ -30,6 +30,7 @@ from nrlf.core.constants import (
 from nrlf.core.dynamodb.repository import DocumentPointerRepository
 from nrlf.core.errors import OperationOutcomeError, ParseError
 from nrlf.core.logger import LogReference, logger
+from nrlf.core.model import PermissionsPolicy
 from nrlf.core.request import parse_body, parse_headers, parse_params, parse_path
 from nrlf.core.response import Response
 
@@ -159,11 +160,21 @@ def _load_v2_connection_metadata(headers: Dict[str, str], path: str):
     logger.log(LogReference.HANDLER004e)
     pointer_permissions = get_pointer_permissions_v2(metadata, path)
 
-    metadata.pointer_types = pointer_permissions.get("types", [])
+    metadata.nrl_permissions_policy = PermissionsPolicy.model_validate(
+        pointer_permissions
+    )
+
+    if "allow_all_types" in metadata.nrl_permissions_policy.access_controls:
+        metadata.nrl_permissions_policy.types = PointerTypes.list()
 
     logger.log(
-        LogReference.HANDLER004f, pointer_types=metadata.pointer_types
-    )  # TODO: log other permissions as they're added
+        LogReference.HANDLER004f,
+        permissions_policy=(
+            metadata.nrl_permissions_policy.model_dump()
+            if metadata.nrl_permissions_policy
+            else None
+        ),
+    )
 
     return metadata
 
@@ -297,11 +308,16 @@ def request_handler(
             logger.log(LogReference.HANDLER001, config=config.model_dump())
             metadata = load_connection_metadata(event.headers, config, event.path)
 
-            if metadata.pointer_types == []:
+            allowed_types = (
+                metadata.nrl_permissions_policy.types
+                if metadata.nrl_permissions_policy
+                else metadata.pointer_types
+            )
+            if allowed_types == []:
                 logger.log(
                     LogReference.HANDLER005,
                     ods_code=metadata.ods_code,
-                    pointer_types=metadata.pointer_types,
+                    pointer_types=allowed_types,
                 )
                 raise OperationOutcomeError(
                     status_code="403",

@@ -76,12 +76,18 @@ def _check_permissions(
             expression="custodian.identifier.value",
         )
 
-    if core_model.type not in metadata.pointer_types:
+    allowed_types = (
+        metadata.nrl_permissions_policy.types
+        if metadata.nrl_permissions_policy
+        else metadata.pointer_types
+    )
+
+    if core_model.type not in allowed_types:
         logger.log(
             LogReference.PROCREATE005,
             ods_code=metadata.ods_code,
             type=core_model.type,
-            pointer_types=metadata.pointer_types,
+            pointer_types=allowed_types,
         )
         return SpineErrorResponse.AUTHOR_CREDENTIALS_ERROR(
             diagnostics="The type of the provided DocumentReference is not in the list of allowed types for this organisation",

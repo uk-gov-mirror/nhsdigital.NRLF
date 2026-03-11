@@ -89,6 +89,67 @@ def test_upsert_document_reference_happy_path(
 @mock_aws
 @mock_repository
 @freeze_time("2024-03-21T12:34:56.789")
+@patch("nrlf.core.decorators.get_pointer_permissions_v2")
+def test_upsert_document_reference_happy_path_v2(
+    get_pointer_permissions_mock, repository: DocumentPointerRepository
+):
+    doc_ref_data = load_document_reference_data("Y05868-736253002-Valid")
+
+    v2_headers = create_headers(
+        additional_headers={
+            "nhsd-end-user-organisation-ods": "Y05868",
+            "nhsd-nrl-app-id": "Y05868-TestApp-12345678",
+        }
+    )
+    v2_headers.pop("nhsd-client-rp-details")
+
+    get_pointer_permissions_mock.return_value = {
+        "access_controls": [],
+        "types": ["http://snomed.info/sct|736253002"],
+    }
+
+    event = create_test_api_gateway_event(
+        headers=v2_headers,
+        body=doc_ref_data,
+    )
+
+    result = handler(event, create_mock_context())
+    body = result.pop("body")
+
+    assert result == {
+        "statusCode": "201",
+        "headers": {
+            "Location": "/DocumentReference/Y05868-99999-99999-999999",
+            **default_response_headers(),
+        },
+        "isBase64Encoded": False,
+    }
+
+    parsed_body = json.loads(body)
+    assert parsed_body == {
+        "resourceType": "OperationOutcome",
+        "issue": [
+            {
+                "severity": "information",
+                "code": "informational",
+                "details": {
+                    "coding": [
+                        {
+                            "code": "RESOURCE_CREATED",
+                            "display": "Resource created",
+                            "system": "https://fhir.nhs.uk/ValueSet/NRL-ResponseCode",
+                        }
+                    ],
+                },
+                "diagnostics": "The document has been created",
+            }
+        ],
+    }
+
+
+@mock_aws
+@mock_repository
+@freeze_time("2024-03-21T12:34:56.789")
 def test_upsert_document_reference_happy_path_with_ssp(
     repository: DocumentPointerRepository,
 ):
@@ -714,6 +775,65 @@ def test_upsert_document_reference_pointer_type_not_allowed(
     )
 
     parse_permissions_mock.return_value = ["invalid"]
+    result = handler(event, create_mock_context())
+    body = result.pop("body")
+
+    assert result == {
+        "statusCode": "403",
+        "headers": default_response_headers(),
+        "isBase64Encoded": False,
+    }
+
+    parsed_body = json.loads(body)
+
+    assert parsed_body == {
+        "resourceType": "OperationOutcome",
+        "issue": [
+            {
+                "severity": "error",
+                "code": "forbidden",
+                "details": {
+                    "coding": [
+                        {
+                            "code": "AUTHOR_CREDENTIALS_ERROR",
+                            "display": "Author credentials error",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
+                        }
+                    ]
+                },
+                "diagnostics": "The type of the provided DocumentReference is not in the list of allowed types for this organisation",
+                "expression": ["type.coding[0].code"],
+            }
+        ],
+    }
+
+
+@mock_aws
+@mock_repository
+@patch("nrlf.core.decorators.get_pointer_permissions_v2")
+def test_upsert_document_reference_pointer_type_not_allowed_v2(
+    get_pointer_permissions_mock, repository: DocumentPointerRepository
+):
+    doc_ref = load_document_reference("Y05868-736253002-Valid")
+
+    v2_headers = create_headers(
+        additional_headers={
+            "nhsd-end-user-organisation-ods": "Y05868",
+            "nhsd-nrl-app-id": "Y05868-TestApp-12345678",
+        }
+    )
+    v2_headers.pop("nhsd-client-rp-details")
+
+    get_pointer_permissions_mock.return_value = {
+        "access_controls": [],
+        "types": ["http://snomed.info/sct|99999999999"],
+    }
+
+    event = create_test_api_gateway_event(
+        headers=v2_headers,
+        body=doc_ref.model_dump_json(exclude_none=True),
+    )
+
     result = handler(event, create_mock_context())
     body = result.pop("body")
 

@@ -60,7 +60,7 @@ resource "aws_s3_bucket_versioning" "authorization-store" {
     status = "Enabled"
   }
 }
-# Need to pull these into state if they already exist
+
 resource "aws_s3_object" "consumer-object" {
   bucket = aws_s3_bucket.authorization-store.id
   key    = "consumer/"

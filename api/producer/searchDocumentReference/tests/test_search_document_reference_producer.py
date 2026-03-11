@@ -57,6 +57,55 @@ def test_search_document_reference_happy_path(
 
 @mock_aws
 @mock_repository
+@patch("nrlf.core.decorators.get_pointer_permissions_v2")
+def test_search_document_reference_happy_path_v2(
+    get_pointer_permissions_mock,
+    repository: DocumentPointerRepository,
+):
+    doc_ref = load_document_reference("Y05868-736253002-Valid")
+    doc_pointer = DocumentPointer.from_document_reference(doc_ref)
+    repository.create(doc_pointer)
+
+    v2_headers = create_headers(
+        additional_headers={
+            "nhsd-end-user-organisation-ods": "Y05868",
+            "nhsd-nrl-app-id": "Y05868-TestApp-12345678",
+        }
+    )
+    v2_headers.pop("nhsd-client-rp-details")
+
+    get_pointer_permissions_mock.return_value = {
+        "access_controls": [],
+        "types": ["http://snomed.info/sct|736253002"],
+    }
+
+    event = create_test_api_gateway_event(
+        headers=v2_headers,
+        query_string_parameters={
+            "subject:identifier": "https://fhir.nhs.uk/Id/nhs-number|6700028191",
+        },
+    )
+
+    result = handler(event, create_mock_context())
+    body = result.pop("body")
+
+    assert result == {
+        "statusCode": "200",
+        "headers": default_response_headers(),
+        "isBase64Encoded": False,
+    }
+
+    parsed_body = json.loads(body)
+    assert parsed_body == {
+        "resourceType": "Bundle",
+        "type": "searchset",
+        "total": 1,
+        "entry": [{"resource": doc_ref.model_dump(exclude_none=True)}],
+    }
+
+
+@mock_aws
+@mock_repository
 def test_search_document_reference_no_results(
     repository: DocumentPointerRepository,
 ):
@@ -460,6 +509,60 @@ def test_search_document_reference_filters_by_pointer_types(
         "total": 0,
         "entry": [],
     }
+
+
+@mock_aws
+@mock_repository
+@patch("nrlf.core.decorators.get_pointer_permissions_v2")
+def test_search_document_reference_filters_by_pointer_types_v2(
+    get_pointer_permissions_mock,
+    repository: DocumentPointerRepository,
+):
+    allowed_doc_ref = load_document_reference("Y05868-736253002-Valid")
+    allowed_pointer = DocumentPointer.from_document_reference(allowed_doc_ref)
+    repository.create(allowed_pointer)
+
+    disallowed_doc_ref = load_document_reference("Y05868-736253002-Valid")
+    assert disallowed_doc_ref.type and disallowed_doc_ref.type.coding
+    disallowed_doc_ref.type.coding[0].code = "861421000000109"
+    disallowed_doc_ref.type.coding[0].system = "http://snomed.info/sct"
+    disallowed_pointer = DocumentPointer.from_document_reference(disallowed_doc_ref)
+    disallowed_pointer.id = "Y05868-disallowed-type"
+    disallowed_pointer.type = "http://snomed.info/sct|861421000000109"
+    repository.create(disallowed_pointer)
+
+    v2_headers = create_headers(
+        additional_headers={
+            "nhsd-end-user-organisation-ods": "Y05868",
+            "nhsd-nrl-app-id": "Y05868-TestApp-12345678",
+        }
+    )
+    v2_headers.pop("nhsd-client-rp-details")
+
+    get_pointer_permissions_mock.return_value = {
+        "access_controls": [],
+        "types": ["http://snomed.info/sct|736253002"],
+    }
+
+    event = create_test_api_gateway_event(
+        headers=v2_headers,
+        query_string_parameters={
+            "subject:identifier": "https://fhir.nhs.uk/Id/nhs-number|6700028191",
+        },
+    )
+
+    result = handler(event, create_mock_context())
+    body = result.pop("body")
+
+    assert result == {
+        "statusCode": "200",
+        "headers": default_response_headers(),
+        "isBase64Encoded": False,
+    }
+
+    parsed_body = json.loads(body)
+    assert parsed_body["total"] == 1
+    assert parsed_body["entry"][0]["resource"]["id"] == allowed_doc_ref.id
 
 
 @mock_aws
