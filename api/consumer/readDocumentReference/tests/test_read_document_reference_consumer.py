@@ -1,4 +1,5 @@
 import json
+from unittest.mock import patch
 
 from moto import mock_aws
 
@@ -26,6 +27,47 @@ def test_read_document_reference_happy_path(
 
     event = create_test_api_gateway_event(
         headers=create_headers(), path_parameters={"id": "Y05868-99999-99999-999999"}
+    )
+
+    result = handler(event, create_mock_context())
+    body = result.pop("body")
+
+    assert result == {
+        "statusCode": "200",
+        "headers": default_response_headers(),
+        "isBase64Encoded": False,
+    }
+
+    parsed_body = json.loads(body)
+    assert parsed_body == doc_ref.model_dump(exclude_none=True)
+
+
+@mock_aws
+@mock_repository
+@patch("nrlf.core.decorators.get_pointer_permissions_v2")
+def test_read_document_reference_happy_path_v2(
+    get_pointer_permissions_mock, repository: DocumentPointerRepository
+):
+    doc_ref = load_document_reference("Y05868-736253002-Valid")
+    doc_pointer = DocumentPointer.from_document_reference(doc_ref)
+    repository.create(doc_pointer)
+
+    v2_headers = create_headers(
+        additional_headers={
+            "nhsd-end-user-organisation-ods": "Y05868",
+            "nhsd-nrl-app-id": "Y05868-TestApp-12345678",
+        }
+    )
+    v2_headers.pop("nhsd-client-rp-details")
+
+    get_pointer_permissions_mock.return_value = {
+        "access_controls": [],
+        "types": ["http://snomed.info/sct|736253002"],
+    }
+
+    event = create_test_api_gateway_event(
+        headers=v2_headers,
+        path_parameters={"id": doc_pointer.id},
     )
 
     result = handler(event, create_mock_context())
@@ -125,6 +167,65 @@ def test_read_document_reference_unauthorised_for_type(
 
     event = create_test_api_gateway_event(
         headers=create_headers(app_id="12356", ods_code="RQI"),
+        path_parameters={"id": doc_pointer.id},
+    )
+
+    result = handler(event, create_mock_context())
+    body = result.pop("body")
+
+    assert result == {
+        "statusCode": "403",
+        "headers": default_response_headers(),
+        "isBase64Encoded": False,
+    }
+
+    parsed_body = json.loads(body)
+    assert parsed_body == {
+        "resourceType": "OperationOutcome",
+        "issue": [
+            {
+                "severity": "error",
+                "code": "forbidden",
+                "details": {
+                    "coding": [
+                        {
+                            "code": "ACCESS DENIED",
+                            "display": "Access has been denied to process this request",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
+                        }
+                    ]
+                },
+                "diagnostics": "The requested DocumentReference is not of a type that this organisation is allowed to access",
+            }
+        ],
+    }
+
+
+@mock_aws
+@mock_repository
+@patch("nrlf.core.decorators.get_pointer_permissions_v2")
+def test_read_document_reference_unauthorised_for_type_v2(
+    get_pointer_permissions_mock, repository: DocumentPointerRepository
+):
+    doc_ref = load_document_reference("Y05868-736253002-Valid")
+    doc_pointer = DocumentPointer.from_document_reference(doc_ref)
+    repository.create(doc_pointer)
+
+    headers = create_headers(
+        additional_headers={
+            "nhsd-end-user-organisation-ods": "Y05868",
+            "nhsd-nrl-app-id": "Y05868-TestApp-12345678",
+        }
+    )
+    headers.pop("nhsd-client-rp-details")
+
+    get_pointer_permissions_mock.return_value = {
+        "access_controls": [],
+        "types": ["http://snomed.info/sct|736373009"],
+    }
+
+    event = create_test_api_gateway_event(
+        headers=headers,
         path_parameters={"id": doc_pointer.id},
     )
 
