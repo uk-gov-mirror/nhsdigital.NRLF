@@ -118,11 +118,11 @@ Feature: Producer v2 permissions by pointer type - Success and Failure Scenarios
 
   Scenario: V2 Permissions with org-level permissions for requested type but app level permissions for other types
     Given the application 'ProducerTest004' (ID 'app-t004') is registered to access the API
-    When producer v2 'ORGA' creates a DocumentReference with values:
+    When producer v2 'ODS1' creates a DocumentReference with values:
       | property        | value                          |
       | subject         | 9278693472                     |
       | status          | current                        |
-      | type            | 749001000000101                |
+      | type            | 2181441000000107               |
       | category        | 734163000                      |
       | custodian       | ODS1                           |
       | author          | HAR1                           |

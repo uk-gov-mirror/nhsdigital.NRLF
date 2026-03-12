@@ -85,7 +85,7 @@ def add_feature_test_files(local_path):
                 [PointerTypes.EOL_CARE_PLAN.value],
                 [],
             ),  # http://snomed.info/sct|736373009
-            ("app-t004", "ODS1", [PointerTypes.PERSONALISED_CARE_AND_SUPPORT_PLAN]),
+            ("app-t004", "ODS1", [PointerTypes.PERSONALISED_CARE_AND_SUPPORT_PLAN], []),
             (
                 "z00z-y11y-x22x",
                 "4LLTYP35P",
@@ -106,7 +106,7 @@ def add_feature_test_files(local_path):
     ]
     app_permissions = {
         "consumer": [
-            ("app-t001", [PointerTypes.MENTAL_HEALTH_PLAN]),
+            ("app-t001", [PointerTypes.MENTAL_HEALTH_PLAN], []),
             (
                 "app-t002",
                 [
@@ -114,8 +114,9 @@ def add_feature_test_files(local_path):
                     PointerTypes.EMERGENCY_HEALTHCARE_PLAN,
                     PointerTypes.NEWS2_CHART,
                 ],
+                [],
             ),
-            ("app-t004", [PointerTypes.APPOINTMENT]),
+            ("app-t004", [PointerTypes.APPOINTMENT], []),
         ],
         "producer": [
             ("app-t001", [PointerTypes.EOL_COORDINATION_SUMMARY]),
@@ -126,8 +127,9 @@ def add_feature_test_files(local_path):
                     PointerTypes.EMERGENCY_HEALTHCARE_PLAN,
                     PointerTypes.NEWS2_CHART,
                 ],
+                [],
             ),
-            ("app-t004", [PointerTypes.APPOINTMENT]),
+            ("app-t004", [PointerTypes.APPOINTMENT], []),
         ],
     }
     [
@@ -135,7 +137,7 @@ def add_feature_test_files(local_path):
             Path.joinpath(local_path, actor_type), app_id, pointer_types
         )
         for actor_type, entries in app_permissions.items()
-        for app_id, pointer_types in entries
+        for app_id, pointer_types, access_controls in entries
     ]
 
 
