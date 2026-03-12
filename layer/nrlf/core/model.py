@@ -48,7 +48,15 @@ class ClientRpDetails(BaseModel):
     developer_app_id: StrictStr = Field(alias="developer.app.id")
 
 
-# expand with other permissions types: pointer_types, etc
+class PermissionsPolicy(BaseModel):
+    access_controls: list[str] = Field(default_factory=list)
+    types: list[str] = Field(default_factory=list)
+    categories: list[str] = Field(default_factory=list)
+    interactions: list[str] = Field(default_factory=list)
+    produce_for_authors: list[str] = Field(default_factory=list)
+    produce_for_custodians: list[str] = Field(default_factory=list)
+
+
 class ConnectionMetadata(BaseModel):
     pointer_types: list[str] = Field(alias="nrl.pointer-types", default_factory=list)
     ods_code: str = Field(alias="nrl.ods-code")
@@ -56,3 +64,4 @@ class ConnectionMetadata(BaseModel):
     nrl_app_id: str = Field(alias="nrl.app-id")
     is_test_event: bool = Field(alias="nrl.test-event", default=False)
     client_rp_details: ClientRpDetails
+    nrl_permissions_policy: PermissionsPolicy | None = None

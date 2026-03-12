@@ -39,9 +39,29 @@ ALLOWED_RELATES_TO_CODES = {
 }
 CLIENT_RP_DETAILS = "nhsd-client-rp-details"
 CONNECTION_METADATA = "nhsd-connection-metadata"
+
+
+class V2Headers(str, Enum):
+    NHSD_END_USER_ORGANISATION_ODS = "nhsd-end-user-organisation-ods"
+    NHSD_NRL_APP_ID = "nhsd-nrl-app-id"
+
+
 PERMISSION_AUDIT_DATES_FROM_PAYLOAD = "audit-dates-from-payload"
 PERMISSION_SUPERSEDE_IGNORE_DELETE_FAIL = "supersede-ignore-delete-fail"
 PERMISSION_ALLOW_ALL_POINTER_TYPES = "allow-all-pointer-types"
+
+
+class AccessControls(Enum):
+    ALLOW_FULL_ACCESS = "allow_full_access"
+    ALLOW_ALL_TYPES = "allow_all_types"
+    ALLOW_ALL_SUPPLIER_INTERACTIONS = "allow_all_supplier_interactions"
+    ALLOW_PRODUCE_FOR_ANY_AUTHOR = "allow_produce_for_any_author"
+    ALLOW_PRODUCE_FOR_ANY_CUSTODIAN = "allow_produce_for_any_custodian"
+    ALLOW_OVERRIDE_CREATION_DATETIME = "allow_override_creation_datetime"
+
+    @staticmethod
+    def list():
+        return [control.value for control in AccessControls]
 
 
 NHSD_REQUEST_ID_HEADER = "NHSD-Request-Id"
