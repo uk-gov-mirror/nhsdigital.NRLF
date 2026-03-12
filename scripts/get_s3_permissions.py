@@ -129,7 +129,7 @@ def add_feature_test_files(local_path):
             ("app-t004", [PointerTypes.APPOINTMENT.value], []),
         ],
         "producer": [
-            ("app-t001", [PointerTypes.EOL_COORDINATION_SUMMARY.value]),
+            ("app-t001", [PointerTypes.EOL_COORDINATION_SUMMARY.value], []),
             (
                 "app-t003",
                 [
