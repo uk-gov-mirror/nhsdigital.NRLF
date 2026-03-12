@@ -87,7 +87,7 @@ Feature: Producer v2 APP-LEVEL permissions by pointer type - Success and Failure
       | subject         | 9278693472                     |
       | status          | current                        |
       | type            | 749001000000101                |
-      | category        | 734163000                      |
+      | category        | 419891008                      |
       | custodian       | ORGA                           |
       | author          | HAR1                           |
       | url             | https://example.org/my-doc.pdf |
