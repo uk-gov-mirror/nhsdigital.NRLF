@@ -70,7 +70,12 @@ def add_feature_test_files(local_path):
                 [PointerTypes.MENTAL_HEALTH_PLAN.value],
                 [],
             ),  # http://snomed.info/sct|736253002
-            ("app-t004", "ODS1", [PointerTypes.PERSONALISED_CARE_AND_SUPPORT_PLAN], []),
+            (
+                "app-t004",
+                "ODS1",
+                [PointerTypes.PERSONALISED_CARE_AND_SUPPORT_PLAN.value],
+                [],
+            ),
             (
                 "z00z-y11y-x22x",
                 "4LLTYP35C",
@@ -85,7 +90,12 @@ def add_feature_test_files(local_path):
                 [PointerTypes.EOL_CARE_PLAN.value],
                 [],
             ),  # http://snomed.info/sct|736373009
-            ("app-t004", "ODS1", [PointerTypes.PERSONALISED_CARE_AND_SUPPORT_PLAN], []),
+            (
+                "app-t004",
+                "ODS1",
+                [PointerTypes.PERSONALISED_CARE_AND_SUPPORT_PLAN.value],
+                [],
+            ),
             (
                 "z00z-y11y-x22x",
                 "4LLTYP35P",
@@ -106,30 +116,30 @@ def add_feature_test_files(local_path):
     ]
     app_permissions = {
         "consumer": [
-            ("app-t001", [PointerTypes.MENTAL_HEALTH_PLAN], []),
+            ("app-t001", [PointerTypes.MENTAL_HEALTH_PLAN.value], []),
             (
                 "app-t002",
                 [
-                    PointerTypes.ADVANCE_CARE_PLAN,
-                    PointerTypes.EMERGENCY_HEALTHCARE_PLAN,
-                    PointerTypes.NEWS2_CHART,
+                    PointerTypes.ADVANCE_CARE_PLAN.value,
+                    PointerTypes.EMERGENCY_HEALTHCARE_PLAN.value,
+                    PointerTypes.NEWS2_CHART.value,
                 ],
                 [],
             ),
-            ("app-t004", [PointerTypes.APPOINTMENT], []),
+            ("app-t004", [PointerTypes.APPOINTMENT.value], []),
         ],
         "producer": [
-            ("app-t001", [PointerTypes.EOL_COORDINATION_SUMMARY]),
+            ("app-t001", [PointerTypes.EOL_COORDINATION_SUMMARY.value]),
             (
                 "app-t003",
                 [
-                    PointerTypes.ADVANCE_CARE_PLAN,
-                    PointerTypes.EMERGENCY_HEALTHCARE_PLAN,
-                    PointerTypes.NEWS2_CHART,
+                    PointerTypes.ADVANCE_CARE_PLAN.value,
+                    PointerTypes.EMERGENCY_HEALTHCARE_PLAN.value,
+                    PointerTypes.NEWS2_CHART.value,
                 ],
                 [],
             ),
-            ("app-t004", [PointerTypes.APPOINTMENT], []),
+            ("app-t004", [PointerTypes.APPOINTMENT.value], []),
         ],
     }
     [
