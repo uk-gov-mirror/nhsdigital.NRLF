@@ -22,9 +22,14 @@ def get_pointer_permissions_v2(
     ods_code = connection_metadata.ods_code
     app_id = connection_metadata.nrl_app_id
 
-    key = f"{producer_or_consumer}/{app_id}/{ods_code}.json"
-    logger.log(LogReference.V2PERMISSIONS011, key=key)
-
+    # check for app-wide permissions
+    app_wide_key = f"{producer_or_consumer}/{app_id}.json"
+    if path.isfile(f"/opt/python/nrlf_permissions/{app_wide_key}"):
+        logger.log(LogReference.V2PERMISSIONS011, key=app_wide_key)
+        key = app_wide_key
+    else:  # use org level
+        key = f"{producer_or_consumer}/{app_id}/{ods_code}.json"
+        logger.log(LogReference.V2PERMISSIONS011, key=key)
     file_path = f"/opt/python/nrlf_permissions/{key}"
 
     pointer_permissions = {}
