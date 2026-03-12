@@ -6,7 +6,7 @@ from pathlib import Path
 import fire
 from aws_session_assume import get_boto_session
 
-from nrlf.core.constants import PointerTypes
+from nrlf.core.constants import AccessControls, PointerTypes
 
 
 def get_file_folders(s3_client, bucket_name, prefix=""):
@@ -49,10 +49,10 @@ def add_test_files(folder, file_name, local_path):
         json.dump(PointerTypes.list(), f)
 
 
-def _write_permission_file(folder_path, ods_code, pointer_types):
+def _write_permission_file(folder_path, ods_code, pointer_types, access_controls=None):
     folder_path.mkdir(parents=True, exist_ok=True)
     with open(folder_path / f"{ods_code}.json", "w") as f:
-        json.dump({"types": pointer_types}, f)
+        json.dump({"access_controls": access_controls or [], "types": pointer_types}, f)
 
 
 def add_feature_test_files(local_path):
@@ -68,24 +68,41 @@ def add_feature_test_files(local_path):
                 "z00z-y11y-x22x",
                 "RX898",
                 [PointerTypes.MENTAL_HEALTH_PLAN.value],
+                [],
             ),  # http://snomed.info/sct|736253002
             ("app-t004", "ODS1", [PointerTypes.PERSONALISED_CARE_AND_SUPPORT_PLAN]),
+            (
+                "z00z-y11y-x22x",
+                "4LLTYP35C",
+                [],
+                [AccessControls.ALLOW_ALL_TYPES.value],
+            ),
         ],
         "producer": [
             (
                 "z00z-y11y-x22x",
                 "RX898",
                 [PointerTypes.EOL_CARE_PLAN.value],
+                [],
             ),  # http://snomed.info/sct|736373009
             ("app-t004", "ODS1", [PointerTypes.PERSONALISED_CARE_AND_SUPPORT_PLAN]),
+            (
+                "z00z-y11y-x22x",
+                "4LLTYP35P",
+                [],
+                [AccessControls.ALLOW_ALL_TYPES.value],
+            ),
         ],
     }
     [
         _write_permission_file(
-            Path.joinpath(local_path, actor_type, app_id), ods_code, pointer_types
+            Path.joinpath(local_path, actor_type, app_id),
+            ods_code,
+            pointer_types,
+            access_controls,
         )
-        for actor_type, entries in org_permissions.items()
-        for app_id, ods_code, pointer_types in entries
+        for actor_type, entries in permissions.items()
+        for app_id, ods_code, pointer_types, access_controls in entries
     ]
     app_permissions = {
         "consumer": [

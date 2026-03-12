@@ -50,11 +50,17 @@ def handler(
     base_url = f"https://{config.ENVIRONMENT}.api.service.nhs.uk/"
     self_link = f"{base_url}record-locator/consumer/FHIR/R4/DocumentReference?subject:identifier=https://fhir.nhs.uk/Id/nhs-number|{body.nhs_number}"
 
-    if not validate_type(body.type, metadata.pointer_types):
+    allowed_types = (
+        metadata.nrl_permissions_policy.types
+        if metadata.nrl_permissions_policy
+        else metadata.pointer_types
+    )
+
+    if not validate_type(body.type, allowed_types):
         logger.log(
             LogReference.CONPOSTSEARCH002,
             type=body.type,
-            pointer_types=metadata.pointer_types,
+            pointer_types=allowed_types,
         )
         return SpineErrorResponse.INVALID_CODE_SYSTEM(
             diagnostics="The provided type does not match the allowed types for this organisation",
@@ -80,7 +86,7 @@ def handler(
     if custodian_id:
         self_link += f"&custodian:identifier=https://fhir.nhs.uk/Id/ods-organization-code|{custodian_id}"
 
-    pointer_types = [body.type.root] if body.type else metadata.pointer_types
+    pointer_types = [body.type.root] if body.type else allowed_types
     if body.type:
         self_link += f"&type={body.type.root}"
 

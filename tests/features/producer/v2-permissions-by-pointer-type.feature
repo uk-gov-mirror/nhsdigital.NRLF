@@ -118,7 +118,7 @@ Feature: Producer v2 permissions by pointer type - Success and Failure Scenarios
       """
     And the resource with id 'RX898-111-DeleteDocRefTest1' does not exist
 
-  Scenario: V2 Permissions with no access for pointer type - searchDocumentReference
+  Scenario: V2 Permissions search results are scoped to allowed pointer types - searchDocumentReference
     Given a DocumentReference resource exists with values:
       | property    | value                                 |
       | id          | RX898-1111111111-SearchNHSDocRefTest1 |
@@ -131,16 +131,16 @@ Feature: Producer v2 permissions by pointer type - Success and Failure Scenarios
       | custodian   | RX898                                 |
       | author      | X26                                   |
     And a DocumentReference resource exists with values:
-      | property    | value                               |
-      | id          | SG4-1111111111-SearchNHSDocRefTest3 |
-      | subject     | 9999999999                          |
-      | status      | current                             |
-      | type        | 1363501000000100                    |
-      | category    | 734163000                           |
-      | contentType | application/pdf                     |
-      | url         | https://example.org/my-doc.pdf      |
-      | custodian   | SG4                                 |
-      | author      | X26                                 |
+      | property    | value                                 |
+      | id          | RX898-1111111111-SearchNHSDocRefTest2 |
+      | subject     | 9999999999                            |
+      | status      | current                               |
+      | type        | 1363501000000100                      |
+      | category    | 734163000                             |
+      | contentType | application/pdf                       |
+      | url         | https://example.org/my-doc.pdf        |
+      | custodian   | RX898                                 |
+      | author      | X26                                   |
     When producer v2 'RX898' searches for DocumentReferences with parameters:
       | parameter | value      |
       | subject   | 9999999999 |
@@ -159,7 +159,60 @@ Feature: Producer v2 permissions by pointer type - Success and Failure Scenarios
       | url         | https://example.org/my-doc.pdf        |
       | custodian   | RX898                                 |
       | author      | X26                                   |
-    And the Bundle does not contain a DocumentReference with ID 'SG4-1111111111-SearchNHSDocRefTest3'
+    And the Bundle does not contain a DocumentReference with ID 'RX898-1111111111-SearchNHSDocRefTest2'
+
+  Scenario: V2 Permissions search results for allow_all_types - searchDocumentReference
+    Given a DocumentReference resource exists with values:
+      | property    | value                                 |
+      | id          | RX898-1111111111-SearchNHSDocRefTest1 |
+      | subject     | 9999999999                            |
+      | status      | current                               |
+      | type        | 736373009                             |
+      | category    | 734163000                             |
+      | contentType | application/pdf                       |
+      | url         | https://example.org/my-doc.pdf        |
+      | custodian   | 4LLTYP35P                             |
+      | author      | X26                                   |
+    And a DocumentReference resource exists with values:
+      | property    | value                                 |
+      | id          | RX898-1111111111-SearchNHSDocRefTest2 |
+      | subject     | 9999999999                            |
+      | status      | current                               |
+      | type        | 1363501000000100                      |
+      | category    | 734163000                             |
+      | contentType | application/pdf                       |
+      | url         | https://example.org/my-doc.pdf        |
+      | custodian   | 4LLTYP35P                             |
+      | author      | X26                                   |
+    When producer v2 '4LLTYP35P' searches for DocumentReferences with parameters:
+      | parameter | value      |
+      | subject   | 9999999999 |
+    Then the response status code is 200
+    And the response is a searchset Bundle
+    And the Bundle has a total of 2
+    And the Bundle has 2 entries
+    And the Bundle contains an DocumentReference with values:
+      | property    | value                                 |
+      | id          | RX898-1111111111-SearchNHSDocRefTest1 |
+      | subject     | 9999999999                            |
+      | status      | current                               |
+      | type        | 736373009                             |
+      | category    | 734163000                             |
+      | contentType | application/pdf                       |
+      | url         | https://example.org/my-doc.pdf        |
+      | custodian   | 4LLTYP35P                             |
+      | author      | X26                                   |
+    And the Bundle contains an DocumentReference with values:
+      | property    | value                                 |
+      | id          | RX898-1111111111-SearchNHSDocRefTest2 |
+      | subject     | 9999999999                            |
+      | status      | current                               |
+      | type        | 1363501000000100                      |
+      | category    | 734163000                             |
+      | contentType | application/pdf                       |
+      | url         | https://example.org/my-doc.pdf        |
+      | custodian   | 4LLTYP35P                             |
+      | author      | X26                                   |
 
   Scenario: V2 Permissions with no access for org - searchDocumentReference
     Given a DocumentReference resource exists with values:

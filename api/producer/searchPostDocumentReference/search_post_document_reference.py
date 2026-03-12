@@ -46,11 +46,17 @@ def handler(
             expression="subject:identifier",
         )
 
-    if not validate_type(body.type, metadata.pointer_types):
+    allowed_types = (
+        metadata.nrl_permissions_policy.types
+        if metadata.nrl_permissions_policy
+        else metadata.pointer_types
+    )
+
+    if not validate_type(body.type, allowed_types):
         logger.log(
             LogReference.PROPOSTSEARCH002,
             type=body.type,
-            pointer_types=metadata.pointer_types,
+            pointer_types=allowed_types,
         )
         return SpineErrorResponse.INVALID_CODE_SYSTEM(
             diagnostics="The provided type does not match the allowed types for this organisation",
@@ -68,7 +74,7 @@ def handler(
             expression="category",
         )
 
-    pointer_types = [body.type.root] if body.type else metadata.pointer_types
+    pointer_types = [body.type.root] if body.type else allowed_types
     bundle = {"resourceType": "Bundle", "type": "searchset", "total": 0, "entry": []}
 
     logger.log(
