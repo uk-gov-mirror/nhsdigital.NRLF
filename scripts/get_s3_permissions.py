@@ -70,7 +70,7 @@ def add_feature_test_files(local_path):
                 [PointerTypes.MENTAL_HEALTH_PLAN.value],
                 [],
             ),  # http://snomed.info/sct|736253002
-            ("app-t004", "ODS1", [PointerTypes.PERSONALISED_CARE_AND_SUPPORT_PLAN]),
+            ("app-t004", "ODS1", [PointerTypes.PERSONALISED_CARE_AND_SUPPORT_PLAN], []),
             (
                 "z00z-y11y-x22x",
                 "4LLTYP35C",
@@ -134,7 +134,10 @@ def add_feature_test_files(local_path):
     }
     [
         _write_permission_file(
-            Path.joinpath(local_path, actor_type), app_id, pointer_types
+            Path.joinpath(local_path, actor_type),
+            app_id,
+            pointer_types,
+            access_controls,
         )
         for actor_type, entries in app_permissions.items()
         for app_id, pointer_types, access_controls in entries
