@@ -101,7 +101,7 @@ def add_feature_test_files(local_path):
             pointer_types,
             access_controls,
         )
-        for actor_type, entries in permissions.items()
+        for actor_type, entries in org_permissions.items()
         for app_id, ods_code, pointer_types, access_controls in entries
     ]
     app_permissions = {
