@@ -62,7 +62,7 @@ def add_feature_test_files(local_path):
     """
 
     print("Adding feature test v2 permissions to temporary directory...")
-    permissions = {
+    org_permissions = {
         "consumer": [
             (
                 "z00z-y11y-x22x",
@@ -70,6 +70,12 @@ def add_feature_test_files(local_path):
                 [PointerTypes.MENTAL_HEALTH_PLAN.value],
                 [],
             ),  # http://snomed.info/sct|736253002
+            (
+                "app-t004",
+                "ODS1",
+                [PointerTypes.PERSONALISED_CARE_AND_SUPPORT_PLAN.value],
+                [],
+            ),
             (
                 "z00z-y11y-x22x",
                 "4LLTYP35C",
@@ -85,6 +91,12 @@ def add_feature_test_files(local_path):
                 [],
             ),  # http://snomed.info/sct|736373009
             (
+                "app-t004",
+                "ODS1",
+                [PointerTypes.PERSONALISED_CARE_AND_SUPPORT_PLAN.value],
+                [],
+            ),
+            (
                 "z00z-y11y-x22x",
                 "4LLTYP35P",
                 [],
@@ -99,8 +111,46 @@ def add_feature_test_files(local_path):
             pointer_types,
             access_controls,
         )
-        for actor_type, entries in permissions.items()
+        for actor_type, entries in org_permissions.items()
         for app_id, ods_code, pointer_types, access_controls in entries
+    ]
+    app_permissions = {
+        "consumer": [
+            ("app-t001", [PointerTypes.MENTAL_HEALTH_PLAN.value], []),
+            (
+                "app-t002",
+                [
+                    PointerTypes.ADVANCE_CARE_PLAN.value,
+                    PointerTypes.EMERGENCY_HEALTHCARE_PLAN.value,
+                    PointerTypes.NEWS2_CHART.value,
+                ],
+                [],
+            ),
+            ("app-t004", [PointerTypes.APPOINTMENT.value], []),
+        ],
+        "producer": [
+            ("app-t001", [PointerTypes.EOL_COORDINATION_SUMMARY.value], []),
+            (
+                "app-t003",
+                [
+                    PointerTypes.ADVANCE_CARE_PLAN.value,
+                    PointerTypes.EMERGENCY_HEALTHCARE_PLAN.value,
+                    PointerTypes.NEWS2_CHART.value,
+                ],
+                [],
+            ),
+            ("app-t004", [PointerTypes.APPOINTMENT.value], []),
+        ],
+    }
+    [
+        _write_permission_file(
+            Path.joinpath(local_path, actor_type),
+            app_id,
+            pointer_types,
+            access_controls,
+        )
+        for actor_type, entries in app_permissions.items()
+        for app_id, pointer_types, access_controls in entries
     ]
 
 
