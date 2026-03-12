@@ -1,9 +1,8 @@
-Feature: Producer v2 permissions by pointer type - Success and Failure Scenarios
+Feature: Producer v2 APP-LEVEL permissions by pointer type - Success and Failure Scenarios
   For the v2 permissions model, permissions are resolved from a JSON file stored in the
   nrlf_permissions Lambda layer.  Permissions for the feature tests are baked into the layer by
   `scripts/get_s3_permissions.py` at build time, so no dynamic seeding step is required for
   success scenarios.
-
 
   Scenario: HAPPY PATH V2 Permissions with access for pointer type - createDocumentReference
     Given the application 'ProducerTest001' (ID 'app-t001') is registered to access the API
@@ -37,7 +36,7 @@ Feature: Producer v2 permissions by pointer type - Success and Failure Scenarios
       }
       """
     And the response has a Location header
-    And the Location header starts with '/DocumentReference/RX898-'
+    And the Location header starts with '/DocumentReference/ORGA-'
     And the resource in the Location header exists with values:
       | property        | value                          |
       | subject         | 9278693472                     |
@@ -87,7 +86,7 @@ Feature: Producer v2 permissions by pointer type - Success and Failure Scenarios
       | property        | value                          |
       | subject         | 9278693472                     |
       | status          | current                        |
-      | type            | 736366004                      |
+      | type            | 749001000000101                |
       | category        | 734163000                      |
       | custodian       | ORGA                           |
       | author          | HAR1                           |
