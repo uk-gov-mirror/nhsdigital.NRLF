@@ -12,9 +12,11 @@ from api.producer.upsertDocumentReference.upsert_document_reference import (
 from nrlf.core.constants import (
     CLIENT_RP_DETAILS,
     PERMISSION_SUPERSEDE_IGNORE_DELETE_FAIL,
+    AccessControls,
     V2Headers,
 )
 from nrlf.core.dynamodb.repository import DocumentPointer, DocumentPointerRepository
+from nrlf.core.model import ConnectionMetadata, PermissionsPolicy
 from nrlf.producer.fhir.r4.model import (
     DocumentReferenceRelatesTo,
     Identifier,
@@ -1773,9 +1775,19 @@ def test_upsert_document_reference_with_date_overridden(
 def test__set_create_time_fields(doc_ref_name: str):
     test_time = "2024-03-24T12:34:56.789Z"
     test_doc_ref = load_document_reference(doc_ref_name)
-    test_perms = []
+    test_metadata = ConnectionMetadata.model_validate(
+        {
+            "nrl.ods-code": "Y05868",
+            "nrl.permissions": [],
+            "nrl.app-id": "Y05868-TestApp",
+            "client_rp_details": {
+                "developer.app.name": "TestApp",
+                "developer.app.id": "12345",
+            },
+        }
+    )
 
-    response = _set_upsert_time_fields(test_time, test_doc_ref, test_perms)
+    response = _set_upsert_time_fields(test_time, test_doc_ref, test_metadata)
 
     assert response.model_dump(exclude_none=True) == {
         **test_doc_ref.model_dump(exclude_none=True),
@@ -1794,12 +1806,22 @@ def test__set_create_time_fields(doc_ref_name: str):
         "Y05868-736253002-Valid-with-date-and-meta-lastupdated",
     ],
 )
-def test__set_create_time_fields_when_doc_has_date_and_perms(doc_ref_name: str):
+def test__set_create_time_fields_when_doc_has_date_and_v1_perms(doc_ref_name: str):
     test_time = "2024-03-24T12:34:56.789Z"
     test_doc_ref = load_document_reference(doc_ref_name)
-    test_perms = ["audit-dates-from-payload"]
+    test_metadata = ConnectionMetadata.model_validate(
+        {
+            "nrl.ods-code": "Y05868",
+            "nrl.permissions": ["audit-dates-from-payload"],
+            "nrl.app-id": "Y05868-TestApp",
+            "client_rp_details": {
+                "developer.app.name": "TestApp",
+                "developer.app.id": "12345",
+            },
+        }
+    )
 
-    response = _set_upsert_time_fields(test_time, test_doc_ref, test_perms)
+    response = _set_upsert_time_fields(test_time, test_doc_ref, test_metadata)
 
     assert response.model_dump(exclude_none=True) == {
         **test_doc_ref.model_dump(exclude_none=True),
@@ -1811,12 +1833,93 @@ def test__set_create_time_fields_when_doc_has_date_and_perms(doc_ref_name: str):
 
 
 @freeze_time("2024-03-25")
-def test__set_create_time_fields_when_no_date_but_perms():
+def test__set_create_time_fields_when_no_date_but_v1_perms():
     test_time = "2024-03-24T12:34:56.789Z"
     test_doc_ref = load_document_reference("Y05868-736253002-Valid")
-    test_perms = ["audit-dates-from-payload"]
+    test_metadata = ConnectionMetadata.model_validate(
+        {
+            "nrl.ods-code": "Y05868",
+            "nrl.permissions": ["audit-dates-from-payload"],
+            "nrl.app-id": "Y05868-TestApp",
+            "client_rp_details": {
+                "developer.app.name": "TestApp",
+                "developer.app.id": "12345",
+            },
+        }
+    )
 
-    response = _set_upsert_time_fields(test_time, test_doc_ref, test_perms)
+    response = _set_upsert_time_fields(test_time, test_doc_ref, test_metadata)
+
+    assert response.model_dump(exclude_none=True) == {
+        **test_doc_ref.model_dump(exclude_none=True),
+        "meta": {
+            "lastUpdated": test_time,
+        },
+        "date": test_time,
+    }
+
+
+@freeze_time("2024-03-25")
+@mark.parametrize(
+    "doc_ref_name",
+    [
+        "Y05868-736253002-Valid-with-date",
+        "Y05868-736253002-Valid-with-date-and-meta-lastupdated",
+    ],
+)
+def test__set_upsert_time_fields_v2_when_doc_has_date_and_access_control(
+    doc_ref_name: str,
+):
+    test_time = "2024-03-24T12:34:56.789Z"
+    test_doc_ref = load_document_reference(doc_ref_name)
+    test_metadata = ConnectionMetadata.model_validate(
+        {
+            "nrl.ods-code": "Y05868",
+            "nrl.permissions": [],
+            "nrl.app-id": "Y05868-TestApp",
+            "client_rp_details": {
+                "developer.app.name": "TestApp",
+                "developer.app.id": "12345",
+            },
+            "nrl_permissions_policy": {
+                "access_controls": [
+                    AccessControls.ALLOW_OVERRIDE_CREATION_DATETIME.value
+                ]
+            },
+        }
+    )
+
+    response = _set_upsert_time_fields(test_time, test_doc_ref, test_metadata)
+
+    assert response.model_dump(exclude_none=True) == {
+        **test_doc_ref.model_dump(exclude_none=True),
+        "meta": {
+            "lastUpdated": test_time,
+        },
+        "date": test_doc_ref.date,
+    }
+
+
+@freeze_time("2024-03-25")
+def test__set_upsert_time_fields_v2_when_no_date_but_access_control():
+    test_time = "2024-03-24T12:34:56.789Z"
+    test_doc_ref = load_document_reference("Y05868-736253002-Valid")
+    test_metadata = ConnectionMetadata.model_validate(
+        {
+            "nrl.ods-code": "Y05868",
+            "nrl.permissions": [],
+            "nrl.app-id": "Y05868-TestApp",
+            "client_rp_details": {
+                "developer.app.name": "TestApp",
+                "developer.app.id": "12345",
+            },
+        }
+    )
+    test_metadata.nrl_permissions_policy = PermissionsPolicy(
+        access_controls=[AccessControls.ALLOW_OVERRIDE_CREATION_DATETIME.value]
+    )
+
+    response = _set_upsert_time_fields(test_time, test_doc_ref, test_metadata)
 
     assert response.model_dump(exclude_none=True) == {
         **test_doc_ref.model_dump(exclude_none=True),

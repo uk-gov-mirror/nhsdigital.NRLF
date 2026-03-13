@@ -100,7 +100,10 @@ def add_feature_test_files(local_path):
                 "z00z-y11y-x22x",
                 "4LLTYP35P",
                 [],
-                [AccessControls.ALLOW_ALL_TYPES.value],
+                [
+                    AccessControls.ALLOW_ALL_TYPES.value,
+                    AccessControls.ALLOW_OVERRIDE_CREATION_DATETIME.value,
+                ],
             ),
         ],
     }

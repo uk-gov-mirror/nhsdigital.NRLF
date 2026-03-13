@@ -3,6 +3,7 @@ from nrlf.core.constants import (
     PERMISSION_AUDIT_DATES_FROM_PAYLOAD,
     PERMISSION_SUPERSEDE_IGNORE_DELETE_FAIL,
     TYPES_WITH_MULTIPLES,
+    AccessControls,
 )
 from nrlf.core.decorators import request_handler
 from nrlf.core.dynamodb.repository import DocumentPointer, DocumentPointerRepository
@@ -16,7 +17,9 @@ from nrlf.producer.fhir.r4.model import DocumentReference, Meta
 
 
 def _set_upsert_time_fields(
-    upsert_time: str, document_reference: DocumentReference, nrl_permissions: list[str]
+    upsert_time: str,
+    document_reference: DocumentReference,
+    metadata: ConnectionMetadata,
 ) -> DocumentReference:
     """
     Set the date and lastUpdated timestamps on the provided DocumentReference
@@ -25,11 +28,15 @@ def _set_upsert_time_fields(
         document_reference.meta = Meta()
     document_reference.meta.lastUpdated = upsert_time
 
-    if (
-        document_reference.date
-        and PERMISSION_AUDIT_DATES_FROM_PAYLOAD in nrl_permissions
-    ):
-        # Perserving the original date if it exists and the permission is set
+    can_override_creation_datetime = (
+        AccessControls.ALLOW_OVERRIDE_CREATION_DATETIME.value
+        in metadata.nrl_permissions_policy.access_controls
+        if metadata.nrl_permissions_policy
+        else PERMISSION_AUDIT_DATES_FROM_PAYLOAD in metadata.nrl_permissions
+    )
+
+    if document_reference.date and can_override_creation_datetime:
+        # Preserving the original date if it exists and the permission is set
         logger.log(
             LogReference.PROUPSERT011,
             id=document_reference.id,
@@ -49,7 +56,7 @@ def _create_core_model(resource: DocumentReference, metadata: ConnectionMetadata
     document_reference = _set_upsert_time_fields(
         creation_time,
         document_reference=resource,
-        nrl_permissions=metadata.nrl_permissions,
+        metadata=metadata,
     )
 
     return DocumentPointer.from_document_reference(
