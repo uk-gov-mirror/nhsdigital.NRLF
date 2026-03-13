@@ -1,10 +1,13 @@
 ---
 repos:
-  - repo: https://github.com/Yelp/detect-secrets
-    rev: 001e16323a2f0162336345f4ceb6d72c204980b5 # v1.4.0
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: 83d9cd684c87d95d656c1458ef04895a7f1cbd8e # v8.30.1
     hooks:
-      - id: detect-secrets
-        exclude: .pre-commit-config.yaml|layer/psycopg2/.*
+      - id: gitleaks
+        name: Detect secrets using Gitleaks
+        description: Detect hardcoded secrets in your changes using Gitleaks
+        entry: gitleaks git --pre-commit --redact --staged --verbose
+        language: golang
 
   - repo: https://github.com/prettier/pre-commit
     rev: 57f39166b5a5a504d6808b87ab98d41ebf095b46
