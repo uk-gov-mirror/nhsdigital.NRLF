@@ -15,6 +15,16 @@ report/
 *.cer
 *.csr
 *.crt
+*.p12
+*.pfx
+
+# Other potential secret files
+.env
+.env.*
+*_rsa
+*_dsa
+*_ecdsa
+*_ed25519
 
 # .tfstate files
 *.tfstate
