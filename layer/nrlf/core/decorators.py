@@ -147,11 +147,17 @@ RepositoryType = Union[Type[DocumentPointerRepository], None]
 
 def _use_v2_permissions_model(headers: Dict[str, str]) -> bool:
     case_insensitive_headers = {key.lower(): value for key, value in headers.items()}
-    # if either or both headers are missing
-    return (
-        CLIENT_RP_DETAILS not in case_insensitive_headers.keys()
-        or CONNECTION_METADATA not in case_insensitive_headers.keys()
+
+    v1_headers_provided = (
+        CLIENT_RP_DETAILS in case_insensitive_headers.keys()
+        and CONNECTION_METADATA in case_insensitive_headers.keys()
     )
+    if v1_headers_provided:
+        return False
+
+    v2_permissions_configured = get_pointer_permissions_v2() != {}
+
+    return v2_permissions_configured
 
 
 def _load_v2_connection_metadata(headers: Dict[str, str], path: str):
