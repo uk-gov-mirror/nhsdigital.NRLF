@@ -6,7 +6,7 @@ from pathlib import Path
 import fire
 from aws_session_assume import get_boto_session
 
-from nrlf.core.constants import PointerTypes
+from nrlf.core.constants import AccessControls, PointerTypes
 
 
 def get_file_folders(s3_client, bucket_name, prefix=""):
@@ -49,10 +49,10 @@ def add_test_files(folder, file_name, local_path):
         json.dump(PointerTypes.list(), f)
 
 
-def _write_permission_file(folder_path, ods_code, pointer_types):
+def _write_permission_file(folder_path, ods_code, pointer_types, access_controls=None):
     folder_path.mkdir(parents=True, exist_ok=True)
     with open(folder_path / f"{ods_code}.json", "w") as f:
-        json.dump({"types": pointer_types}, f)
+        json.dump({"access_controls": access_controls or [], "types": pointer_types}, f)
 
 
 def add_feature_test_files(local_path):
@@ -62,28 +62,98 @@ def add_feature_test_files(local_path):
     """
 
     print("Adding feature test v2 permissions to temporary directory...")
-    permissions = {
+    org_permissions = {
         "consumer": [
             (
                 "z00z-y11y-x22x",
                 "RX898",
                 [PointerTypes.MENTAL_HEALTH_PLAN.value],
+                [],
             ),  # http://snomed.info/sct|736253002
+            (
+                "app-t004",
+                "ODS1",
+                [PointerTypes.PERSONALISED_CARE_AND_SUPPORT_PLAN.value],
+                [],
+            ),
+            (
+                "z00z-y11y-x22x",
+                "4LLTYP35C",
+                [],
+                [AccessControls.ALLOW_ALL_TYPES.value],
+            ),
         ],
         "producer": [
             (
                 "z00z-y11y-x22x",
                 "RX898",
                 [PointerTypes.EOL_CARE_PLAN.value],
+                [],
             ),  # http://snomed.info/sct|736373009
+            (
+                "app-t004",
+                "ODS1",
+                [PointerTypes.PERSONALISED_CARE_AND_SUPPORT_PLAN.value],
+                [],
+            ),
+            (
+                "z00z-y11y-x22x",
+                "4LLTYP35P",
+                [],
+                [
+                    AccessControls.ALLOW_ALL_TYPES.value,
+                    AccessControls.ALLOW_OVERRIDE_CREATION_DATETIME.value,
+                ],
+            ),
         ],
     }
     [
         _write_permission_file(
-            Path.joinpath(local_path, actor_type, app_id), ods_code, pointer_types
+            Path.joinpath(local_path, actor_type, app_id),
+            ods_code,
+            pointer_types,
+            access_controls,
         )
-        for actor_type, entries in permissions.items()
-        for app_id, ods_code, pointer_types in entries
+        for actor_type, entries in org_permissions.items()
+        for app_id, ods_code, pointer_types, access_controls in entries
+    ]
+    app_permissions = {
+        "consumer": [
+            ("app-t001", [PointerTypes.MENTAL_HEALTH_PLAN.value], []),
+            (
+                "app-t002",
+                [
+                    PointerTypes.ADVANCE_CARE_PLAN.value,
+                    PointerTypes.EMERGENCY_HEALTHCARE_PLAN.value,
+                    PointerTypes.NEWS2_CHART.value,
+                ],
+                [],
+            ),
+            ("app-t004", [PointerTypes.APPOINTMENT.value], []),
+        ],
+        "producer": [
+            ("app-t001", [PointerTypes.EOL_COORDINATION_SUMMARY.value], []),
+            (
+                "app-t003",
+                [
+                    PointerTypes.ADVANCE_CARE_PLAN.value,
+                    PointerTypes.EMERGENCY_HEALTHCARE_PLAN.value,
+                    PointerTypes.NEWS2_CHART.value,
+                ],
+                [],
+            ),
+            ("app-t004", [PointerTypes.APPOINTMENT.value], []),
+        ],
+    }
+    [
+        _write_permission_file(
+            Path.joinpath(local_path, actor_type),
+            app_id,
+            pointer_types,
+            access_controls,
+        )
+        for actor_type, entries in app_permissions.items()
+        for app_id, pointer_types, access_controls in entries
     ]
 
 

@@ -7,9 +7,11 @@ from api.consumer.searchDocumentReference.search_document_reference import handl
 from nrlf.consumer.fhir.r4.model import CodeableConcept, Identifier
 from nrlf.core.constants import (
     CATEGORY_ATTRIBUTES,
+    CLIENT_RP_DETAILS,
     TYPE_ATTRIBUTES,
     Categories,
     PointerTypes,
+    V2Headers,
 )
 from nrlf.core.dynamodb.repository import DocumentPointer, DocumentPointerRepository
 from nrlf.tests.data import load_document_reference
@@ -49,6 +51,60 @@ def test_search_document_reference_happy_path(
 
     parsed_body = json.loads(body)
 
+    assert parsed_body == {
+        "resourceType": "Bundle",
+        "type": "searchset",
+        "link": [
+            {
+                "relation": "self",
+                "url": "https://pytest.api.service.nhs.uk/record-locator/consumer/FHIR/R4/DocumentReference?subject:identifier=https://fhir.nhs.uk/Id/nhs-number|6700028191",
+            }
+        ],
+        "total": 1,
+        "entry": [{"resource": doc_ref.model_dump(exclude_none=True)}],
+    }
+
+
+@mock_aws
+@mock_repository
+@patch("nrlf.core.decorators.get_pointer_permissions_v2")
+def test_search_document_reference_happy_path_v2(
+    get_pointer_permissions_mock, repository: DocumentPointerRepository
+):
+    doc_ref = load_document_reference("Y05868-736253002-Valid")
+    doc_pointer = DocumentPointer.from_document_reference(doc_ref)
+    repository.create(doc_pointer)
+
+    v2_headers = create_headers(
+        additional_headers={
+            V2Headers.NHSD_END_USER_ORGANISATION_ODS: "Y05868",
+            V2Headers.NHSD_NRL_APP_ID: "Y05868-TestApp-12345678",
+        }
+    )
+    v2_headers.pop(CLIENT_RP_DETAILS)
+
+    get_pointer_permissions_mock.return_value = {
+        "access_controls": [],
+        "types": ["http://snomed.info/sct|736253002"],
+    }
+
+    event = create_test_api_gateway_event(
+        headers=v2_headers,
+        query_string_parameters={
+            "subject:identifier": "https://fhir.nhs.uk/Id/nhs-number|6700028191",
+        },
+    )
+
+    result = handler(event, create_mock_context())
+    body = result.pop("body")
+
+    assert result == {
+        "statusCode": "200",
+        "headers": default_response_headers(),
+        "isBase64Encoded": False,
+    }
+
+    parsed_body = json.loads(body)
     assert parsed_body == {
         "resourceType": "Bundle",
         "type": "searchset",
@@ -645,6 +701,65 @@ def test_search_document_reference_invalid_type(
         query_string_parameters={
             "subject:identifier": "https://fhir.nhs.uk/Id/nhs-number|6700028191",
             "type": "https://fhir.nhs.uk/CodeSystem/Document-Type|invalid",
+        },
+    )
+
+    result = handler(event, create_mock_context())
+    body = result.pop("body")
+
+    assert result == {
+        "statusCode": "400",
+        "headers": default_response_headers(),
+        "isBase64Encoded": False,
+    }
+
+    parsed_body = json.loads(body)
+    assert parsed_body == {
+        "resourceType": "OperationOutcome",
+        "issue": [
+            {
+                "severity": "error",
+                "code": "code-invalid",
+                "details": {
+                    "coding": [
+                        {
+                            "code": "INVALID_CODE_SYSTEM",
+                            "display": "Invalid code system",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
+                        }
+                    ]
+                },
+                "diagnostics": "Invalid query parameter (The provided type does not match the allowed types for this organisation)",
+                "expression": ["type"],
+            }
+        ],
+    }
+
+
+@mock_aws
+@mock_repository
+@patch("nrlf.core.decorators.get_pointer_permissions_v2")
+def test_search_document_reference_invalid_type_v2(
+    get_pointer_permissions_mock, repository: DocumentPointerRepository
+):
+    v2_headers = create_headers(
+        additional_headers={
+            V2Headers.NHSD_END_USER_ORGANISATION_ODS: "Y05868",
+            V2Headers.NHSD_NRL_APP_ID: "Y05868-TestApp-12345678",
+        }
+    )
+    v2_headers.pop(CLIENT_RP_DETAILS)
+
+    get_pointer_permissions_mock.return_value = {
+        "access_controls": [],
+        "types": ["http://snomed.info/sct|736253002"],
+    }
+
+    event = create_test_api_gateway_event(
+        headers=v2_headers,
+        query_string_parameters={
+            "subject:identifier": "https://fhir.nhs.uk/Id/nhs-number|6700028191",
+            "type": "http://snomed.info/sct|861421000000109",
         },
     )
 

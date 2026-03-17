@@ -210,3 +210,79 @@ Feature: Consumer v2 permissions by pointer type - Success and Failure Scenarios
         "expression": ["type"]
       }
       """
+
+  Scenario: V2 permissions with access all pointer types retrieves expected document references - searchPostDocumentReference
+    Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
+    And a DocumentReference resource exists with values:
+      | property    | value                              |
+      | id          | X26-5900056201-SearchMultipleType1 |
+      | subject     | 9000000378                         |
+      | status      | current                            |
+      | type        | 736253002                          |
+      | category    | 734163000                          |
+      | contentType | application/pdf                    |
+      | url         | https://example.org/my-doc-1.pdf   |
+      | custodian   | X26                                |
+      | author      | X26                                |
+    And a DocumentReference resource exists with values:
+      | property    | value                              |
+      | id          | X26-5900056201-SearchMultipleType2 |
+      | subject     | 9000000378                         |
+      | status      | current                            |
+      | type        | 1382601000000107                   |
+      | category    | 734163000                          |
+      | contentType | application/pdf                    |
+      | url         | https://example.org/my-doc-2.pdf   |
+      | custodian   | X26                                |
+      | author      | X26                                |
+    And a DocumentReference resource exists with values:
+      | property    | value                              |
+      | id          | X26-5900056201-SearchMultipleType3 |
+      | subject     | 9000000378                         |
+      | status      | current                            |
+      | type        | 736373009                          |
+      | category    | 734163000                          |
+      | contentType | application/pdf                    |
+      | url         | https://example.org/my-doc-3.pdf   |
+      | custodian   | X26                                |
+      | author      | X26                                |
+    When consumer v2 '4LLTYP35C' searches for DocumentReferences using POST with request body:
+      | key     | value      |
+      | subject | 9000000378 |
+    Then the response status code is 200
+    And the response is a searchset Bundle
+    And the Bundle has a total of 3
+    And the Bundle has 3 entries
+    And the Bundle contains an DocumentReference with values
+      | property    | value                              |
+      | id          | X26-5900056201-SearchMultipleType1 |
+      | subject     | 9000000378                         |
+      | status      | current                            |
+      | type        | 736253002                          |
+      | category    | 734163000                          |
+      | contentType | application/pdf                    |
+      | url         | https://example.org/my-doc-1.pdf   |
+      | custodian   | X26                                |
+      | author      | X26                                |
+    And the Bundle contains an DocumentReference with values
+      | property    | value                              |
+      | id          | X26-5900056201-SearchMultipleType2 |
+      | subject     | 9000000378                         |
+      | status      | current                            |
+      | type        | 1382601000000107                   |
+      | category    | 734163000                          |
+      | contentType | application/pdf                    |
+      | url         | https://example.org/my-doc-2.pdf   |
+      | custodian   | X26                                |
+      | author      | X26                                |
+    And the Bundle contains an DocumentReference with values
+      | property    | value                              |
+      | id          | X26-5900056201-SearchMultipleType3 |
+      | subject     | 9000000378                         |
+      | status      | current                            |
+      | type        | 736373009                          |
+      | category    | 734163000                          |
+      | contentType | application/pdf                    |
+      | url         | https://example.org/my-doc-3.pdf   |
+      | custodian   | X26                                |
+      | author      | X26                                |

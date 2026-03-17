@@ -45,12 +45,18 @@ def handler(
             diagnostics="The requested DocumentReference could not be found"
         )
 
-    if result.type not in metadata.pointer_types:
+    allowed_types = (
+        metadata.nrl_permissions_policy.types
+        if metadata.nrl_permissions_policy
+        else metadata.pointer_types
+    )
+
+    if result.type not in allowed_types:
         logger.log(
             LogReference.CONREAD002,
             ods_code=metadata.ods_code,
             type=result.type,
-            pointer_types=metadata.pointer_types,
+            pointer_types=allowed_types,
         )
         return SpineErrorResponse.ACCESS_DENIED(
             diagnostics="The requested DocumentReference is not of a type that this organisation is allowed to access"
