@@ -90,10 +90,6 @@ class LogReference(Enum):
     V2PERMISSIONS013 = _Reference(
         "WARN", "No v2 permissions file found in lambda layer"
     )
-    V2PERMISSIONS014 = _Reference(
-        "EXCEPTION",
-        "An error occurred whilst retrieving v2 pointer permissions",
-    )
 
     # Parse Logs
     PARSE000 = _Reference("DEBUG", "Attempting to parse data against model")

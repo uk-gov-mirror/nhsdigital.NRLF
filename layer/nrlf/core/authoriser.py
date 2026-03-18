@@ -38,7 +38,7 @@ def get_pointer_permissions_v2(
             pointer_permissions = json.load(file)
     except Exception as exc:
         logger.log(
-            LogReference.V2PERMISSIONS014,
+            LogReference.S3PERMISSIONS005,
             exc_info=sys.exc_info(),
             stacklevel=5,
             error=str(exc),
