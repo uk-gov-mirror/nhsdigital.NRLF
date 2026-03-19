@@ -156,9 +156,11 @@ def _use_v2_permissions_model(headers: Dict[str, str]) -> bool:
 
 def _load_v2_connection_metadata(headers: Dict[str, str], path: str):
     logger.log(LogReference.HANDLER004d)
-    metadata = parse_headers(headers, use_v2_permissions=True)
 
-    logger.log(LogReference.HANDLER004e)
+    metadata = parse_headers(headers, use_v2_permissions=True)
+    logger.log(LogReference.HANDLER003, metadata=metadata.model_dump())
+
+    logger.log(LogReference.HANDLER004b)
     pointer_permissions = get_pointer_permissions_v2(metadata, path)
 
     metadata.nrl_permissions_policy = PermissionsPolicy.model_validate(
@@ -169,10 +171,11 @@ def _load_v2_connection_metadata(headers: Dict[str, str], path: str):
         AccessControls.ALLOW_ALL_TYPES.value
         in metadata.nrl_permissions_policy.access_controls
     ):
+        logger.log(LogReference.HANDLER004a)
         metadata.nrl_permissions_policy.types = PointerTypes.list()
 
     logger.log(
-        LogReference.HANDLER004f,
+        LogReference.HANDLER004c,
         permissions_policy=(
             metadata.nrl_permissions_policy.model_dump()
             if metadata.nrl_permissions_policy
@@ -184,13 +187,16 @@ def _load_v2_connection_metadata(headers: Dict[str, str], path: str):
 
 
 def load_connection_metadata(headers: Dict[str, str], config: Config, path=""):
+    logger.log(LogReference.HANDLER002, headers=headers)
 
     if _use_v2_permissions_model(headers):
         return _load_v2_connection_metadata(headers, path)
 
     metadata = parse_headers(headers, use_v2_permissions=False)
+    logger.log(LogReference.HANDLER003, metadata=metadata.model_dump())
+
     if PERMISSION_ALLOW_ALL_POINTER_TYPES in metadata.nrl_permissions:
-        logger.log(LogReference.HANDLER004b)
+        logger.log(LogReference.HANDLER004a)
         metadata.pointer_types = PointerTypes.list()
         return metadata
 

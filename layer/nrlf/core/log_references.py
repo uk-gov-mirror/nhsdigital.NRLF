@@ -30,11 +30,9 @@ class LogReference(Enum):
     )
     HANDLER004 = _Reference("INFO", "Authorisation lookup enabled")
     HANDLER004a = _Reference("INFO", "Authorisation lookup skipped for sync request")
-    HANDLER004b = _Reference("INFO", "Parsing embedded permissions file from S3")
-    HANDLER004c = _Reference("INFO", "Parsed embedded permissions file from S3")
+    HANDLER004b = _Reference("INFO", "Parsing embedded permissions file")
+    HANDLER004c = _Reference("INFO", "Parsed embedded permissions file")
     HANDLER004d = _Reference("INFO", "Using v2 permissions model")
-    HANDLER004e = _Reference("INFO", "Parsing v2 permissions file from lambda layer")
-    HANDLER004f = _Reference("INFO", "Parsed v2 permissions file from lambda layer")
     HANDLER005 = _Reference("WARN", "Rejecting request due to missing pointer types")
     HANDLER006 = _Reference("DEBUG", "Attempting to parse request parameters")
     HANDLER007 = _Reference("INFO", "Parsed request parameters")
@@ -91,10 +89,6 @@ class LogReference(Enum):
     )
     V2PERMISSIONS013 = _Reference(
         "WARN", "No v2 permissions file found in lambda layer"
-    )
-    V2PERMISSIONS014 = _Reference(
-        "EXCEPTION",
-        "An error occurred whilst retrieving v2 pointer permissions",
     )
 
     # Parse Logs
