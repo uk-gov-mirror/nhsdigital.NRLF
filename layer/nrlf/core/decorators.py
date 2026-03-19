@@ -19,14 +19,13 @@ from nrlf.core.authoriser import (
 from nrlf.core.codes import SpineErrorConcept
 from nrlf.core.config import Config
 from nrlf.core.constants import (
-    CLIENT_RP_DETAILS,
-    CONNECTION_METADATA,
     NHSD_CORRELATION_ID_HEADER,
     PERMISSION_ALLOW_ALL_POINTER_TYPES,
     X_CORRELATION_ID_HEADER,
     X_REQUEST_ID_HEADER,
     AccessControls,
     PointerTypes,
+    V2Headers,
 )
 from nrlf.core.dynamodb.repository import DocumentPointerRepository
 from nrlf.core.errors import OperationOutcomeError, ParseError
@@ -145,17 +144,18 @@ def logger_initialiser(
 RepositoryType = Union[Type[DocumentPointerRepository], None]
 
 
-def _use_v2_permissions_model(headers: Dict[str, str]) -> bool:
+def _use_v2_permissions_model(headers: Dict[str, str], path: str) -> bool:
     case_insensitive_headers = {key.lower(): value for key, value in headers.items()}
 
-    v1_headers_provided = (
-        CLIENT_RP_DETAILS in case_insensitive_headers.keys()
-        and CONNECTION_METADATA in case_insensitive_headers.keys()
+    v2_headers_provided = (
+        V2Headers.NHSD_END_USER_ORGANISATION_ODS in case_insensitive_headers.keys()
+        and V2Headers.NHSD_NRL_APP_ID in case_insensitive_headers.keys()
     )
-    if v1_headers_provided:
+    if not v2_headers_provided:
         return False
 
-    v2_permissions_configured = get_pointer_permissions_v2() != {}
+    metadata = parse_headers(headers, use_v2_permissions=True)
+    v2_permissions_configured = get_pointer_permissions_v2(metadata, path) != {}
 
     return v2_permissions_configured
 
@@ -195,7 +195,7 @@ def _load_v2_connection_metadata(headers: Dict[str, str], path: str):
 def load_connection_metadata(headers: Dict[str, str], config: Config, path=""):
     logger.log(LogReference.HANDLER002, headers=headers)
 
-    if _use_v2_permissions_model(headers):
+    if _use_v2_permissions_model(headers, path):
         return _load_v2_connection_metadata(headers, path)
 
     metadata = parse_headers(headers, use_v2_permissions=False)
