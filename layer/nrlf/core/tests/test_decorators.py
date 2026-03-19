@@ -807,39 +807,6 @@ def test_request_load_connection_metadata_with_no_permission_lookup_or_file():
     assert expected_metadata.pointer_types == []
 
 
-missing_headers = [
-    ["nhsd-connection-metadata"],
-    ["nhsd-connection-metadata", "nhsd-client-rp-details"],
-    ["nhsd-client-rp-details"],
-]
-
-
-@pytest.mark.parametrize("headers_missing_from_request", missing_headers)
-def test_request_load_connection_with_missing_headers_gets_v2_permissions(
-    headers_missing_from_request, mocker
-):
-    mocker.patch(
-        "nrlf.core.decorators.get_pointer_permissions_v2",
-        return_value={"types": ["http://snomed.info/sct|736253001"]},
-    )
-    headers = create_headers(
-        additional_headers={
-            V2Headers.NHSD_END_USER_ORGANISATION_ODS: "Y05868",
-            V2Headers.NHSD_NRL_APP_ID: "Y05868-TestApp-12345678",
-        }
-    )
-    for header_name in headers_missing_from_request:
-        headers.pop(header_name)
-
-    expected_metadata = load_connection_metadata(
-        headers=headers, config=Config(), path="/producer/DocumentReference"
-    )
-
-    assert expected_metadata.pointer_types == []
-    assert expected_metadata.ods_code == "Y05868"
-    assert expected_metadata.nrl_app_id == "Y05868-TestApp-12345678"
-
-
 def _create_v2_headers() -> dict:
     """Create headers that trigger the v2 permissions model (missing nhsd-client-rp-details)."""
     headers = create_headers(
@@ -850,6 +817,66 @@ def _create_v2_headers() -> dict:
     )
     headers.pop("nhsd-client-rp-details")
     return headers
+
+
+def test_load_connection_metadata_v2_happy_path(
+    mocker,
+):
+    mocker.patch(
+        "nrlf.core.decorators.get_pointer_permissions_v2",
+        return_value={
+            "types": [
+                "http://snomed.info/sct|749001000000101",
+                "https://nicip.nhs.uk|MAULR",
+            ]
+        },
+    )
+
+    metadata = load_connection_metadata(
+        headers=_create_v2_headers(),
+        config=Config(),
+        path="/producer/DocumentReference",
+    )
+
+    assert metadata.nrl_permissions_policy.types == [
+        "http://snomed.info/sct|749001000000101",
+        "https://nicip.nhs.uk|MAULR",
+    ]
+    assert metadata.pointer_types == []  # no v1 permissions
+    assert metadata.ods_code == "Y05868"
+    assert metadata.nrl_app_id == "Y05868-TestApp-12345678"
+
+
+def test_load_connection_metadata_gets_v2_permissions_when_v1_headers_also_provided(
+    mocker,
+):
+    v1_permissions = [
+        "http://snomed.info/sct|749001000000101",
+        "https://nicip.nhs.uk|MAULR",
+    ]
+    mocker.patch(
+        "nrlf.core.decorators.parse_permissions_file",
+        return_value=v1_permissions,
+    )
+    v2_permissions = {"access_controls": [AccessControls.ALLOW_ALL_TYPES.value]}
+    mocker.patch(
+        "nrlf.core.decorators.get_pointer_permissions_v2",
+        return_value=v2_permissions,
+    )
+
+    v1_plus_v2_headers = create_headers(
+        additional_headers={
+            V2Headers.NHSD_END_USER_ORGANISATION_ODS: "Y05868",
+            V2Headers.NHSD_NRL_APP_ID: "Y05868-TestApp-12345678",
+        }
+    )
+
+    metadata = load_connection_metadata(
+        headers=v1_plus_v2_headers, config=Config(), path="/producer/DocumentReference"
+    )
+
+    assert metadata.nrl_permissions_policy.types == PointerTypes.list()
+    assert metadata.pointer_types == []  # no v1 permissions
 
 
 def test_load_connection_metadata_gets_v1_permissions_when_v2_permission_file_missing(
@@ -875,13 +902,43 @@ def test_load_connection_metadata_gets_v1_permissions_when_v2_permission_file_mi
         }
     )
 
-    expected_metadata = load_connection_metadata(
+    metadata = load_connection_metadata(
         headers=v1_plus_v2_headers, config=Config(), path="/producer/DocumentReference"
     )
 
-    assert expected_metadata.pointer_types == v1_permissions
-    assert expected_metadata.ods_code == "Y05868"
-    assert expected_metadata.nrl_app_id == "Y05868-TestApp-12345678"
+    assert metadata.pointer_types == v1_permissions
+    assert metadata.nrl_permissions_policy == None  # no v2 permissions
+
+
+def test_load_connection_metadata_gets_v1_permissions_when_v2_headers_missing(
+    mocker,
+):
+    v1_permissions = [
+        "http://snomed.info/sct|749001000000101",
+        "https://nicip.nhs.uk|MAULR",
+    ]
+    mocker.patch(
+        "nrlf.core.decorators.parse_permissions_file",
+        return_value=v1_permissions,
+    )
+    v2_permissions = {"access_controls": [AccessControls.ALLOW_ALL_TYPES.value]}
+    mocker.patch(
+        "nrlf.core.decorators.get_pointer_permissions_v2",
+        return_value=v2_permissions,
+    )
+
+    v1_headers_only = create_headers(
+        additional_headers={
+            V2Headers.NHSD_END_USER_ORGANISATION_ODS: "Y05868",
+        }
+    )
+
+    metadata = load_connection_metadata(
+        headers=v1_headers_only, config=Config(), path="/producer/DocumentReference"
+    )
+
+    assert metadata.pointer_types == v1_permissions
+    assert metadata.nrl_permissions_policy == None  # no v2 permissions
 
 
 def test_load_v2_connection_metadata_allow_all_types(mocker: MockerFixture):
