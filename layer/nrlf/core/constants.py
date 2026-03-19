@@ -58,6 +58,7 @@ class AccessControls(Enum):
     ALLOW_PRODUCE_FOR_ANY_AUTHOR = "allow_produce_for_any_author"
     ALLOW_PRODUCE_FOR_ANY_CUSTODIAN = "allow_produce_for_any_custodian"
     ALLOW_OVERRIDE_CREATION_DATETIME = "allow_override_creation_datetime"
+    ALLOW_SUPERSEDE_WITH_DELETE_FAILURE = "allow_supersede_with_delete_failure"
 
     @staticmethod
     def list():

@@ -254,7 +254,10 @@ def handler(
         return error_response
 
     can_ignore_delete_fail = (
-        PERMISSION_SUPERSEDE_IGNORE_DELETE_FAIL in metadata.nrl_permissions
+        AccessControls.ALLOW_SUPERSEDE_WITH_DELETE_FAILURE.value
+        in metadata.nrl_permissions_policy.access_controls
+        if metadata.nrl_permissions_policy
+        else PERMISSION_SUPERSEDE_IGNORE_DELETE_FAIL in metadata.nrl_permissions
     )
 
     if ids_to_delete := _get_document_ids_to_supersede(

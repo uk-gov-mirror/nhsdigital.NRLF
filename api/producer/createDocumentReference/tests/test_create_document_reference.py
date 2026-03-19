@@ -1435,7 +1435,7 @@ def test_create_document_reference_supersede_deletes_old_pointers_replace(
 @mock_aws
 @mock_repository
 @freeze_uuid("00000000-0000-0000-0000-000000000001")
-def test_create_document_reference_supersede_succeeds_with_toggle(
+def test_supersede_non_existent_pointer_succeeds_with_v1_ignore_delete_fail(
     repository: DocumentPointerRepository,
 ):
     doc_ref = load_document_reference("Y05868-736253002-Valid")
@@ -1493,7 +1493,7 @@ def test_create_document_reference_supersede_succeeds_with_toggle(
 
 @mock_aws
 @mock_repository
-def test_create_document_reference_supersede_fails_without_toggle(
+def test_supersede_non_existent_pointer_fails_without_v1_ignore_delete_fail(
     repository: DocumentPointerRepository,
 ):
     doc_ref = load_document_reference("Y05868-736253002-Valid")
@@ -1508,6 +1508,143 @@ def test_create_document_reference_supersede_fails_without_toggle(
 
     event = create_test_api_gateway_event(
         headers=create_headers(),
+        body=doc_ref.model_dump_json(exclude_none=True),
+    )
+
+    result = handler(event, create_mock_context())
+    body = result.pop("body")
+
+    assert result == {
+        "statusCode": "422",
+        "headers": default_response_headers(),
+        "isBase64Encoded": False,
+    }
+
+    parsed_body = json.loads(body)
+
+    assert parsed_body == {
+        "resourceType": "OperationOutcome",
+        "issue": [
+            {
+                "severity": "error",
+                "code": "business-rule",
+                "details": {
+                    "coding": [
+                        {
+                            "code": "UNPROCESSABLE_ENTITY",
+                            "display": "Unprocessable Entity",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
+                        }
+                    ]
+                },
+                "diagnostics": "The relatesTo target document does not exist",
+                "expression": ["relatesTo[0].target.identifier.value"],
+            }
+        ],
+    }
+
+
+@mock_aws
+@mock_repository
+@freeze_uuid("00000000-0000-0000-0000-000000000001")
+@patch("nrlf.core.decorators.get_pointer_permissions_v2")
+def test_supersede_non_existent_pointer_succeeds_with_v2_access_control(
+    get_pointer_permissions_mock, repository: DocumentPointerRepository
+):
+    doc_ref = load_document_reference("Y05868-736253002-Valid")
+
+    # Add reference to a non-existing pointer
+    doc_ref.relatesTo = [
+        DocumentReferenceRelatesTo(
+            code="replaces",
+            target=Reference(identifier=Identifier(value="Y05868-99999-99999-000000")),
+        )
+    ]
+
+    v2_headers = create_headers(
+        additional_headers={
+            V2Headers.NHSD_END_USER_ORGANISATION_ODS: "Y05868",
+            V2Headers.NHSD_NRL_APP_ID: "Y05868-TestApp-12345678",
+        }
+    )
+    v2_headers.pop(CLIENT_RP_DETAILS)
+
+    get_pointer_permissions_mock.return_value = {
+        "access_controls": [AccessControls.ALLOW_SUPERSEDE_WITH_DELETE_FAILURE.value],
+        "types": ["http://snomed.info/sct|736253002"],
+    }
+
+    event = create_test_api_gateway_event(
+        headers=v2_headers,
+        body=doc_ref.model_dump_json(exclude_none=True),
+    )
+
+    result = handler(event, create_mock_context())
+    body = result.pop("body")
+
+    assert result == {
+        "statusCode": "201",
+        "headers": {
+            "Location": "/DocumentReference/Y05868-00000000-0000-0000-0000-000000000001",
+            **default_response_headers(),
+        },
+        "isBase64Encoded": False,
+    }
+
+    parsed_body = json.loads(body)
+
+    assert parsed_body == {
+        "resourceType": "OperationOutcome",
+        "issue": [
+            {
+                "severity": "information",
+                "code": "informational",
+                "details": {
+                    "coding": [
+                        {
+                            "code": "RESOURCE_SUPERSEDED",
+                            "display": "Resource created and resource(s) deleted",
+                            "system": "https://fhir.nhs.uk/ValueSet/NRL-ResponseCode",
+                        }
+                    ]
+                },
+                "diagnostics": "The document has been superseded by a new version",
+            }
+        ],
+    }
+
+
+@mock_aws
+@mock_repository
+@patch("nrlf.core.decorators.get_pointer_permissions_v2")
+def test_supersede_fails_without_v2_access_control(
+    get_pointer_permissions_mock, repository: DocumentPointerRepository
+):
+    doc_ref = load_document_reference("Y05868-736253002-Valid")
+
+    # Add reference to a non-existing pointer
+    doc_ref.relatesTo = [
+        DocumentReferenceRelatesTo(
+            code="replaces",
+            target=Reference(identifier=Identifier(value="Y05868-99999-99999-000000")),
+        )
+    ]
+
+    v2_headers = create_headers(
+        additional_headers={
+            V2Headers.NHSD_END_USER_ORGANISATION_ODS: "Y05868",
+            V2Headers.NHSD_NRL_APP_ID: "Y05868-TestApp-12345678",
+        }
+    )
+    v2_headers.pop(CLIENT_RP_DETAILS)
+
+    get_pointer_permissions_mock.return_value = {
+        "access_controls": [],
+        "types": ["http://snomed.info/sct|736253002"],
+    }
+
+    event = create_test_api_gateway_event(
+        headers=v2_headers,
         body=doc_ref.model_dump_json(exclude_none=True),
     )
 

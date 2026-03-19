@@ -6,7 +6,7 @@ Feature: Producer - upsertDocumentReference - Failure Scenarios
       | system                 | value            |
       | http://snomed.info/sct | 1363501000000100 |
       | http://snomed.info/sct | 736253002        |
-    When producer 'X26' upserts a DocumentReference with values:
+    When producer v1 'X26' upserts a DocumentReference with values:
       | property  | value                          |
       | id        | X26-testid-upsert-0001-0001    |
       | subject   | 9999999999                     |
@@ -45,7 +45,7 @@ Feature: Producer - upsertDocumentReference - Failure Scenarios
       | system                 | value            |
       | http://snomed.info/sct | 1363501000000100 |
       | http://snomed.info/sct | 736253002        |
-    When producer 'X26' upserts a DocumentReference with values:
+    When producer v1 'X26' upserts a DocumentReference with values:
       | property  | value                          |
       | subject   | 9999999999                     |
       | type      | 736253002                      |
@@ -82,7 +82,7 @@ Feature: Producer - upsertDocumentReference - Failure Scenarios
     And the organisation 'ANGY1' is authorised to access pointer types:
       | system                 | value     |
       | http://snomed.info/sct | 736253002 |
-    When producer 'ANGY1' upserts a DocumentReference with values:
+    When producer v1 'ANGY1' upserts a DocumentReference with values:
       | property     | value                          |
       | id           | X26-testid-upsert-0001-0001    |
       | subject      | 9278693472                     |
@@ -120,7 +120,7 @@ Feature: Producer - upsertDocumentReference - Failure Scenarios
     And the organisation 'ANGY1' is authorised to access pointer types:
       | system                 | value     |
       | http://snomed.info/sct | 736253002 |
-    When producer 'ANGY1' upserts a DocumentReference with values:
+    When producer v1 'ANGY1' upserts a DocumentReference with values:
       | property     | value                          |
       | id           | X26-testid-upsert-0001-0001    |
       | subject      | 9999999999                     |
@@ -161,7 +161,7 @@ Feature: Producer - upsertDocumentReference - Failure Scenarios
       | system                 | value            |
       | http://snomed.info/sct | 1363501000000100 |
       | http://snomed.info/sct | 736253002        |
-    When producer 'X26' upserts a DocumentReference with values:
+    When producer v1 'X26' upserts a DocumentReference with values:
       | property  | value                          |
       | id        | X26-testid-upsert-0001-0001    |
       | subject   | 9999999999                     |
@@ -200,7 +200,7 @@ Feature: Producer - upsertDocumentReference - Failure Scenarios
       | system               | value |
       | https://nicip.nhs.uk | MAULR |
       | https://nicip.nhs.uk | MAXIB |
-    When producer 'ANGY1' upserts a DocumentReference with values:
+    When producer v1 'ANGY1' upserts a DocumentReference with values:
       | property     | value                          |
       | id           | ANGY1-testid-upsert-0001-0001  |
       | subject      | 9999999999                     |
@@ -335,7 +335,7 @@ Feature: Producer - upsertDocumentReference - Failure Scenarios
     And the organisation 'ANGY1' is authorised to access pointer types:
       | system                 | value     |
       | http://snomed.info/sct | 736253002 |
-    When producer 'ANGY1' upserts a DocumentReference with values:
+    When producer v1 'ANGY1' upserts a DocumentReference with values:
       | property    | value                          |
       | id          | TSTCUS-sample-id-00003         |
       | subject     | 9999999999                     |

@@ -8,7 +8,7 @@ Feature: Producer - upsertDocumentReference - Success Scenarios
     And the organisation 'ANGY1' is authorised to access pointer types:
       | system                 | value     |
       | http://snomed.info/sct | 736253002 |
-    When producer 'ANGY1' upserts a DocumentReference with values:
+    When producer v1 'ANGY1' upserts a DocumentReference with values:
       | property  | value                          |
       | id        | ANGY1-testid-upsert-0001-0001  |
       | subject   | 9278693472                     |
@@ -54,7 +54,7 @@ Feature: Producer - upsertDocumentReference - Success Scenarios
       | system               | value |
       | https://nicip.nhs.uk | MAULR |
       | https://nicip.nhs.uk | MAXIB |
-    When producer 'ANGY1' upserts a DocumentReference with values:
+    When producer v1 'ANGY1' upserts a DocumentReference with values:
       | property    | value                          |
       | id          | ANGY1-testid-upsert-0001-0001  |
       | subject     | 9278693472                     |
@@ -95,7 +95,7 @@ Feature: Producer - upsertDocumentReference - Success Scenarios
       | custodian   | ANGY1                          |
       | author      | HAR1                           |
       | url         | https://example.org/my-doc.pdf |
-    When producer 'ANGY1' upserts a DocumentReference with values:
+    When producer v1 'ANGY1' upserts a DocumentReference with values:
       | property    | value                          |
       | id          | ANGY1-testid-upsert-0001-0002  |
       | subject     | 9278693472                     |

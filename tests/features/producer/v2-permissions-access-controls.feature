@@ -91,3 +91,71 @@ Feature: Producer v2 access_control permissions - Success and Failure Scenarios
       | url             | https://example.org/my-doc.pdf |
       | practiceSetting | 788002001                      |
     And the date of the resource in the Location header is not '2024-06-01T12:00:00Z'
+
+  Scenario: Successfully supersede a DocumentReference with ALLOW_SUPERSEDE_WITH_DELETE_FAILURE - upsertDocumentReference
+    Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
+    When producer v2 '4LLTYP35P' upserts a DocumentReference with values:
+      | property   | value                                          |
+      | id         | 4LLTYP35P-testid-upsert-0001-0002              |
+      | subject    | 9278693472                                     |
+      | status     | current                                        |
+      | type       | 736253002                                      |
+      | category   | 734163000                                      |
+      | custodian  | 4LLTYP35P                                      |
+      | author     | 4LLTYP35P                                      |
+      | url        | https://example.org/newdoc.pdf                 |
+      | supercedes | 4LLTYP35P-000-ThisRefDoesNotExistSupersedeTest |
+    Then the response status code is 201
+    And the response is an OperationOutcome with 1 issue
+    And the OperationOutcome contains the issue:
+      """
+      {
+         "severity": "information",
+         "code": "informational",
+         "details": {
+           "coding": [
+             {
+               "system": "https://fhir.nhs.uk/ValueSet/NRL-ResponseCode",
+               "code": "RESOURCE_SUPERSEDED",
+               "display": "Resource created and resource(s) deleted"
+             }
+           ]
+         },
+         "diagnostics": "The document has been superseded by a new version"
+       }
+      """
+
+  Scenario: Supersede a DocumentReference fails without ALLOW_SUPERSEDE_WITH_DELETE_FAILURE - createDocumentReference
+    Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
+    When producer v2 'RX898' creates a DocumentReference with values:
+      | property   | value                                      |
+      | subject    | 9278693472                                 |
+      | status     | current                                    |
+      | type       | 736373009                                  |
+      | category   | 734163000                                  |
+      | custodian  | RX898                                      |
+      | author     | RX898                                      |
+      | url        | https://example.org/newdoc.pdf             |
+      | supercedes | RX898-000-ThisRefDoesNotExistSupersedeTest |
+    Then the response status code is 422
+    And the response is an OperationOutcome with 1 issue
+    And the OperationOutcome contains the issue:
+      """
+      {
+        "severity": "error",
+        "code": "business-rule",
+        "details": {
+            "coding": [
+              {
+                "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
+                "code": "UNPROCESSABLE_ENTITY",
+                "display": "Unprocessable Entity"
+              }
+            ]
+        },
+        "diagnostics": "The relatesTo target document does not exist",
+        "expression": [
+            "relatesTo[0].target.identifier.value"
+        ]
+      }
+      """
