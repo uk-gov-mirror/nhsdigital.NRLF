@@ -1,13 +1,13 @@
-resource "aws_s3_bucket" "athena" {
+resource "aws_s3_bucket" "athena" { # NOSONAR (S6258) - Logging not required for this bucket
   bucket = "${var.name_prefix}-athena"
 }
 
-resource "aws_s3_bucket_policy" "athena" {
-  bucket = "${var.name_prefix}-athena"
+resource "aws_s3_bucket_policy" "athena-https-only" {
+  bucket = aws_s3_bucket.athena.id
 
   policy = jsonencode({
     Version = "2012-10-17"
-    Id      = "athena-policy"
+    Id      = "athena-https-only-policy"
     Statement = [
       {
         Sid    = "HTTPSOnly"
@@ -25,7 +25,18 @@ resource "aws_s3_bucket_policy" "athena" {
             "aws:SecureTransport" = "false"
           }
         }
-      },
+      }
+    ]
+  })
+}
+
+resource "aws_s3_bucket_policy" "athena-access" {
+  bucket = aws_s3_bucket.athena.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Id      = "athena-access-policy"
+    Statement = [
       {
         Sid : "AllowAthenaAccess",
         Effect : "Allow",

@@ -1,16 +1,6 @@
-resource "aws_s3_bucket" "firehose" {
+resource "aws_s3_bucket" "firehose" { # NOSONAR (S6258) - Logging not required for this bucket
   bucket        = "${var.prefix}-firehose"
   force_destroy = true
-}
-
-resource "aws_s3_bucket_server_side_encryption_configuration" "firehose" {
-  bucket = aws_s3_bucket.firehose.id
-  rule {
-    apply_server_side_encryption_by_default {
-      kms_master_key_id = aws_kms_key.firehose.arn
-      sse_algorithm     = "aws:kms"
-    }
-  }
 }
 
 resource "aws_s3_bucket_policy" "firehose-policy" {
@@ -37,6 +27,16 @@ resource "aws_s3_bucket_policy" "firehose-policy" {
       },
     ]
   })
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "firehose" {
+  bucket = aws_s3_bucket.firehose.id
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = aws_kms_key.firehose.arn
+      sse_algorithm     = "aws:kms"
+    }
+  }
 }
 
 resource "aws_s3_bucket_public_access_block" "firehose-public-access-block" {

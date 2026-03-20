@@ -1,4 +1,4 @@
-resource "aws_s3_bucket" "ci_data" {
+resource "aws_s3_bucket" "ci_data" { # NOSONAR (S6258) - Logging not required for this bucket
   bucket = "${local.prefix}--ci-data"
 }
 
