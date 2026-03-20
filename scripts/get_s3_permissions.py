@@ -65,7 +65,7 @@ def add_feature_test_files(local_path):
     org_permissions = {
         "consumer": [
             (
-                "z00z-y11y-x22x",
+                "v2-z00z-y11y-x22x",
                 "RX898",
                 [PointerTypes.MENTAL_HEALTH_PLAN.value],
                 [],
@@ -77,7 +77,7 @@ def add_feature_test_files(local_path):
                 [],
             ),
             (
-                "z00z-y11y-x22x",
+                "v2-z00z-y11y-x22x",
                 "4LLTYP35C",
                 [],
                 [AccessControls.ALLOW_ALL_TYPES.value],
@@ -85,7 +85,7 @@ def add_feature_test_files(local_path):
         ],
         "producer": [
             (
-                "z00z-y11y-x22x",
+                "v2-z00z-y11y-x22x",
                 "RX898",
                 [PointerTypes.EOL_CARE_PLAN.value],
                 [],
@@ -97,7 +97,7 @@ def add_feature_test_files(local_path):
                 [],
             ),
             (
-                "z00z-y11y-x22x",
+                "v2-z00z-y11y-x22x",
                 "4LLTYP35P",
                 [],
                 [

@@ -5,7 +5,7 @@ Feature: Producer v2 permissions by pointer type - Success and Failure Scenarios
   success scenarios.
 
   Background:
-    Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
+    Given the application 'DataShare' (ID 'v2-z00z-y11y-x22x') is registered to access the API
 
   Scenario: V2 Permissions with access for pointer type - createDocumentReference
     When producer v2 'RX898' creates a DocumentReference with values:

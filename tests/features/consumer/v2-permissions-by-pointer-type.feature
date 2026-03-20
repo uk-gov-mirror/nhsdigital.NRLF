@@ -5,7 +5,7 @@ Feature: Consumer v2 permissions by pointer type - Success and Failure Scenarios
   success scenarios.
 
   Background:
-    Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
+    Given the application 'DataShare' (ID 'v2-z00z-y11y-x22x') is registered to access the API
 
   Scenario: V2 Permissions with access for pointer type - readDocumentReference
     Given a DocumentReference resource exists with values:
@@ -121,7 +121,7 @@ Feature: Consumer v2 permissions by pointer type - Success and Failure Scenarios
       """
 
   Scenario: V2 permissions with access for pointer type retrieves expected document references - searchPostDocumentReference
-    Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
+    Given the application 'DataShare' (ID 'v2-z00z-y11y-x22x') is registered to access the API
     And a DocumentReference resource exists with values:
       | property    | value                                 |
       | id          | X26-1111111111-SearchMultipleRefTest1 |
@@ -187,7 +187,7 @@ Feature: Consumer v2 permissions by pointer type - Success and Failure Scenarios
     And the Bundle does not contain a DocumentReference with ID 'X26-1111111111-SearchMultipleRefTestDifferentType'
 
   Scenario: V2 permissions with no access for pointer type - searchDocumentReference
-    Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
+    Given the application 'DataShare' (ID 'v2-z00z-y11y-x22x') is registered to access the API
     When consumer v2 'RX898' searches for DocumentReferences with parameters:
       | parameter | value                                   |
       | subject   | 9278693472                              |
@@ -212,7 +212,7 @@ Feature: Consumer v2 permissions by pointer type - Success and Failure Scenarios
       """
 
   Scenario: V2 permissions with access all pointer types retrieves expected document references - searchPostDocumentReference
-    Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
+    Given the application 'DataShare' (ID 'v2-z00z-y11y-x22x') is registered to access the API
     And a DocumentReference resource exists with values:
       | property    | value                              |
       | id          | X26-5900056201-SearchMultipleType1 |
