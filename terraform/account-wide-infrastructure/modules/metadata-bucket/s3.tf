@@ -1,4 +1,4 @@
-resource "aws_s3_bucket" "metadata_bucket" {
+resource "aws_s3_bucket" "metadata_bucket" { # NOSONAR (S6258) - Logging not required for this bucket
   bucket        = "${var.name_prefix}-metadata"
   force_destroy = false
 }

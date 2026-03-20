@@ -1,4 +1,4 @@
-resource "aws_s3_bucket" "api_truststore" {
+resource "aws_s3_bucket" "api_truststore" { # NOSONAR (S6258) - Logging not required for this bucket
   bucket        = "${var.name_prefix}-api-truststore"
   force_destroy = var.enable_bucket_force_destroy
   tags = {

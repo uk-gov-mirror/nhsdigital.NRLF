@@ -233,7 +233,7 @@ Feature: Consumer - searchDocumentReference - Success Scenarios
       | custodian   | DK94                           |
       | author      | N64                            |
     When producer 'DK94' requests to delete DocumentReference with id 'DK94-111-DeleteDocRefTest1'
-    And consumer v1 'RX898' searches for DocumentReferences using POST with request body:
+    And consumer 'RX898' searches for DocumentReferences using POST with request body:
       | key       | value      |
       | subject   | 9278693472 |
       | custodian | RX898      |

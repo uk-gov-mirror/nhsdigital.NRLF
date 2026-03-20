@@ -104,7 +104,7 @@ env = [
     "AUTH_STORE=auth-store",
     "TABLE_NAME=unit-test-document-pointer"
 ]
-pythonpath = [".", "./scripts"]
+pythonpath = [".", "./scripts", "./terraform/account-wide-infrastructure/modules/glue/src"]
 
 [tool.datamodel-codegen]
 target-python-version = "3.12"

@@ -1,6 +1,9 @@
+import os
 import time
 
 import boto3
+
+AWS_REGION = os.getenv("AWS_REGION", "eu-west-2")
 
 
 class LogPipeline:
@@ -13,8 +16,8 @@ class LogPipeline:
         target_path,
         host_prefixes,
         job_name,
-        partition_cols=[],
-        transformations=[],
+        partition_cols=None,
+        transformations=None,
     ):
         """Initialize Glue context, Spark session, logger, and paths"""
         self.glue_context = glue_context
@@ -23,12 +26,12 @@ class LogPipeline:
         self.source_path = source_path
         self.target_path = target_path
         self.host_prefixes = host_prefixes
-        self.partition_cols = partition_cols
-        self.transformations = transformations
+        self.partition_cols = partition_cols if partition_cols else []
+        self.transformations = transformations if transformations else []
         self.glue = boto3.client(
             service_name="glue",
-            region_name="eu-west-2",
-            endpoint_url="https://glue.eu-west-2.amazonaws.com",
+            region_name=AWS_REGION,
+            endpoint_url=f"https://glue.{AWS_REGION}.amazonaws.com",
         )
         self.job_name = job_name
         self.name_prefix = "-".join(job_name.split("-")[:4])

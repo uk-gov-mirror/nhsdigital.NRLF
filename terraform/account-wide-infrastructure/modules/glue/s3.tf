@@ -1,10 +1,10 @@
 # S3 Bucket for Raw Data
-resource "aws_s3_bucket" "source-data-bucket" {
+resource "aws_s3_bucket" "source-data-bucket" { # NOSONAR (S6258) - Logging not required for this bucket
   bucket = "${var.name_prefix}-source-data-bucket"
 }
 
 resource "aws_s3_bucket_policy" "source-data-bucket" {
-  bucket = "${var.name_prefix}-source-data-bucket"
+  bucket = aws_s3_bucket.source-data-bucket.id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -68,18 +68,18 @@ resource "aws_s3_bucket_lifecycle_configuration" "source-data-bucket-lifecycle" 
 resource "aws_s3_bucket_versioning" "source-data-bucket-versioning" {
   bucket = aws_s3_bucket.source-data-bucket.id
   versioning_configuration {
-    status = "Disabled"
+    status = "Disabled" # NOSONAR (S6252) - Versioning is not required for this bucket
   }
 }
 
 
 # S3 Bucket for Processed Data
-resource "aws_s3_bucket" "target-data-bucket" {
+resource "aws_s3_bucket" "target-data-bucket" { # NOSONAR (S6258) - Logging not required for this bucket
   bucket = "${var.name_prefix}-target-data-bucket"
 }
 
 resource "aws_s3_bucket_policy" "target-data-bucket" {
-  bucket = "${var.name_prefix}-target-data-bucket"
+  bucket = aws_s3_bucket.target-data-bucket.id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -127,12 +127,12 @@ resource "aws_s3_bucket_public_access_block" "target-data-bucket-public-access-b
 }
 
 # S3 Bucket for Code
-resource "aws_s3_bucket" "code-bucket" {
+resource "aws_s3_bucket" "code-bucket" { # NOSONAR (S6258) - Logging not required for this bucket
   bucket = "${var.name_prefix}-code-bucket"
 }
 
 resource "aws_s3_bucket_policy" "code-bucket" {
-  bucket = "${var.name_prefix}-code-bucket"
+  bucket = aws_s3_bucket.code-bucket.id
 
   policy = jsonencode({
     Version = "2012-10-17"

@@ -231,9 +231,7 @@ def producer_read_document_reference_step(
 
 
 @when("producer '{ods_code}' searches for DocumentReferences with parameters")
-def producer_search_document_reference_step(
-    context: Context, version: str, ods_code: str
-):
+def producer_search_document_reference_step(context: Context, ods_code: str):
     client = producer_client_from_context(context, ods_code)
 
     if not context.table:
