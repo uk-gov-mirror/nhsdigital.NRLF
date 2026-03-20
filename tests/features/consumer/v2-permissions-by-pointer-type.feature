@@ -19,7 +19,7 @@ Feature: Consumer v2 permissions by pointer type - Success and Failure Scenarios
       | url         | https://example.org/my-doc.pdf             |
       | custodian   | RX898                                      |
       | author      | RX898                                      |
-    When consumer v2 'RX898' reads a DocumentReference with ID 'RX898-9999999999-ReadDocRefV2SameCustodian'
+    When consumer 'RX898' reads a DocumentReference with ID 'RX898-9999999999-ReadDocRefV2SameCustodian'
     Then the response status code is 200
     And the response is a DocumentReference with JSON value:
       """
@@ -155,7 +155,7 @@ Feature: Consumer v2 permissions by pointer type - Success and Failure Scenarios
       | url         | https://example.org/my-doc-3.pdf                  |
       | custodian   | X26                                               |
       | author      | X26                                               |
-    When consumer v2 'RX898' searches for DocumentReferences using POST with request body:
+    When consumer 'RX898' searches for DocumentReferences using POST with request body:
       | key     | value      |
       | subject | 9278693472 |
     Then the response status code is 200
@@ -188,7 +188,7 @@ Feature: Consumer v2 permissions by pointer type - Success and Failure Scenarios
 
   Scenario: V2 permissions with no access for pointer type - searchDocumentReference
     Given the application 'DataShare' (ID 'v2-z00z-y11y-x22x') is registered to access the API
-    When consumer v2 'RX898' searches for DocumentReferences with parameters:
+    When consumer 'RX898' searches for DocumentReferences with parameters:
       | parameter | value                                   |
       | subject   | 9278693472                              |
       | type      | http://snomed.info/sct\|887701000000100 |
@@ -246,7 +246,7 @@ Feature: Consumer v2 permissions by pointer type - Success and Failure Scenarios
       | url         | https://example.org/my-doc-3.pdf   |
       | custodian   | X26                                |
       | author      | X26                                |
-    When consumer v2 '4LLTYP35C' searches for DocumentReferences using POST with request body:
+    When consumer '4LLTYP35C' searches for DocumentReferences using POST with request body:
       | key     | value      |
       | subject | 9000000378 |
     Then the response status code is 200

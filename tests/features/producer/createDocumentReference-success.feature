@@ -5,7 +5,7 @@ Feature: Producer - createDocumentReference - Success Scenarios
     And the organisation 'ANGY1' is authorised to access pointer types:
       | system                 | value     |
       | http://snomed.info/sct | 736253002 |
-    When producer v1 'ANGY1' creates a DocumentReference with values:
+    When producer 'ANGY1' creates a DocumentReference with values:
       | property        | value                          |
       | subject         | 9278693472                     |
       | status          | current                        |
@@ -110,7 +110,7 @@ Feature: Producer - createDocumentReference - Success Scenarios
       | custodian       | ANGY1                          |
       | author          | HAR1                           |
       | practiceSetting | 788002001                      |
-    When producer v1 'ANGY1' creates a DocumentReference with values:
+    When producer 'ANGY1' creates a DocumentReference with values:
       | property        | value                          |
       | subject         | 9278693472                     |
       | status          | current                        |
@@ -161,7 +161,7 @@ Feature: Producer - createDocumentReference - Success Scenarios
     And the organisation 'ANGY1' is authorised to access pointer types:
       | system                 | value          |
       | http://snomed.info/sct | <pointer-type> |
-    When producer v1 'ANGY1' creates a DocumentReference with values:
+    When producer 'ANGY1' creates a DocumentReference with values:
       | property        | value                          |
       | subject         | 9278693472                     |
       | status          | current                        |
@@ -239,7 +239,7 @@ Feature: Producer - createDocumentReference - Success Scenarios
       | system               | value |
       | https://nicip.nhs.uk | MAULR |
       | https://nicip.nhs.uk | MAXIB |
-    When producer v1 'ANGY1' creates a DocumentReference with values:
+    When producer 'ANGY1' creates a DocumentReference with values:
       | property        | value                          |
       | subject         | 9278693472                     |
       | status          | current                        |
@@ -282,7 +282,7 @@ Feature: Producer - createDocumentReference - Success Scenarios
       | author          | HAR1                           |
       | url             | https://example.org/my-doc.pdf |
       | practiceSetting | 788002001                      |
-    When producer v1 'ANGY1' creates a DocumentReference with values:
+    When producer 'ANGY1' creates a DocumentReference with values:
       | property        | value                          |
       | subject         | 9278693472                     |
       | status          | current                        |
@@ -330,7 +330,7 @@ Feature: Producer - createDocumentReference - Success Scenarios
     And the organisation 'BARS1' is authorised to access pointer types:
       | system                 | value           |
       | http://snomed.info/sct | 749001000000101 |
-    When producer v1 'BARS1' creates a DocumentReference with values:
+    When producer 'BARS1' creates a DocumentReference with values:
       | property        | value                         |
       | subject         | 9278693472                    |
       | status          | current                       |

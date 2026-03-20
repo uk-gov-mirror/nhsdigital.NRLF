@@ -33,11 +33,11 @@ def _config_from_context(context: Context, ods_code: str):
     )
 
 
-def consumer_client_from_context(context: Context, ods_code: str, v2: bool = False):
+def consumer_client_from_context(context: Context, ods_code: str):
     client_config = _config_from_context(context, ods_code)
-    return ConsumerTestClient(config=client_config, use_v2=v2)
+    return ConsumerTestClient(config=client_config)
 
 
-def producer_client_from_context(context: Context, ods_code: str, v2: bool = False):
+def producer_client_from_context(context: Context, ods_code: str):
     client_config = _config_from_context(context, ods_code)
-    return ProducerTestClient(config=client_config, use_v2=v2)
+    return ProducerTestClient(config=client_config)

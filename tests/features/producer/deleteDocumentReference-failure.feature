@@ -19,7 +19,7 @@ Feature: Producer - deleteDocumentReference - Failure Scenarios
       | url         | https://example.org/my-doc.pdf     |
       | custodian   | OC84                               |
       | author      | N64                                |
-    When producer v1 'DK94' requests to delete DocumentReference with id 'OC84-111-DeleteTest-NotYourPointer'
+    When producer 'DK94' requests to delete DocumentReference with id 'OC84-111-DeleteTest-NotYourPointer'
     Then the response status code is 403
     And the response is an OperationOutcome with 1 issue
     And the OperationOutcome contains the issue:

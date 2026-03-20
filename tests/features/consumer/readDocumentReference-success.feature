@@ -16,7 +16,7 @@ Feature: Consumer - readDocumentReference - Success Scenarios
       | url         | https://example.org/my-doc.pdf           |
       | custodian   | RX898                                    |
       | author      | RX898                                    |
-    When consumer v1 'RX898' reads a DocumentReference with ID 'RX898-9999999999-ReadDocRefSameCustodian'
+    When consumer 'RX898' reads a DocumentReference with ID 'RX898-9999999999-ReadDocRefSameCustodian'
     Then the response status code is 200
     And the response is a DocumentReference with JSON value:
       """
@@ -133,7 +133,7 @@ Feature: Consumer - readDocumentReference - Success Scenarios
       | url         | https://example.org/my-doc.pdf         |
       | custodian   | X26                                    |
       | author      | RX898                                  |
-    When consumer v1 'RX898' reads a DocumentReference with ID 'X26-9999999999-ReadDocRefDiffCustodian'
+    When consumer 'RX898' reads a DocumentReference with ID 'X26-9999999999-ReadDocRefDiffCustodian'
     Then the response status code is 200
     And the response is a DocumentReference with JSON value:
       """
@@ -250,5 +250,5 @@ Feature: Consumer - readDocumentReference - Success Scenarios
       | url         | https://example.org/my-doc.pdf             |
       | custodian   | RX898\|001                                 |
       | author      | RX898                                      |
-    When consumer v1 'RX898' reads a DocumentReference with ID 'RX898%7C001-1234567890-ReadDocRefUrlEncoded'
+    When consumer 'RX898' reads a DocumentReference with ID 'RX898%7C001-1234567890-ReadDocRefUrlEncoded'
     Then the response status code is 200

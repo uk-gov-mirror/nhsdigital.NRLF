@@ -16,7 +16,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
     And the organisation 'ANGY1' is authorised to access pointer types:
       | system                 | value     |
       | http://snomed.info/sct | 736253002 |
-    When producer v1 'ANGY1' creates a DocumentReference with values:
+    When producer 'ANGY1' creates a DocumentReference with values:
       | property  | value                          |
       | subject   | 9999999999                     |
       | status    | current                        |
@@ -53,7 +53,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
     And the organisation 'ANGY1' is authorised to access pointer types:
       | system                 | value     |
       | http://snomed.info/sct | 736253002 |
-    When producer v1 'ANGY1' creates a DocumentReference with values:
+    When producer 'ANGY1' creates a DocumentReference with values:
       | property  | value                          |
       | subject   | 1234567890                     |
       | status    | current                        |
@@ -212,7 +212,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
       | url         | https://example.org/my-doc.pdf  |
       | custodian   | N0TANGY                         |
       | author      | HAR1                            |
-    When producer v1 'ANGY1' creates a DocumentReference with values:
+    When producer 'ANGY1' creates a DocumentReference with values:
       | property   | value                           |
       | subject    | 9278693472                      |
       | status     | current                         |
@@ -263,7 +263,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
     Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
     And the organisation 'ANGY1' is authorised to access pointer types:
       | system | value |
-    When producer v1 'ANGY1' creates a DocumentReference with values:
+    When producer 'ANGY1' creates a DocumentReference with values:
       | property  | value                          |
       | subject   | 9999999999                     |
       | status    | current                        |
@@ -298,7 +298,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
       | system                 | value            |
       | http://snomed.info/sct | 1363501000000100 |
       | http://snomed.info/sct | 736253002        |
-    When producer v1 'X26' creates a DocumentReference with values:
+    When producer 'X26' creates a DocumentReference with values:
       | property  | value                          |
       | subject   | 9999999999                     |
       | type      | 736253002                      |
@@ -335,7 +335,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
     And the organisation 'ANGY1' is authorised to access pointer types:
       | system                 | value     |
       | http://snomed.info/sct | 736253002 |
-    When producer v1 'ANGY1' creates a DocumentReference with values:
+    When producer 'ANGY1' creates a DocumentReference with values:
       | property  | value                          |
       | subject   | 9999999999                     |
       | status    | current                        |
@@ -373,7 +373,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
       | system                 | value            |
       | http://snomed.info/sct | 1363501000000100 |
       | http://snomed.info/sct | 736253002        |
-    When producer v1 'X26' creates a DocumentReference with values:
+    When producer 'X26' creates a DocumentReference with values:
       | property  | value                          |
       | subject   | 9999999999                     |
       | status    | current                        |
@@ -544,7 +544,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
     And the organisation 'ANGY1' is authorised to access pointer types:
       | system                 | value     |
       | http://snomed.info/sct | 736253002 |
-    When producer v1 'ANGY1' creates a DocumentReference with values:
+    When producer 'ANGY1' creates a DocumentReference with values:
       | property     | value                          |
       | subject      | 9278693472                     |
       | status       | current                        |
@@ -581,7 +581,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
     And the organisation 'ANGY1' is authorised to access pointer types:
       | system                 | value     |
       | http://snomed.info/sct | 736253002 |
-    When producer v1 'ANGY1' creates a DocumentReference with values:
+    When producer 'ANGY1' creates a DocumentReference with values:
       | property     | value                          |
       | subject      | 9999999999                     |
       | status       | current                        |
@@ -620,7 +620,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
       | system               | value |
       | https://nicip.nhs.uk | MAULR |
       | https://nicip.nhs.uk | MAXIB |
-    When producer v1 'ANGY1' creates a DocumentReference with values:
+    When producer 'ANGY1' creates a DocumentReference with values:
       | property     | value                          |
       | subject      | 9999999999                     |
       | status       | current                        |
@@ -665,7 +665,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
       | system                 | value            |
       | http://snomed.info/sct | 1363501000000100 |
       | http://snomed.info/sct | 736253002        |
-    When producer v1 'X26' creates a DocumentReference with values:
+    When producer 'X26' creates a DocumentReference with values:
       | property        | value                          |
       | subject         | 9999999999                     |
       | status          | current                        |
@@ -814,7 +814,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
     And the organisation 'ANGY1' is authorised to access pointer types:
       | system                 | value     |
       | http://snomed.info/sct | 736253002 |
-    When producer v1 'ANGY1' creates a DocumentReference with values:
+    When producer 'ANGY1' creates a DocumentReference with values:
       | property    | value                          |
       | subject     | 9999999999                     |
       | status      | current                        |

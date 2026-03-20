@@ -8,7 +8,7 @@ Feature: Producer v2 permissions by pointer type - Success and Failure Scenarios
     Given the application 'DataShare' (ID 'v2-z00z-y11y-x22x') is registered to access the API
 
   Scenario: V2 Permissions with access for pointer type - createDocumentReference
-    When producer v2 'RX898' creates a DocumentReference with values:
+    When producer 'RX898' creates a DocumentReference with values:
       | property        | value                          |
       | subject         | 9278693472                     |
       | status          | current                        |
@@ -51,7 +51,7 @@ Feature: Producer v2 permissions by pointer type - Success and Failure Scenarios
       | practiceSetting | 788002001                      |
 
   Scenario: V2 Permissions with no access for pointer type - createDocumentReference
-    When producer v2 'RX898' creates a DocumentReference with values:
+    When producer 'RX898' creates a DocumentReference with values:
       | property        | value                          |
       | subject         | 9278693472                     |
       | status          | current                        |
@@ -96,7 +96,7 @@ Feature: Producer v2 permissions by pointer type - Success and Failure Scenarios
       | url         | https://example.org/my-doc.pdf |
       | custodian   | RX898                          |
       | author      | RX898                          |
-    When producer v2 'RX898' requests to delete DocumentReference with id 'RX898-111-DeleteDocRefTest1'
+    When producer 'RX898' requests to delete DocumentReference with id 'RX898-111-DeleteDocRefTest1'
     Then the response status code is 200
     And the response is an OperationOutcome with 1 issue
     And the OperationOutcome contains the issue:
@@ -141,7 +141,7 @@ Feature: Producer v2 permissions by pointer type - Success and Failure Scenarios
       | url         | https://example.org/my-doc.pdf        |
       | custodian   | RX898                                 |
       | author      | X26                                   |
-    When producer v2 'RX898' searches for DocumentReferences with parameters:
+    When producer 'RX898' searches for DocumentReferences with parameters:
       | parameter | value      |
       | subject   | 9999999999 |
     Then the response status code is 200
@@ -184,7 +184,7 @@ Feature: Producer v2 permissions by pointer type - Success and Failure Scenarios
       | url         | https://example.org/my-doc.pdf        |
       | custodian   | 4LLTYP35P                             |
       | author      | X26                                   |
-    When producer v2 '4LLTYP35P' searches for DocumentReferences with parameters:
+    When producer '4LLTYP35P' searches for DocumentReferences with parameters:
       | parameter | value      |
       | subject   | 9999999999 |
     Then the response status code is 200
@@ -226,7 +226,7 @@ Feature: Producer v2 permissions by pointer type - Success and Failure Scenarios
       | url         | https://example.org/my-doc.pdf        |
       | custodian   | RX898                                 |
       | author      | X26                                   |
-    When producer v2 'N00RG1' searches for DocumentReferences with parameters:
+    When producer 'N00RG1' searches for DocumentReferences with parameters:
       | parameter | value      |
       | subject   | 9999999999 |
     Then the response status code is 403
