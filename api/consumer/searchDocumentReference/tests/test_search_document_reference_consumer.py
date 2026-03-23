@@ -10,6 +10,7 @@ from nrlf.core.constants import (
     CLIENT_RP_DETAILS,
     TYPE_ATTRIBUTES,
     Categories,
+    ConsumerApiInteractions,
     PointerTypes,
     V2Headers,
 )
@@ -22,6 +23,10 @@ from nrlf.tests.events import (
     create_test_api_gateway_event,
     default_response_headers,
 )
+
+create_mock_context_default_args = {
+    "function_name": "nhsd-nrlf--perftest-2--api--consumer--searchDocumentReference"
+}
 
 
 @mock_aws
@@ -85,6 +90,7 @@ def test_search_document_reference_happy_path_v2(
 
     get_pointer_permissions_mock.return_value = {
         "access_controls": [],
+        "interactions": [ConsumerApiInteractions.SEARCH_DOCUMENT_REFERENCE.value],
         "types": ["http://snomed.info/sct|736253002"],
     }
 
@@ -95,7 +101,7 @@ def test_search_document_reference_happy_path_v2(
         },
     )
 
-    result = handler(event, create_mock_context())
+    result = handler(event, create_mock_context(**create_mock_context_default_args))
     body = result.pop("body")
 
     assert result == {
@@ -752,6 +758,7 @@ def test_search_document_reference_invalid_type_v2(
 
     get_pointer_permissions_mock.return_value = {
         "access_controls": [],
+        "interactions": ConsumerApiInteractions.list(),
         "types": ["http://snomed.info/sct|736253002"],
     }
 
@@ -763,7 +770,7 @@ def test_search_document_reference_invalid_type_v2(
         },
     )
 
-    result = handler(event, create_mock_context())
+    result = handler(event, create_mock_context(**create_mock_context_default_args))
     body = result.pop("body")
 
     assert result == {

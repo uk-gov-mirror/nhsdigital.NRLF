@@ -4,7 +4,7 @@ from unittest.mock import patch
 from moto import mock_aws
 
 from api.consumer.readDocumentReference.read_document_reference import handler
-from nrlf.core.constants import CLIENT_RP_DETAILS, V2Headers
+from nrlf.core.constants import CLIENT_RP_DETAILS, ConsumerApiInteractions, V2Headers
 from nrlf.core.dynamodb.repository import DocumentPointer, DocumentPointerRepository
 from nrlf.tests.data import load_document_reference
 from nrlf.tests.dynamodb import mock_repository
@@ -14,6 +14,10 @@ from nrlf.tests.events import (
     create_test_api_gateway_event,
     default_response_headers,
 )
+
+create_mock_context_default_args = {
+    "function_name": "nhsd-nrlf--qa-sandbox-2--api--producer--readDocumentReference"
+}
 
 
 @mock_aws
@@ -63,6 +67,7 @@ def test_read_document_reference_happy_path_v2(
 
     get_pointer_permissions_mock.return_value = {
         "access_controls": [],
+        "interactions": [ConsumerApiInteractions.READ_DOCUMENT_REFERENCE.value],
         "types": ["http://snomed.info/sct|736253002"],
     }
 
@@ -71,7 +76,7 @@ def test_read_document_reference_happy_path_v2(
         path_parameters={"id": doc_pointer.id},
     )
 
-    result = handler(event, create_mock_context())
+    result = handler(event, create_mock_context(**create_mock_context_default_args))
     body = result.pop("body")
 
     assert result == {
@@ -222,6 +227,7 @@ def test_read_document_reference_unauthorised_for_type_v2(
 
     get_pointer_permissions_mock.return_value = {
         "access_controls": [],
+        "interactions": [ConsumerApiInteractions.READ_DOCUMENT_REFERENCE.value],
         "types": ["http://snomed.info/sct|736373009"],
     }
 
@@ -230,7 +236,7 @@ def test_read_document_reference_unauthorised_for_type_v2(
         path_parameters={"id": doc_pointer.id},
     )
 
-    result = handler(event, create_mock_context())
+    result = handler(event, create_mock_context(**create_mock_context_default_args))
     body = result.pop("body")
 
     assert result == {

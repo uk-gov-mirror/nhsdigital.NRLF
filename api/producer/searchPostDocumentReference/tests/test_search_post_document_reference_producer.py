@@ -12,6 +12,7 @@ from nrlf.core.constants import (
     TYPE_ATTRIBUTES,
     Categories,
     PointerTypes,
+    ProducerApiInteractions,
     V2Headers,
 )
 from nrlf.core.dynamodb.repository import DocumentPointer, DocumentPointerRepository
@@ -23,6 +24,10 @@ from nrlf.tests.events import (
     create_test_api_gateway_event,
     default_response_headers,
 )
+
+create_mock_context_default_args = {
+    "function_name": "nhsd-nrlf--ref-2--api--producer--searchPostDocumentReference"
+}
 
 
 @mock_aws
@@ -82,6 +87,7 @@ def test_search_post_document_reference_happy_path_v2(
 
     get_pointer_permissions_mock.return_value = {
         "access_controls": [],
+        "interactions": [ProducerApiInteractions.SEARCH_POST_DOCUMENT_REFERENCE.value],
         "types": ["http://snomed.info/sct|736253002"],
     }
 
@@ -94,7 +100,7 @@ def test_search_post_document_reference_happy_path_v2(
         ),
     )
 
-    result = handler(event, create_mock_context())
+    result = handler(event, create_mock_context(**create_mock_context_default_args))
     body = result.pop("body")
 
     assert result == {
@@ -562,6 +568,7 @@ def test_search_post_document_reference_filters_by_pointer_types_v2(
 
     get_pointer_permissions_mock.return_value = {
         "access_controls": [],
+        "interactions": ProducerApiInteractions.list(),
         "types": ["http://snomed.info/sct|736253002"],
     }
 
@@ -574,7 +581,7 @@ def test_search_post_document_reference_filters_by_pointer_types_v2(
         ),
     )
 
-    result = handler(event, create_mock_context())
+    result = handler(event, create_mock_context(**create_mock_context_default_args))
     body = result.pop("body")
 
     assert result == {

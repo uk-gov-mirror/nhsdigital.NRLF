@@ -74,9 +74,9 @@ def create_test_api_gateway_event(
     }
 
 
-def create_mock_context():
+def create_mock_context(function_name="test_function"):
     return Mock(
-        function_name="test_function",
+        function_name=function_name,
         function_version="1",
         invoked_function_arn="arn:aws:lambda:eu-west-2:123456789012:function:test_function:1",
     )

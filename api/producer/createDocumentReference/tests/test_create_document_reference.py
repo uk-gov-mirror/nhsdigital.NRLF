@@ -14,6 +14,7 @@ from nrlf.core.constants import (
     CLIENT_RP_DETAILS,
     SNOMED_SYSTEM_URL,
     AccessControls,
+    ProducerApiInteractions,
     V2Headers,
 )
 from nrlf.core.dynamodb.repository import DocumentPointer, DocumentPointerRepository
@@ -31,6 +32,10 @@ from nrlf.tests.events import (
     create_test_api_gateway_event,
     default_response_headers,
 )
+
+create_mock_context_default_args = {
+    "function_name": "nhsd-nrlf--01ba47--api--producer--createDocumentReference"
+}
 
 
 @mock_aws
@@ -757,6 +762,7 @@ def test_create_document_reference_happy_path_v2(
 
     get_pointer_permissions_mock.return_value = {
         "access_controls": [],
+        "interactions": [ProducerApiInteractions.CREATE_DOCUMENT_REFERENCE.value],
         "types": ["http://snomed.info/sct|736253002"],
     }
 
@@ -765,7 +771,7 @@ def test_create_document_reference_happy_path_v2(
         body=doc_ref_data,
     )
 
-    result = handler(event, create_mock_context())
+    result = handler(event, create_mock_context(**create_mock_context_default_args))
     body = result.pop("body")
 
     assert result == {
@@ -818,6 +824,7 @@ def test_create_document_reference_pointer_type_not_allowed_v2(
     # Return a type that does not match the document's type
     get_pointer_permissions_mock.return_value = {
         "access_controls": [],
+        "interactions": [ProducerApiInteractions.CREATE_DOCUMENT_REFERENCE.value],
         "types": ["http://snomed.info/sct|736373009"],
     }
 
@@ -826,7 +833,7 @@ def test_create_document_reference_pointer_type_not_allowed_v2(
         body=doc_ref.model_dump_json(exclude_none=True),
     )
 
-    result = handler(event, create_mock_context())
+    result = handler(event, create_mock_context(**create_mock_context_default_args))
     body = result.pop("body")
 
     assert result == {
@@ -1571,6 +1578,7 @@ def test_supersede_non_existent_pointer_succeeds_with_v2_access_control(
 
     get_pointer_permissions_mock.return_value = {
         "access_controls": [AccessControls.ALLOW_SUPERSEDE_WITH_DELETE_FAILURE.value],
+        "interactions": [ProducerApiInteractions.CREATE_DOCUMENT_REFERENCE.value],
         "types": ["http://snomed.info/sct|736253002"],
     }
 
@@ -1579,7 +1587,7 @@ def test_supersede_non_existent_pointer_succeeds_with_v2_access_control(
         body=doc_ref.model_dump_json(exclude_none=True),
     )
 
-    result = handler(event, create_mock_context())
+    result = handler(event, create_mock_context(**create_mock_context_default_args))
     body = result.pop("body")
 
     assert result == {
@@ -1640,6 +1648,7 @@ def test_supersede_fails_without_v2_access_control(
 
     get_pointer_permissions_mock.return_value = {
         "access_controls": [],
+        "interactions": [ProducerApiInteractions.CREATE_DOCUMENT_REFERENCE.value],
         "types": ["http://snomed.info/sct|736253002"],
     }
 
@@ -1648,7 +1657,7 @@ def test_supersede_fails_without_v2_access_control(
         body=doc_ref.model_dump_json(exclude_none=True),
     )
 
-    result = handler(event, create_mock_context())
+    result = handler(event, create_mock_context(**create_mock_context_default_args))
     body = result.pop("body")
 
     assert result == {

@@ -34,6 +34,7 @@ class LogReference(Enum):
     HANDLER004c = _Reference("INFO", "Parsed embedded permissions file")
     HANDLER004d = _Reference("INFO", "Using v2 permissions model")
     HANDLER005 = _Reference("WARN", "Rejecting request due to missing pointer types")
+    HANDLER005a = _Reference("WARN", "Rejecting request due to missing interaction")
     HANDLER006 = _Reference("DEBUG", "Attempting to parse request parameters")
     HANDLER007 = _Reference("INFO", "Parsed request parameters")
     HANDLER008 = _Reference("DEBUG", "Attempting to parse request body")

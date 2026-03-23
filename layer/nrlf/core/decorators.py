@@ -74,7 +74,7 @@ def error_handler(
 
 
 def header_handler(
-    wrapped_func: Callable[..., Dict[str, Any]]
+    wrapped_func: Callable[..., Dict[str, Any]],
 ) -> Callable[..., Dict[str, Any]]:
     """
     Wraps the function to set the specific headers in the request and response
@@ -118,7 +118,7 @@ def header_handler(
 
 
 def logger_initialiser(
-    wrapper_func: Callable[..., Dict[str, Any]]
+    wrapper_func: Callable[..., Dict[str, Any]],
 ) -> Callable[..., Dict[str, Any]]:
     """
     Wraps the function and initialises the request logger
@@ -210,6 +210,10 @@ def load_connection_metadata(headers: Dict[str, str], config: Config, path=""):
     logger.log(LogReference.HANDLER004c, pointer_types=pointer_types)
 
     return metadata
+
+
+def _parse_function_name(full_function_name: str):
+    return full_function_name.split("-")[-1]
 
 
 def filter_kwargs(handler_func: RequestHandler, kwargs: Dict[str, Any]):
@@ -336,6 +340,26 @@ def request_handler(
                     details=SpineErrorConcept.from_code("ACCESS DENIED"),
                     diagnostics=f"Your organisation '{metadata.ods_code}' does not have permission to access this resource. Contact the onboarding team.",
                 )
+
+            if metadata.nrl_permissions_policy:
+                allowed_interactions = metadata.nrl_permissions_policy.interactions
+                if (
+                    _parse_function_name(context.function_name)
+                    not in allowed_interactions
+                ):
+                    logger.log(
+                        LogReference.HANDLER005a,
+                        ods_code=metadata.ods_code,
+                        app_id=metadata.nrl_app_id,
+                        interactions=allowed_interactions,
+                    )
+                    raise OperationOutcomeError(
+                        status_code="403",
+                        severity="error",
+                        code="forbidden",
+                        details=SpineErrorConcept.from_code("ACCESS DENIED"),
+                        diagnostics=f"Your organisation '{metadata.ods_code}' does not have permission to access this resource. Contact the onboarding team.",
+                    )
 
             kwargs = {
                 "event": event,

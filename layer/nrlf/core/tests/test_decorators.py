@@ -13,10 +13,13 @@ from nrlf.core.constants import (
     PERMISSION_ALLOW_ALL_POINTER_TYPES,
     X_REQUEST_ID_HEADER,
     AccessControls,
+    ConsumerApiInteractions,
     PointerTypes,
+    ProducerApiInteractions,
     V2Headers,
 )
 from nrlf.core.decorators import (
+    _parse_function_name,
     deprecated,
     error_handler,
     header_handler,
@@ -355,6 +358,49 @@ def test_log_includes_client_cert_details_when_no_cert(mocker: MockerFixture):
     ][0]["client_cert_info"]
 
     assert logged_cert_info == "No client certificate provided"
+
+
+@pytest.mark.parametrize(
+    ("long_function_name", "expected"),
+    [
+        (
+            "nhsd-nrlf--anjal-dev--api--producer--deleteDocumentReference",
+            ProducerApiInteractions.DELETE_DOCUMENT_REFERENCE.value,
+        ),
+        (
+            "nhsd-nrlf--dev-1--api--consumer--readDocumentReference",
+            ConsumerApiInteractions.READ_DOCUMENT_REFERENCE.value,
+        ),
+        (
+            "nhsd-nrlf--int-1--api--consumer--searchPostDocumentReference",
+            ConsumerApiInteractions.SEARCH_POST_DOCUMENT_REFERENCE.value,
+        ),
+        (
+            "nhsd-nrlf--dev-sandbox-2--api--producer--updateDocumentReference",
+            ProducerApiInteractions.UPDATE_DOCUMENT_REFERENCE.value,
+        ),
+        (
+            "nhsd-nrlf--3d9729--api--producer--upsertDocumentReference",
+            ProducerApiInteractions.UPSERT_DOCUMENT_REFERENCE.value,
+        ),
+        (
+            "nhsd-nrlf--ref-2--api--producer--searchPostDocumentReference",
+            ProducerApiInteractions.SEARCH_POST_DOCUMENT_REFERENCE.value,
+        ),
+        (
+            "nhsd-nrlf--qa-sandbox-2--api--producer--readDocumentReference",
+            ProducerApiInteractions.READ_DOCUMENT_REFERENCE.value,
+        ),
+        # (
+        #     "nhsd-nrlf--perftest-1--api--producer--searchPostDocumentReferenc",  # uh oh
+        #     ProducerApiInteractions.SEARCH_DOCUMENT_REFERENCE.value,
+        # ),
+    ],
+)
+def test_parse_function_name(long_function_name, expected):
+    result = _parse_function_name(long_function_name)
+
+    assert result == expected
 
 
 def test_verify_request_id_happy_path():
@@ -936,6 +982,100 @@ def test_request_handler_with_custom_repository(mocker: MockerFixture):
     assert repository_mock.call_args.kwargs == {
         "table_name": "unit-test-document-pointer",
     }
+
+
+def test_request_handler_interaction_allowed_when_function_in_v2_interactions(
+    mocker: MockerFixture,
+):
+    mocker.patch(
+        "nrlf.core.decorators.get_pointer_permissions_v2",
+        return_value={
+            "types": ["http://snomed.info/sct|736253002"],
+            "interactions": ["test_function"],
+        },
+    )
+
+    @request_handler()
+    def decorated_function() -> Response:
+        return Response(
+            statusCode="200",
+            body=json.dumps({"message": "Hello, World!"}),
+            headers={"Content-Type": "application/json"},
+        )
+
+    event = create_test_api_gateway_event(headers=_create_v2_headers())
+    context = create_mock_context(function_name="test_function")
+
+    result = decorated_function(event, context)
+
+    assert result["statusCode"] == "200"
+
+
+def test_request_handler_interaction_forbidden_when_function_not_in_v2_interactions(
+    mocker: MockerFixture,
+):
+    mocker.patch(
+        "nrlf.core.decorators.get_pointer_permissions_v2",
+        return_value={
+            "types": ["http://snomed.info/sct|736253002"],
+            "interactions": ["someOtherFunction"],
+        },
+    )
+
+    @request_handler()
+    def decorated_function() -> Response:
+        return Response(
+            statusCode="200",
+            body=json.dumps({"message": "Hello, World!"}),
+            headers={"Content-Type": "application/json"},
+        )
+
+    event = create_test_api_gateway_event(headers=_create_v2_headers())
+    context = create_mock_context(function_name="theOgFunction")
+    mock_logger = mocker.patch("nrlf.core.decorators.logger")
+
+    result = decorated_function(event, context)
+
+    assert result["statusCode"] == "403"
+    parsed_body = json.loads(result["body"])
+    assert parsed_body["issue"][0]["code"] == "forbidden"
+    assert (
+        "'Y05868' does not have permission to access this resource"
+        in parsed_body["issue"][0]["diagnostics"]
+    )
+    assert any(
+        args and args[0] == LogReference.HANDLER005a
+        for args, _ in mock_logger.log.call_args_list
+    )
+
+
+def test_request_handler_interaction_forbidden_when_v2_interactions_empty(
+    mocker: MockerFixture,
+):
+    mocker.patch(
+        "nrlf.core.decorators.get_pointer_permissions_v2",
+        return_value={
+            "types": ["http://snomed.info/sct|736253002"],
+            "interactions": [],
+        },
+    )
+
+    @request_handler()
+    def decorated_function() -> Response:
+        return Response(
+            statusCode="200",
+            body=json.dumps({"message": "Hello, World!"}),
+            headers={"Content-Type": "application/json"},
+        )
+
+    event = create_test_api_gateway_event(headers=_create_v2_headers())
+    context = create_mock_context()
+
+    result = decorated_function(event, context)
+
+    assert result["statusCode"] == "403"
+    parsed_body = json.loads(result["body"])
+    assert parsed_body["issue"][0]["code"] == "forbidden"
 
 
 def test_deprecated_decorator():

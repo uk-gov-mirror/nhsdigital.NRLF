@@ -65,6 +65,48 @@ class AccessControls(Enum):
         return [control.value for control in AccessControls]
 
 
+class ApiInteractions(Enum):
+    READ_DOCUMENT_REFERENCE = "readDocumentReference"
+    SEARCH_DOCUMENT_REFERENCE = "searchDocumentReference"
+    SEARCH_POST_DOCUMENT_REFERENCE = "searchPostDocumentReference"
+    CREATE_DOCUMENT_REFERENCE = "createDocumentReference"
+    DELETE_DOCUMENT_REFERENCE = "deleteDocumentReference"
+    UPDATE_DOCUMENT_REFERENCE = "updateDocumentReference"
+    UPSERT_DOCUMENT_REFERENCE = "upsertDocumentReference"
+
+    @staticmethod
+    def list():
+        return [interaction.value for interaction in ApiInteractions]
+
+
+class ConsumerApiInteractions(Enum):
+    READ_DOCUMENT_REFERENCE = ApiInteractions.READ_DOCUMENT_REFERENCE.value
+    SEARCH_DOCUMENT_REFERENCE = ApiInteractions.SEARCH_DOCUMENT_REFERENCE.value
+    SEARCH_POST_DOCUMENT_REFERENCE = (
+        ApiInteractions.SEARCH_POST_DOCUMENT_REFERENCE.value
+    )
+
+    @staticmethod
+    def list():
+        return [interaction.value for interaction in ConsumerApiInteractions]
+
+
+class ProducerApiInteractions(Enum):
+    READ_DOCUMENT_REFERENCE = ApiInteractions.READ_DOCUMENT_REFERENCE.value
+    SEARCH_DOCUMENT_REFERENCE = ApiInteractions.SEARCH_DOCUMENT_REFERENCE.value
+    SEARCH_POST_DOCUMENT_REFERENCE = (
+        ApiInteractions.SEARCH_POST_DOCUMENT_REFERENCE.value
+    )
+    CREATE_DOCUMENT_REFERENCE = ApiInteractions.CREATE_DOCUMENT_REFERENCE.value
+    DELETE_DOCUMENT_REFERENCE = ApiInteractions.DELETE_DOCUMENT_REFERENCE.value
+    UPDATE_DOCUMENT_REFERENCE = ApiInteractions.UPDATE_DOCUMENT_REFERENCE.value
+    UPSERT_DOCUMENT_REFERENCE = ApiInteractions.UPSERT_DOCUMENT_REFERENCE.value
+
+    @staticmethod
+    def list():
+        return [interaction.value for interaction in ProducerApiInteractions]
+
+
 NHSD_REQUEST_ID_HEADER = "NHSD-Request-Id"
 NHSD_CORRELATION_ID_HEADER = "NHSD-Correlation-Id"
 X_REQUEST_ID_HEADER = "X-Request-Id"
