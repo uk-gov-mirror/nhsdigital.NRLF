@@ -88,7 +88,7 @@ class LogReference(Enum):
         "INFO", "Retrieved v2 pointer permissions from lambda layer"
     )
     V2PERMISSIONS013 = _Reference(
-        "WARN", "No v2 permissions file found in lambda layer"
+        "INFO", "No v2 permissions file found in lambda layer"
     )
 
     # Parse Logs

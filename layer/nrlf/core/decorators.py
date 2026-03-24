@@ -25,12 +25,11 @@ from nrlf.core.constants import (
     X_REQUEST_ID_HEADER,
     AccessControls,
     PointerTypes,
-    V2Headers,
 )
 from nrlf.core.dynamodb.repository import DocumentPointerRepository
 from nrlf.core.errors import OperationOutcomeError, ParseError
 from nrlf.core.logger import LogReference, logger
-from nrlf.core.model import PermissionsPolicy
+from nrlf.core.model import ConnectionMetadata, PermissionsPolicy
 from nrlf.core.request import parse_body, parse_headers, parse_params, parse_path
 from nrlf.core.response import Response
 
@@ -73,7 +72,7 @@ def error_handler(
 
 
 def header_handler(
-    wrapped_func: Callable[..., Dict[str, Any]]
+    wrapped_func: Callable[..., Dict[str, Any]],
 ) -> Callable[..., Dict[str, Any]]:
     """
     Wraps the function to set the specific headers in the request and response
@@ -117,7 +116,7 @@ def header_handler(
 
 
 def logger_initialiser(
-    wrapper_func: Callable[..., Dict[str, Any]]
+    wrapper_func: Callable[..., Dict[str, Any]],
 ) -> Callable[..., Dict[str, Any]]:
     """
     Wraps the function and initialises the request logger
@@ -144,29 +143,25 @@ def logger_initialiser(
 RepositoryType = Union[Type[DocumentPointerRepository], None]
 
 
-def _use_v2_permissions_model(headers: Dict[str, str], path: str) -> bool:
-    case_insensitive_headers = {key.lower(): value for key, value in headers.items()}
-
-    v2_headers_provided = (
-        V2Headers.NHSD_END_USER_ORGANISATION_ODS in case_insensitive_headers.keys()
-        and V2Headers.NHSD_NRL_APP_ID in case_insensitive_headers.keys()
-    )
-    if not v2_headers_provided:
-        return False
-
-    metadata = parse_headers(headers, use_v2_permissions=True)
-    v2_permissions_configured = get_pointer_permissions_v2(metadata, path) != {}
-
-    return v2_permissions_configured
-
-
-def _load_v2_connection_metadata(headers: Dict[str, str], path: str):
-    logger.log(LogReference.HANDLER004d)
-
-    metadata = parse_headers(headers, use_v2_permissions=True)
-    logger.log(LogReference.HANDLER003, metadata=metadata.model_dump())
+def v1_perms_stuff(metadata: ConnectionMetadata, config: Config):
+    if PERMISSION_ALLOW_ALL_POINTER_TYPES in metadata.nrl_permissions:
+        logger.log(LogReference.HANDLER004a)
+        metadata.pointer_types = PointerTypes.list()
+        return metadata
 
     logger.log(LogReference.HANDLER004b)
+    pointer_types = parse_permissions_file(metadata)
+    if not pointer_types and not metadata.is_test_event:
+        logger.log(LogReference.HANDLER004)
+        pointer_types = get_pointer_types(metadata, config)
+
+    metadata.pointer_types = pointer_types
+    logger.log(LogReference.HANDLER004c, pointer_types=pointer_types)
+
+    return metadata
+
+
+def v2_perms_stuff(metadata: ConnectionMetadata, path=""):
     pointer_permissions = get_pointer_permissions_v2(metadata, path)
 
     metadata.nrl_permissions_policy = PermissionsPolicy.model_validate(
@@ -195,27 +190,16 @@ def _load_v2_connection_metadata(headers: Dict[str, str], path: str):
 def load_connection_metadata(headers: Dict[str, str], config: Config, path=""):
     logger.log(LogReference.HANDLER002, headers=headers)
 
-    if _use_v2_permissions_model(headers, path):
-        return _load_v2_connection_metadata(headers, path)
-
-    metadata = parse_headers(headers, use_v2_permissions=False)
+    metadata = parse_headers(headers)
     logger.log(LogReference.HANDLER003, metadata=metadata.model_dump())
 
-    if PERMISSION_ALLOW_ALL_POINTER_TYPES in metadata.nrl_permissions:
-        logger.log(LogReference.HANDLER004a)
-        metadata.pointer_types = PointerTypes.list()
-        return metadata
+    try:
+        return v2_perms_stuff(metadata, path)
+    except FileNotFoundError:
+        # No v2 perms file found, so try v1 instead
+        pass
 
-    logger.log(LogReference.HANDLER004b)
-    pointer_types = parse_permissions_file(metadata)
-    if not pointer_types and not metadata.is_test_event:
-        logger.log(LogReference.HANDLER004)
-        pointer_types = get_pointer_types(metadata, config)
-
-    metadata.pointer_types = pointer_types
-    logger.log(LogReference.HANDLER004c, pointer_types=pointer_types)
-
-    return metadata
+    return v1_perms_stuff(metadata, config)
 
 
 def filter_kwargs(handler_func: RequestHandler, kwargs: Dict[str, Any]):
