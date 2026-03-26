@@ -1004,6 +1004,29 @@ def test_load_v2_connection_metadata_missing_access_controls(mocker: MockerFixtu
     assert metadata.nrl_permissions_policy.types == specific_types
 
 
+def test_load_v2_connection_metadata_invalid_permissions_file(mocker: MockerFixture):
+    mocker.patch("nrlf.core.decorators.get_pointer_permissions_v2", return_value=[])
+
+    with pytest.raises(OperationOutcomeError) as err:
+        load_connection_metadata(
+            headers=_create_v2_headers(),
+            config=Config(),
+            path="/producer/DocumentReference",
+        )
+
+    assert err.value.status_code == "401"
+    assert err.value.operation_outcome.resourceType == "OperationOutcome"
+    assert err.value.operation_outcome.issue[0].severity == "error"
+    assert err.value.operation_outcome.issue[0].code == "invalid"
+    assert err.value.operation_outcome.issue[0].details == SpineErrorConcept.from_code(
+        "MISSING_OR_INVALID_HEADER"
+    )
+    assert (
+        err.value.operation_outcome.issue[0].diagnostics
+        == "Unable to parse metadata about the requesting application. Contact the onboarding team."
+    )
+
+
 def test_request_handler_with_custom_repository(mocker: MockerFixture):
     repository_mock = mocker.Mock()
 

@@ -9,7 +9,7 @@ from aws_lambda_powertools.utilities.data_classes import (
     event_source,
 )
 from aws_lambda_powertools.utilities.typing import LambdaContext
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 from nrlf.core.authoriser import (
     get_pointer_permissions_v2,
@@ -164,9 +164,27 @@ def v1_perms_stuff(metadata: ConnectionMetadata, config: Config):
 def v2_perms_stuff(metadata: ConnectionMetadata, path=""):
     pointer_permissions = get_pointer_permissions_v2(metadata, path)
 
-    metadata.nrl_permissions_policy = PermissionsPolicy.model_validate(
-        pointer_permissions
-    )
+    try:
+        metadata.nrl_permissions_policy = PermissionsPolicy.model_validate(
+            pointer_permissions
+        )
+    except ValidationError as err:
+        logger.log(
+            LogReference.HANDLER004e,
+            pointer_permissions=pointer_permissions,
+            path=path,
+            validation_errors=err.errors(),
+        )
+        raise OperationOutcomeError(
+            status_code="401",
+            severity="error",
+            code="invalid",
+            details=SpineErrorConcept.from_code("MISSING_OR_INVALID_HEADER"),
+            diagnostics=(
+                "Unable to parse metadata about the requesting application. "
+                "Contact the onboarding team."
+            ),
+        ) from None
 
     if (
         AccessControls.ALLOW_ALL_TYPES.value
