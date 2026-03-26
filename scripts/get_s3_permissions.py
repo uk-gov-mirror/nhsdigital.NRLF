@@ -6,7 +6,12 @@ from pathlib import Path
 import fire
 from aws_session_assume import get_boto_session
 
-from nrlf.core.constants import AccessControls, PointerTypes
+from nrlf.core.constants import (
+    AccessControls,
+    ConsumerApiInteractions,
+    PointerTypes,
+    ProducerApiInteractions,
+)
 
 
 def get_file_folders(s3_client, bucket_name, prefix=""):
@@ -49,10 +54,29 @@ def add_test_files(folder, file_name, local_path):
         json.dump(PointerTypes.list(), f)
 
 
-def _write_permission_file(folder_path, ods_code, pointer_types, access_controls=None):
+def _get_default_interactions(folder_path):
+    if "producer" in str(folder_path):
+        return ProducerApiInteractions.list()
+    return ConsumerApiInteractions.list()
+
+
+def _write_permission_file(
+    folder_path,
+    ods_code,
+    pointer_types,
+    access_controls=None,
+    interactions=None,
+):
     folder_path.mkdir(parents=True, exist_ok=True)
     with open(folder_path / f"{ods_code}.json", "w") as f:
-        json.dump({"access_controls": access_controls or [], "types": pointer_types}, f)
+        json.dump(
+            {
+                "access_controls": access_controls or [],
+                "interactions": interactions or _get_default_interactions(folder_path),
+                "types": pointer_types,
+            },
+            f,
+        )
 
 
 def add_feature_test_files(local_path):
