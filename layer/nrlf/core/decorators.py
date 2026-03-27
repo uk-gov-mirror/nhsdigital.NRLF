@@ -9,7 +9,7 @@ from aws_lambda_powertools.utilities.data_classes import (
     event_source,
 )
 from aws_lambda_powertools.utilities.typing import LambdaContext
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 from nrlf.core.authoriser import (
     get_pointer_permissions_v2,
@@ -19,8 +19,6 @@ from nrlf.core.authoriser import (
 from nrlf.core.codes import SpineErrorConcept
 from nrlf.core.config import Config
 from nrlf.core.constants import (
-    CLIENT_RP_DETAILS,
-    CONNECTION_METADATA,
     NHSD_CORRELATION_ID_HEADER,
     PERMISSION_ALLOW_ALL_POINTER_TYPES,
     X_CORRELATION_ID_HEADER,
@@ -31,7 +29,7 @@ from nrlf.core.constants import (
 from nrlf.core.dynamodb.repository import DocumentPointerRepository
 from nrlf.core.errors import OperationOutcomeError, ParseError
 from nrlf.core.logger import LogReference, logger
-from nrlf.core.model import PermissionsPolicy
+from nrlf.core.model import ConnectionMetadata, PermissionsPolicy
 from nrlf.core.request import parse_body, parse_headers, parse_params, parse_path
 from nrlf.core.response import Response
 
@@ -145,27 +143,48 @@ def logger_initialiser(
 RepositoryType = Union[Type[DocumentPointerRepository], None]
 
 
-def _use_v2_permissions_model(headers: Dict[str, str]) -> bool:
-    case_insensitive_headers = {key.lower(): value for key, value in headers.items()}
-    # if either or both headers are missing
-    return (
-        CLIENT_RP_DETAILS not in case_insensitive_headers.keys()
-        or CONNECTION_METADATA not in case_insensitive_headers.keys()
-    )
-
-
-def _load_v2_connection_metadata(headers: Dict[str, str], path: str):
-    logger.log(LogReference.HANDLER004d)
-
-    metadata = parse_headers(headers, use_v2_permissions=True)
-    logger.log(LogReference.HANDLER003, metadata=metadata.model_dump())
+def v1_perms_stuff(metadata: ConnectionMetadata, config: Config):
+    if PERMISSION_ALLOW_ALL_POINTER_TYPES in metadata.nrl_permissions:
+        logger.log(LogReference.HANDLER004a)
+        metadata.pointer_types = PointerTypes.list()
+        return metadata
 
     logger.log(LogReference.HANDLER004b)
+    pointer_types = parse_permissions_file(metadata)
+    if not pointer_types and not metadata.is_test_event:
+        logger.log(LogReference.HANDLER004)
+        pointer_types = get_pointer_types(metadata, config)
+
+    metadata.pointer_types = pointer_types
+    logger.log(LogReference.HANDLER004c, pointer_types=pointer_types)
+
+    return metadata
+
+
+def v2_perms_stuff(metadata: ConnectionMetadata, path=""):
     pointer_permissions = get_pointer_permissions_v2(metadata, path)
 
-    metadata.nrl_permissions_policy = PermissionsPolicy.model_validate(
-        pointer_permissions
-    )
+    try:
+        metadata.nrl_permissions_policy = PermissionsPolicy.model_validate(
+            pointer_permissions
+        )
+    except ValidationError as err:
+        logger.log(
+            LogReference.HANDLER004e,
+            pointer_permissions=pointer_permissions,
+            path=path,
+            validation_errors=err.errors(),
+        )
+        raise OperationOutcomeError(
+            status_code="401",
+            severity="error",
+            code="invalid",
+            details=SpineErrorConcept.from_code("MISSING_OR_INVALID_HEADER"),
+            diagnostics=(
+                "Unable to parse metadata about the requesting application. "
+                "Contact the onboarding team."
+            ),
+        ) from None
 
     if (
         AccessControls.ALLOW_ALL_TYPES.value
@@ -189,27 +208,16 @@ def _load_v2_connection_metadata(headers: Dict[str, str], path: str):
 def load_connection_metadata(headers: Dict[str, str], config: Config, path=""):
     logger.log(LogReference.HANDLER002, headers=headers)
 
-    if _use_v2_permissions_model(headers):
-        return _load_v2_connection_metadata(headers, path)
-
-    metadata = parse_headers(headers, use_v2_permissions=False)
+    metadata = parse_headers(headers)
     logger.log(LogReference.HANDLER003, metadata=metadata.model_dump())
 
-    if PERMISSION_ALLOW_ALL_POINTER_TYPES in metadata.nrl_permissions:
-        logger.log(LogReference.HANDLER004a)
-        metadata.pointer_types = PointerTypes.list()
-        return metadata
+    try:
+        return v2_perms_stuff(metadata, path)
+    except FileNotFoundError:
+        # No v2 perms file found, so try v1 instead
+        pass
 
-    logger.log(LogReference.HANDLER004b)
-    pointer_types = parse_permissions_file(metadata)
-    if not pointer_types and not metadata.is_test_event:
-        logger.log(LogReference.HANDLER004)
-        pointer_types = get_pointer_types(metadata, config)
-
-    metadata.pointer_types = pointer_types
-    logger.log(LogReference.HANDLER004c, pointer_types=pointer_types)
-
-    return metadata
+    return v1_perms_stuff(metadata, config)
 
 
 def _parse_function_name(full_function_name: str):

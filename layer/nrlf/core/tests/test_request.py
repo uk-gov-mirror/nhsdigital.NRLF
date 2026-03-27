@@ -4,7 +4,7 @@ import pytest
 
 from nrlf.core.errors import OperationOutcomeError, ParseError
 from nrlf.core.logger import LogReference, logger
-from nrlf.core.request import _fetch_ods_app_id_headers, parse_body, parse_headers
+from nrlf.core.request import _fetch_v2_ods_app_id_headers, parse_body, parse_headers
 from nrlf.producer.fhir.r4.model import DocumentReference
 from nrlf.tests.data import load_document_reference_data
 
@@ -59,7 +59,7 @@ def test_fetch_ods_app_id_headers(
     headers, expected_ods, expected_app_id, expected_log, mocker
 ):
     spy = mocker.spy(logger, "log")
-    ods_code, nrl_app_id = _fetch_ods_app_id_headers(headers)
+    ods_code, nrl_app_id = _fetch_v2_ods_app_id_headers(headers)
 
     assert ods_code == expected_ods
     assert nrl_app_id == expected_app_id
@@ -207,7 +207,7 @@ def test_parse_headers_valid_headers_v2_permissions():
         "nhsd-nrl-app-id": "X26-TestApp-12345",
     }
 
-    metadata = parse_headers(headers, use_v2_permissions=True)
+    metadata = parse_headers(headers)
 
     assert metadata.pointer_types == ["pointer_type"]
     assert metadata.ods_code == "X26"

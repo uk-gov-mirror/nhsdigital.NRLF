@@ -33,6 +33,7 @@ class LogReference(Enum):
     HANDLER004b = _Reference("INFO", "Parsing embedded permissions file")
     HANDLER004c = _Reference("INFO", "Parsed embedded permissions file")
     HANDLER004d = _Reference("INFO", "Using v2 permissions model")
+    HANDLER004e = _Reference("ERROR", "Unable to validate PermissionsPolicy")
     HANDLER005 = _Reference("WARN", "Rejecting request due to missing pointer types")
     HANDLER005a = _Reference("WARN", "Rejecting request due to missing interaction")
     HANDLER006 = _Reference("DEBUG", "Attempting to parse request parameters")
@@ -89,7 +90,7 @@ class LogReference(Enum):
         "INFO", "Retrieved v2 pointer permissions from lambda layer"
     )
     V2PERMISSIONS013 = _Reference(
-        "WARN", "No v2 permissions file found in lambda layer"
+        "INFO", "No v2 permissions file found in lambda layer"
     )
 
     # Parse Logs

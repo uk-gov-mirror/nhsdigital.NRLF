@@ -1,5 +1,7 @@
 from unittest.mock import mock_open, patch
 
+import pytest
+
 from nrlf.core.authoriser import get_pointer_permissions_v2, parse_permissions_file
 from nrlf.core.logger import LogReference, logger
 from nrlf.core.request import parse_headers
@@ -76,17 +78,16 @@ def test_authoriser_get_v2_permissions_with_app_pointer_types(
     spy.assert_called_with(LogReference.V2PERMISSIONS011, key=expected_lookup_key)
 
 
-def test_authoriser_parse_v2_permission_file_with_no_permission_file(mocker):
-    spy = mocker.spy(logger, "log")
-    expected_lookup_key = "consumer/NotAnApp/NotFound.json"
+def test_authoriser_parse_v2_permission_file_with_no_permission_file():
+    with pytest.raises(FileNotFoundError) as error:
+        get_pointer_permissions_v2(
+            connection_metadata=parse_headers(
+                create_headers(ods_code="NotFound", nrl_app_id="NotAnApp")
+            ),
+            request_path="/consumer/_status",
+        )
 
-    metadata_result = get_pointer_permissions_v2(
-        connection_metadata=parse_headers(
-            create_headers(ods_code="NotFound", nrl_app_id="NotAnApp")
-        ),
-        request_path="/consumer/_status",
+    assert (
+        f"No such file or directory: '/opt/python/nrlf_permissions/consumer/NotAnApp/NotFound.json'"
+        in str(error.value)
     )
-
-    assert metadata_result == {}
-
-    spy.assert_any_call(LogReference.V2PERMISSIONS011, key=expected_lookup_key)

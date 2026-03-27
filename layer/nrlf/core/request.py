@@ -11,12 +11,10 @@ from nrlf.core.logger import LogReference, logger
 from nrlf.core.model import ClientRpDetails, ConnectionMetadata
 
 
-def _fetch_ods_app_id_headers(headers: dict[str, str]):
-
+def _fetch_v2_ods_app_id_headers(headers: dict[str, str]):
     case_insensitive_headers = {key.lower(): value for key, value in headers.items()}
 
     ods_code = case_insensitive_headers.get(V2Headers.NHSD_END_USER_ORGANISATION_ODS)
-
     if not ods_code or len(ods_code.strip()) == 0:
         logger.log(
             LogReference.HANDLER003a,
@@ -33,9 +31,7 @@ def _fetch_ods_app_id_headers(headers: dict[str, str]):
     return ods_code, nrl_app_id
 
 
-def parse_headers(
-    headers: Dict[str, str], use_v2_permissions=False
-) -> ConnectionMetadata:
+def parse_headers(headers: Dict[str, str]) -> ConnectionMetadata:
     """
     Parses the connection metadata and client rp details from the headers passed from Apigee
     """
@@ -49,8 +45,8 @@ def parse_headers(
             case_insensitive_headers.get(CONNECTION_METADATA, "{}")
         )
 
-        if use_v2_permissions:
-            ods_code, nrl_app_id = _fetch_ods_app_id_headers(case_insensitive_headers)
+        ods_code, nrl_app_id = _fetch_v2_ods_app_id_headers(case_insensitive_headers)
+        if ods_code and nrl_app_id:
             raw_connection_metadata["nrl.ods-code"] = ods_code
             raw_connection_metadata["nrl.app-id"] = nrl_app_id
             raw_client_rp_details["developer.app.id"] = nrl_app_id

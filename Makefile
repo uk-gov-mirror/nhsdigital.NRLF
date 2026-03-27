@@ -8,7 +8,7 @@ SHELL := /bin/bash
 DIST_PATH ?= ./dist
 TEST_ARGS ?= --cov --cov-report=term-missing --cov-report=xml:$(DIST_PATH)/test-coverage.xml
 SMOKE_TEST_ARGS ?=
-FEATURE_TEST_ARGS ?= ./tests/features --format progress2
+FEATURE_TEST_ARGS ?= ./tests/features
 TF_WORKSPACE_NAME ?= $(shell terraform -chdir=terraform/infrastructure workspace show)
 ENV ?= dev
 ACCOUNT ?= dev
@@ -117,6 +117,7 @@ test-features-integration: check-warn ## Run the BDD feature tests in the integr
 		--define="env=$(TF_WORKSPACE_NAME)" \
 		--define="account_name=$(ENV)" \
 		--define="use_shared_resources=${USE_SHARED_RESOURCES}" \
+		-v --format progress2 \
 		$(FEATURE_TEST_ARGS)
 
 integration-test-with-custom_tag:

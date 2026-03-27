@@ -80,6 +80,12 @@ def _write_permission_file(
         )
 
 
+def _write_v1_permission_file(folder_path, ods_code, pointer_types):
+    folder_path.mkdir(parents=True, exist_ok=True)
+    with open(folder_path / f"{ods_code}.json", "w") as f:
+        json.dump(pointer_types, f)
+
+
 def add_feature_test_files(local_path):
     """Bake in v2 permissions for the feature test application so that the
     v2 permissions model can be proven via feature tests without
@@ -90,7 +96,7 @@ def add_feature_test_files(local_path):
     org_permissions = {
         "consumer": [
             (
-                "z00z-y11y-x22x",
+                "v2-z00z-y11y-x22x",
                 "RX898",
                 [PointerTypes.MENTAL_HEALTH_PLAN.value],
                 [],
@@ -104,7 +110,7 @@ def add_feature_test_files(local_path):
                 ConsumerApiInteractions.list(),
             ),
             (
-                "z00z-y11y-x22x",
+                "v2-z00z-y11y-x22x",
                 "4LLTYP35C",
                 [],
                 [AccessControls.ALLOW_ALL_TYPES.value],
@@ -120,7 +126,7 @@ def add_feature_test_files(local_path):
         ],
         "producer": [
             (
-                "z00z-y11y-x22x",
+                "v2-z00z-y11y-x22x",
                 "RX898",
                 [PointerTypes.EOL_CARE_PLAN.value],
                 [],
@@ -134,7 +140,7 @@ def add_feature_test_files(local_path):
                 ProducerApiInteractions.list(),
             ),
             (
-                "z00z-y11y-x22x",
+                "v2-z00z-y11y-x22x",
                 "4LLTYP35P",
                 [],
                 [
@@ -201,6 +207,24 @@ def add_feature_test_files(local_path):
         )
         for actor_type, entries in app_permissions.items()
         for app_id, pointer_types, access_controls in entries
+    ]
+
+    print("Adding feature test v1 permissions to temporary directory...")
+    v1_permissions = [
+        (
+            "v2-z00z-y11y-x22x",
+            "V1ONLY0D5",
+            [PointerTypes.LLOYD_GEORGE_FOLDER.value],
+            [],
+        ),  # http://snomed.info/sct|16521000000101
+    ]
+    [
+        _write_v1_permission_file(
+            Path.joinpath(local_path, app_id),
+            ods_code,
+            pointer_types,
+        )
+        for app_id, ods_code, pointer_types, access_controls in v1_permissions
     ]
 
 
