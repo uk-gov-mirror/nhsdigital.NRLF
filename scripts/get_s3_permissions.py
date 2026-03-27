@@ -9,6 +9,7 @@ from aws_session_assume import get_boto_session
 from nrlf.core.constants import (
     AccessControls,
     ConsumerApiInteractions,
+    InternalApiInteractions,
     PointerTypes,
     ProducerApiInteractions,
 )
@@ -141,7 +142,14 @@ def add_feature_test_files(local_path):
                     AccessControls.ALLOW_OVERRIDE_CREATION_DATETIME.value,
                     AccessControls.ALLOW_SUPERSEDE_WITH_DELETE_FAILURE.value,
                 ],
-                ProducerApiInteractions.list(),
+                ProducerApiInteractions.list().extend(InternalApiInteractions.list()),
+            ),
+            (
+                "z00z-y11y-x22x",
+                "1DSYNC1NT3R4CT1ON5",
+                [],
+                [AccessControls.ALLOW_ALL_TYPES.value],
+                InternalApiInteractions.list(),
             ),
         ],
     }

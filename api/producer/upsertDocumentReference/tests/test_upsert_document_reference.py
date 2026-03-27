@@ -14,6 +14,7 @@ from nrlf.core.constants import (
     PERMISSION_SUPERSEDE_IGNORE_DELETE_FAIL,
     AccessControls,
     InternalApiInteractions,
+    ProducerApiInteractions,
     V2Headers,
 )
 from nrlf.core.dynamodb.repository import DocumentPointer, DocumentPointerRepository
@@ -1660,6 +1661,76 @@ def test_supersede_fails_without_v2_access_control(
                 },
                 "diagnostics": "The relatesTo target document does not exist",
                 "expression": ["relatesTo[0].target.identifier.value"],
+            }
+        ],
+    }
+
+
+@mock_aws
+@mock_repository
+@patch("nrlf.core.decorators.get_pointer_permissions_v2")
+def test_v2_producer_interactions_cannot_supersede(
+    get_pointer_permissions_mock, repository: DocumentPointerRepository
+):
+    doc_ref = load_document_reference("Y05868-736253002-Valid")
+    doc_pointer = DocumentPointer.from_document_reference(doc_ref)
+    repository.create(doc_pointer)
+
+    # Change document ID and NHS number
+    doc_ref.id = "Y05868-99999-99999-111111"
+    doc_ref.relatesTo = [
+        DocumentReferenceRelatesTo(
+            code="replaces",
+            target=Reference(identifier=Identifier(value="Y05868-99999-99999-999999")),
+        )
+    ]
+
+    v2_headers = create_headers(
+        additional_headers={
+            V2Headers.NHSD_END_USER_ORGANISATION_ODS: "Y05868",
+            V2Headers.NHSD_NRL_APP_ID: "Y05868-TestApp-12345678",
+        }
+    )
+    v2_headers.pop(CLIENT_RP_DETAILS)
+
+    get_pointer_permissions_mock.return_value = {
+        "access_controls": [],
+        "interactions": ProducerApiInteractions.list(),
+        "types": ["http://snomed.info/sct|736253002"],
+    }
+
+    event = create_test_api_gateway_event(
+        headers=v2_headers,
+        body=doc_ref.model_dump_json(exclude_none=True),
+    )
+
+    result = handler(event, create_mock_context(**create_mock_context_default_args))
+    body = result.pop("body")
+
+    assert result == {
+        "statusCode": "403",
+        "headers": default_response_headers(),
+        "isBase64Encoded": False,
+    }
+
+    parsed_body = json.loads(body)
+
+    assert parsed_body == {
+        "resourceType": "OperationOutcome",
+        "issue": [
+            {
+                "severity": "error",
+                "code": "forbidden",
+                "details": {
+                    "coding": [
+                        {
+                            "code": "ACCESS DENIED",
+                            "display": "Access has been denied to process this request",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
+                        }
+                    ]
+                },
+                "diagnostics": "Your organisation 'Y05868' does not have permission to access this resource. Contact the onboarding team.",
             }
         ],
     }

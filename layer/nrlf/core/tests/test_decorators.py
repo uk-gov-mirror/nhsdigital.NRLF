@@ -935,6 +935,30 @@ def test_load_v2_connection_metadata_specific_types(mocker: MockerFixture):
     assert metadata.nrl_permissions_policy.types == specific_types
 
 
+def test_load_v2_connection_metadata_access_control_does_not_override_interactions(
+    mocker: MockerFixture,
+):
+    mocker.patch(
+        "nrlf.core.decorators.get_pointer_permissions_v2",
+        return_value={
+            "access_controls": [AccessControls.ALLOW_ALL_TYPES.value],
+            "interactions": ProducerApiInteractions.list(),
+            "types": [],
+        },
+    )
+
+    metadata = load_connection_metadata(
+        headers=_create_v2_headers(),
+        config=Config(),
+        path="/producer/DocumentReference",
+    )
+
+    assert metadata.nrl_permissions_policy.types == PointerTypes.list()
+    assert (
+        metadata.nrl_permissions_policy.interactions == ProducerApiInteractions.list()
+    )
+
+
 def test_load_v2_connection_metadata_missing_access_controls(mocker: MockerFixture):
     specific_types = ["http://snomed.info/sct|736253002"]
     mocker.patch(
