@@ -49,7 +49,7 @@ def create_test_api_gateway_event(
 ) -> Dict[str, Any]:
     return {
         "resource": "/",
-        "path": "/",
+        "path": "/consumer/producer/",
         "httpMethod": "GET",
         "requestContext": {
             "resourcePath": "/",

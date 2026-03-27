@@ -16,7 +16,7 @@ Feature: Consumer - searchDocumentReference - Success Scenarios
       | url         | https://example.org/my-doc.pdf  |
       | custodian   | 02V                             |
       | author      | 02V                             |
-    When consumer v1 'RX898' searches for DocumentReferences with parameters:
+    When consumer 'RX898' searches for DocumentReferences with parameters:
       | parameter | value      |
       | subject   | 9278693472 |
     Then the response status code is 200
@@ -53,7 +53,7 @@ Feature: Consumer - searchDocumentReference - Success Scenarios
       | custodian   | 02V                             |
       | author      | 02V                             |
       | identifier  | 02V.123456789                   |
-    When consumer v1 'RX898' searches for DocumentReferences with parameters:
+    When consumer 'RX898' searches for DocumentReferences with parameters:
       | parameter | value      |
       | subject   | 9278693472 |
     Then the response status code is 200
@@ -90,7 +90,7 @@ Feature: Consumer - searchDocumentReference - Success Scenarios
       | url         | https://example.org/my-doc.pdf  |
       | custodian   | 02V                             |
       | author      | 02V                             |
-    When consumer v1 'RX898' searches for DocumentReferences with parameters:
+    When consumer 'RX898' searches for DocumentReferences with parameters:
       | parameter | value      |
       | subject   | 9278693472 |
       | custodian | 02V        |
@@ -138,7 +138,7 @@ Feature: Consumer - searchDocumentReference - Success Scenarios
       | url         | https://example.org/my-doc.pdf   |
       | custodian   | DK94                             |
       | author      | DK94                             |
-    When consumer v1 'RX898' searches for DocumentReferences with parameters:
+    When consumer 'RX898' searches for DocumentReferences with parameters:
       | parameter | value      |
       | subject   | 9278693472 |
       | custodian | 02V        |
@@ -186,7 +186,7 @@ Feature: Consumer - searchDocumentReference - Success Scenarios
       | url         | https://example.org/my-doc.pdf  |
       | custodian   | 02V                             |
       | author      | 02V                             |
-    When consumer v1 'RX898' searches for DocumentReferences with parameters:
+    When consumer 'RX898' searches for DocumentReferences with parameters:
       | parameter | value      |
       | subject   | 9278693472 |
       | custodian | 02V        |
@@ -245,7 +245,7 @@ Feature: Consumer - searchDocumentReference - Success Scenarios
       | url         | https://example.org/my-doc-3.pdf      |
       | custodian   | 02V                                   |
       | author      | 02V                                   |
-    When consumer v1 'RX898' searches for DocumentReferences with parameters:
+    When consumer 'RX898' searches for DocumentReferences with parameters:
       | parameter | value      |
       | subject   | 9278693472 |
     Then the response status code is 200
@@ -298,8 +298,8 @@ Feature: Consumer - searchDocumentReference - Success Scenarios
       | url         | https://example.org/my-doc.pdf |
       | custodian   | DK94                           |
       | author      | N64                            |
-    When producer v1 'DK94' requests to delete DocumentReference with id 'DK94-111-DeleteDocRefTest1'
-    And consumer v1 'RX898' searches for DocumentReferences with parameters:
+    When producer 'DK94' requests to delete DocumentReference with id 'DK94-111-DeleteDocRefTest1'
+    And consumer 'RX898' searches for DocumentReferences with parameters:
       | parameter | value      |
       | subject   | 9278693472 |
       | custodian | RX898      |
@@ -348,7 +348,7 @@ Feature: Consumer - searchDocumentReference - Success Scenarios
       | url         | https://example.org/my-doc-3.pdf      |
       | custodian   | 02V                                   |
       | author      | 02V                                   |
-    When consumer v1 'RX898' searches for DocumentReferences with parameters:
+    When consumer 'RX898' searches for DocumentReferences with parameters:
       | parameter | value                             |
       | subject   | 9278693472                        |
       | category  | http://snomed.info/sct\|734163000 |
@@ -409,7 +409,7 @@ Feature: Consumer - searchDocumentReference - Success Scenarios
       | url         | https://example.org/my-doc-3.pdf      |
       | custodian   | 02V                                   |
       | author      | 02V                                   |
-    When consumer v1 'RX898' searches for DocumentReferences with parameters:
+    When consumer 'RX898' searches for DocumentReferences with parameters:
       | parameter | value                                    |
       | subject   | 9278693472                               |
       | category  | http://snomed.info/sct\|1102421000000108 |
@@ -450,7 +450,7 @@ Feature: Consumer - searchDocumentReference - Success Scenarios
       | url         | https://example.org/my-doc-3.pdf      |
       | custodian   | 02V                                   |
       | author      | 02V                                   |
-    When consumer v1 'RX898' searches for DocumentReferences with parameters:
+    When consumer 'RX898' searches for DocumentReferences with parameters:
       | parameter | value      |
       | subject   | 9278693472 |
       | _summary  | count      |
@@ -510,7 +510,7 @@ Feature: Consumer - searchDocumentReference - Success Scenarios
       | url         | https://example.org/my-doc-4.pdf      |
       | custodian   | 02V                                   |
       | author      | 02V                                   |
-    When consumer v1 'RX898' searches for DocumentReferences with parameters:
+    When consumer 'RX898' searches for DocumentReferences with parameters:
       | parameter | value                                                                     |
       | subject   | 9278693472                                                                |
       | category  | http://snomed.info/sct\|734163000,http://snomed.info/sct\|823651000000106 |

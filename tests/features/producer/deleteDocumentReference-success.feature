@@ -18,7 +18,7 @@ Feature: Producer - deleteDocumentReference - Success Scenarios
       | url         | https://example.org/my-doc.pdf |
       | custodian   | DK94                           |
       | author      | N64                            |
-    When producer v1 'DK94' requests to delete DocumentReference with id 'DK94-111-DeleteDocRefTest1'
+    When producer 'DK94' requests to delete DocumentReference with id 'DK94-111-DeleteDocRefTest1'
     Then the response status code is 200
     And the response is an OperationOutcome with 1 issue
     And the OperationOutcome contains the issue:
@@ -47,7 +47,7 @@ Feature: Producer - deleteDocumentReference - Success Scenarios
     And the organisation 'DK94' is authorised to access pointer types:
       | system                 | value     |
       | http://snomed.info/sct | 736253002 |
-    When producer v1 'DK94' requests to delete DocumentReference with id 'DK94-000-NoPointerHere'
+    When producer 'DK94' requests to delete DocumentReference with id 'DK94-000-NoPointerHere'
     Then the response status code is 200
     And the response is an OperationOutcome with 1 issue
     And the OperationOutcome contains the issue:

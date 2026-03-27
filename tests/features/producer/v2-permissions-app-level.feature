@@ -6,7 +6,7 @@ Feature: Producer v2 APP-LEVEL permissions by pointer type - Success and Failure
 
   Scenario: HAPPY PATH V2 Permissions with access for pointer type - createDocumentReference
     Given the application 'ProducerTest001' (ID 'app-t001') is registered to access the API
-    When producer v2 'ORGA' creates a DocumentReference with values:
+    When producer 'ORGA' creates a DocumentReference with values:
       | property        | value                          |
       | subject         | 9278693472                     |
       | status          | current                        |
@@ -50,7 +50,7 @@ Feature: Producer v2 APP-LEVEL permissions by pointer type - Success and Failure
 
   Scenario: V2 Permissions with no producer access at all (but app level consumer access for specified type)
     Given the application 'ProducerTest002' (ID 'app-t002') is registered to access the API
-    When producer v2 'ORGA' creates a DocumentReference with values:
+    When producer 'ORGA' creates a DocumentReference with values:
       | property        | value                          |
       | subject         | 9278693472                     |
       | status          | current                        |
@@ -82,7 +82,7 @@ Feature: Producer v2 APP-LEVEL permissions by pointer type - Success and Failure
 
   Scenario: V2 Permissions with no access to specified type
     Given the application 'ProducerTest003' (ID 'app-t003') is registered to access the API
-    When producer v2 'ORGA' creates a DocumentReference with values:
+    When producer 'ORGA' creates a DocumentReference with values:
       | property        | value                          |
       | subject         | 9278693472                     |
       | status          | current                        |
@@ -117,7 +117,7 @@ Feature: Producer v2 APP-LEVEL permissions by pointer type - Success and Failure
 
   Scenario: V2 Permissions with org-level permissions for requested type but app level permissions for other types
     Given the application 'ProducerTest004' (ID 'app-t004') is registered to access the API
-    When producer v2 'ODS1' creates a DocumentReference with values:
+    When producer 'ODS1' creates a DocumentReference with values:
       | property        | value                          |
       | subject         | 9278693472                     |
       | status          | current                        |

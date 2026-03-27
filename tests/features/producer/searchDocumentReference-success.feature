@@ -27,7 +27,7 @@ Feature: Producer - searchDocumentReference - Success Scenarios
       | url         | https://example.org/my-doc.pdf        |
       | custodian   | RX898                                 |
       | author      | X26                                   |
-    When producer v1 'RX898' searches for DocumentReferences with parameters:
+    When producer 'RX898' searches for DocumentReferences with parameters:
       | parameter | value      |
       | subject   | 9278693472 |
     Then the response status code is 200
@@ -86,7 +86,7 @@ Feature: Producer - searchDocumentReference - Success Scenarios
       | url         | https://example.org/my-doc.pdf        |
       | custodian   | RX898                                 |
       | author      | X26                                   |
-    When producer v1 'RX898' searches for DocumentReferences with parameters:
+    When producer 'RX898' searches for DocumentReferences with parameters:
       | parameter    | value      |
       | pointer_type | 736253002  |
       | subject      | 9999999999 |

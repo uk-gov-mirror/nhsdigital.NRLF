@@ -5,7 +5,7 @@ Feature: Consumer v2 permissions by pointer type - Success and Failure Scenarios
   success scenarios.
 
   Background:
-    Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
+    Given the application 'DataShare' (ID 'v2-z00z-y11y-x22x') is registered to access the API
 
   Scenario: V2 Permissions with access for pointer type - readDocumentReference
     Given a DocumentReference resource exists with values:
@@ -19,7 +19,7 @@ Feature: Consumer v2 permissions by pointer type - Success and Failure Scenarios
       | url         | https://example.org/my-doc.pdf             |
       | custodian   | RX898                                      |
       | author      | RX898                                      |
-    When consumer v2 'RX898' reads a DocumentReference with ID 'RX898-9999999999-ReadDocRefV2SameCustodian'
+    When consumer 'RX898' reads a DocumentReference with ID 'RX898-9999999999-ReadDocRefV2SameCustodian'
     Then the response status code is 200
     And the response is a DocumentReference with JSON value:
       """
@@ -121,7 +121,7 @@ Feature: Consumer v2 permissions by pointer type - Success and Failure Scenarios
       """
 
   Scenario: V2 permissions with access for pointer type retrieves expected document references - searchPostDocumentReference
-    Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
+    Given the application 'DataShare' (ID 'v2-z00z-y11y-x22x') is registered to access the API
     And a DocumentReference resource exists with values:
       | property    | value                                 |
       | id          | X26-1111111111-SearchMultipleRefTest1 |
@@ -155,7 +155,7 @@ Feature: Consumer v2 permissions by pointer type - Success and Failure Scenarios
       | url         | https://example.org/my-doc-3.pdf                  |
       | custodian   | X26                                               |
       | author      | X26                                               |
-    When consumer v2 'RX898' searches for DocumentReferences using POST with request body:
+    When consumer 'RX898' searches for DocumentReferences using POST with request body:
       | key     | value      |
       | subject | 9278693472 |
     Then the response status code is 200
@@ -187,8 +187,8 @@ Feature: Consumer v2 permissions by pointer type - Success and Failure Scenarios
     And the Bundle does not contain a DocumentReference with ID 'X26-1111111111-SearchMultipleRefTestDifferentType'
 
   Scenario: V2 permissions with no access for pointer type - searchDocumentReference
-    Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
-    When consumer v2 'RX898' searches for DocumentReferences with parameters:
+    Given the application 'DataShare' (ID 'v2-z00z-y11y-x22x') is registered to access the API
+    When consumer 'RX898' searches for DocumentReferences with parameters:
       | parameter | value                                   |
       | subject   | 9278693472                              |
       | type      | http://snomed.info/sct\|887701000000100 |
@@ -211,8 +211,132 @@ Feature: Consumer v2 permissions by pointer type - Success and Failure Scenarios
       }
       """
 
+  Scenario: No V2 Permissions for org gets v1 permissions - readDocumentReference
+    Given a DocumentReference resource exists with values:
+      | property    | value                                     |
+      | id          | V1ONLY0D5-9999999999-ReadDocRefNoV2FindV1 |
+      | subject     | 9999999999                                |
+      | status      | current                                   |
+      | type        | 16521000000101                            |
+      | category    | 419891008                                 |
+      | contentType | application/pdf                           |
+      | url         | https://example.org/my-doc.pdf            |
+      | custodian   | V1ONLY0D5                                 |
+      | author      | V1ONLY0D5                                 |
+    And a DocumentReference resource exists with values:
+      | property    | value                                            |
+      | id          | RX898-9999999999-ReadDocRefNoV2PermsSoDontFindMe |
+      | subject     | 9999999999                                       |
+      | status      | current                                          |
+      | type        | 736253002                                        |
+      | category    | 734163000                                        |
+      | contentType | application/pdf                                  |
+      | url         | https://example.org/my-doc.pdf                   |
+      | custodian   | RX898                                            |
+      | author      | RX898                                            |
+    When consumer 'V1ONLY0D5' reads a DocumentReference with ID 'V1ONLY0D5-9999999999-ReadDocRefNoV2FindV1'
+    Then the response status code is 200
+    And the response is a DocumentReference with JSON value:
+      """
+      {
+        "resourceType": "DocumentReference",
+        "id": "V1ONLY0D5-9999999999-ReadDocRefNoV2FindV1",
+        "status": "current",
+        "type": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "16521000000101",
+              "display": "Lloyd George record folder"
+            }
+          ]
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "419891008",
+                "display": "Record artifact"
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "identifier": {
+            "system": "https://fhir.nhs.uk/Id/nhs-number",
+            "value": "9999999999"
+          }
+        },
+        "custodian": {
+          "identifier": {
+            "system": "https://fhir.nhs.uk/Id/ods-organization-code",
+            "value": "V1ONLY0D5"
+          }
+        },
+        "author": [
+          {
+            "identifier": {
+              "system": "https://fhir.nhs.uk/Id/ods-organization-code",
+              "value": "V1ONLY0D5"
+            }
+          }
+        ],
+        "content": [
+          {
+            "attachment": {
+              "contentType": "application/pdf",
+              "url": "https://example.org/my-doc.pdf"
+            },
+            "format": {
+              "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLFormatCode",
+              "code": "urn:nhs-ic:unstructured",
+              "display": "Unstructured Document"
+            },
+            "extension": [
+              {
+                "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-ContentStability",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability",
+                      "code": "static",
+                      "display": "Static"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-NRLRetrievalMechanism",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLRetrievalMechanism",
+                      "code": "Direct",
+                      "display": "Direct"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "context": {
+          "practiceSetting": {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "788007007",
+                "display": "General practice service"
+              }
+            ]
+          }
+        }
+      }
+      """
+
   Scenario: V2 permissions with access all pointer types retrieves expected document references - searchPostDocumentReference
-    Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
+    Given the application 'DataShare' (ID 'v2-z00z-y11y-x22x') is registered to access the API
     And a DocumentReference resource exists with values:
       | property    | value                              |
       | id          | X26-5900056201-SearchMultipleType1 |
@@ -246,7 +370,7 @@ Feature: Consumer v2 permissions by pointer type - Success and Failure Scenarios
       | url         | https://example.org/my-doc-3.pdf   |
       | custodian   | X26                                |
       | author      | X26                                |
-    When consumer v2 '4LLTYP35C' searches for DocumentReferences using POST with request body:
+    When consumer '4LLTYP35C' searches for DocumentReferences using POST with request body:
       | key     | value      |
       | subject | 9000000378 |
     Then the response status code is 200
