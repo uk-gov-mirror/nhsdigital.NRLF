@@ -8,7 +8,7 @@ Feature: Producer v2 permissions by pointer type - Success and Failure Scenarios
     Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
 
   Scenario: V2 Permissions with no access for producer interaction - createDocumentReference
-    When producer v2 '1DSYNC1NT3R4CT1ON5' creates a DocumentReference with values:
+    When producer '1DSYNC1NT3R4CT1ON5' creates a DocumentReference with values:
       | property        | value                          |
       | subject         | 9278693472                     |
       | status          | current                        |
@@ -50,7 +50,7 @@ Feature: Producer v2 permissions by pointer type - Success and Failure Scenarios
       | url         | https://example.org/my-doc.pdf       |
       | custodian   | ODS1                                 |
       | author      | X26                                  |
-    When producer v2 'ODS1' upserts a DocumentReference with values:
+    When producer 'ODS1' upserts a DocumentReference with values:
       | property  | value                                |
       | id        | ODS1-1111111111-SearchNHSDocRefTest1 |
       | subject   | 9999999999                           |
