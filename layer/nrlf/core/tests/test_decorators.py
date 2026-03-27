@@ -14,6 +14,7 @@ from nrlf.core.constants import (
     X_REQUEST_ID_HEADER,
     AccessControls,
     ConsumerApiInteractions,
+    InternalApiInteractions,
     PointerTypes,
     ProducerApiInteractions,
     V2Headers,
@@ -381,7 +382,7 @@ def test_log_includes_client_cert_details_when_no_cert(mocker: MockerFixture):
         ),
         (
             "nhsd-nrlf--3d9729--api--producer--upsertDocumentReference",
-            ProducerApiInteractions.UPSERT_DOCUMENT_REFERENCE.value,
+            InternalApiInteractions.UPSERT_DOCUMENT_REFERENCE.value,
         ),
         (
             "nhsd-nrlf--ref-2--api--producer--searchPostDocumentReference",

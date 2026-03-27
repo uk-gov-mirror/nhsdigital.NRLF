@@ -100,11 +100,18 @@ class ProducerApiInteractions(Enum):
     CREATE_DOCUMENT_REFERENCE = ApiInteractions.CREATE_DOCUMENT_REFERENCE.value
     DELETE_DOCUMENT_REFERENCE = ApiInteractions.DELETE_DOCUMENT_REFERENCE.value
     UPDATE_DOCUMENT_REFERENCE = ApiInteractions.UPDATE_DOCUMENT_REFERENCE.value
-    UPSERT_DOCUMENT_REFERENCE = ApiInteractions.UPSERT_DOCUMENT_REFERENCE.value
 
     @staticmethod
     def list():
         return [interaction.value for interaction in ProducerApiInteractions]
+
+
+class InternalApiInteractions(Enum):
+    UPSERT_DOCUMENT_REFERENCE = ApiInteractions.UPSERT_DOCUMENT_REFERENCE.value
+
+    @staticmethod
+    def list():
+        return [interaction.value for interaction in InternalApiInteractions]
 
 
 NHSD_REQUEST_ID_HEADER = "NHSD-Request-Id"

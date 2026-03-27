@@ -13,7 +13,7 @@ from nrlf.core.constants import (
     CLIENT_RP_DETAILS,
     PERMISSION_SUPERSEDE_IGNORE_DELETE_FAIL,
     AccessControls,
-    ProducerApiInteractions,
+    InternalApiInteractions,
     V2Headers,
 )
 from nrlf.core.dynamodb.repository import DocumentPointer, DocumentPointerRepository
@@ -116,7 +116,7 @@ def test_upsert_document_reference_happy_path_v2(
 
     get_pointer_permissions_mock.return_value = {
         "access_controls": [],
-        "interactions": [ProducerApiInteractions.UPSERT_DOCUMENT_REFERENCE.value],
+        "interactions": [InternalApiInteractions.UPSERT_DOCUMENT_REFERENCE.value],
         "types": ["http://snomed.info/sct|736253002"],
     }
 
@@ -838,7 +838,7 @@ def test_upsert_document_reference_pointer_type_not_allowed_v2(
 
     get_pointer_permissions_mock.return_value = {
         "access_controls": [],
-        "interactions": [ProducerApiInteractions.UPSERT_DOCUMENT_REFERENCE.value],
+        "interactions": [InternalApiInteractions.UPSERT_DOCUMENT_REFERENCE.value],
         "types": ["http://snomed.info/sct|99999999999"],
     }
 
@@ -1553,7 +1553,7 @@ def test_supersede_non_existent_pointer_succeeds_with_v2_access_control(
 
     get_pointer_permissions_mock.return_value = {
         "access_controls": [AccessControls.ALLOW_SUPERSEDE_WITH_DELETE_FAILURE.value],
-        "interactions": ProducerApiInteractions.list(),
+        "interactions": InternalApiInteractions.list(),
         "types": ["http://snomed.info/sct|736253002"],
     }
 
@@ -1623,7 +1623,7 @@ def test_supersede_fails_without_v2_access_control(
 
     get_pointer_permissions_mock.return_value = {
         "access_controls": [],
-        "interactions": [ProducerApiInteractions.UPSERT_DOCUMENT_REFERENCE.value],
+        "interactions": [InternalApiInteractions.UPSERT_DOCUMENT_REFERENCE.value],
         "types": ["http://snomed.info/sct|736253002"],
     }
 

@@ -93,18 +93,28 @@ def add_feature_test_files(local_path):
                 "RX898",
                 [PointerTypes.MENTAL_HEALTH_PLAN.value],
                 [],
+                ConsumerApiInteractions.list(),
             ),  # http://snomed.info/sct|736253002
             (
                 "app-t004",
                 "ODS1",
                 [PointerTypes.PERSONALISED_CARE_AND_SUPPORT_PLAN.value],
                 [],
+                ConsumerApiInteractions.list(),
             ),
             (
                 "z00z-y11y-x22x",
                 "4LLTYP35C",
                 [],
                 [AccessControls.ALLOW_ALL_TYPES.value],
+                ConsumerApiInteractions.list(),
+            ),
+            (
+                "z00z-y11y-x22x",
+                "1NT3R4CT1ON5",
+                [],
+                [AccessControls.ALLOW_ALL_TYPES.value],
+                [ConsumerApiInteractions.READ_DOCUMENT_REFERENCE.value],
             ),
         ],
         "producer": [
@@ -113,12 +123,14 @@ def add_feature_test_files(local_path):
                 "RX898",
                 [PointerTypes.EOL_CARE_PLAN.value],
                 [],
+                ProducerApiInteractions.list(),
             ),  # http://snomed.info/sct|736373009
             (
                 "app-t004",
                 "ODS1",
                 [PointerTypes.PERSONALISED_CARE_AND_SUPPORT_PLAN.value],
                 [],
+                ProducerApiInteractions.list(),
             ),
             (
                 "z00z-y11y-x22x",
@@ -129,6 +141,7 @@ def add_feature_test_files(local_path):
                     AccessControls.ALLOW_OVERRIDE_CREATION_DATETIME.value,
                     AccessControls.ALLOW_SUPERSEDE_WITH_DELETE_FAILURE.value,
                 ],
+                ProducerApiInteractions.list(),
             ),
         ],
     }
@@ -138,9 +151,10 @@ def add_feature_test_files(local_path):
             ods_code,
             pointer_types,
             access_controls,
+            interactions,
         )
         for actor_type, entries in org_permissions.items()
-        for app_id, ods_code, pointer_types, access_controls in entries
+        for app_id, ods_code, pointer_types, access_controls, interactions in entries
     ]
     app_permissions = {
         "consumer": [
