@@ -182,6 +182,81 @@ def add_feature_test_files(local_path):
     ]
 
 
+def add_smoke_test_files(local_path):
+    """Bake in v2 permissions for the smoke test application so that the
+    v2 permissions model can be proven via smoke tests without
+    requiring a dynamic layer rebuild between test setup and test execution.
+    """
+
+    print("Adding smoke test v2 permissions to temporary directory...")
+    org_permissions = {
+        "consumer": [
+            (
+                "4e41d2d9-3ef6-48dc-8406-5faba77ffd83",  # apigee_app_id
+                "SMOKETEST",  # ods_code
+                [
+                    PointerTypes.MENTAL_HEALTH_PLAN.value
+                ],  # http://snomed.info/sct|736253002
+                [],
+            ),
+        ],
+        "producer": [
+            (
+                "SMOKETEST_1DSYNC",
+                "SMOKETEST",
+                [],
+                [AccessControls.ALLOW_ALL_TYPES],
+            ),
+        ],
+    }
+    [
+        _write_permission_file(
+            Path.joinpath(local_path, actor_type, app_id),
+            ods_code,
+            pointer_types,
+            access_controls,
+        )
+        for actor_type, entries in org_permissions.items()
+        for app_id, ods_code, pointer_types, access_controls in entries
+    ]
+    app_permissions = {
+        "consumer": [
+            ("app-t001", [PointerTypes.MENTAL_HEALTH_PLAN.value], []),
+        ],
+        "producer": [
+            ("app-t001", [PointerTypes.EOL_COORDINATION_SUMMARY.value], []),
+        ],
+    }
+    [
+        _write_permission_file(
+            Path.joinpath(local_path, actor_type),
+            app_id,
+            pointer_types,
+            access_controls,
+        )
+        for actor_type, entries in app_permissions.items()
+        for app_id, pointer_types, access_controls in entries
+    ]
+
+    print("Adding smoke test v1 permissions to temporary directory...")
+    v1_permissions = [
+        (
+            "v2-z00z-y11y-x22x",
+            "V1ONLY0D5",
+            [PointerTypes.LLOYD_GEORGE_FOLDER.value],
+            [],
+        ),  # http://snomed.info/sct|16521000000101
+    ]
+    [
+        _write_v1_permission_file(
+            Path.joinpath(local_path, app_id),
+            ods_code,
+            pointer_types,
+        )
+        for app_id, ods_code, pointer_types, access_controls in v1_permissions
+    ]
+
+
 def download_files(s3_client, bucket_name, local_path, file_names, folders):
     print(f"Downloading {len(file_names)} S3 files to temporary directory...")
     local_path = Path(local_path)
