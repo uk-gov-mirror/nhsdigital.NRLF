@@ -12,7 +12,7 @@ test_cases = [
     (
         {
             "NHSD-end-USER-organISAtion-oDs": "ODS123",
-            "nhsd-nrl-app-id": "This-is-an-app-id",
+            "x-proxygen-app-nrl-app-id": "This-is-an-app-id",
         },
         "ODS123",
         "This-is-an-app-id",
@@ -31,13 +31,13 @@ test_cases = [
     ),
     (
         {
-            "nHSd-nrL-aPp-Id": "This-is-an-app-id",
+            "x-pROXyGen-aPp-nRl-ApP-Id": "This-is-an-app-id",
         },
         None,
         "This-is-an-app-id",
         {
             "code": LogReference.HANDLER003a,
-            "headers_names": ["nhsd-nrl-app-id"],
+            "headers_names": ["x-proxygen-app-nrl-app-id"],
         },
     ),
     (
@@ -204,7 +204,7 @@ def test_parse_headers_valid_headers_v2_permissions():
             }
         ),
         "nhsd-end-user-organisation-ods": "X26",
-        "nhsd-nrl-app-id": "X26-TestApp-12345",
+        "x-proxygen-app-nrl-app-id": "X26-TestApp-12345",
     }
 
     metadata = parse_headers(headers)

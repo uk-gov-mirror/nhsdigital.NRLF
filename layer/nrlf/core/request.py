@@ -21,7 +21,7 @@ def _fetch_v2_ods_app_id_headers(headers: dict[str, str]):
             headers_names=list(case_insensitive_headers.keys()),
         )
 
-    nrl_app_id = case_insensitive_headers.get(V2Headers.NHSD_NRL_APP_ID)
+    nrl_app_id = case_insensitive_headers.get(V2Headers.X_PROXYGEN_APP_NRL_APP_ID)
     if not nrl_app_id or len(nrl_app_id.strip()) == 0:
         logger.log(
             LogReference.HANDLER003b,

@@ -750,7 +750,7 @@ def test_create_document_reference_happy_path_v2(
     v2_headers = create_headers(
         additional_headers={
             V2Headers.NHSD_END_USER_ORGANISATION_ODS: "Y05868",
-            V2Headers.NHSD_NRL_APP_ID: "Y05868-TestApp-12345678",
+            V2Headers.X_PROXYGEN_APP_NRL_APP_ID: "Y05868-TestApp-12345678",
         }
     )
     v2_headers.pop(CLIENT_RP_DETAILS)
@@ -810,7 +810,7 @@ def test_create_document_reference_pointer_type_not_allowed_v2(
     headers = create_headers(
         additional_headers={
             V2Headers.NHSD_END_USER_ORGANISATION_ODS: "Y05868",
-            V2Headers.NHSD_NRL_APP_ID: "Y05868-TestApp-12345678",
+            V2Headers.X_PROXYGEN_APP_NRL_APP_ID: "Y05868-TestApp-12345678",
         }
     )
     headers.pop("nhsd-client-rp-details")
@@ -1564,7 +1564,7 @@ def test_supersede_non_existent_pointer_succeeds_with_v2_access_control(
     v2_headers = create_headers(
         additional_headers={
             V2Headers.NHSD_END_USER_ORGANISATION_ODS: "Y05868",
-            V2Headers.NHSD_NRL_APP_ID: "Y05868-TestApp-12345678",
+            V2Headers.X_PROXYGEN_APP_NRL_APP_ID: "Y05868-TestApp-12345678",
         }
     )
     v2_headers.pop(CLIENT_RP_DETAILS)
@@ -1633,7 +1633,7 @@ def test_supersede_fails_without_v2_access_control(
     v2_headers = create_headers(
         additional_headers={
             V2Headers.NHSD_END_USER_ORGANISATION_ODS: "Y05868",
-            V2Headers.NHSD_NRL_APP_ID: "Y05868-TestApp-12345678",
+            V2Headers.X_PROXYGEN_APP_NRL_APP_ID: "Y05868-TestApp-12345678",
         }
     )
     v2_headers.pop(CLIENT_RP_DETAILS)

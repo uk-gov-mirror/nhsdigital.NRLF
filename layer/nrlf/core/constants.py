@@ -43,7 +43,7 @@ CONNECTION_METADATA = "nhsd-connection-metadata"
 
 class V2Headers(str, Enum):
     NHSD_END_USER_ORGANISATION_ODS = "nhsd-end-user-organisation-ods"
-    NHSD_NRL_APP_ID = "nhsd-nrl-app-id"
+    X_PROXYGEN_APP_NRL_APP_ID = "x-proxygen-app-nrl-app-id"
 
 
 PERMISSION_AUDIT_DATES_FROM_PAYLOAD = "audit-dates-from-payload"

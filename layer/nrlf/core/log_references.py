@@ -26,7 +26,7 @@ class LogReference(Enum):
         "WARN", "Missing nhsd-end-user-organisation-ods header for v2 permissions"
     )
     HANDLER003b = _Reference(
-        "WARN", "Missing nhsd-nrl-app-id header for v2 permissions"
+        "WARN", "Missing x-proxygen-app-nrl-app-id header for v2 permissions"
     )
     HANDLER004 = _Reference("INFO", "Authorisation lookup enabled")
     HANDLER004a = _Reference("INFO", "Authorisation lookup skipped for sync request")

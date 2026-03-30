@@ -815,7 +815,7 @@ def _create_v2_headers() -> dict:
     headers = create_headers(
         additional_headers={
             V2Headers.NHSD_END_USER_ORGANISATION_ODS: "Y05868",
-            V2Headers.NHSD_NRL_APP_ID: "Y05868-TestApp-12345678",
+            V2Headers.X_PROXYGEN_APP_NRL_APP_ID: "Y05868-TestApp-12345678",
         }
     )
     headers.pop("nhsd-client-rp-details")
@@ -870,7 +870,7 @@ def test_load_connection_metadata_gets_v2_permissions_when_v1_headers_also_provi
     v1_plus_v2_headers = create_headers(
         additional_headers={
             V2Headers.NHSD_END_USER_ORGANISATION_ODS: "Y05868",
-            V2Headers.NHSD_NRL_APP_ID: "Y05868-TestApp-12345678",
+            V2Headers.X_PROXYGEN_APP_NRL_APP_ID: "Y05868-TestApp-12345678",
         }
     )
 
@@ -901,7 +901,7 @@ def test_load_connection_metadata_gets_v1_permissions_when_v2_permission_file_mi
     v1_plus_v2_headers = create_headers(
         additional_headers={
             V2Headers.NHSD_END_USER_ORGANISATION_ODS: "Y05868",
-            V2Headers.NHSD_NRL_APP_ID: "Y05868-TestApp-12345678",
+            V2Headers.X_PROXYGEN_APP_NRL_APP_ID: "Y05868-TestApp-12345678",
         }
     )
 
@@ -932,7 +932,7 @@ def test_load_connection_metadata_throws_error_when_v2_permissions_lookup_encoun
     v1_plus_v2_headers = create_headers(
         additional_headers={
             V2Headers.NHSD_END_USER_ORGANISATION_ODS: "Y05868",
-            V2Headers.NHSD_NRL_APP_ID: "Y05868-TestApp-12345678",
+            V2Headers.X_PROXYGEN_APP_NRL_APP_ID: "Y05868-TestApp-12345678",
         }
     )
 

@@ -92,7 +92,7 @@ class ConsumerTestClient:
                     "NHSD-Connection-Metadata": json.dumps(connection_metadata),
                     "NHSD-Client-RP-Details": json.dumps(client_rp_details),
                     V2Headers.NHSD_END_USER_ORGANISATION_ODS: self.config.connection_metadata.ods_code,
-                    V2Headers.NHSD_NRL_APP_ID: self.config.connection_metadata.nrl_app_id,
+                    V2Headers.X_PROXYGEN_APP_NRL_APP_ID: self.config.connection_metadata.nrl_app_id,
                     NHSD_CORRELATION_ID_HEADER: "test-correlation-id",
                 }
             )
@@ -236,7 +236,7 @@ class ProducerTestClient:
                     "NHSD-Connection-Metadata": json.dumps(connection_metadata),
                     "NHSD-Client-RP-Details": json.dumps(client_rp_details),
                     V2Headers.NHSD_END_USER_ORGANISATION_ODS: self.config.connection_metadata.ods_code,
-                    V2Headers.NHSD_NRL_APP_ID: self.config.connection_metadata.nrl_app_id,
+                    V2Headers.X_PROXYGEN_APP_NRL_APP_ID: self.config.connection_metadata.nrl_app_id,
                     NHSD_CORRELATION_ID_HEADER: "test-correlation-id",
                 }
             )
