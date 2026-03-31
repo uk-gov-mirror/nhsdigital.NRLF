@@ -12,6 +12,8 @@ updates:
     commit-message:
       prefix: "poetry"
     open-pull-requests-limit: 10
+    cooldown:
+      default-days: 7
 
   - package-ecosystem: "github-actions"
     directory: "/"
