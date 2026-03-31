@@ -1,9 +1,11 @@
 import pytest
 
-from nrlf.core.constants import PERMISSION_ALLOW_ALL_POINTER_TYPES
+from nrlf.core.constants import PERMISSION_ALLOW_ALL_POINTER_TYPES, V2Headers
 from tests.smoke.environment import ConnectMode, EnvironmentConfig, SmokeTestParameters
 from tests.smoke.setup import build_document_reference
 from tests.utilities.api_clients import ProducerTestClient
+
+v1_1dsync_app_id = "SMOKETEST_1DSYNC_V1"
 
 
 @pytest.fixture
@@ -16,7 +18,10 @@ def producer_client_1dsync_v1(
         client_config.connection_metadata["nrl.permissions"] = [
             PERMISSION_ALLOW_ALL_POINTER_TYPES
         ]
-        client_config.connection_metadata["nrl.app-id"] = "SMOKETEST_1DSYNC_V1"
+        client_config.connection_metadata["nrl.app-id"] = v1_1dsync_app_id
+        client_config.custom_headers[V2Headers.X_PROXYGEN_APP_NRL_APP_ID] = (
+            v1_1dsync_app_id
+        )
 
     return ProducerTestClient(config=client_config)
 

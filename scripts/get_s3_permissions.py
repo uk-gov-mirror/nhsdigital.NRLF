@@ -191,7 +191,7 @@ def add_smoke_test_files(local_path):
     org_permissions = {
         "consumer": [
             (
-                "X26-NRL-6981ad7d-cff4-4613-93d0-df60e5e2fc52",  # nrl_app_id
+                "X26-NRL-6981ad7d-cff4-4613-93d0-df60e5e2fc52",
                 "SMOKETEST",  # ods_code
                 [
                     PointerTypes.MENTAL_HEALTH_PLAN.value
@@ -201,18 +201,19 @@ def add_smoke_test_files(local_path):
         ],
         "producer": [
             (
-                "SMOKETEST_1DSYNC",
-                "SMOKETEST",
-                [],
-                [AccessControls.ALLOW_ALL_TYPES.value],
-            ),
-            (
-                "X26-NRL-6981ad7d-cff4-4613-93d0-df60e5e2fc52",  # nrl_app_id
+                "X26-NRL-6981ad7d-cff4-4613-93d0-df60e5e2fc52",
                 "SMOKETEST",  # ods_code
                 [
                     PointerTypes.MENTAL_HEALTH_PLAN.value
                 ],  # http://snomed.info/sct|736253002
                 [],
+            ),
+            (
+                # For public tests - don't have a separate apigee app for 1DSync
+                "X26-NRL-6981ad7d-cff4-4613-93d0-df60e5e2fc52",
+                "SMOKETEST1DSYNC",
+                [],
+                [AccessControls.ALLOW_ALL_TYPES.value],
             ),
         ],
     }
@@ -227,11 +228,12 @@ def add_smoke_test_files(local_path):
         for app_id, ods_code, pointer_types, access_controls in entries
     ]
     app_permissions = {
-        "consumer": [
-            ("app-t001", [PointerTypes.MENTAL_HEALTH_PLAN.value], []),
-        ],
         "producer": [
-            ("app-t001", [PointerTypes.EOL_COORDINATION_SUMMARY.value], []),
+            (
+                "SMOKETEST1DSYNC",
+                [],
+                [AccessControls.ALLOW_ALL_TYPES.value],
+            ),
         ],
     }
     [
@@ -248,7 +250,7 @@ def add_smoke_test_files(local_path):
     print("Adding smoke test v1 permissions to temporary directory...")
     v1_permissions = [
         (
-            "SMOKETEST_1DSYNC_V1",
+            "SMOKETEST1DSYNCV1",
             "SMOKETEST",
             [],  # not needed, won't hit this file
         ),

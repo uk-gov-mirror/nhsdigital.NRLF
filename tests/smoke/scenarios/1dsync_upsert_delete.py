@@ -16,7 +16,11 @@ def producer_client_1dsync(
         client_config.connection_metadata["nrl.permissions"] = [
             PERMISSION_ALLOW_ALL_POINTER_TYPES
         ]
-        client_config.connection_metadata["nrl.app-id"] = "SMOKETEST_1DSYNC"
+        client_config.connection_metadata["nrl.app-id"] = "SMOKETEST1DSYNC"
+    else:
+        client_config.custom_headers["NHSD-End-User-Organisation-ODS"] = (
+            "SMOKETEST1DSYNC"
+        )
 
     return ProducerTestClient(config=client_config)
 

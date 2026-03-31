@@ -40,7 +40,7 @@ def test_smoke_consumer_search_read(
     consumer_client: ConsumerTestClient, test_data_v1: dict
 ):
     """
-    Smoke test scenario for a consumer search and read behavior
+    Smoke test scenario for a consumer search and read behaviour
     """
     patient_id = test_data_v1["patient_nhs_number"]
     test_pointers = test_data_v1["pointers"]

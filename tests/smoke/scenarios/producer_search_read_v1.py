@@ -40,7 +40,7 @@ def test_smoke_producer_search_read(
     producer_client_v1: ProducerTestClient, test_data: dict
 ):
     """
-    Smoke test scenario for a producer search and read behavior
+    Smoke test scenario for a producer search and read behaviour
     """
     patient_id = test_data["patient_nhs_number"]
     test_pointers = test_data["pointers"]

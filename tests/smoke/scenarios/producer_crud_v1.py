@@ -9,7 +9,7 @@ def test_smoke_producer_crud_v1(
     smoke_test_parameters: SmokeTestParameters,
 ):
     """
-    Smoke test scenario for producer CRUD behavior
+    Smoke test scenario for producer CRUD behaviour
     """
     test_ods_code = smoke_test_parameters.v1_ods_code
     test_docref = build_document_reference(
