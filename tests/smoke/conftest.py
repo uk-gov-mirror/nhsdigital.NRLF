@@ -68,7 +68,6 @@ def consumer_client_v1(
     environment_config: EnvironmentConfig, smoke_test_parameters: SmokeTestParameters
 ) -> ConsumerTestClient:
     config = environment_config.to_client_config(smoke_test_parameters)
-    config.connection_metadata.ods_code = "SMOKETESTV1"
     if environment_config.connect_mode == ConnectMode.INTERNAL:
         config.connection_metadata.ods_code = smoke_test_parameters.v1_ods_code
     config.custom_headers["NHSD-End-User-Organisation-ODS"] = (

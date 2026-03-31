@@ -1,9 +1,9 @@
 import pytest
 
 from nrlf.core.constants import PERMISSION_ALLOW_ALL_POINTER_TYPES, V2Headers
-from tests.smoke.environment import ConnectMode, EnvironmentConfig, SmokeTestParameters
+from tests.smoke.environment import EnvironmentConfig, SmokeTestParameters
 from tests.smoke.setup import build_document_reference
-from tests.utilities.api_clients import ProducerTestClient
+from tests.utilities.api_clients import ConnectionMetadata, ProducerTestClient
 
 v1_1dsync_app_id = "SMOKETEST_1DSYNC_V1"
 
@@ -14,11 +14,19 @@ def producer_client_1dsync_v1(
 ) -> ProducerTestClient:
     client_config = environment_config.to_client_config(smoke_test_parameters)
 
-    if environment_config.connect_mode == ConnectMode.INTERNAL:
-        client_config.connection_metadata["nrl.permissions"] = [
-            PERMISSION_ALLOW_ALL_POINTER_TYPES
-        ]
-        client_config.connection_metadata["nrl.app-id"] = v1_1dsync_app_id
+    if environment_config.connect_mode == "internal":
+        connection_metadata = ConnectionMetadata.model_validate(
+            {
+                "nrl.permissions": [PERMISSION_ALLOW_ALL_POINTER_TYPES],
+                "nrl.app-id": v1_1dsync_app_id,
+                "nrl.ods-code": smoke_test_parameters.ods_code,
+                "client_rp_details": {
+                    "developer.app.name": smoke_test_parameters.apigee_app_name,
+                    "developer.app.id": smoke_test_parameters.apigee_app_id,
+                },
+            }
+        )
+        client_config.connection_metadata = connection_metadata
         client_config.custom_headers[V2Headers.X_PROXYGEN_APP_NRL_APP_ID] = (
             v1_1dsync_app_id
         )
