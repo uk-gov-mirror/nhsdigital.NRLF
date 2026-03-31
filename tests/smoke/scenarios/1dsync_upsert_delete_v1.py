@@ -16,7 +16,7 @@ def producer_client_1dsync_v1(
         client_config.connection_metadata["nrl.permissions"] = [
             PERMISSION_ALLOW_ALL_POINTER_TYPES
         ]
-        client_config.connection_metadata["nrl.app-id"] = "SMOKETEST_1DSYNC_v1"
+        client_config.connection_metadata["nrl.app-id"] = "SMOKETEST_1DSYNC_V1"
 
     return ProducerTestClient(config=client_config)
 

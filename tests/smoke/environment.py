@@ -59,7 +59,6 @@ class EnvironmentConfig:
                 custom_headers={
                     "X-Request-Id": smoketest_id,
                     "NHSD-Correlation-Id": f"{smoketest_id}.smoketest.{self.stack_name}.{self.env_name}",
-                    "X-Proxygen-App-NRL-App-ID": parameters.nrlf_app_id,
                 },
                 connection_metadata=connection_metadata,
                 client_cert=(

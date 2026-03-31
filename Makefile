@@ -7,7 +7,7 @@ SHELL := /bin/bash
 
 DIST_PATH ?= ./dist
 TEST_ARGS ?= --cov --cov-report=term-missing --cov-report=xml:$(DIST_PATH)/test-coverage.xml
-SMOKE_TEST_ARGS ?=
+SMOKE_TEST_ARGS ?= -s ./tests/smoke/scenarios/*
 FEATURE_TEST_ARGS ?= ./tests/features
 TF_WORKSPACE_NAME ?= $(shell terraform -chdir=terraform/infrastructure workspace show)
 ENV ?= dev
@@ -149,14 +149,14 @@ test-smoke-internal: check-warn ## Run the smoke tests against the internal envi
 	TEST_STACK_NAME=$(TF_WORKSPACE_NAME) \
 	TEST_STACK_DOMAIN=$(shell terraform -chdir=terraform/infrastructure output -raw domain 2>/dev/null) \
 	TEST_CONNECT_MODE="internal" \
-		pytest ./tests/smoke/scenarios/* $(SMOKE_TEST_ARGS)
+		pytest $(SMOKE_TEST_ARGS)
 
 test-smoke-public: check-warn ## Run the smoke tests for the external access points
 	@echo "Running smoke tests for the public endpoints ${ENV}"
 	TEST_ENVIRONMENT_NAME=$(ENV) \
 	TEST_STACK_NAME=$(TF_WORKSPACE_NAME) \
 	TEST_CONNECT_MODE="public" \
-		pytest ./tests/smoke/scenarios/* $(SMOKE_TEST_ARGS)
+		pytest $(SMOKE_TEST_ARGS)
 
 test-performance-prepare:
 	mkdir -p $(DIST_PATH)

@@ -50,6 +50,24 @@ def consumer_client(
     )
 
 
+@pytest.fixture(autouse=True, scope="session")
+def producer_client_v1(
+    environment_config: EnvironmentConfig, smoke_test_parameters: SmokeTestParameters
+) -> ProducerTestClient:
+    config = environment_config.to_client_config(smoke_test_parameters)
+    config.connection_metadata.ods_code = "SMOKETESTV1"
+    return ProducerTestClient(config=config)
+
+
+@pytest.fixture(autouse=True, scope="session")
+def consumer_client_v1(
+    environment_config: EnvironmentConfig, smoke_test_parameters: SmokeTestParameters
+) -> ConsumerTestClient:
+    config = environment_config.to_client_config(smoke_test_parameters)
+    config.connection_metadata.ods_code = "SMOKETESTV1"
+    return ConsumerTestClient(config=config)
+
+
 @pytest.fixture
 def test_nhs_numbers(smoke_test_parameters: SmokeTestParameters) -> list[str]:
     return smoke_test_parameters.test_nhs_numbers

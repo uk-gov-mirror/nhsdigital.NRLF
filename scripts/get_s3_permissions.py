@@ -169,7 +169,6 @@ def add_feature_test_files(local_path):
             "v2-z00z-y11y-x22x",
             "V1ONLY0D5",
             [PointerTypes.LLOYD_GEORGE_FOLDER.value],
-            [],
         ),  # http://snomed.info/sct|16521000000101
     ]
     [
@@ -178,7 +177,7 @@ def add_feature_test_files(local_path):
             ods_code,
             pointer_types,
         )
-        for app_id, ods_code, pointer_types, access_controls in v1_permissions
+        for app_id, ods_code, pointer_types in v1_permissions
     ]
 
 
@@ -192,7 +191,7 @@ def add_smoke_test_files(local_path):
     org_permissions = {
         "consumer": [
             (
-                "4e41d2d9-3ef6-48dc-8406-5faba77ffd83",  # apigee_app_id
+                "X26-NRL-6981ad7d-cff4-4613-93d0-df60e5e2fc52",  # nrl_app_id
                 "SMOKETEST",  # ods_code
                 [
                     PointerTypes.MENTAL_HEALTH_PLAN.value
@@ -205,7 +204,15 @@ def add_smoke_test_files(local_path):
                 "SMOKETEST_1DSYNC",
                 "SMOKETEST",
                 [],
-                [AccessControls.ALLOW_ALL_TYPES],
+                [AccessControls.ALLOW_ALL_TYPES.value],
+            ),
+            (
+                "X26-NRL-6981ad7d-cff4-4613-93d0-df60e5e2fc52",  # nrl_app_id
+                "SMOKETEST",  # ods_code
+                [
+                    PointerTypes.MENTAL_HEALTH_PLAN.value
+                ],  # http://snomed.info/sct|736253002
+                [],
             ),
         ],
     }
@@ -241,11 +248,15 @@ def add_smoke_test_files(local_path):
     print("Adding smoke test v1 permissions to temporary directory...")
     v1_permissions = [
         (
-            "v2-z00z-y11y-x22x",
-            "V1ONLY0D5",
-            [PointerTypes.LLOYD_GEORGE_FOLDER.value],
-            [],
-        ),  # http://snomed.info/sct|16521000000101
+            "SMOKETEST_1DSYNC_V1",
+            "SMOKETEST",
+            [],  # not needed, won't hit this file
+        ),
+        (
+            "X26-NRL-6981ad7d-cff4-4613-93d0-df60e5e2fc52",
+            "SMOKETESTV1",
+            [PointerTypes.MENTAL_HEALTH_PLAN.value],  # http://snomed.info/sct|736253002
+        ),
     ]
     [
         _write_v1_permission_file(
@@ -253,7 +264,7 @@ def add_smoke_test_files(local_path):
             ods_code,
             pointer_types,
         )
-        for app_id, ods_code, pointer_types, access_controls in v1_permissions
+        for app_id, ods_code, pointer_types in v1_permissions
     ]
 
 
@@ -274,6 +285,7 @@ def download_files(s3_client, bucket_name, local_path, file_names, folders):
 
     add_test_files("K6PerformanceTest", "Y05868.json", local_path)
     add_feature_test_files(local_path)
+    add_smoke_test_files(local_path)
 
 
 def main(use_shared_resources: str, env: str, workspace: str, path_to_store: str):
