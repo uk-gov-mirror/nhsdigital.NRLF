@@ -15,6 +15,7 @@ class SmokeTestParameters:
         self.nrlf_app_id = parameters.get("nrlf_app_id")
         self.ods_code = parameters.get("ods_code")
         self.test_nhs_numbers = parameters.get("test_nhs_numbers").split(",")
+        self.v1_ods_code = "SMOKETESTV1"
 
 
 class ConnectMode(Enum):
@@ -59,6 +60,8 @@ class EnvironmentConfig:
                 custom_headers={
                     "X-Request-Id": smoketest_id,
                     "NHSD-Correlation-Id": f"{smoketest_id}.smoketest.{self.stack_name}.{self.env_name}",
+                    "X-Proxygen-App-NRL-App-ID": parameters.nrlf_app_id,
+                    "NHSD-End-User-Organisation-ODS": parameters.ods_code,
                 },
                 connection_metadata=connection_metadata,
                 client_cert=(

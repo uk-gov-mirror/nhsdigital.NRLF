@@ -4,7 +4,7 @@ import boto3
 import pytest
 
 from scripts.aws_session_assume import get_boto_session
-from tests.smoke.environment import EnvironmentConfig, SmokeTestParameters
+from tests.smoke.environment import ConnectMode, EnvironmentConfig, SmokeTestParameters
 from tests.utilities.api_clients import ConsumerTestClient, ProducerTestClient
 
 
@@ -55,7 +55,11 @@ def producer_client_v1(
     environment_config: EnvironmentConfig, smoke_test_parameters: SmokeTestParameters
 ) -> ProducerTestClient:
     config = environment_config.to_client_config(smoke_test_parameters)
-    config.connection_metadata.ods_code = "SMOKETESTV1"
+    if environment_config.connect_mode == ConnectMode.INTERNAL:
+        config.connection_metadata.ods_code = smoke_test_parameters.v1_ods_code
+    config.custom_headers["NHSD-End-User-Organisation-ODS"] = (
+        smoke_test_parameters.v1_ods_code
+    )
     return ProducerTestClient(config=config)
 
 
@@ -65,6 +69,11 @@ def consumer_client_v1(
 ) -> ConsumerTestClient:
     config = environment_config.to_client_config(smoke_test_parameters)
     config.connection_metadata.ods_code = "SMOKETESTV1"
+    if environment_config.connect_mode == ConnectMode.INTERNAL:
+        config.connection_metadata.ods_code = smoke_test_parameters.v1_ods_code
+    config.custom_headers["NHSD-End-User-Organisation-ODS"] = (
+        smoke_test_parameters.v1_ods_code
+    )
     return ConsumerTestClient(config=config)
 
 

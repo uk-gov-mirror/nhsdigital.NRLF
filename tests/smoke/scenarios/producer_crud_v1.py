@@ -1,3 +1,4 @@
+from tests.smoke.environment import SmokeTestParameters
 from tests.smoke.setup import build_document_reference
 from tests.utilities.api_clients import ProducerTestClient
 
@@ -5,11 +6,12 @@ from tests.utilities.api_clients import ProducerTestClient
 def test_smoke_producer_crud_v1(
     producer_client_v1: ProducerTestClient,
     test_nhs_numbers: list[str],
+    smoke_test_parameters: SmokeTestParameters,
 ):
     """
     Smoke test scenario for producer CRUD behavior
     """
-    test_ods_code = producer_client_v1.config.connection_metadata.ods_code
+    test_ods_code = smoke_test_parameters.v1_ods_code
     test_docref = build_document_reference(
         nhs_number=test_nhs_numbers[0], custodian=test_ods_code
     )
