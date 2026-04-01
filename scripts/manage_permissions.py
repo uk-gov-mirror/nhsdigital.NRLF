@@ -141,7 +141,12 @@ def list_available_access_controls() -> None:
     """
     print("The following access controls can be assigned:")
 
-    for control in AccessControls.list():
+    currently_supported_access_controls = [
+        AccessControls.ALLOW_ALL_TYPES,
+        AccessControls.ALLOW_OVERRIDE_CREATION_DATETIME,
+        AccessControls.ALLOW_SUPERSEDE_WITH_DELETE_FAILURE,
+    ]
+    for control in currently_supported_access_controls:
         print(f"- {control}")
 
 
