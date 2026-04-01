@@ -252,7 +252,7 @@ if __name__ == "__main__":
         {
             "list_apps": list_apps,
             "list_orgs": list_orgs,
-            "list_allowed_types": list_allowed_types,
+            "list_available_types": list_available_types,
             "show_perms": show_perms,
             "set_perms": set_perms,
             "clear_perms": clear_perms,

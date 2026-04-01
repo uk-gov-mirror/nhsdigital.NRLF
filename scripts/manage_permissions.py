@@ -8,6 +8,8 @@ from enum import Enum
 import fire
 from aws_session_assume import get_boto_session
 
+from nrlf.core.constants import TYPE_ATTRIBUTES, AccessControls
+
 nrl_env = os.getenv("ENV", "dev")
 nrl_auth_bucket_name = os.getenv(
     "NRL_AUTH_BUCKET_NAME", f"nhsd-nrlf--{nrl_env}-authorization-store"
@@ -123,12 +125,33 @@ def list_orgs(supplier_type: SupplierType, app_id: str) -> None:
         print(f"- {org}")
 
 
+def list_available_pointer_types() -> None:
+    """
+    List all pointer types that can be used in permissions.
+    """
+    print("The following pointer-types can be assigned:")
+
+    for pointer_type, attributes in TYPE_ATTRIBUTES.items():
+        print("- %-45s (%s)" % (pointer_type, attributes["display"][:45]))
+
+
+def list_available_access_controls() -> None:
+    """
+    List all access controls that can be assigned in permissions.
+    """
+    print("The following access controls can be assigned:")
+
+    for control in AccessControls.list():
+        print(f"- {control}")
+
+
 if __name__ == "__main__":
     fire.Fire(
         {
             "list_apps": list_apps,
             "list_orgs": list_orgs,
-            # "list_allowed_types": list_allowed_types,
+            "list_available_pointer_types": list_available_pointer_types,
+            "list_available_access_controls": list_available_access_controls,
             # "show_perms": show_perms,
             # "set_perms": set_perms,
             # "clear_perms": clear_perms,
