@@ -181,18 +181,24 @@ def add_feature_test_files(local_path):
     ]
 
 
-def add_smoke_test_files(local_path):
+def add_smoke_test_files(secretsmanager, local_path, env_name):
     """Bake in v2 permissions for the smoke test application so that the
     v2 permissions model can be proven via smoke tests without
     requiring a dynamic layer rebuild between test setup and test execution.
     """
 
+    parameters_name = f"nhsd-nrlf--{env_name}--smoke-test-parameters"
+
+    secret_value = secretsmanager.get_secret_value(SecretId=parameters_name)
+    parameters = json.loads(secret_value["SecretString"])
+    smoke_test_app_id = parameters.get("nrlf_app_id")
+
     print("Adding smoke test v2 permissions to temporary directory...")
     org_permissions = {
         "consumer": [
             (
-                "X26-NRL-6981ad7d-cff4-4613-93d0-df60e5e2fc52",
-                "SMOKETEST",  # ods_code
+                smoke_test_app_id,
+                "SMOKETEST",
                 [
                     PointerTypes.MENTAL_HEALTH_PLAN.value
                 ],  # http://snomed.info/sct|736253002
@@ -201,8 +207,8 @@ def add_smoke_test_files(local_path):
         ],
         "producer": [
             (
-                "X26-NRL-6981ad7d-cff4-4613-93d0-df60e5e2fc52",
-                "SMOKETEST",  # ods_code
+                smoke_test_app_id,
+                "SMOKETEST",
                 [
                     PointerTypes.MENTAL_HEALTH_PLAN.value
                 ],  # http://snomed.info/sct|736253002
@@ -210,7 +216,7 @@ def add_smoke_test_files(local_path):
             ),
             (
                 # For public tests - don't have a separate apigee app for 1DSync
-                "X26-NRL-6981ad7d-cff4-4613-93d0-df60e5e2fc52",
+                smoke_test_app_id,
                 "SMOKETEST1DSYNC",
                 [],
                 [AccessControls.ALLOW_ALL_TYPES.value],
@@ -249,13 +255,13 @@ def add_smoke_test_files(local_path):
 
     print("Adding smoke test v1 permissions to temporary directory...")
     v1_permissions = [
-        (
+        (  # not needed, won't hit this file
             "SMOKETEST1DSYNCV1",
             "SMOKETEST",
-            [],  # not needed, won't hit this file
+            [],
         ),
         (
-            "X26-NRL-6981ad7d-cff4-4613-93d0-df60e5e2fc52",
+            smoke_test_app_id,
             "SMOKETESTV1",
             [PointerTypes.MENTAL_HEALTH_PLAN.value],  # http://snomed.info/sct|736253002
         ),
@@ -270,7 +276,9 @@ def add_smoke_test_files(local_path):
     ]
 
 
-def download_files(s3_client, bucket_name, local_path, file_names, folders):
+def download_files(
+    s3_client, bucket_name, local_path, file_names, folders, secretsmanager, env_name
+):
     print(f"Downloading {len(file_names)} S3 files to temporary directory...")
     local_path = Path(local_path)
 
@@ -287,7 +295,7 @@ def download_files(s3_client, bucket_name, local_path, file_names, folders):
 
     add_test_files("K6PerformanceTest", "Y05868.json", local_path)
     add_feature_test_files(local_path)
-    add_smoke_test_files(local_path)
+    add_smoke_test_files(secretsmanager, local_path, env_name)
 
 
 def main(use_shared_resources: str, env: str, workspace: str, path_to_store: str):
@@ -299,12 +307,15 @@ def main(use_shared_resources: str, env: str, workspace: str, path_to_store: str
     s3 = boto_session.client("s3")
     files, folders = get_file_folders(s3, bucket)
 
+    secretsmanager = boto_session.client("secretsmanager", region_name="eu-west-2")
     download_files(
         s3,
         bucket,
         path.abspath(path.join(path_to_store + "/nrlf_permissions")),
         files,
         folders,
+        secretsmanager,
+        env_name=env,
     )
     print("Downloaded S3 permissions...")
 
