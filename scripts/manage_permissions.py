@@ -75,7 +75,9 @@ def list_apps(supplier_type: SupplierType) -> None:
 
     keys = _list_s3_keys(f"{supplier_type}/")
     apps = {key.split("/")[1] for key in keys[1:]}
-    app_level_perm_files = {key for key in apps if key and key.endswith(".json")}
+    app_level_perm_files = {
+        key.removesuffix(".json") for key in apps if key and key.endswith(".json")
+    }
     apps_with_orgs = {key for key in apps if key and not key.endswith(".json")}
 
     if not apps:
@@ -95,11 +97,37 @@ def list_apps(supplier_type: SupplierType) -> None:
         print(f"- {app_level}")
 
 
+def list_orgs(supplier_type: SupplierType, app_id: str) -> None:
+    """
+    List all organizations for a specific consumer or producer application.
+    """
+
+    if supplier_type.lower() not in SupplierType.list():
+        print("Usage: list organisations for a given app and supplier type")
+        print("  list_orgs consumer <app_id>")
+        print("  list_orgs producer <app_id>")
+        return
+
+    keys = _list_s3_keys(f"{supplier_type}/{app_id}/")
+    orgs = [
+        key.split("/", maxsplit=2)[2].removesuffix(".json")
+        for key in keys
+        if key and key.endswith(".json")
+    ]
+
+    if not orgs:
+        print(f"No organizations found for {supplier_type} app {app_id}.")
+
+    print(f"There are {len(orgs)} organizations for app {app_id}:")
+    for org in orgs:
+        print(f"- {org}")
+
+
 if __name__ == "__main__":
     fire.Fire(
         {
             "list_apps": list_apps,
-            # "list_orgs": list_orgs,
+            "list_orgs": list_orgs,
             # "list_allowed_types": list_allowed_types,
             # "show_perms": show_perms,
             # "set_perms": set_perms,
