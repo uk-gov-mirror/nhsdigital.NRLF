@@ -5,7 +5,7 @@ from tests.smoke.environment import ConnectMode, EnvironmentConfig, SmokeTestPar
 from tests.smoke.setup import build_document_reference
 from tests.utilities.api_clients import ConnectionMetadata, ProducerTestClient
 
-v1_1dsync_app_id = "SMOKETEST_1DSYNC_V1"
+v1_1dsync_app_id = "SMOKETEST1DSYNCV1"
 
 
 @pytest.fixture

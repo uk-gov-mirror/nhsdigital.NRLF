@@ -51,7 +51,7 @@ class EnvironmentConfig:
             }
         )
 
-        smoketest_id = str(uuid.uuid4())
+        smoketest_id = f"SMOKETEST-{str(uuid.uuid4())}"
         env_resources_name = self.env_name.split("-")[0]
 
         if self.connect_mode == ConnectMode.INTERNAL.value:
@@ -60,8 +60,6 @@ class EnvironmentConfig:
                 custom_headers={
                     "X-Request-Id": smoketest_id,
                     "NHSD-Correlation-Id": f"{smoketest_id}.smoketest.{self.stack_name}.{self.env_name}",
-                    "X-Proxygen-App-NRL-App-ID": parameters.nrlf_app_id,
-                    "NHSD-End-User-Organisation-ODS": parameters.ods_code,
                 },
                 connection_metadata=connection_metadata,
                 client_cert=(
