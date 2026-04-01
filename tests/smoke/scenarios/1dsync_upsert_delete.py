@@ -1,7 +1,7 @@
 import pytest
 
 from nrlf.core.constants import PERMISSION_ALLOW_ALL_POINTER_TYPES, V2Headers
-from tests.smoke.environment import EnvironmentConfig, SmokeTestParameters
+from tests.smoke.environment import ConnectMode, EnvironmentConfig, SmokeTestParameters
 from tests.smoke.setup import build_document_reference
 from tests.utilities.api_clients import ConnectionMetadata, ProducerTestClient
 
@@ -14,7 +14,8 @@ def producer_client_1dsync(
 ) -> ProducerTestClient:
     client_config = environment_config.to_client_config(smoke_test_parameters)
 
-    if environment_config.connect_mode == "internal":
+    if environment_config.connect_mode == ConnectMode.INTERNAL.value:
+        # Use app-level perms in internal mode
         connection_metadata = ConnectionMetadata.model_validate(
             {
                 "nrl.permissions": [PERMISSION_ALLOW_ALL_POINTER_TYPES],
@@ -31,7 +32,7 @@ def producer_client_1dsync(
             v2_1dsync_app_id
         )
     else:
-        # can't use app-level perms here without setting up another apigee app, use ODS instead
+        # Can't use app-level perms here without setting up another apigee app, use ODS instead
         client_config.custom_headers["NHSD-End-User-Organisation-ODS"] = (
             "SMOKETEST1DSYNC"
         )
