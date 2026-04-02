@@ -266,7 +266,76 @@ def show_perms(supplier_type: SupplierType, app_id: str, org_ods=None) -> None:
     # )
 
 
-def clear_perms(supplier_type, app_id: str, org_ods=None) -> None:
+def add_pointer_type_perms(
+    supplier_type: SupplierType, app_id: str, org_ods=None, *pointer_types_to_add: str
+) -> None:
+    # TODO:
+    # confirm before proceeding mode
+    # formatting help for pointer types ?
+    # highlight new additions in proposed pointer types list e.g. [NEW]
+    if supplier_type.lower() not in SupplierType.list() or not app_id:
+        print("Usage: add pointer type permissions for a given organisation or app")
+        print("  show_perms consumer <app_id> <org_ods> <pointer_types>")
+        print("  show_perms producer <app_id> <org_ods> <pointer_types>")
+        print("  show_perms consumer <app_id> <pointer_types>")
+        print("  show_perms producer <app_id> <pointer_types>")
+        return
+
+    if not pointer_types_to_add:
+        print(
+            "No pointer types provided. Please specify at least one pointer type or use clear_perms command."
+        )
+        return
+
+    if org_ods:
+        lookup_path = f"{supplier_type}/{app_id}/{org_ods}.json"
+    else:
+        lookup_path = f"{supplier_type}/{app_id}.json"
+
+    unknown_types = [pt for pt in pointer_types_to_add if pt not in TYPE_ATTRIBUTES]
+    if unknown_types:
+        print(f"Error: Unknown pointer types provided: {', '.join(unknown_types)}")
+        print()
+        return
+
+    perms_ugly = _get_perms_from_s3(lookup_path)
+    if not perms_ugly:
+        print(f"Setting up new permissions file...")
+        perms_ugly = "{}"
+
+    current_perms = json.loads(perms_ugly)
+    current_pointer_types: list = current_perms.get("types", [])
+    if all(
+        new_pointer_type in current_pointer_types
+        for new_pointer_type in pointer_types_to_add
+    ):
+        print(
+            f"No changes needed for {lookup_path}. These pointer types are already assigned."
+        )
+        return
+
+    proposed_pointer_types = current_pointer_types + list(pointer_types_to_add)
+    _print_perm_with_lookup(
+        "proposed pointer types", proposed_pointer_types, TYPE_ATTRIBUTES
+    )
+    current_perms["types"] = proposed_pointer_types
+
+    s3 = _get_s3_client()
+    s3.put_object(
+        Bucket=nrl_auth_bucket_name,
+        Key=lookup_path,
+        Body=json.dumps(current_perms, indent=4),
+        ContentType="application/json",
+    )
+
+    print()
+    print(f"Set permissions for lookup_path")
+
+    print()
+    show_perms(supplier_type, app_id, org_ods)
+
+
+def clear_perms(supplier_type: SupplierType, app_id: str, org_ods=None) -> None:
     """
     Clear permissions for an application or organization.
     This will remove all permissions for the specified app and org.
@@ -327,7 +396,7 @@ if __name__ == "__main__":
             "list_available_pointer_types": list_available_pointer_types,
             "list_available_access_controls": list_available_access_controls,
             "show_perms": show_perms,
-            # "set_perms": set_perms,
+            "add_pointer_type_to_perms": add_pointer_type_perms,
             "clear_perms": clear_perms,
             # "help": help,
         }
