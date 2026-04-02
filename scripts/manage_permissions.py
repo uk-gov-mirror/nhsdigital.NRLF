@@ -1,6 +1,12 @@
 #!/usr/bin/env python
 """
-Manage app ans organisation v2 permissions for NRLF apps in a given environment ENV
+Manage app and organisation v2 permissions for NRLF apps in a given environment ENV
+
+```sh
+ENV=dev \
+COMPARE_AND_CONFIRM=true \
+poetry run python ./scripts/manage_permissions.py <command> <args>
+```
 """
 import json
 import os
@@ -15,7 +21,6 @@ nrl_env = os.getenv("ENV", "dev")
 nrl_auth_bucket_name = os.getenv(
     "NRL_AUTH_BUCKET_NAME", f"nhsd-nrlf--{nrl_env}-authorization-store"
 )
-
 COMPARE_AND_CONFIRM = (
     True
     if nrl_env == "prod"
@@ -236,29 +241,82 @@ def show_perms(supplier_type: SupplierType, app_id: str, org_ods=None) -> None:
         "pointer type", perms_pretty.get("types", []), TYPE_ATTRIBUTES
     )
 
-    _print_perm_with_lookup(
-        "pointer categories", perms_pretty.get("categories", []), CATEGORY_ATTRIBUTES
-    )
+    # _print_perm_with_lookup(
+    #     "pointer categories", perms_pretty.get("categories", []), CATEGORY_ATTRIBUTES
+    # )
 
     _print_perm(
         "access control",
         perms_pretty.get("access_controls", []),
     )
 
-    _print_perm(
-        "API interaction",
-        perms_pretty.get("interaction", []),
-    )
+    # _print_perm(
+    #     "API interaction",
+    #     perms_pretty.get("interaction", []),
+    # )
 
-    _print_perm(
-        "Produce for authors",
-        perms_pretty.get("produce_for_authors", []),
-    )
+    # _print_perm(
+    #     "Produce for authors",
+    #     perms_pretty.get("produce_for_authors", []),
+    # )
 
-    _print_perm(
-        "Produce for custodians",
-        perms_pretty.get("produce_for_custodians", []),
+    # _print_perm(
+    #     "Produce for custodians",
+    #     perms_pretty.get("produce_for_custodians", []),
+    # )
+
+
+def clear_perms(supplier_type, app_id: str, org_ods=None) -> None:
+    """
+    Clear permissions for an application or organization.
+    This will remove all permissions for the specified app and org.
+
+    COMPARE_AND_CONFIRM=true \
+    poetry run python ./scripts/manage_permissions.py clear_perms consumer ANJALI_POSTMAN_APP TEST4
+    """
+    if supplier_type.lower() not in SupplierType.list() or not app_id:
+        print("Usage: clear permissions for a given organisation or app")
+        print("  clear_perms consumer <app_id> <org_ods>")
+        print("  clear_perms producer <app_id> <org_ods>")
+        print("  clear_perms consumer <app_id>")
+        print("  clear_perms producer <app_id>")
+        return
+
+    if org_ods:
+        lookup_path = f"{supplier_type}/{app_id}/{org_ods}.json"
+    else:
+        lookup_path = f"{supplier_type}/{app_id}.json"
+
+    if COMPARE_AND_CONFIRM:
+        current_perms = _get_perms_from_s3(lookup_path)
+        if not current_perms or current_perms == "{}":
+            print(
+                f"No need to clear permissions for {lookup_path} as it currently has no permissions set."
+            )
+            return
+
+        print()
+        print(f"Current permissions for {lookup_path}:")
+        print(current_perms)
+
+        print()
+        confirm = (
+            input("Are you SURE you want to clear these permissions? (yes/NO): ")
+            .strip()
+            .lower()
+        )
+        if confirm != "yes":
+            print("Operation cancelled at user request.")
+            return
+
+    s3 = _get_s3_client()
+    s3.put_object(
+        Bucket=nrl_auth_bucket_name,
+        Key=lookup_path,
+        Body="{}",
+        ContentType="application/json",
     )
+    print(f"Cleared permissions for {lookup_path}.")
 
 
 if __name__ == "__main__":
@@ -270,6 +328,7 @@ if __name__ == "__main__":
             "list_available_access_controls": list_available_access_controls,
             "show_perms": show_perms,
             # "set_perms": set_perms,
-            # "clear_perms": clear_perms,
+            "clear_perms": clear_perms,
+            # "help": help,
         }
     )
