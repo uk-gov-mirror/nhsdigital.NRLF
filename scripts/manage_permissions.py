@@ -9,7 +9,7 @@ from enum import Enum
 import fire
 from aws_session_assume import get_boto_session
 
-from nrlf.core.constants import TYPE_ATTRIBUTES, AccessControls
+from nrlf.core.constants import CATEGORY_ATTRIBUTES, TYPE_ATTRIBUTES, AccessControls
 
 nrl_env = os.getenv("ENV", "dev")
 nrl_auth_bucket_name = os.getenv(
@@ -167,21 +167,44 @@ def list_available_access_controls() -> None:
 
 
 def _print_perm(
-    perms_pretty: dict, lookup_path: str, perm_pretty_name: str, perm_key: str
+    perm_pretty_name: str,
+    perm_to_print: list,
 ):
+    # if not perm_to_print:
+    #     return
     print()
-    access_controls = perms_pretty.get(perm_key, [])
-    if access_controls:
-        print(f"{lookup_path} has these {perm_pretty_name}s:")
-        for control in access_controls:
-            print(f"- {control}")
-    else:
-        print(f"{lookup_path} has no {perm_pretty_name}s")
+    plural = (
+        perm_pretty_name if perm_pretty_name.endswith("s") else f"{perm_pretty_name}s"
+    )
+    print(f"{plural.upper()} ({len(perm_to_print)})")
+    for perm in perm_to_print:
+        print(f"- {perm}")
+
+
+def _print_perm_with_lookup(
+    perm_pretty_name: str,
+    perm_to_print: list,
+    attribute_lookup: dict[str, dict[str, str]],
+):
+    """
+    Lookup human-readable names for a permission and print
+    """
+    printable = []
+    for perm_item in perm_to_print:
+        display_name = attribute_lookup.get(
+            perm_item, {"display": f"Unknown {perm_pretty_name.lower()}"}
+        )["display"]
+        printable_perm_and_display_name = "%-45s (%s)" % (
+            display_name[:44],
+            perm_item,
+        )
+        printable.append(printable_perm_and_display_name)
+    _print_perm(perm_pretty_name, printable)
 
 
 def show_perms(supplier_type: SupplierType, app_id: str, org_ods=None) -> None:
     """
-    Show the permissions for a given application or organization.
+    Show permissions for a given application or organization.
     """
     if supplier_type.lower() not in SupplierType.list() or not app_id:
         print("Usage: show permissions for a given organisation or app")
@@ -204,37 +227,38 @@ def show_perms(supplier_type: SupplierType, app_id: str, org_ods=None) -> None:
 
     perms_pretty = json.loads(perms_ugly)
     if not perms_pretty:
-        print(f"No pointer-types found in permission file for {lookup_path}.")
+        print(f"No permissions found in file for {lookup_path}.")
         return
 
-    pretty_type_data = {
-        pointertype_perm: TYPE_ATTRIBUTES.get(
-            pointertype_perm, {"display": "Unknown type"}
-        )
-        for pointertype_perm in perms_pretty.get("types")
-    }
-    types = [
-        "%-45s (%s)"
-        % (pretty_type_data[pointertype_perm]["display"][:44], pointertype_perm)
-        for pointertype_perm in perms_pretty.get("types")
-    ]
-    print(f"{lookup_path} is allowed to access these pointer-types:")
-    for type_display in types:
-        print(f"- {type_display}")
+    print(f"{lookup_path} is allowed access to the following...")
 
-    _print_perm(
-        perms_pretty,
-        lookup_path,
-        perm_pretty_name="access control",
-        perm_key="access_controls",
+    _print_perm_with_lookup(
+        "pointer type", perms_pretty.get("types", []), TYPE_ATTRIBUTES
     )
 
-    # _print_perm(
-    #     perms_pretty,
-    #     lookup_path,
-    #     perm_pretty_name="API interaction",
-    #     perm_key="interaction",
-    # )
+    _print_perm_with_lookup(
+        "pointer categories", perms_pretty.get("categories", []), CATEGORY_ATTRIBUTES
+    )
+
+    _print_perm(
+        "access control",
+        perms_pretty.get("access_controls", []),
+    )
+
+    _print_perm(
+        "API interaction",
+        perms_pretty.get("interaction", []),
+    )
+
+    _print_perm(
+        "Produce for authors",
+        perms_pretty.get("produce_for_authors", []),
+    )
+
+    _print_perm(
+        "Produce for custodians",
+        perms_pretty.get("produce_for_custodians", []),
+    )
 
 
 if __name__ == "__main__":
