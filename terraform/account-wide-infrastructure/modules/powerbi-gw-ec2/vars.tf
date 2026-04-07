@@ -10,7 +10,7 @@ variable "use_custom_ami" {}
 variable "root_volume_size" {
   type        = number
   description = "Size of the root EBS volume in GB"
-  default     = 40
+  default     = 120
 }
 variable "root_volume_iops" {
   type        = number

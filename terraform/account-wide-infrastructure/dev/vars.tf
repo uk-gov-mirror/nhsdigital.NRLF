@@ -71,7 +71,7 @@ variable "use_powerbi_gw_custom_ami" {
 variable "powerbi_gw_root_volume_size" {
   type        = number
   description = "Size of the root EBS volume in GB"
-  default     = 40
+  default     = 120
 }
 
 variable "powerbi_gw_root_volume_iops" {
