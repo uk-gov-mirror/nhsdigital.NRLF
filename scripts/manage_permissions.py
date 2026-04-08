@@ -92,16 +92,78 @@ def _get_perms_from_s3(file_key: str) -> str | None:
     return item["Body"].read().decode("utf-8")
 
 
+def _build_lookup_path(supplier_type: str, app_id: str, org_ods: str | None) -> str:
+    if supplier_type.lower() not in SupplierType.list():
+        print(f"Error: invalid supplier {supplier_type}")
+        return
+    if not app_id:
+        print("Error: please provide an app_id")
+        return
+
+    if org_ods:
+        return f"{supplier_type}/{app_id}/{org_ods}.json"
+    return f"{supplier_type}/{app_id}.json"
+
+
+def _load_or_setup_perms(lookup_path: str) -> dict:
+    perms_ugly = _get_perms_from_s3(lookup_path)
+    if not perms_ugly:
+        print("Setting up new permissions file...")
+        return {}
+    return json.loads(perms_ugly)
+
+
+def _confirm_proceed(
+    prompt: str = "Do you want to proceed with these changes? (yes/NO): ",
+) -> bool:
+    """
+    If COMPARE_AND_CONFIRM enabled, ask the user to confirm before writing changes.
+    """
+    if not COMPARE_AND_CONFIRM:
+        return True
+    print()
+    confirm = input(prompt).strip().lower()
+    if confirm != "yes":
+        print("Operation cancelled at user request.")
+        return False
+    return True
+
+
+def _save_updated_perms(
+    lookup_path: str,
+    updated_perms: dict,
+    supplier_type: str,
+    app_id: str,
+    org_ods: str | None,
+    success_message="Set permissions",
+) -> None:
+    """
+    Write updated permissions to S3 and display the new state.
+    """
+    s3 = _get_s3_client()
+    s3.put_object(
+        Bucket=nrl_auth_bucket_name,
+        Key=lookup_path,
+        Body=json.dumps(updated_perms, indent=4),
+        ContentType="application/json",
+    )
+    print()
+    print(f"{success_message.strip()} for {lookup_path}")
+
+    print()
+    show_perms(supplier_type, app_id, org_ods)
+
+
 def list_apps(supplier_type: SupplierType) -> None:
     """
-    List all consumer or producer applications in the NRL environment.
+    List all consumer or producer applications for a given supplier type
 
-    Apps ending in .json have app-level permissions
+    Specifies which apps have app-level or org-level permissions
+        list_apps consumer
+        list_apps producer
     """
     if supplier_type.lower() not in SupplierType.list():
-        print("Usage: list apps for a given supplier type")
-        print("  list_apps consumer")
-        print("  list_apps producer")
+        print(f"Error: invalid supplier {supplier_type}")
         return
 
     keys = _list_s3_keys(f"{supplier_type}/")
@@ -132,11 +194,12 @@ def list_apps(supplier_type: SupplierType) -> None:
 def list_orgs(supplier_type: SupplierType, app_id: str) -> None:
     """
     List all organizations for a specific consumer or producer application.
+
+        list_orgs consumer <app_id>
+        list_orgs producer <app_id>
     """
     if supplier_type.lower() not in SupplierType.list():
-        print("Usage: list organisations for a given app and supplier type")
-        print("  list_orgs consumer <app_id>")
-        print("  list_orgs producer <app_id>")
+        print(f"Error: invalid supplier {supplier_type}")
         return
 
     keys = _list_s3_keys(f"{supplier_type}/{app_id}/")
@@ -219,19 +282,15 @@ def _print_perm_with_lookup(
 def show_perms(supplier_type: SupplierType, app_id: str, org_ods=None) -> None:
     """
     Show permissions for a given application or organization.
-    """
-    if supplier_type.lower() not in SupplierType.list() or not app_id:
-        print("Usage: show permissions for a given organisation or app")
-        print("  show_perms consumer <app_id> <org_ods>")
-        print("  show_perms producer <app_id> <org_ods>")
-        print("  show_perms consumer <app_id>")
-        print("  show_perms producer <app_id>")
-        return
 
-    if org_ods:
-        lookup_path = f"{supplier_type}/{app_id}/{org_ods}.json"
-    else:
-        lookup_path = f"{supplier_type}/{app_id}.json"
+        show_perms consumer <app_id> <org_ods>
+        show_perms producer <app_id> <org_ods>
+        show_perms consumer <app_id>
+        show_perms producer <app_id>
+    """
+    lookup_path = _build_lookup_path(supplier_type, app_id, org_ods)
+    if not lookup_path:
+        return
 
     perms_ugly = _get_perms_from_s3(lookup_path)
 
@@ -275,98 +334,54 @@ def show_perms(supplier_type: SupplierType, app_id: str, org_ods=None) -> None:
     # )
 
 
-def _save_pointer_types(
-    lookup_path: str,
-    current_perms: dict,
-    proposed_pointer_types: list,
-    supplier_type: SupplierType,
-    app_id: str,
-    org_ods,
-) -> None:
-    _print_perm_with_lookup(
-        "proposed pointer types", proposed_pointer_types, TYPE_ATTRIBUTES
-    )
-
-    if COMPARE_AND_CONFIRM:
-        print()
-        confirm = (
-            input("Do you want to proceed with these changes? (yes/NO): ")
-            .strip()
-            .lower()
-        )
-        if confirm != "yes":
-            print("Operation cancelled at user request.")
-            return
-
-    current_perms["types"] = proposed_pointer_types
-
-    s3 = _get_s3_client()
-    s3.put_object(
-        Bucket=nrl_auth_bucket_name,
-        Key=lookup_path,
-        Body=json.dumps(current_perms, indent=4),
-        ContentType="application/json",
-    )
-
-    print()
-    print(f"Set permissions for {lookup_path}")
-
-    print()
-    show_perms(supplier_type, app_id, org_ods)
-
-
 def add_pointer_type_perms(
     supplier_type: SupplierType, app_id: str, org_ods=None, *pointer_types_to_add: str
 ) -> None:
     """
     Add permissions for a given list of pointer types to an app or org.
 
-    Specify pointer_types = all to add a list of all (current) pointer types.
+    Specify pointer_types=all to add all (current) pointer types.
+
+        add_pointer_type_perms consumer <app_id> <org_ods> <pointer_types>
+        add_pointer_type_perms producer <app_id> <org_ods> <pointer_types>
+        add_pointer_type_perms consumer <app_id> <pointer_types>
+        add_pointer_type_perms producer <app_id> <pointer_types>
 
     TODO:
     highlight new additions in proposed pointer types list e.g. [NEW]
     """
-    if supplier_type.lower() not in SupplierType.list() or not app_id:
-        print("Usage: add pointer type permissions for a given organisation or app")
-        print("  add_pointer_type_perms consumer <app_id> <org_ods> <pointer_types>")
-        print("  add_pointer_type_perms producer <app_id> <org_ods> <pointer_types>")
-        print("  add_pointer_type_perms consumer <app_id> <pointer_types>")
-        print("  add_pointer_type_perms producer <app_id> <pointer_types>")
+
+    lookup_path = _build_lookup_path(supplier_type, app_id, org_ods)
+    if not lookup_path:
         return
 
     if not pointer_types_to_add:
         print("No pointer types provided. Please specify at least one pointer type.")
         return
 
-    if org_ods:
-        lookup_path = f"{supplier_type}/{app_id}/{org_ods}.json"
-    else:
-        lookup_path = f"{supplier_type}/{app_id}.json"
-
     if len(pointer_types_to_add) == 1 and pointer_types_to_add[0] == "all":
         print("Setting permissions for access to all pointer types.")
         pointer_types_to_add = tuple(TYPE_ATTRIBUTES.keys())
 
-    unknown_types = [pt for pt in pointer_types_to_add if pt not in TYPE_ATTRIBUTES]
+    unknown_types = [
+        pointer_type
+        for pointer_type in pointer_types_to_add
+        if pointer_type not in TYPE_ATTRIBUTES
+    ]
     if unknown_types:
         print(f"Error: Unknown pointer types provided: {', '.join(unknown_types)}")
         print()
         return
 
-    perms_ugly = _get_perms_from_s3(lookup_path)
-    if not perms_ugly:
-        print(f"Setting up new permissions file...")
-        perms_ugly = "{}"
-
-    current_perms = json.loads(perms_ugly)
+    current_perms = _load_or_setup_perms(lookup_path)
     current_pointer_types: list = current_perms.get("types", [])
 
-    already_added_types = list(
-        new_pointer_type
-        for new_pointer_type in pointer_types_to_add
-        if new_pointer_type in current_pointer_types
-    )
-    if len(already_added_types):
+    already_added_types = [
+        pointer_type
+        for pointer_type in pointer_types_to_add
+        if pointer_type in current_pointer_types
+    ]
+    if already_added_types:
         print(
             f"Error: Unable to add pointer types. These pointer types are already assigned to {lookup_path}:"
         )
@@ -375,14 +390,15 @@ def add_pointer_type_perms(
         return
 
     proposed_pointer_types = current_pointer_types + list(pointer_types_to_add)
-    _save_pointer_types(
-        lookup_path,
-        current_perms,
-        proposed_pointer_types,
-        supplier_type,
-        app_id,
-        org_ods,
+    _print_perm_with_lookup(
+        "proposed pointer types", proposed_pointer_types, TYPE_ATTRIBUTES
     )
+
+    if not _confirm_proceed():
+        return
+
+    current_perms["types"] = proposed_pointer_types
+    _save_updated_perms(lookup_path, current_perms, supplier_type, app_id, org_ods)
 
 
 def add_access_control_perms(
@@ -391,21 +407,16 @@ def add_access_control_perms(
     """
     Add permissions for a given list of access controls to an app or org.
 
-    Specify access_controls = all to add a list of all (current) access controls.
+        add_access_control_perms consumer <app_id> <org_ods> <access_controls>
+        add_access_control_perms producer <app_id> <org_ods> <access_controls>
+        add_access_control_perms consumer <app_id> <access_controls>
+        add_access_control_perms producer <app_id> <access_controls>
 
     TODO:
     highlight new additions in proposed access controls list e.g. [NEW]
     """
-    if supplier_type.lower() not in SupplierType.list() or not app_id:
-        print("Usage: add access control permissions for a given organisation or app")
-        print(
-            "  add_access_control_perms consumer <app_id> <org_ods> <access_controls>"
-        )
-        print(
-            "  add_access_control_perms producer <app_id> <org_ods> <access_controls>"
-        )
-        print("  add_access_control_perms consumer <app_id> <access_controls>")
-        print("  add_access_control_perms producer <app_id> <access_controls>")
+    lookup_path = _build_lookup_path(supplier_type, app_id, org_ods)
+    if not lookup_path:
         return
 
     if not access_controls_to_add:
@@ -414,15 +425,10 @@ def add_access_control_perms(
         )
         return
 
-    if org_ods:
-        lookup_path = f"{supplier_type}/{app_id}/{org_ods}.json"
-    else:
-        lookup_path = f"{supplier_type}/{app_id}.json"
-
     unknown_access_controls = [
-        pt
-        for pt in access_controls_to_add
-        if pt not in currently_supported_access_controls
+        access_control
+        for access_control in access_controls_to_add
+        if access_control not in currently_supported_access_controls
     ]
     if unknown_access_controls:
         print(
@@ -432,20 +438,15 @@ def add_access_control_perms(
         list_available_access_controls()
         return
 
-    perms_ugly = _get_perms_from_s3(lookup_path)
-    if not perms_ugly:
-        print(f"Setting up new permissions file...")
-        perms_ugly = "{}"
-
-    current_perms = json.loads(perms_ugly)
+    current_perms = _load_or_setup_perms(lookup_path)
     current_access_controls: list = current_perms.get("access_controls", [])
 
-    already_added_access_controls = list(
-        new_access_control
-        for new_access_control in access_controls_to_add
-        if new_access_control in current_access_controls
-    )
-    if len(already_added_access_controls):
+    already_added_access_controls = [
+        access_control
+        for access_control in access_controls_to_add
+        if access_control in current_access_controls
+    ]
+    if already_added_access_controls:
         print(
             f"Error: Unable to add access controls. These access controls are already assigned to {lookup_path}:"
         )
@@ -454,35 +455,13 @@ def add_access_control_perms(
         return
 
     proposed_access_controls = current_access_controls + list(access_controls_to_add)
-
     _print_perm("proposed access controls", proposed_access_controls)
 
-    if COMPARE_AND_CONFIRM:
-        print()
-        confirm = (
-            input("Do you want to proceed with these changes? (yes/NO): ")
-            .strip()
-            .lower()
-        )
-        if confirm != "yes":
-            print("Operation cancelled at user request.")
-            return
+    if not _confirm_proceed():
+        return
 
     current_perms["access_controls"] = proposed_access_controls
-
-    s3 = _get_s3_client()
-    s3.put_object(
-        Bucket=nrl_auth_bucket_name,
-        Key=lookup_path,
-        Body=json.dumps(current_perms, indent=4),
-        ContentType="application/json",
-    )
-
-    print()
-    print(f"Set permissions for {lookup_path}")
-
-    print()
-    show_perms(supplier_type, app_id, org_ods)
+    _save_updated_perms(lookup_path, current_perms, supplier_type, app_id, org_ods)
 
 
 def remove_pointer_type_perms(
@@ -492,14 +471,15 @@ def remove_pointer_type_perms(
     *pointer_types_to_remove: str,
 ) -> None:
     """
-    Remove a list of pointer type permissions for a given app or org.
+    Remove pointer type permissions for a given organisation or app.
+
+        remove_pointer_type_perms consumer <app_id> <org_ods> <pointer_types>
+        remove_pointer_type_perms producer <app_id> <org_ods> <pointer_types>
+        remove_pointer_type_perms consumer <app_id> <pointer_types>
+        remove_pointer_type_perms producer <app_id> <pointer_types>
     """
-    if supplier_type.lower() not in SupplierType.list() or not app_id:
-        print("Usage: remove pointer type permissions for a given organisation or app")
-        print("  remove_pointer_type_perms consumer <app_id> <org_ods> <pointer_types>")
-        print("  remove_pointer_type_perms producer <app_id> <org_ods> <pointer_types>")
-        print("  remove_pointer_type_perms consumer <app_id> <pointer_types>")
-        print("  remove_pointer_type_perms producer <app_id> <pointer_types>")
+    lookup_path = _build_lookup_path(supplier_type, app_id, org_ods)
+    if not lookup_path:
         return
 
     if not pointer_types_to_remove:
@@ -508,12 +488,11 @@ def remove_pointer_type_perms(
         )
         return
 
-    if org_ods:
-        lookup_path = f"{supplier_type}/{app_id}/{org_ods}.json"
-    else:
-        lookup_path = f"{supplier_type}/{app_id}.json"
-
-    unknown_types = [pt for pt in pointer_types_to_remove if pt not in TYPE_ATTRIBUTES]
+    unknown_types = [
+        pointer_type
+        for pointer_type in pointer_types_to_remove
+        if pointer_type not in TYPE_ATTRIBUTES
+    ]
     if unknown_types:
         print(f"Error: Unknown pointer types provided: {', '.join(unknown_types)}")
         print()
@@ -526,13 +505,13 @@ def remove_pointer_type_perms(
     current_perms = json.loads(perms_ugly)
     current_pointer_types: list = current_perms.get("types", [])
 
-    # Cannot remove pointer types not already assigned
-    types_not_assigned = list(
-        type_to_remove
-        for type_to_remove in pointer_types_to_remove
-        if type_to_remove not in current_pointer_types
-    )
-    if len(types_not_assigned):
+    # Cannot remove pointer types that aren't already assigned
+    types_not_assigned = [
+        pointer_type
+        for pointer_type in pointer_types_to_remove
+        if pointer_type not in current_pointer_types
+    ]
+    if types_not_assigned:
         print(
             f"Error: Unable to remove pointer types. These pointer types aren't assigned to {lookup_path}:"
         )
@@ -545,14 +524,15 @@ def remove_pointer_type_perms(
         for pointer_type in current_pointer_types
         if pointer_type not in pointer_types_to_remove
     ]
-    _save_pointer_types(
-        lookup_path,
-        current_perms,
-        proposed_pointer_types,
-        supplier_type,
-        app_id,
-        org_ods,
+    _print_perm_with_lookup(
+        "proposed pointer types", proposed_pointer_types, TYPE_ATTRIBUTES
     )
+
+    if not _confirm_proceed():
+        return
+
+    current_perms["types"] = proposed_pointer_types
+    _save_updated_perms(lookup_path, current_perms, supplier_type, app_id, org_ods)
 
 
 def remove_access_control_perms(
@@ -563,17 +543,14 @@ def remove_access_control_perms(
 ) -> None:
     """
     Remove access controls for a given an app or org.
+
+        remove_access_control_perms consumer <app_id> <org_ods> <access_controls>
+        remove_access_control_perms producer <app_id> <org_ods> <access_controls>
+        remove_access_control_perms consumer <app_id> <access_controls>
+        remove_access_control_perms producer <app_id> <access_controls>
     """
-    if supplier_type.lower() not in SupplierType.list() or not app_id:
-        print("Usage: add access control permissions for a given organisation or app")
-        print(
-            "  remove_access_control_perms consumer <app_id> <org_ods> <access_controls>"
-        )
-        print(
-            "  remove_access_control_perms producer <app_id> <org_ods> <access_controls>"
-        )
-        print("  remove_access_control_perms consumer <app_id> <access_controls>")
-        print("  remove_access_control_perms producer <app_id> <access_controls>")
+    lookup_path = _build_lookup_path(supplier_type, app_id, org_ods)
+    if not lookup_path:
         return
 
     if not access_controls_to_remove:
@@ -582,15 +559,10 @@ def remove_access_control_perms(
         )
         return
 
-    if org_ods:
-        lookup_path = f"{supplier_type}/{app_id}/{org_ods}.json"
-    else:
-        lookup_path = f"{supplier_type}/{app_id}.json"
-
     unknown_access_controls = [
-        pt
-        for pt in access_controls_to_remove
-        if pt not in currently_supported_access_controls
+        access_control
+        for access_control in access_controls_to_remove
+        if access_control not in currently_supported_access_controls
     ]
     if unknown_access_controls:
         print(
@@ -601,19 +573,18 @@ def remove_access_control_perms(
 
     perms_ugly = _get_perms_from_s3(lookup_path)
     if not perms_ugly:
-        print(f"Setting up new permissions file...")
-        perms_ugly = "{}"
+        return
 
     current_perms = json.loads(perms_ugly)
     current_access_controls: list = current_perms.get("access_controls", [])
 
-    # Cannot remove access controls not already assigned
-    access_controls_not_assigned = list(
-        access_control_to_remove
-        for access_control_to_remove in access_controls_to_remove
-        if access_control_to_remove not in current_access_controls
-    )
-    if len(access_controls_not_assigned):
+    # Cannot remove access controls that aren't already assigned
+    access_controls_not_assigned = [
+        access_control
+        for access_control in access_controls_to_remove
+        if access_control not in current_access_controls
+    ]
+    if access_controls_not_assigned:
         print(
             f"Error: Unable to remove access controls. These access controls aren't assigned to {lookup_path}:"
         )
@@ -621,95 +592,61 @@ def remove_access_control_perms(
         print()
         return
 
-    proposed_access_controls = current_access_controls + list(access_controls_to_remove)
-
     proposed_access_controls = [
         access_control
         for access_control in current_access_controls
         if access_control not in access_controls_to_remove
     ]
-
     _print_perm("proposed access controls", proposed_access_controls)
 
-    if COMPARE_AND_CONFIRM:
-        print()
-        confirm = (
-            input("Do you want to proceed with these changes? (yes/NO): ")
-            .strip()
-            .lower()
-        )
-        if confirm != "yes":
-            print("Operation cancelled at user request.")
-            return
+    if not _confirm_proceed():
+        return
 
     current_perms["access_controls"] = proposed_access_controls
-
-    s3 = _get_s3_client()
-    s3.put_object(
-        Bucket=nrl_auth_bucket_name,
-        Key=lookup_path,
-        Body=json.dumps(current_perms, indent=4),
-        ContentType="application/json",
-    )
-
-    print()
-    print(f"Set permissions for {lookup_path}")
-
-    print()
-    show_perms(supplier_type, app_id, org_ods)
+    _save_updated_perms(lookup_path, current_perms, supplier_type, app_id, org_ods)
 
 
 def clear_perms(supplier_type: SupplierType, app_id: str, org_ods=None) -> None:
     """
     Clear permissions for an application or organization.
-    This will remove all permissions for the specified app and org.
 
-    COMPARE_AND_CONFIRM=true \
-    poetry run python ./scripts/manage_permissions.py clear_perms consumer ANJALI_POSTMAN_APP TEST4
+    This will remove ALL permissions for the specified app or org.
+
+        clear_perms consumer <app_id> <org_ods>
+        clear_perms producer <app_id> <org_ods>
+        clear_perms consumer <app_id>
+        clear_perms producer <app_id>
     """
-    if supplier_type.lower() not in SupplierType.list() or not app_id:
-        print("Usage: clear permissions for a given organisation or app")
-        print("  clear_perms consumer <app_id> <org_ods>")
-        print("  clear_perms producer <app_id> <org_ods>")
-        print("  clear_perms consumer <app_id>")
-        print("  clear_perms producer <app_id>")
+
+    lookup_path = _build_lookup_path(supplier_type, app_id, org_ods)
+    if not lookup_path:
         return
 
-    if org_ods:
-        lookup_path = f"{supplier_type}/{app_id}/{org_ods}.json"
-    else:
-        lookup_path = f"{supplier_type}/{app_id}.json"
+    current_perms = _get_perms_from_s3(lookup_path)
+    if not current_perms or current_perms == "{}":
+        print(
+            f"No need to clear permissions for {lookup_path} as it currently has no permissions set."
+        )
+        return
 
     if COMPARE_AND_CONFIRM:
-        current_perms = _get_perms_from_s3(lookup_path)
-        if not current_perms or current_perms == "{}":
-            print(
-                f"No need to clear permissions for {lookup_path} as it currently has no permissions set."
-            )
-            return
-
         print()
         print(f"Current permissions for {lookup_path}:")
         print(current_perms)
 
-        print()
-        confirm = (
-            input("Are you SURE you want to clear these permissions? (yes/NO): ")
-            .strip()
-            .lower()
-        )
-        if confirm != "yes":
-            print("Operation cancelled at user request.")
+        if not _confirm_proceed(
+            "Are you SURE you want to clear these permissions? (yes/NO): "
+        ):
             return
 
-    s3 = _get_s3_client()
-    s3.put_object(
-        Bucket=nrl_auth_bucket_name,
-        Key=lookup_path,
-        Body="{}",
-        ContentType="application/json",
+    _save_updated_perms(
+        lookup_path,
+        {},
+        supplier_type,
+        app_id,
+        org_ods,
+        success_message="Cleared permissions",
     )
-    print(f"Cleared permissions for {lookup_path}.")
 
 
 if __name__ == "__main__":
@@ -725,6 +662,5 @@ if __name__ == "__main__":
             "remove_pointer_type_perms": remove_pointer_type_perms,
             "remove_access_control_perms": remove_access_control_perms,
             "clear_perms": clear_perms,
-            # "help": help,
         }
     )
