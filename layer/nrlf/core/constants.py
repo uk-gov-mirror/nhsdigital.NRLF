@@ -65,6 +65,61 @@ class AccessControls(Enum):
         return [control.value for control in AccessControls]
 
 
+class SupplierType(Enum):
+    PRODUCER = "producer"
+    CONSUMER = "consumer"
+
+    @staticmethod
+    def list():
+        return [supplier.value for supplier in SupplierType]
+
+
+class V2PermissionKey(Enum):
+    ACCESS_CONTROLS = "access_controls"
+    TYPES = "types"
+    CATEGORIES = "categories"
+    INTERACTIONS = "interactions"
+    PRODUCE_FOR_AUTHORS = "produce_for_authors"
+    PRODUCE_FOR_CUSTODIANS = "produce_for_custodians"
+
+    @staticmethod
+    def list():
+        return [permission_key.value for permission_key in V2PermissionKey]
+
+    def human_readable(self, plural=False):
+        human_lookup = {
+            V2PermissionKey.ACCESS_CONTROLS.value: {
+                "singular": "access control",
+                "plural": "access controls",
+            },
+            V2PermissionKey.TYPES.value: {
+                "singular": "pointer type",
+                "plural": "pointer types",
+            },
+            V2PermissionKey.CATEGORIES.value: {
+                "singular": "category",
+                "plural": "categories",
+            },
+            V2PermissionKey.INTERACTIONS.value: {
+                "singular": "interaction",
+                "plural": "interactions",
+            },
+            V2PermissionKey.PRODUCE_FOR_AUTHORS.value: {
+                "singular": "produce for author",
+                "plural": "produce for authors",
+            },
+            V2PermissionKey.PRODUCE_FOR_CUSTODIANS.value: {
+                "singular": "produce for custodian",
+                "plural": "produce for custodians",
+            },
+        }
+
+        if plural:
+            return human_lookup.get(self.value)["plural"]
+
+        return human_lookup.get(self.value)["singular"]
+
+
 NHSD_REQUEST_ID_HEADER = "NHSD-Request-Id"
 NHSD_CORRELATION_ID_HEADER = "NHSD-Correlation-Id"
 X_REQUEST_ID_HEADER = "X-Request-Id"
