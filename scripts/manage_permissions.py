@@ -178,10 +178,13 @@ def _print_perm(
     # if not perm_to_print:
     #     return
     print()
-    plural = (
-        perm_pretty_name if perm_pretty_name.endswith("s") else f"{perm_pretty_name}s"
-    )
-    print(f"{plural.upper()} ({len(perm_to_print)})")
+    if perm_pretty_name:
+        plural = (
+            perm_pretty_name
+            if perm_pretty_name.endswith("s")
+            else f"{perm_pretty_name}s"
+        )
+        print(f"{plural.upper()} ({len(perm_to_print)})")
     for perm in perm_to_print:
         print(f"- {perm}")
 
@@ -269,16 +272,21 @@ def show_perms(supplier_type: SupplierType, app_id: str, org_ods=None) -> None:
 def add_pointer_type_perms(
     supplier_type: SupplierType, app_id: str, org_ods=None, *pointer_types_to_add: str
 ) -> None:
-    # TODO:
-    # confirm before proceeding mode
-    # formatting help for pointer types ?
-    # highlight new additions in proposed pointer types list e.g. [NEW]
+    """
+    TODO:
+    confirm before proceeding mode
+    formatting help for pointer types ?
+    validate not adding a duplicate type
+    add list of all pointer types vs adding access control
+    highlight new additions in proposed pointer types list e.g. [NEW]
+    don't create at app level if ODS level present & backwards too? - hmm maybe too fancy
+    """
     if supplier_type.lower() not in SupplierType.list() or not app_id:
         print("Usage: add pointer type permissions for a given organisation or app")
-        print("  show_perms consumer <app_id> <org_ods> <pointer_types>")
-        print("  show_perms producer <app_id> <org_ods> <pointer_types>")
-        print("  show_perms consumer <app_id> <pointer_types>")
-        print("  show_perms producer <app_id> <pointer_types>")
+        print("  add_pointer_type_perms consumer <app_id> <org_ods> <pointer_types>")
+        print("  add_pointer_type_perms producer <app_id> <org_ods> <pointer_types>")
+        print("  add_pointer_type_perms consumer <app_id> <pointer_types>")
+        print("  add_pointer_type_perms producer <app_id> <pointer_types>")
         return
 
     if not pointer_types_to_add:
@@ -291,6 +299,10 @@ def add_pointer_type_perms(
         lookup_path = f"{supplier_type}/{app_id}/{org_ods}.json"
     else:
         lookup_path = f"{supplier_type}/{app_id}.json"
+
+    if len(pointer_types_to_add) == 1 and pointer_types_to_add[0] == "all":
+        print("Setting permissions for access to all pointer types.")
+        pointer_types_to_add = tuple(TYPE_ATTRIBUTES.keys())
 
     unknown_types = [pt for pt in pointer_types_to_add if pt not in TYPE_ATTRIBUTES]
     if unknown_types:
@@ -305,19 +317,35 @@ def add_pointer_type_perms(
 
     current_perms = json.loads(perms_ugly)
     current_pointer_types: list = current_perms.get("types", [])
-    if all(
-        new_pointer_type in current_pointer_types
+
+    already_added_types = list(
+        new_pointer_type
         for new_pointer_type in pointer_types_to_add
-    ):
-        print(
-            f"No changes needed for {lookup_path}. These pointer types are already assigned."
-        )
+        if new_pointer_type in current_pointer_types
+    )
+    if len(already_added_types):
+        print(f"Error: These pointer types are already assigned to {lookup_path}:")
+        _print_perm_with_lookup("", already_added_types, TYPE_ATTRIBUTES)
+        print()
         return
 
     proposed_pointer_types = current_pointer_types + list(pointer_types_to_add)
+    print()
     _print_perm_with_lookup(
         "proposed pointer types", proposed_pointer_types, TYPE_ATTRIBUTES
     )
+
+    if COMPARE_AND_CONFIRM:
+        print()
+        confirm = (
+            input("Do you want to proceed with these changes? (yes/NO): ")
+            .strip()
+            .lower()
+        )
+        if confirm != "yes":
+            print("Operation cancelled at user request.")
+            return
+
     current_perms["types"] = proposed_pointer_types
 
     s3 = _get_s3_client()
@@ -329,7 +357,7 @@ def add_pointer_type_perms(
     )
 
     print()
-    print(f"Set permissions for lookup_path")
+    print(f"Set permissions for {lookup_path}")
 
     print()
     show_perms(supplier_type, app_id, org_ods)
