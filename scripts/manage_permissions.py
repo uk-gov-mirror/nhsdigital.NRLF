@@ -28,9 +28,9 @@ COMPARE_AND_CONFIRM = (
 )
 
 currently_supported_access_controls = [
-    AccessControls.ALLOW_ALL_TYPES,
-    AccessControls.ALLOW_OVERRIDE_CREATION_DATETIME,
-    AccessControls.ALLOW_SUPERSEDE_WITH_DELETE_FAILURE,
+    AccessControls.ALLOW_ALL_TYPES.value,
+    AccessControls.ALLOW_OVERRIDE_CREATION_DATETIME.value,
+    AccessControls.ALLOW_SUPERSEDE_WITH_DELETE_FAILURE.value,
 ]
 
 
@@ -126,6 +126,7 @@ def list_apps(supplier_type: SupplierType) -> None:
     print(f"There are {len(app_level_perm_files)} apps with app-level permissions:")
     for app_level in app_level_perm_files:
         print(f"- {app_level}")
+    print()
 
 
 def list_orgs(supplier_type: SupplierType, app_id: str) -> None:
@@ -151,6 +152,7 @@ def list_orgs(supplier_type: SupplierType, app_id: str) -> None:
     print(f"There are {len(orgs)} organizations for app {app_id}:")
     for org in orgs:
         print(f"- {org}")
+    print()
 
 
 def list_available_pointer_types() -> None:
@@ -161,6 +163,7 @@ def list_available_pointer_types() -> None:
 
     for pointer_type, attributes in TYPE_ATTRIBUTES.items():
         print("- %-45s (%s)" % (pointer_type, attributes["display"][:45]))
+    print()
 
 
 def list_available_access_controls() -> None:
@@ -171,6 +174,7 @@ def list_available_access_controls() -> None:
 
     for control in currently_supported_access_controls:
         print(f"- {control}")
+    print()
 
 
 def _print_perm(
@@ -279,7 +283,6 @@ def _save_pointer_types(
     app_id: str,
     org_ods,
 ) -> None:
-    print()
     _print_perm_with_lookup(
         "proposed pointer types", proposed_pointer_types, TYPE_ATTRIBUTES
     )
@@ -425,10 +428,8 @@ def add_access_control_perms(
         print(
             f"Error: Unknown or unsupported access controls provided: {', '.join(unknown_access_controls)}"
         )
-        print(
-            f"Error: Unknown or unsupported access controls provided: {', '.join(unknown_access_controls)}"
-        )
         print()
+        list_available_access_controls()
         return
 
     perms_ugly = _get_perms_from_s3(lookup_path)
@@ -454,7 +455,6 @@ def add_access_control_perms(
 
     proposed_access_controls = current_access_controls + list(access_controls_to_add)
 
-    print()
     _print_perm("proposed access controls", proposed_access_controls)
 
     if COMPARE_AND_CONFIRM:
@@ -541,9 +541,9 @@ def remove_pointer_type_perms(
         return
 
     proposed_pointer_types = [
-        current_pointer_type
-        for current_pointer_type in current_pointer_types
-        if current_pointer_type not in pointer_types_to_remove
+        pointer_type
+        for pointer_type in current_pointer_types
+        if pointer_type not in pointer_types_to_remove
     ]
     _save_pointer_types(
         lookup_path,
@@ -553,6 +553,110 @@ def remove_pointer_type_perms(
         app_id,
         org_ods,
     )
+
+
+def remove_access_control_perms(
+    supplier_type: SupplierType,
+    app_id: str,
+    org_ods=None,
+    *access_controls_to_remove: str,
+) -> None:
+    """
+    Remove access controls for a given an app or org.
+    """
+    if supplier_type.lower() not in SupplierType.list() or not app_id:
+        print("Usage: add access control permissions for a given organisation or app")
+        print(
+            "  remove_access_control_perms consumer <app_id> <org_ods> <access_controls>"
+        )
+        print(
+            "  remove_access_control_perms producer <app_id> <org_ods> <access_controls>"
+        )
+        print("  remove_access_control_perms consumer <app_id> <access_controls>")
+        print("  remove_access_control_perms producer <app_id> <access_controls>")
+        return
+
+    if not access_controls_to_remove:
+        print(
+            "No access controls provided. Please specify at least one access control or use clear_perms command."
+        )
+        return
+
+    if org_ods:
+        lookup_path = f"{supplier_type}/{app_id}/{org_ods}.json"
+    else:
+        lookup_path = f"{supplier_type}/{app_id}.json"
+
+    unknown_access_controls = [
+        pt
+        for pt in access_controls_to_remove
+        if pt not in currently_supported_access_controls
+    ]
+    if unknown_access_controls:
+        print(
+            f"Error: Unknown or unsupported access controls provided: {', '.join(unknown_access_controls)}"
+        )
+        print()
+        return
+
+    perms_ugly = _get_perms_from_s3(lookup_path)
+    if not perms_ugly:
+        print(f"Setting up new permissions file...")
+        perms_ugly = "{}"
+
+    current_perms = json.loads(perms_ugly)
+    current_access_controls: list = current_perms.get("access_controls", [])
+
+    # Cannot remove access controls not already assigned
+    access_controls_not_assigned = list(
+        access_control_to_remove
+        for access_control_to_remove in access_controls_to_remove
+        if access_control_to_remove not in current_access_controls
+    )
+    if len(access_controls_not_assigned):
+        print(
+            f"Error: Unable to remove access controls. These access controls aren't assigned to {lookup_path}:"
+        )
+        _print_perm("", access_controls_not_assigned)
+        print()
+        return
+
+    proposed_access_controls = current_access_controls + list(access_controls_to_remove)
+
+    proposed_access_controls = [
+        access_control
+        for access_control in current_access_controls
+        if access_control not in access_controls_to_remove
+    ]
+
+    _print_perm("proposed access controls", proposed_access_controls)
+
+    if COMPARE_AND_CONFIRM:
+        print()
+        confirm = (
+            input("Do you want to proceed with these changes? (yes/NO): ")
+            .strip()
+            .lower()
+        )
+        if confirm != "yes":
+            print("Operation cancelled at user request.")
+            return
+
+    current_perms["access_controls"] = proposed_access_controls
+
+    s3 = _get_s3_client()
+    s3.put_object(
+        Bucket=nrl_auth_bucket_name,
+        Key=lookup_path,
+        Body=json.dumps(current_perms, indent=4),
+        ContentType="application/json",
+    )
+
+    print()
+    print(f"Set permissions for {lookup_path}")
+
+    print()
+    show_perms(supplier_type, app_id, org_ods)
 
 
 def clear_perms(supplier_type: SupplierType, app_id: str, org_ods=None) -> None:
@@ -616,9 +720,10 @@ if __name__ == "__main__":
             "list_available_pointer_types": list_available_pointer_types,
             "list_available_access_controls": list_available_access_controls,
             "show_perms": show_perms,
-            "add_pointer_type_to_perms": add_pointer_type_perms,
-            "add_access_control_to_perms": add_access_control_perms,
+            "add_pointer_type_perms": add_pointer_type_perms,
+            "add_access_control_perms": add_access_control_perms,
             "remove_pointer_type_perms": remove_pointer_type_perms,
+            "remove_access_control_perms": remove_access_control_perms,
             "clear_perms": clear_perms,
             # "help": help,
         }
