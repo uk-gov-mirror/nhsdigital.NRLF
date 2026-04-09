@@ -754,37 +754,37 @@ PERMISSION_KEY_ATTRIBUTES = {
     V2PermissionKey.ACCESS_CONTROLS.value: {
         "display": "access controls",
         "display_singular": "access control",
-        "permission_lookup": None,
+        "attribute_lookup": None,
         "all_assignable_permission_items": AccessControls.list(),
     },
     V2PermissionKey.TYPES.value: {
         "display": "pointer types",
         "display_singular": "pointer type",
-        "permission_lookup": TYPE_ATTRIBUTES,
+        "attribute_lookup": TYPE_ATTRIBUTES,
         "all_assignable_permission_items": PointerTypes.list(),
     },
     V2PermissionKey.CATEGORIES.value: {
         "display": "categories",
         "display_singular": "category",
-        "permission_lookup": CATEGORY_ATTRIBUTES,
+        "attribute_lookup": CATEGORY_ATTRIBUTES,
         "all_assignable_permission_items": Categories.list(),
     },
     V2PermissionKey.INTERACTIONS.value: {
         "display": "interactions",
         "display_singular": "interaction",
-        "permission_lookup": "",
+        "attribute_lookup": "",
         "all_assignable_permission_items": "",
     },
     V2PermissionKey.PRODUCE_FOR_AUTHORS.value: {
         "display": "produce for authors",
         "display_singular": "produce for author",
-        "permission_lookup": "",
+        "attribute_lookup": "",
         "all_assignable_permission_items": "",
     },
     V2PermissionKey.PRODUCE_FOR_CUSTODIANS.value: {
         "display": "produce for custodians",
         "display_singular": "produce for custodian",
-        "permission_lookup": "",
+        "attribute_lookup": "",
         "all_assignable_permission_items": "",
     },
 }

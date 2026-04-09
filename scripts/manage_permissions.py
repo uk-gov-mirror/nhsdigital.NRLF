@@ -58,9 +58,9 @@ currently_supported_access_controls = [
 ]
 
 
-print(f"Using NRL environment: {nrl_env}")
-print(f"Using NRL auth bucket: {nrl_auth_bucket_name}")
-print(f"Compare and confirm mode: {COMPARE_AND_CONFIRM}")
+print(f"📚 Using NRL environment: {nrl_env}")
+print(f"🪣  Using NRL auth bucket: {nrl_auth_bucket_name}")
+print(f"🔍 Compare and confirm mode: {COMPARE_AND_CONFIRM}")
 print()
 
 
@@ -85,7 +85,7 @@ def _list_s3_keys(file_key_prefix: str) -> list[str]:
             keys.extend([item["Key"] for item in page["Contents"]])
 
     if not keys:
-        print(f"No files found with prefix: {file_key_prefix}")
+        print(f"👀 No files found with prefix: {file_key_prefix}")
         return []
 
     return keys
@@ -97,11 +97,11 @@ def _get_perms_from_s3(file_key: str) -> str | None:
     try:
         item = s3.get_object(Bucket=nrl_auth_bucket_name, Key=file_key)
     except s3.exceptions.NoSuchKey:
-        print(f"Permissions file {file_key} does not exist in the bucket.")
+        print(f"👀 Permissions file {file_key} does not exist in the bucket.")
         return None
 
     if "Body" not in item:
-        print(f"No body found for permissions file {file_key}.")
+        print(f"❌ Error: no body found for permissions file {file_key}.")
         return None
 
     return item["Body"].read().decode("utf-8")
@@ -111,10 +111,10 @@ def _build_lookup_path(
     supplier_type: str, app_id: str, org_ods: str | None
 ) -> str | None:
     if supplier_type.lower() not in SupplierType.list():
-        print(f"Error: invalid supplier {supplier_type}")
+        print(f"❌ Error: invalid supplier {supplier_type}")
         return
     if not app_id:
-        print("Error: please provide an app_id")
+        print("❌ Error: please provide an app_id")
         return
 
     if org_ods:
@@ -123,17 +123,17 @@ def _build_lookup_path(
 
 
 def _load_or_setup_perms(lookup_path: str) -> dict:
-    print(f"Looking up permissions for {lookup_path}")
+    print(f"⏳ Looking up permissions for {lookup_path}")
     perms_ugly = _get_perms_from_s3(lookup_path)
     if not perms_ugly:
-        print("Setting up new permissions file...")
+        print("✨ Setting up new permissions file...")
         return {}
     print()
     return json.loads(perms_ugly)
 
 
 def _confirm_proceed(
-    prompt: str = "Do you want to proceed with these changes?",
+    prompt: str = "❓ Do you want to proceed with these changes?",
 ) -> bool:
     """
     If COMPARE_AND_CONFIRM=true, ask the user to confirm before writing changes.
@@ -143,7 +143,7 @@ def _confirm_proceed(
     print()
     confirm = input(f"{prompt} (yes/NO): ").strip().lower()
     if confirm != "yes":
-        print("Operation cancelled at user request.")
+        print("❌ Operation cancelled at user request.")
         return False
     return True
 
@@ -167,10 +167,13 @@ def _save_updated_perms(
         ContentType="application/json",
     )
     print()
-    print(f"{success_message.strip()} for {lookup_path}")
+    print(f"🎉 {success_message.strip()} for {lookup_path}")
 
     print()
     show_perms(supplier_type, app_id, org_ods)
+
+    print("💡 Remember to update the lambda layer for these changes to take effect")
+    print()
 
 
 json_file_ending = ".json"
@@ -185,7 +188,7 @@ def list_apps(supplier_type: SupplierType) -> None:
         list_apps producer
     """
     if supplier_type.lower() not in SupplierType.list():
-        print(f"Error: invalid supplier {supplier_type}")
+        print(f"❌ Error: invalid supplier {supplier_type}")
         return
 
     keys = _list_s3_keys(f"{supplier_type}/")
@@ -198,18 +201,23 @@ def list_apps(supplier_type: SupplierType) -> None:
     apps_with_orgs = {key for key in apps if key and not key.endswith(json_file_ending)}
 
     if not apps:
-        print("No applications found in the bucket.")
+        print(f"👀 No applications found in the {nrl_env} bucket.")
         return
 
-    print(f"There are {len(apps)} apps in {nrl_env} env")
+    def there_are_x_apps(app_count: int):
+        is_are = "is" if app_count is 1 else "are"
+        s = "" if app_count is 1 else "s"
+        return f"There {is_are} {app_count} app{s}"
+
+    print(f"{there_are_x_apps(len(apps))} in the {nrl_env} env")
 
     print()
-    print(f"There are {len(apps_with_orgs)} apps containing org-level permissions:")
+    print(f"{there_are_x_apps(len(apps_with_orgs))} containing org-level permissions:")
     for app_with_orgs in apps_with_orgs:
         print(f"- {app_with_orgs}")
 
     print()
-    print(f"There are {len(app_level_perm_files)} apps with app-level permissions:")
+    print(f"{there_are_x_apps(len(app_level_perm_files))} with app-level permissions:")
     for app_level in app_level_perm_files:
         print(f"- {app_level}")
     print()
@@ -223,7 +231,7 @@ def list_orgs(supplier_type: SupplierType, app_id: str) -> None:
         list_orgs producer <app_id>
     """
     if supplier_type.lower() not in SupplierType.list():
-        print(f"Error: invalid supplier {supplier_type}")
+        print(f"❌ Error: invalid supplier {supplier_type}")
         return
 
     keys = _list_s3_keys(f"{supplier_type}/{app_id}/")
@@ -234,9 +242,14 @@ def list_orgs(supplier_type: SupplierType, app_id: str) -> None:
     ]
 
     if not orgs:
-        print(f"No organizations found for {supplier_type} app {app_id}.")
+        print()
+        print(f"👀 No organizations found for {supplier_type} app {app_id}.")
+        return
 
-    print(f"There are {len(orgs)} organizations for app {app_id}:")
+    org_count = len(orgs)
+    is_are = "is" if org_count == 1 else "are"
+    s = "" if org_count == 1 else "s"
+    print(f"There {is_are} {org_count} organization{s} for app {app_id}:")
     for org in orgs:
         print(f"- {org}")
     print()
@@ -321,12 +334,12 @@ def show_perms(supplier_type: SupplierType, app_id: str, org_ods=None) -> None:
     perms_ugly = _get_perms_from_s3(lookup_path)
 
     if not perms_ugly:
-        print(f"No permissions file found for {lookup_path}.")
+        print(f"👀 No permissions file found for {lookup_path}.")
         return
 
     perms_pretty = json.loads(perms_ugly)
     if not perms_pretty:
-        print(f"No permissions found in file for {lookup_path}.")
+        print(f"👀 No permissions found in file for {lookup_path}.")
         return
 
     print(f"{lookup_path} is allowed access to the following...")
@@ -335,7 +348,7 @@ def show_perms(supplier_type: SupplierType, app_id: str, org_ods=None) -> None:
         _print_perm_with_lookup(
             perm,
             perms_pretty.get(perm, []),
-            PERMISSION_KEY_ATTRIBUTES.get(perm)["permission_lookup"],
+            PERMISSION_KEY_ATTRIBUTES.get(perm)["attribute_lookup"],
         )
 
 
@@ -360,7 +373,7 @@ def add_perm(
         add_perm access_controls producer <app_id> allow_all_types allow_supersede_with_delete_failure
     """
     if permission_key not in currently_supported_permission_keys:
-        print(f"Error: invalid permission being set: {permission_key}")
+        print(f"❌ Error: invalid permission being set: {permission_key}")
         print(f"Supported permission keys: {currently_supported_permission_keys}")
         return
 
@@ -377,19 +390,21 @@ def add_perm(
 
     if not items_to_add:
         print(
-            f"No {permission_name} provided. Please specify at least one {permission_name_singular}."
+            f"❌ Error: no {permission_name} provided. Please specify at least one {permission_name_singular}."
         )
         return
 
     if len(items_to_add) == 1 and items_to_add[0] == "all":
-        print(f"Setting permissions for access to all {permission_name}.")
+        print(f"📚 Setting permissions for access to all {permission_name}.")
         items_to_add = all_assignable_permission_items
 
     unknown_items = [
         item for item in items_to_add if item not in all_assignable_permission_items
     ]
     if unknown_items:
-        print(f"Error: Unknown {permission_name} provided: {', '.join(unknown_items)}")
+        print(
+            f"❌ Error: Unknown {permission_name} provided: {', '.join(unknown_items)}"
+        )
         print()
         return
 
@@ -401,7 +416,7 @@ def add_perm(
     ]
     if already_added_items:
         print(
-            f"Error: Unable to add {permission_name}. These {permission_name} are already assigned to {lookup_path}:"
+            f"❌ Error: Unable to add {permission_name}. These {permission_name} are already assigned to {lookup_path}:"
         )
         _print_perm_with_lookup("", already_added_items, permission_lookup)
         print()
@@ -416,7 +431,7 @@ def add_perm(
 
     add_count = len(items_to_add)
     if not _confirm_proceed(
-        f"Do you want to proceed with these changes and add {add_count} {permission_name if add_count >1 else permission_name_singular}?"
+        f"❓ Do you want to proceed with these changes and add {add_count} {permission_name_singular if add_count == 1 else permission_name}?"
     ):
         return
 
@@ -442,7 +457,7 @@ def remove_perm(
         remove_perm access_controls producer <app_id> allow_all_types allow_supersede_with_delete_failure
     """
     if permission_key not in currently_supported_permission_keys:
-        print(f"Error: invalid permission being set: {permission_key}")
+        print(f"❌ Error: invalid permission being set: {permission_key}")
         print(f"Supported permission keys: {currently_supported_permission_keys}")
         return
 
@@ -459,7 +474,7 @@ def remove_perm(
 
     if not items_to_remove:
         print(
-            f"No {permission_name} provided. Please specify at least one {permission_name_singular}."
+            f"👀 No {permission_name} provided. Please specify at least one {permission_name_singular}."
         )
         return
 
@@ -467,11 +482,13 @@ def remove_perm(
         item for item in items_to_remove if item not in all_assignable_permission_items
     ]
     if unknown_items:
-        print(f"Error: Unknown {permission_name} provided: {', '.join(unknown_items)}")
+        print(
+            f"❌ Error: Unknown {permission_name} provided: {', '.join(unknown_items)}"
+        )
         print()
         return
 
-    print(f"Looking up permissions for {lookup_path}")
+    print(f"⏳ Looking up permissions for {lookup_path}")
     perms_ugly = _get_perms_from_s3(lookup_path)
     if not perms_ugly:
         return
@@ -486,7 +503,7 @@ def remove_perm(
     ]
     if items_not_assigned:
         print(
-            f"Error: Unable to remove {permission_name}. These {permission_name} aren't assigned to {lookup_path}:"
+            f"❌ Error: Unable to remove {permission_name}. These {permission_name} aren't assigned to {lookup_path}:"
         )
         _print_perm("", items_not_assigned)
         print()
@@ -503,7 +520,7 @@ def remove_perm(
 
     remove_count = len(items_to_remove)
     if not _confirm_proceed(
-        f"Do you want to proceed with these changes and remove {remove_count} {permission_name if remove_count >1 else permission_name_singular}?"
+        f"❓ Do you want to proceed with these changes and remove {remove_count} {permission_name_singular if remove_count == 1 else permission_name}?"
     ):
         return
 
@@ -530,7 +547,7 @@ def clear_perms(supplier_type: SupplierType, app_id: str, org_ods=None) -> None:
     current_perms = _get_perms_from_s3(lookup_path)
     if not current_perms or current_perms == "{}":
         print(
-            f"No need to clear permissions for {lookup_path} as it currently has no permissions set."
+            f"⏭️ No need to clear permissions for {lookup_path} as it currently has no permissions set."
         )
         return
 

@@ -189,7 +189,7 @@ def test_add_perm_rejects_invalid_permission_key(capsys):
 def test_add_perm_rejects_no_items(capsys):
     add_perm("types", "producer", APP_ID, ORG_ODS)
 
-    assert "No pointer types provided" in capsys.readouterr().out
+    assert "no pointer types provided" in capsys.readouterr().out
 
 
 def test_add_perm_rejects_unknown_items(capsys):
