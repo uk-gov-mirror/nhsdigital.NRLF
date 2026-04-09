@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 
 RUN apt update && \
@@ -11,7 +11,6 @@ RUN apt update && \
         gnupg \
         libbz2-dev \
         libffi-dev \
-        libicu70 \
         liblzma-dev \
         libncursesw5-dev \
         libreadline-dev \
