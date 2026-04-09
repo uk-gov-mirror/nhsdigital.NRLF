@@ -17,11 +17,11 @@ from aws_session_assume import get_boto_session
 
 from nrlf.core.constants import (
     CATEGORY_ATTRIBUTES,
+    PERMISSION_KEY_ATTRIBUTES,
     TYPE_ATTRIBUTES,
     AccessControls,
     Categories,
     PointerTypes,
-    SupplierType,
     V2PermissionKey,
 )
 
@@ -34,6 +34,16 @@ COMPARE_AND_CONFIRM = (
     if nrl_env == "prod"
     else os.getenv("COMPARE_AND_CONFIRM", "false").lower() == "true"
 )
+
+
+class SupplierType(Enum):
+    PRODUCER = "producer"
+    CONSUMER = "consumer"
+
+    @staticmethod
+    def list():
+        return [supplier.value for supplier in SupplierType]
+
 
 currently_supported_permission_keys = [
     V2PermissionKey.TYPES.value,
@@ -97,7 +107,9 @@ def _get_perms_from_s3(file_key: str) -> str | None:
     return item["Body"].read().decode("utf-8")
 
 
-def _build_lookup_path(supplier_type: str, app_id: str, org_ods: str | None) -> str:
+def _build_lookup_path(
+    supplier_type: str, app_id: str, org_ods: str | None
+) -> str | None:
     if supplier_type.lower() not in SupplierType.list():
         print(f"Error: invalid supplier {supplier_type}")
         return
@@ -111,23 +123,25 @@ def _build_lookup_path(supplier_type: str, app_id: str, org_ods: str | None) -> 
 
 
 def _load_or_setup_perms(lookup_path: str) -> dict:
+    print(f"Looking up permissions for {lookup_path}")
     perms_ugly = _get_perms_from_s3(lookup_path)
     if not perms_ugly:
         print("Setting up new permissions file...")
         return {}
+    print()
     return json.loads(perms_ugly)
 
 
 def _confirm_proceed(
-    prompt: str = "Do you want to proceed with these changes? (yes/NO): ",
+    prompt: str = "Do you want to proceed with these changes?",
 ) -> bool:
     """
-    If COMPARE_AND_CONFIRM enabled, ask the user to confirm before writing changes.
+    If COMPARE_AND_CONFIRM=true, ask the user to confirm before writing changes.
     """
     if not COMPARE_AND_CONFIRM:
         return True
     print()
-    confirm = input(prompt).strip().lower()
+    confirm = input(f"{prompt} (yes/NO): ").strip().lower()
     if confirm != "yes":
         print("Operation cancelled at user request.")
         return False
@@ -159,6 +173,9 @@ def _save_updated_perms(
     show_perms(supplier_type, app_id, org_ods)
 
 
+json_file_ending = ".json"
+
+
 def list_apps(supplier_type: SupplierType) -> None:
     """
     List all consumer or producer applications for a given supplier type
@@ -174,9 +191,11 @@ def list_apps(supplier_type: SupplierType) -> None:
     keys = _list_s3_keys(f"{supplier_type}/")
     apps = {key.split("/")[1] for key in keys[1:]}
     app_level_perm_files = {
-        key.removesuffix(".json") for key in apps if key and key.endswith(".json")
+        key.removesuffix(json_file_ending)
+        for key in apps
+        if key and key.endswith(json_file_ending)
     }
-    apps_with_orgs = {key for key in apps if key and not key.endswith(".json")}
+    apps_with_orgs = {key for key in apps if key and not key.endswith(json_file_ending)}
 
     if not apps:
         print("No applications found in the bucket.")
@@ -209,9 +228,9 @@ def list_orgs(supplier_type: SupplierType, app_id: str) -> None:
 
     keys = _list_s3_keys(f"{supplier_type}/{app_id}/")
     orgs = [
-        key.split("/", maxsplit=2)[2].removesuffix(".json")
+        key.split("/", maxsplit=2)[2].removesuffix(json_file_ending)
         for key in keys
-        if key and key.endswith(".json")
+        if key and key.endswith(json_file_ending)
     ]
 
     if not orgs:
@@ -249,8 +268,6 @@ def _print_perm(
     perm_pretty_name: str,
     perm_to_print: list,
 ):
-    # if not perm_to_print:
-    #     return
     print()
     if perm_pretty_name:
         plural = (
@@ -314,51 +331,35 @@ def show_perms(supplier_type: SupplierType, app_id: str, org_ods=None) -> None:
 
     print(f"{lookup_path} is allowed access to the following...")
 
-    _print_perm_with_lookup(
-        "pointer type", perms_pretty.get("types", []), TYPE_ATTRIBUTES
-    )
-
-    # _print_perm_with_lookup(
-    #     "pointer categories", perms_pretty.get("categories", []), CATEGORY_ATTRIBUTES
-    # )
-
-    _print_perm(
-        "access control",
-        perms_pretty.get("access_controls", []),
-    )
-
-    # _print_perm(
-    #     "API interaction",
-    #     perms_pretty.get("interaction", []),
-    # )
-
-    # _print_perm(
-    #     "Produce for authors",
-    #     perms_pretty.get("produce_for_authors", []),
-    # )
-
-    # _print_perm(
-    #     "Produce for custodians",
-    #     perms_pretty.get("produce_for_custodians", []),
-    # )
+    for perm in currently_supported_permission_keys:
+        _print_perm_with_lookup(
+            perm,
+            perms_pretty.get(perm, []),
+            PERMISSION_KEY_ATTRIBUTES.get(perm)["permission_lookup"],
+        )
 
 
-def _add_perm(
-    permission_key: V2PermissionKey,
-    all_assignable_permission_items: dict,
-    permission_lookup: dict[str, dict[str, str]],
+def add_perm(
+    permission_key: str,
     supplier_type: SupplierType,
     app_id: str,
     org_ods=None,
-    *permission_items_to_add: str,
+    *items_to_add: str,
 ) -> None:
     """
-    Add one type of permission to an app or org.
+    Add items to any permission for a given app or org.
+        add_perm <permission_key> <supplier_type> <app_id> <permission_items>
 
-    TODO:
-    highlight new additions in proposed pointer types list e.g. [NEW]
+    Add pointer types to a consumer org:
+        add_perm types consumer <app_id> <org_ods> http://snomed.info/sct|736253002 http://snomed.info/sct|887701000000100
+
+    Add all current pointer types to a producer org:
+        add_perm types producer <app_id> <org_ods> all
+
+    Add access controls to a producer app:
+        add_perm access_controls producer <app_id> allow_all_types allow_supersede_with_delete_failure
     """
-    if permission_key.value not in currently_supported_permission_keys:
+    if permission_key not in currently_supported_permission_keys:
         print(f"Error: invalid permission being set: {permission_key}")
         print(f"Supported permission keys: {currently_supported_permission_keys}")
         return
@@ -367,204 +368,64 @@ def _add_perm(
     if not lookup_path:
         return
 
-    permission_name_plural = permission_key.human_readable(plural=True)
-    permission_name_singular = permission_key.human_readable()
+    (
+        permission_name,
+        permission_name_singular,
+        permission_lookup,
+        all_assignable_permission_items,
+    ) = PERMISSION_KEY_ATTRIBUTES.get(permission_key).values()
 
-    if not permission_items_to_add:
+    if not items_to_add:
         print(
-            f"No {permission_name_plural} provided. Please specify at least one {permission_name_singular}."
+            f"No {permission_name} provided. Please specify at least one {permission_name_singular}."
         )
         return
 
-    if len(permission_items_to_add) == 1 and permission_items_to_add[0] == "all":
-        print(f"Setting permissions for access to all {permission_name_plural}.")
-        permission_items_to_add = all_assignable_permission_items
+    if len(items_to_add) == 1 and items_to_add[0] == "all":
+        print(f"Setting permissions for access to all {permission_name}.")
+        items_to_add = all_assignable_permission_items
 
     unknown_items = [
-        item
-        for item in permission_items_to_add
-        if item not in all_assignable_permission_items
+        item for item in items_to_add if item not in all_assignable_permission_items
     ]
     if unknown_items:
-        print(
-            f"Error: Unknown {permission_name_plural} provided: {', '.join(unknown_items)}"
-        )
+        print(f"Error: Unknown {permission_name} provided: {', '.join(unknown_items)}")
         print()
         return
 
     current_perms = _load_or_setup_perms(lookup_path)
-    current_permission_items: list = current_perms.get(permission_key.value, [])
+    current_permission_items: list = current_perms.get(permission_key, [])
 
     already_added_items = [
-        item for item in permission_items_to_add if item in current_permission_items
+        item for item in items_to_add if item in current_permission_items
     ]
     if already_added_items:
         print(
-            f"Error: Unable to add {permission_name_plural}. These {permission_name_plural} are already assigned to {lookup_path}:"
+            f"Error: Unable to add {permission_name}. These {permission_name} are already assigned to {lookup_path}:"
         )
         _print_perm_with_lookup("", already_added_items, permission_lookup)
         print()
         return
 
-    proposed_permission_items = current_permission_items + list(permission_items_to_add)
+    proposed_permission_items = current_permission_items + list(items_to_add)
     _print_perm_with_lookup(
-        f"proposed {permission_name_plural}",
+        f"proposed {permission_name}",
         proposed_permission_items,
         permission_lookup,
     )
 
-    if not _confirm_proceed():
+    add_count = len(items_to_add)
+    if not _confirm_proceed(
+        f"Do you want to proceed with these changes and add {add_count} {permission_name if add_count >1 else permission_name_singular}?"
+    ):
         return
 
-    current_perms[permission_key.value] = proposed_permission_items
+    current_perms[permission_key] = proposed_permission_items
     _save_updated_perms(lookup_path, current_perms, supplier_type, app_id, org_ods)
 
 
-def add_permission(
-    perm_key: str,
-    supplier_type: SupplierType,
-    app_id: str,
-    org_ods=None,
-    *items_to_add: str,
-):
-    """
-    Add items to any permission for a given app or org.
-        add_permission <permission_key> <supplier_type> <app_id> <permission_items>
-
-    Add pointer types to a consumer org:
-        add_permission types consumer <app_id> <org_ods> http://snomed.info/sct\|736253002 http://snomed.info/sct\|887701000000100
-
-    Add all current pointer types to a producer org:
-        add_permission types producer <app_id> <org_ods> all
-
-    Add access controls to a producer app:
-        add_permission access_controls producer <app_id> allow_all_types allow_supersede_with_delete_failure
-    """
-    match perm_key:
-        case V2PermissionKey.ACCESS_CONTROLS.value:
-            return _add_perm(
-                V2PermissionKey.ACCESS_CONTROLS,
-                AccessControls.list(),
-                None,
-                supplier_type,
-                app_id,
-                org_ods,
-                *items_to_add,
-            )
-
-        case V2PermissionKey.TYPES.value:
-            _add_perm(
-                V2PermissionKey.TYPES,
-                PointerTypes.list(),
-                TYPE_ATTRIBUTES,
-                supplier_type,
-                app_id,
-                org_ods,
-                *items_to_add,
-            )
-
-        # case V2PermissionKey.CATEGORIES.value:
-        #     _add_perm(
-        #         V2PermissionKey.CATEGORIES,
-        #         Categories.list(),
-        #         CATEGORY_ATTRIBUTES,
-        #         supplier_type,
-        #         app_id,
-        #         org_ods,
-        #         *items_to_add,
-        #     )
-
-        case _:
-            print(f"Unrecognised or unsupported permission key: {perm_key}")
-            print(f"Must be one of: {", ".join(V2PermissionKey.list())}")
-
-
-def _remove_perm(
-    permission_key: V2PermissionKey,
-    all_assignable_permission_items: dict,
-    permission_lookup: dict[str, dict[str, str]],
-    supplier_type: SupplierType,
-    app_id: str,
-    org_ods=None,
-    *permission_items_to_remove: str,
-) -> None:
-    """
-    Remove one type of permission to an app or org.
-
-    TODO:
-    highlight new additions in proposed pointer types list e.g. [NEW]
-    """
-    if permission_key.value not in currently_supported_permission_keys:
-        print(f"Error: invalid permission being set: {permission_key}")
-        print(f"Supported permission keys: {currently_supported_permission_keys}")
-        return
-
-    lookup_path = _build_lookup_path(supplier_type, app_id, org_ods)
-    if not lookup_path:
-        return
-
-    permission_name_plural = permission_key.human_readable(plural=True)
-    permission_name_singular = permission_key.human_readable()
-
-    if not permission_items_to_remove:
-        print(
-            f"No {permission_name_plural} provided. Please specify at least one {permission_name_singular}."
-        )
-        return
-
-    unknown_items = [
-        item
-        for item in permission_items_to_remove
-        if item not in all_assignable_permission_items
-    ]
-    if unknown_items:
-        print(
-            f"Error: Unknown {permission_name_plural} provided: {', '.join(unknown_items)}"
-        )
-        print()
-        return
-
-    perms_ugly = _get_perms_from_s3(lookup_path)
-    if not perms_ugly:
-        return
-
-    current_perms = json.loads(perms_ugly)
-    current_permission_items: list = current_perms.get(permission_key.value, [])
-
-    # Cannot remove permission items that aren't already assigned
-    items_not_assigned = [
-        item
-        for item in permission_items_to_remove
-        if item not in current_permission_items
-    ]
-    if items_not_assigned:
-        print(
-            f"Error: Unable to remove {permission_name_plural}. These {permission_name_plural} aren't assigned to {lookup_path}:"
-        )
-        _print_perm("", items_not_assigned)
-        print()
-        return
-
-    proposed_permission_items = [
-        item
-        for item in current_permission_items
-        if item not in permission_items_to_remove
-    ]
-    _print_perm_with_lookup(
-        f"proposed {permission_name_plural}",
-        proposed_permission_items,
-        permission_lookup,
-    )
-
-    if not _confirm_proceed():
-        return
-
-    current_perms[permission_key.value] = proposed_permission_items
-    _save_updated_perms(lookup_path, current_perms, supplier_type, app_id, org_ods)
-
-
-def remove_permission(
-    perm_key: str,
+def remove_perm(
+    permission_key: str,
     supplier_type: SupplierType,
     app_id: str,
     org_ods=None,
@@ -572,51 +433,82 @@ def remove_permission(
 ):
     """
     Remove items from any permission for a given app or org.
-        remove_permission <permission_key> <supplier_type> <app_id> <permission_items>
+        remove_perm <permission_key> <supplier_type> <app_id> <permission_items>
 
     Remove pointer types from a consumer org:
-        remove_permission types consumer <app_id> <org_ods> http://snomed.info/sct\|736253002 http://snomed.info/sct\|887701000000100
+        remove_perm types consumer <app_id> <org_ods> http://snomed.info/sct|736253002 http://snomed.info/sct|887701000000100
 
     Remove access controls from a producer app:
-        remove_permission access_controls producer <app_id> allow_all_types allow_supersede_with_delete_failure
+        remove_perm access_controls producer <app_id> allow_all_types allow_supersede_with_delete_failure
     """
-    match perm_key:
-        case V2PermissionKey.ACCESS_CONTROLS.value:
-            return _remove_perm(
-                V2PermissionKey.ACCESS_CONTROLS,
-                AccessControls.list(),
-                None,
-                supplier_type,
-                app_id,
-                org_ods,
-                *items_to_remove,
-            )
+    if permission_key not in currently_supported_permission_keys:
+        print(f"Error: invalid permission being set: {permission_key}")
+        print(f"Supported permission keys: {currently_supported_permission_keys}")
+        return
 
-        case V2PermissionKey.TYPES.value:
-            _remove_perm(
-                V2PermissionKey.TYPES,
-                PointerTypes.list(),
-                TYPE_ATTRIBUTES,
-                supplier_type,
-                app_id,
-                org_ods,
-                *items_to_remove,
-            )
+    lookup_path = _build_lookup_path(supplier_type, app_id, org_ods)
+    if not lookup_path:
+        return
 
-        # case V2PermissionKey.CATEGORIES.value:
-        #     _remove_perm(
-        #         V2PermissionKey.CATEGORIES,
-        #         Categories.list(),
-        #         CATEGORY_ATTRIBUTES,
-        #         supplier_type,
-        #         app_id,
-        #         org_ods,
-        #         *items_to_remove,
-        #     )
+    (
+        permission_name,
+        permission_name_singular,
+        permission_lookup,
+        all_assignable_permission_items,
+    ) = PERMISSION_KEY_ATTRIBUTES.get(permission_key).values()
 
-        case _:
-            print(f"Unrecognised or unsupported permission key: {perm_key}")
-            print(f"Supported permission keys: {currently_supported_permission_keys}")
+    if not items_to_remove:
+        print(
+            f"No {permission_name} provided. Please specify at least one {permission_name_singular}."
+        )
+        return
+
+    unknown_items = [
+        item for item in items_to_remove if item not in all_assignable_permission_items
+    ]
+    if unknown_items:
+        print(f"Error: Unknown {permission_name} provided: {', '.join(unknown_items)}")
+        print()
+        return
+
+    print(f"Looking up permissions for {lookup_path}")
+    perms_ugly = _get_perms_from_s3(lookup_path)
+    if not perms_ugly:
+        return
+    print()
+
+    current_perms = json.loads(perms_ugly)
+    current_permission_items: list = current_perms.get(permission_key, [])
+
+    # Cannot remove permission items that aren't already assigned
+    items_not_assigned = [
+        item for item in items_to_remove if item not in current_permission_items
+    ]
+    if items_not_assigned:
+        print(
+            f"Error: Unable to remove {permission_name}. These {permission_name} aren't assigned to {lookup_path}:"
+        )
+        _print_perm("", items_not_assigned)
+        print()
+        return
+
+    proposed_permission_items = [
+        item for item in current_permission_items if item not in items_to_remove
+    ]
+    _print_perm_with_lookup(
+        f"proposed {permission_name}",
+        proposed_permission_items,
+        permission_lookup,
+    )
+
+    remove_count = len(items_to_remove)
+    if not _confirm_proceed(
+        f"Do you want to proceed with these changes and remove {remove_count} {permission_name if remove_count >1 else permission_name_singular}?"
+    ):
+        return
+
+    current_perms[permission_key] = proposed_permission_items
+    _save_updated_perms(lookup_path, current_perms, supplier_type, app_id, org_ods)
 
 
 def clear_perms(supplier_type: SupplierType, app_id: str, org_ods=None) -> None:
@@ -647,9 +539,7 @@ def clear_perms(supplier_type: SupplierType, app_id: str, org_ods=None) -> None:
         print(f"Current permissions for {lookup_path}:")
         print(current_perms)
 
-        if not _confirm_proceed(
-            "Are you SURE you want to clear these permissions? (yes/NO): "
-        ):
+        if not _confirm_proceed("Are you SURE you want to clear these permissions?"):
             return
 
     _save_updated_perms(
@@ -670,8 +560,8 @@ if __name__ == "__main__":
             "list_available_pointer_types": list_available_pointer_types,
             "list_available_access_controls": list_available_access_controls,
             "show_perms": show_perms,
-            "add_permission": add_permission,
-            "remove_permission": remove_permission,
+            "add_perm": add_perm,
+            "remove_perm": remove_perm,
             "clear_perms": clear_perms,
         }
     )
