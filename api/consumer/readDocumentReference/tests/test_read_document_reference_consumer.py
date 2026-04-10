@@ -60,7 +60,7 @@ def test_read_document_reference_happy_path_v2(
     v2_headers = create_headers(
         additional_headers={
             V2Headers.NHSD_END_USER_ORGANISATION_ODS: "Y05868",
-            V2Headers.NHSD_NRL_APP_ID: "Y05868-TestApp-12345678",
+            V2Headers.X_PROXYGEN_APP_NRL_APP_ID: "Y05868-TestApp-12345678",
         }
     )
     v2_headers.pop(CLIENT_RP_DETAILS)
@@ -220,7 +220,7 @@ def test_read_document_reference_unauthorised_for_type_v2(
     headers = create_headers(
         additional_headers={
             V2Headers.NHSD_END_USER_ORGANISATION_ODS: "Y05868",
-            V2Headers.NHSD_NRL_APP_ID: "Y05868-TestApp-12345678",
+            V2Headers.X_PROXYGEN_APP_NRL_APP_ID: "Y05868-TestApp-12345678",
         }
     )
     headers.pop("nhsd-client-rp-details")

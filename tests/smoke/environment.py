@@ -15,6 +15,7 @@ class SmokeTestParameters:
         self.nrlf_app_id = parameters.get("nrlf_app_id")
         self.ods_code = parameters.get("ods_code")
         self.test_nhs_numbers = parameters.get("test_nhs_numbers").split(",")
+        self.v1_ods_code = "SMOKETESTV1"
 
 
 class ConnectMode(Enum):
@@ -50,7 +51,7 @@ class EnvironmentConfig:
             }
         )
 
-        smoketest_id = str(uuid.uuid4())
+        smoketest_id = f"SMOKETEST-{str(uuid.uuid4())}"
         env_resources_name = self.env_name.split("-")[0]
 
         if self.connect_mode == ConnectMode.INTERNAL.value:

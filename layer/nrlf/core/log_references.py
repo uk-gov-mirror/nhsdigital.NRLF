@@ -26,7 +26,7 @@ class LogReference(Enum):
         "WARN", "Missing nhsd-end-user-organisation-ods header for v2 permissions"
     )
     HANDLER003b = _Reference(
-        "WARN", "Missing nhsd-nrl-app-id header for v2 permissions"
+        "WARN", "Missing x-proxygen-app-nrl-app-id header for v2 permissions"
     )
     HANDLER004 = _Reference("INFO", "Authorisation lookup enabled")
     HANDLER004a = _Reference("INFO", "Authorisation lookup skipped for sync request")
@@ -151,6 +151,9 @@ class LogReference(Enum):
     REPOSITORY026 = _Reference("EXCEPTION", "Failed to delete resource from DynamoDB")
     REPOSITORY026a = _Reference(
         "EXCEPTION", "Ignoring failure to delete resource from DynamoDB"
+    )
+    REPOSITORY026b = _Reference(
+        "EXCEPTION", "Failed to delete superseded resource from DynamoDB"
     )
     REPOSITORY027 = _Reference("INFO", "Successfully deleted item from DynamoDB")
     REPOSITORY028 = _Reference("INFO", "Received page of search results")

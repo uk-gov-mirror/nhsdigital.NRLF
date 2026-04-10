@@ -80,7 +80,7 @@ def test_search_post_document_reference_happy_path_v2(
     v2_headers = create_headers(
         additional_headers={
             V2Headers.NHSD_END_USER_ORGANISATION_ODS: "Y05868",
-            V2Headers.NHSD_NRL_APP_ID: "Y05868-TestApp-12345678",
+            V2Headers.X_PROXYGEN_APP_NRL_APP_ID: "Y05868-TestApp-12345678",
         }
     )
     v2_headers.pop(CLIENT_RP_DETAILS)
@@ -561,7 +561,7 @@ def test_search_post_document_reference_filters_by_pointer_types_v2(
     v2_headers = create_headers(
         additional_headers={
             V2Headers.NHSD_END_USER_ORGANISATION_ODS: "Y05868",
-            V2Headers.NHSD_NRL_APP_ID: "Y05868-TestApp-12345678",
+            V2Headers.X_PROXYGEN_APP_NRL_APP_ID: "Y05868-TestApp-12345678",
         }
     )
     v2_headers.pop(CLIENT_RP_DETAILS)

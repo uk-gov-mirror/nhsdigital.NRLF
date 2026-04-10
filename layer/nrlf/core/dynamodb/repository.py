@@ -344,14 +344,18 @@ class DocumentPointerRepository(Repository[DocumentPointer]):
         key = f"D#{id_}"
         try:
             self.table.delete_item(Key={"pk": key, "sk": key})
+            logger.log(LogReference.REPOSITORY027, id=id_)
         except Exception as exc:
-            if can_ignore_delete_fail:
-                logger.log(
-                    LogReference.REPOSITORY026a,
-                    exc_info=sys.exc_info(),
-                    stacklevel=5,
-                    error=str(exc),
-                )
+            logger.log(
+                (
+                    LogReference.REPOSITORY026a
+                    if can_ignore_delete_fail
+                    else LogReference.REPOSITORY026b
+                ),
+                exc_info=sys.exc_info(),
+                stacklevel=5,
+                error=str(exc),
+            )
 
     def _query(self, **kwargs) -> Iterator[DocumentPointer]:
         """
