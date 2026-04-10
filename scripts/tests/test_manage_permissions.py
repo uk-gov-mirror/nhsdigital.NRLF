@@ -234,13 +234,43 @@ def test_remove_perm_removes_access_control(mock_get_s3):
 
 
 @patch(f"{MODULE}._get_s3_client")
-def test_remove_perm_rejects_items_not_currently_assigned(mock_get_s3, capsys):
+def test_remove_perm_skips_update_if_all_items_not_currently_assigned(
+    mock_get_s3, capsys
+):
     existing_perms = {"types": [SAMPLE_POINTER_TYPES[0]]}
     mock_get_s3.return_value = _make_s3_mock(body=json.dumps(existing_perms).encode())
 
     remove_perm("types", "consumer", APP_ID, None, SAMPLE_POINTER_TYPES[1])
 
-    assert "aren't assigned" in capsys.readouterr().out
+    assert (
+        "Skipping: None of the requested pointer types are assigned"
+        in capsys.readouterr().out
+    )
+    mock_get_s3.put_object.assert_not_called()
+
+
+@patch(f"{MODULE}._get_s3_client")
+def test_remove_perm_skips_items_not_currently_assigned(mock_get_s3, capsys):
+    existing_perms = {"access_controls": [SAMPLE_ACCESS_CONTROLS[0]]}
+    s3 = _make_s3_mock(body=json.dumps(existing_perms).encode())
+    mock_get_s3.return_value = s3
+
+    remove_perm(
+        "access_controls",
+        "producer",
+        APP_ID,
+        ORG_ODS,
+        SAMPLE_ACCESS_CONTROLS[0],
+        SAMPLE_ACCESS_CONTROLS[1],
+    )
+
+    assert "Skipping access controls not already assigned" in capsys.readouterr().out
+    s3.put_object.assert_called_once_with(
+        Bucket=BUCKET,
+        Key=f"producer/{APP_ID}/{ORG_ODS}.json",
+        Body=json.dumps({"access_controls": []}, indent=4),
+        ContentType="application/json",
+    )
 
 
 @patch(f"{MODULE}._get_s3_client")

@@ -172,7 +172,8 @@ def _save_updated_perms(
     print()
     show_perms(supplier_type, app_id, org_ods)
 
-    print("💡 Remember to update the lambda layer for these changes to take effect")
+    print()
+    print("💡 Remember to update the lambda layer for these changes to take effect 💡")
     print()
 
 
@@ -415,12 +416,16 @@ def add_perm(
         item for item in items_to_add if item in current_permission_items
     ]
     if already_added_items:
-        print(
-            f"❌ Error: Unable to add {permission_name}. These {permission_name} are already assigned to {lookup_path}:"
-        )
+        if len(already_added_items) == len(items_to_add):
+            print(
+                f"⏭️  Skipping: All requested {permission_name} are already assigned to {lookup_path}"
+            )
+            print()
+            return
+
+        print(f"👬 Skipping {permission_name} already assigned to {lookup_path}:")
         _print_perm_with_lookup("", already_added_items, permission_lookup)
         print()
-        return
 
     proposed_permission_items = current_permission_items + list(items_to_add)
     _print_perm_with_lookup(
@@ -497,17 +502,20 @@ def remove_perm(
     current_perms = json.loads(perms_ugly)
     current_permission_items: list = current_perms.get(permission_key, [])
 
-    # Cannot remove permission items that aren't already assigned
     items_not_assigned = [
         item for item in items_to_remove if item not in current_permission_items
     ]
     if items_not_assigned:
-        print(
-            f"❌ Error: Unable to remove {permission_name}. These {permission_name} aren't assigned to {lookup_path}:"
-        )
+        if len(items_not_assigned) == len(items_to_remove):
+            print(
+                f"⏭️  Skipping: None of the requested {permission_name} are assigned to {lookup_path}"
+            )
+            print()
+            return
+
+        print(f"👬 Skipping {permission_name} not already assigned to {lookup_path}:")
         _print_perm("", items_not_assigned)
         print()
-        return
 
     proposed_permission_items = [
         item for item in current_permission_items if item not in items_to_remove
@@ -547,7 +555,7 @@ def clear_perms(supplier_type: SupplierType, app_id: str, org_ods=None) -> None:
     current_perms = _get_perms_from_s3(lookup_path)
     if not current_perms or current_perms == "{}":
         print(
-            f"⏭️ No need to clear permissions for {lookup_path} as it currently has no permissions set."
+            f"⏭️  No need to clear permissions for {lookup_path} as it currently has no permissions set."
         )
         return
 
