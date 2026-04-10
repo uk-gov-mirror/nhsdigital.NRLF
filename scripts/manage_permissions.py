@@ -205,8 +205,8 @@ def list_apps(supplier_type: SupplierType) -> None:
         return
 
     def there_are_x_apps(app_count: int):
-        is_are = "is" if app_count is 1 else "are"
-        s = "" if app_count is 1 else "s"
+        is_are = "is" if app_count == 1 else "are"
+        s = "" if app_count == 1 else "s"
         return f"There {is_are} {app_count} app{s}"
 
     print(f"{there_are_x_apps(len(apps))} in the {nrl_env} env")
