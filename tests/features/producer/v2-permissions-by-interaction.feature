@@ -8,7 +8,7 @@ Feature: Producer v2 permissions by pointer type - Success and Failure Scenarios
     Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
 
   Scenario: V2 Permissions with no access for producer interaction - createDocumentReference
-    When producer '1DSYNC1NT3R4CT1ON5' creates a DocumentReference with values:
+    When producer '1DSYNCTEST' creates a DocumentReference with values:
       | property        | value                          |
       | subject         | 9278693472                     |
       | status          | current                        |
@@ -34,7 +34,7 @@ Feature: Producer v2 permissions by pointer type - Success and Failure Scenarios
             }
           ]
         },
-        "diagnostics": "Your organisation '1DSYNC1NT3R4CT1ON5' does not have permission to access this resource. Contact the onboarding team."
+        "diagnostics": "Your organisation '1DSYNCTEST' does not have permission to access this resource. Contact the onboarding team."
       }
       """
 
@@ -82,19 +82,19 @@ Feature: Producer v2 permissions by pointer type - Success and Failure Scenarios
 
   Scenario: V2 Permissions with internal perms has access for upsert - upsertDocumentReference
     Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
-    And the organisation '1DSYNC1NT3R4CT1ON5' is authorised to access pointer types:
+    And the organisation '1DSYNCTEST' is authorised to access pointer types:
       | system                 | value     |
       | http://snomed.info/sct | 736253002 |
-    When producer v1 '1DSYNC1NT3R4CT1ON5' upserts a DocumentReference with values:
-      | property  | value                                      |
-      | id        | 1DSYNC1NT3R4CT1ON5-testid-upsert-0001-0001 |
-      | subject   | 9278693472                                 |
-      | status    | current                                    |
-      | type      | 736253002                                  |
-      | category  | 734163000                                  |
-      | custodian | 1DSYNC1NT3R4CT1ON5                         |
-      | author    | HAR1                                       |
-      | url       | https://example.org/my-doc.pdf             |
+    When producer '1DSYNCTEST' upserts a DocumentReference with values:
+      | property  | value                              |
+      | id        | 1DSYNCTEST-testid-upsert-0001-0001 |
+      | subject   | 9278693472                         |
+      | status    | current                            |
+      | type      | 736253002                          |
+      | category  | 734163000                          |
+      | custodian | 1DSYNCTEST                         |
+      | author    | HAR1                               |
+      | url       | https://example.org/my-doc.pdf     |
     Then the response status code is 201
     And the response is an OperationOutcome with 1 issue
     And the OperationOutcome contains the issue:
@@ -114,13 +114,13 @@ Feature: Producer v2 permissions by pointer type - Success and Failure Scenarios
         "diagnostics": "The document has been created"
       }
       """
-    And the Document Reference '1DSYNC1NT3R4CT1ON5-testid-upsert-0001-0001' exists with values:
-      | property  | value                                      |
-      | id        | 1DSYNC1NT3R4CT1ON5-testid-upsert-0001-0001 |
-      | subject   | 9278693472                                 |
-      | status    | current                                    |
-      | type      | 736253002                                  |
-      | category  | 734163000                                  |
-      | custodian | 1DSYNC1NT3R4CT1ON5                         |
-      | author    | HAR1                                       |
-      | url       | https://example.org/my-doc.pdf             |
+    And the Document Reference '1DSYNCTEST-testid-upsert-0001-0001' exists with values:
+      | property  | value                              |
+      | id        | 1DSYNCTEST-testid-upsert-0001-0001 |
+      | subject   | 9278693472                         |
+      | status    | current                            |
+      | type      | 736253002                          |
+      | category  | 734163000                          |
+      | custodian | 1DSYNCTEST                         |
+      | author    | HAR1                               |
+      | url       | https://example.org/my-doc.pdf     |

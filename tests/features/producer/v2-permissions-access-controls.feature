@@ -93,18 +93,18 @@ Feature: Producer v2 access_control permissions - Success and Failure Scenarios
     And the date of the resource in the Location header is not '2024-06-01T12:00:00Z'
 
   Scenario: Successfully supersede a DocumentReference with ALLOW_SUPERSEDE_WITH_DELETE_FAILURE - upsertDocumentReference
-    Given the application 'DataShare' (ID 'v2-z00z-y11y-x22x') is registered to access the API
-    When producer '4LLTYP35P' upserts a DocumentReference with values:
-      | property   | value                                          |
-      | id         | 4LLTYP35P-testid-upsert-0001-0002              |
-      | subject    | 9278693472                                     |
-      | status     | current                                        |
-      | type       | 736253002                                      |
-      | category   | 734163000                                      |
-      | custodian  | 4LLTYP35P                                      |
-      | author     | 4LLTYP35P                                      |
-      | url        | https://example.org/newdoc.pdf                 |
-      | supercedes | 4LLTYP35P-000-ThisRefDoesNotExistSupersedeTest |
+    Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
+    When producer '1DSYNCTEST' upserts a DocumentReference with values:
+      | property   | value                                           |
+      | id         | 1DSYNCTEST-testid-upsert-0001-0002              |
+      | subject    | 9278693472                                      |
+      | status     | current                                         |
+      | type       | 736253002                                       |
+      | category   | 734163000                                       |
+      | custodian  | 1DSYNCTEST                                      |
+      | author     | 1DSYNCTEST                                      |
+      | url        | https://example.org/newdoc.pdf                  |
+      | supercedes | 1DSYNCTEST-000-ThisRefDoesNotExistSupersedeTest |
     Then the response status code is 201
     And the response is an OperationOutcome with 1 issue
     And the OperationOutcome contains the issue:

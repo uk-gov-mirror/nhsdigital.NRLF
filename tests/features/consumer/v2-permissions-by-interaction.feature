@@ -9,7 +9,7 @@ Feature: Consumer v2 permissions by interaction - Success and Failure Scenarios
 
   Scenario: V2 permissions with no access for interaction - searchDocumentReference
     Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
-    When consumer '1DSYNC1NT3R4CT1ON5' searches for DocumentReferences with parameters:
+    When consumer '1DSYNCTEST' searches for DocumentReferences with parameters:
       | parameter | value                                   |
       | subject   | 9278693472                              |
       | type      | http://snomed.info/sct\|887701000000100 |
@@ -29,6 +29,6 @@ Feature: Consumer v2 permissions by interaction - Success and Failure Scenarios
             }
           ]
         },
-        "diagnostics": "Your organisation '1DSYNC1NT3R4CT1ON5' does not have permission to access this resource. Contact the onboarding team."
+        "diagnostics": "Your organisation '1DSYNCTEST' does not have permission to access this resource. Contact the onboarding team."
       }
       """

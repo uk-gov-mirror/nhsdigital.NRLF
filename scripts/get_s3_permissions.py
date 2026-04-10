@@ -152,9 +152,13 @@ def add_feature_test_files(local_path):
             ),
             (
                 "z00z-y11y-x22x",
-                "1DSYNC1NT3R4CT1ON5",
+                "1DSYNCTEST",
                 [],
-                [AccessControls.ALLOW_ALL_TYPES.value],
+                [
+                    AccessControls.ALLOW_ALL_TYPES.value,
+                    AccessControls.ALLOW_OVERRIDE_CREATION_DATETIME.value,
+                    AccessControls.ALLOW_SUPERSEDE_WITH_DELETE_FAILURE.value,
+                ],
                 InternalApiInteractions.list(),
             ),
         ],
