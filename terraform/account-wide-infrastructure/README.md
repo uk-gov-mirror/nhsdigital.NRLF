@@ -69,9 +69,9 @@ If that has worked, you should see: "Your account is successfully connected thro
 
 ### Build and publish the container image for CI build
 
-Once all the mgmt infra has been deployed, you need to build and publish the CI image to the ECR repo.
+Once all the mgmt infra has been deployed, you need to build and publish the CI image to the ECR repo. Also follow these steps to update the CI build image.
 
-To do this, first build the image as follows:
+To do this, from the top-level of the repo, build the image as follows:
 
 ```
 make build-ci-image
@@ -88,6 +88,8 @@ and push the image:
 ```
 make publish-ci-image
 ```
+
+This will create an image with a YYYY-MM-DD tag. You can then update the CI_IMAGE_TAG variable in `mgmt/vars.tf" and redeploy the mgmt resources to update codebuild to use the tagged image.
 
 ## Deploy account wide resources
 

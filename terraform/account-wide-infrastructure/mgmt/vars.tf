@@ -28,3 +28,9 @@ variable "vpc_cidr_block" {
   type        = string
   default     = "10.0.0.0/16"
 }
+
+variable "ci_image_tag" {
+  description = "Tag for the CI image in ECR"
+  type        = string
+  default     = "2026-04-09"
+}

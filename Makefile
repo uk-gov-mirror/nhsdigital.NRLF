@@ -23,6 +23,9 @@ PERFTEST_TYPE_DIST_PROFILE ?= default
 PERFTEST_CUSTODIAN_DIST_PROFILE ?= default
 PERFTEST_TOKEN_REFRESH_PORT ?= 8765
 
+CI_BUILD_ARGS ?=
+CI_IMAGE_TAG ?= $(shell date +%Y-%m-%d)
+
 export PATH := $(PATH):$(PWD)/.venv/bin
 export USE_SHARED_RESOURCES := $(shell poetry run python scripts/are_resources_shared_for_stack.py $(TF_WORKSPACE_NAME))
 
@@ -88,8 +91,9 @@ build-api-packages: ./api/consumer/* ./api/producer/*
 build-ci-image: ## Build the CI image
 	@echo "Building the CI image"
 	docker build \
-		-t nhsd-nrlf-ci-build:latest \
-		-f Dockerfile.ci-build
+		-t localhost/nhsd-nrlf-ci-build:${CI_IMAGE_TAG} \
+		-f Dockerfile.ci-build \
+		${CI_BUILD_ARGS}
 
 ecr-login: ## Login to NRLF ECR repo
 	@echo "Logging into ECR"
@@ -103,9 +107,9 @@ publish-ci-image: ## Publish the CI image
 	@echo "Publishing the CI image"
 	$(eval AWS_REGION := $(shell aws configure get region))
 	$(eval AWS_ACCOUNT_ID := $(shell aws sts get-caller-identity | jq -r .Account))
-	@docker tag nhsd-nrlf-ci-build:latest \
-		$(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com/nhsd-nrlf-ci-build:latest
-	@docker push $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com/nhsd-nrlf-ci-build:latest
+	@docker tag localhost/nhsd-nrlf-ci-build:${CI_IMAGE_TAG} \
+		$(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com/nhsd-nrlf-ci-build:${CI_IMAGE_TAG}
+	@docker push $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com/nhsd-nrlf-ci-build:${CI_IMAGE_TAG}
 
 test: check-warn ## Run the unit tests
 	@echo "Running unit tests"
