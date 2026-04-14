@@ -345,6 +345,7 @@ def download_files(
     add_smoke_test_files(secretsmanager, local_path, env_name)
 
     if env_name in ["dev-sandbox", "qa-sandbox", "int-sandbox"]:
+        print(f"Adding sandbox permissions for {env_name} to temporary directory...")
         add_sandbox_files(local_path)
 
 
