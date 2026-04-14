@@ -276,6 +276,48 @@ def add_smoke_test_files(secretsmanager, local_path, env_name):
     ]
 
 
+def add_sandbox_files(local_path):
+    """Add the permissions required for the sandbox environments.
+    Only call this function if your want to add sandbox permissions.
+    These permissions are taken from the existing permissions in the API repos.
+    """
+    sandbox_app_id = "NRL-SANDBOX-APP"
+    nrl_sandbox_perms = {
+        "RJ11": [
+            "http://snomed.info/sct|736253001",
+            "http://snomed.info/sct|736253002",
+        ],
+        # These ones are needed for the Seed data
+        "Y05868": [
+            "http://snomed.info/sct|736253002",
+            "http://snomed.info/sct|887701000000100",
+            "http://snomed.info/sct|1363501000000100",
+            "http://snomed.info/sct|861421000000109",
+        ],
+        "8J008": ["http://snomed.info/sct|1363501000000100"],
+        "RY26A": ["http://snomed.info/sct|861421000000109"],
+        # This one is needed for Smoke Tests
+        "RM559": ["http://snomed.info/sct|736253002"],
+    }
+
+    for ods_code, snomed_codes in nrl_sandbox_perms.items():
+        _write_permission_file(
+            Path.joinpath(local_path, "producer", sandbox_app_id),
+            ods_code,
+            snomed_codes,
+        )
+        _write_permission_file(
+            Path.joinpath(local_path, "consumer", sandbox_app_id),
+            ods_code,
+            snomed_codes,
+        )
+        _write_v1_permission_file(
+            Path.joinpath(local_path, sandbox_app_id),
+            ods_code,
+            snomed_codes,
+        )
+
+
 def download_files(
     s3_client, bucket_name, local_path, file_names, folders, secretsmanager, env_name
 ):
@@ -296,6 +338,9 @@ def download_files(
     add_test_files("K6PerformanceTest", "Y05868.json", local_path)
     add_feature_test_files(local_path)
     add_smoke_test_files(secretsmanager, local_path, env_name)
+
+    if env_name in ["dev-sandbox", "qa-sandbox", "int-sandbox"]:
+        add_sandbox_files(local_path)
 
 
 def main(use_shared_resources: str, env: str, workspace: str, path_to_store: str):
