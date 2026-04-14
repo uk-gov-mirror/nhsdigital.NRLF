@@ -26,12 +26,17 @@ def producer_client_1dsync(
 def test_smoke_1dsync_upsert_delete(
     producer_client_1dsync: ProducerTestClient,
     smoke_test_parameters: SmokeTestParameters,
+    environment_config: EnvironmentConfig,
     test_nhs_numbers: list[str],
 ):
     """
     Smoke test scenario for 1dsync upsert and delete behaviour
     """
-    test_ods_code = "SMOKETEST1DSYNC"
+    if environment_config.env_name in ["dev-sandbox", "qa-sandbox", "int-sandbox"]:
+        test_ods_code = smoke_test_parameters.ods_code
+    else:
+        test_ods_code = "SMOKETEST1DSYNC"
+
     test_docref = build_document_reference(
         nhs_number=test_nhs_numbers[0], custodian=test_ods_code
     )
