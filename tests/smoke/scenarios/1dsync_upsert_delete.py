@@ -15,7 +15,8 @@ def producer_client_1dsync(
     if environment_config.connect_mode == ConnectMode.INTERNAL.value:
         custom_smoke_test_parameters.nrlf_app_id = "SMOKETEST1DSYNC"
 
-    custom_smoke_test_parameters.ods_code = "SMOKETEST1DSYNC"
+    if environment_config.env_name not in ["dev-sandbox", "qa-sandbox", "int-sandbox"]:
+        custom_smoke_test_parameters.ods_code = "SMOKETEST1DSYNC"
 
     client_config = environment_config.to_client_config(custom_smoke_test_parameters)
 
