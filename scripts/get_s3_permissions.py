@@ -284,20 +284,25 @@ def add_sandbox_files(local_path):
     sandbox_app_id = "NRL-SANDBOX-APP"
     nrl_sandbox_perms = {
         "RJ11": [
-            "http://snomed.info/sct|736253001",
-            "http://snomed.info/sct|736253002",
+            PointerTypes.MENTAL_HEALTH_PLAN.value,  # http://snomed.info/sct|736253002
         ],
         # These ones are needed for the Seed data
         "Y05868": [
-            "http://snomed.info/sct|736253002",
-            "http://snomed.info/sct|887701000000100",
-            "http://snomed.info/sct|1363501000000100",
-            "http://snomed.info/sct|861421000000109",
+            PointerTypes.MENTAL_HEALTH_PLAN.value,  # http://snomed.info/sct|736253002
+            PointerTypes.EMERGENCY_HEALTHCARE_PLAN.value,  # http://snomed.info/sct|887701000000100
+            PointerTypes.NEWS2_CHART.value,  # http://snomed.info/sct|1363501000000100
+            PointerTypes.EOL_COORDINATION_SUMMARY.value,  # http://snomed.info/sct|861421000000109
         ],
-        "8J008": ["http://snomed.info/sct|1363501000000100"],
-        "RY26A": ["http://snomed.info/sct|861421000000109"],
+        "8J008": [
+            PointerTypes.NEWS2_CHART.value
+        ],  # http://snomed.info/sct|1363501000000100
+        "RY26A": [
+            PointerTypes.EOL_COORDINATION_SUMMARY.value
+        ],  # http://snomed.info/sct|861421000000109
         # This one is needed for Smoke Tests
-        "RM559": ["http://snomed.info/sct|736253002"],
+        "RM559": [
+            PointerTypes.MENTAL_HEALTH_PLAN.value
+        ],  # http://snomed.info/sct|736253002
     }
 
     for ods_code, snomed_codes in nrl_sandbox_perms.items():
