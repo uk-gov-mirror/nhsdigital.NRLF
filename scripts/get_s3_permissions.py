@@ -279,7 +279,7 @@ def add_smoke_test_files(secretsmanager, local_path, env_name):
 def add_sandbox_files(local_path):
     """Add the permissions required for the sandbox environments.
     Only call this function if your want to add sandbox permissions.
-    These permissions are taken from the existing permissions in the API repos.
+    These permissions are taken from the existing permissions in the API proxy repos.
     """
     sandbox_app_id = "NRL-SANDBOX-APP"
     nrl_sandbox_perms = {
