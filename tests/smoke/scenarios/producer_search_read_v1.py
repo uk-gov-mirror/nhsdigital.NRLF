@@ -2,7 +2,7 @@ from typing import Any, Generator
 
 import pytest
 
-from tests.smoke.environment import SmokeTestParameters
+from tests.smoke.environment import EnvironmentConfig, SmokeTestParameters
 from tests.smoke.setup import build_document_reference, upsert_test_pointer
 from tests.utilities.api_clients import ProducerTestClient
 
@@ -12,8 +12,17 @@ def test_data(
     test_nhs_numbers: list[str],
     producer_client_v1: ProducerTestClient,
     smoke_test_parameters: SmokeTestParameters,
-) -> Generator[str, Any, None]:
-    test_ods_code = smoke_test_parameters.v1_ods_code
+    environment_config: EnvironmentConfig,
+) -> Generator[dict[str, Any], Any, None]:
+
+    if (
+        environment_config.env_name in ["dev-sandbox", "qa-sandbox", "int-sandbox"]
+        and smoke_test_parameters.ods_code
+    ):
+        test_ods_code = smoke_test_parameters.ods_code
+    else:
+        test_ods_code = smoke_test_parameters.v1_ods_code
+
     test_pointers = [
         upsert_test_pointer(
             f"{test_ods_code}-smoketest_producer_count_search_read_pointer_{n}",
