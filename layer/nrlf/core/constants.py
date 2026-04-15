@@ -735,3 +735,56 @@ ATTACHMENT_CONTENT_TYPES = {
     "application/fhir+json",
     "application/json+fhir",
 }
+
+
+class V2PermissionKey(Enum):
+    ACCESS_CONTROLS = "access_controls"
+    TYPES = "types"
+    CATEGORIES = "categories"
+    INTERACTIONS = "interactions"
+    PRODUCE_FOR_AUTHORS = "produce_for_authors"
+    PRODUCE_FOR_CUSTODIANS = "produce_for_custodians"
+
+    @staticmethod
+    def list():
+        return [permission_key.value for permission_key in V2PermissionKey]
+
+
+PERMISSION_KEY_ATTRIBUTES = {
+    V2PermissionKey.ACCESS_CONTROLS.value: {
+        "display": "access controls",
+        "display_singular": "access control",
+        "attribute_lookup": None,
+        "all_assignable_permission_items": AccessControls.list(),
+    },
+    V2PermissionKey.TYPES.value: {
+        "display": "pointer types",
+        "display_singular": "pointer type",
+        "attribute_lookup": TYPE_ATTRIBUTES,
+        "all_assignable_permission_items": PointerTypes.list(),
+    },
+    V2PermissionKey.CATEGORIES.value: {
+        "display": "categories",
+        "display_singular": "category",
+        "attribute_lookup": CATEGORY_ATTRIBUTES,
+        "all_assignable_permission_items": Categories.list(),
+    },
+    V2PermissionKey.INTERACTIONS.value: {
+        "display": "interactions",
+        "display_singular": "interaction",
+        "attribute_lookup": "",
+        "all_assignable_permission_items": "",
+    },
+    V2PermissionKey.PRODUCE_FOR_AUTHORS.value: {
+        "display": "produce for authors",
+        "display_singular": "produce for author",
+        "attribute_lookup": "",
+        "all_assignable_permission_items": "",
+    },
+    V2PermissionKey.PRODUCE_FOR_CUSTODIANS.value: {
+        "display": "produce for custodians",
+        "display_singular": "produce for custodian",
+        "attribute_lookup": "",
+        "all_assignable_permission_items": "",
+    },
+}

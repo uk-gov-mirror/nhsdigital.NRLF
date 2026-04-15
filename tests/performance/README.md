@@ -78,7 +78,7 @@ WARN[0484] {"issue":[{"severity":"error","code":"forbidden","details":{"coding":
 To resolve this, we can give the organisation `TD2L9A` permission to access the pointer type `824321000000109` on the default app:
 
 ```sh
-ENV=perftest poetry run python ./scripts/manage_permissions.py set_perms X26-NRL-6981ad7d-cff4-4613-93d0-df60e5e2fc52 TD2L9A http://snomed.info/sct\|824321000000109
+ENV=perftest poetry run python ./scripts/manage_permissions_v1.py set_perms X26-NRL-6981ad7d-cff4-4613-93d0-df60e5e2fc52 TD2L9A http://snomed.info/sct\|824321000000109
 ```
 
 ### Prepare to run tests
