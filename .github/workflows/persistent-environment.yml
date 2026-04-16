@@ -54,9 +54,8 @@ jobs:
         env:
           ENVIRONMENT: ${{ inputs.environment }}
         run: |
-          account=$(echo "$ENVIRONMENT" | cut -d '-' -f1)
           inactive_stack=$(poetry run python ./scripts/get_env_config.py inactive-stack $ENVIRONMENT)
-          make get-s3-perms ENV=${account} TF_WORKSPACE_NAME=${inactive_stack}
+          make get-s3-perms ENV=$ENVIRONMENT TF_WORKSPACE_NAME=${inactive_stack} USE_SHARED_RESOURCES=true
 
       - name: Save Build Artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2

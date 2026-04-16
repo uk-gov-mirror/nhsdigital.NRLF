@@ -1,4 +1,4 @@
-from tests.smoke.environment import SmokeTestParameters
+from tests.smoke.environment import EnvironmentConfig, SmokeTestParameters
 from tests.smoke.setup import build_document_reference
 from tests.utilities.api_clients import ProducerTestClient
 
@@ -7,11 +7,19 @@ def test_smoke_producer_crud_v1(
     producer_client_v1: ProducerTestClient,
     test_nhs_numbers: list[str],
     smoke_test_parameters: SmokeTestParameters,
+    environment_config: EnvironmentConfig,
 ):
     """
     Smoke test scenario for producer CRUD behaviour
     """
-    test_ods_code = smoke_test_parameters.v1_ods_code
+    if (
+        environment_config.env_name in ["dev-sandbox", "qa-sandbox", "int-sandbox"]
+        and smoke_test_parameters.ods_code
+    ):
+        test_ods_code = smoke_test_parameters.ods_code
+    else:
+        test_ods_code = smoke_test_parameters.v1_ods_code
+
     test_docref = build_document_reference(
         nhs_number=test_nhs_numbers[0], custodian=test_ods_code
     )
