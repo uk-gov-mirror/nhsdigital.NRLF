@@ -91,6 +91,7 @@ class PointerTypes(Enum):
     MRI_AXILLA_BOTH = "https://nicip.nhs.uk|MAXIB"
     APPOINTMENT = "http://snomed.info/sct|749001000000101"
     SHARED_CARE_RECORD = "http://snomed.info/sct|887181000000106"
+    ABOUT_ME = "http://snomed.info/sct|1515851000000101"
 
     @staticmethod
     def list():
@@ -190,6 +191,7 @@ TYPE_ATTRIBUTES = {
         "display": "Appointment",
     },
     PointerTypes.SHARED_CARE_RECORD.value: {"display": "Clinical summary"},
+    PointerTypes.ABOUT_ME.value: {"display": "About me"},
 }
 
 TYPE_CATEGORIES = {
@@ -221,6 +223,7 @@ TYPE_CATEGORIES = {
     #
     # Shared Care Records
     PointerTypes.SHARED_CARE_RECORD.value: Categories.RECORD_HEADINGS.value,
+    PointerTypes.ABOUT_ME.value: Categories.RECORD_HEADINGS.value,
 }
 
 #

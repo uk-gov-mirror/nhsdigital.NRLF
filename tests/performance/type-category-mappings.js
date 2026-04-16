@@ -119,6 +119,10 @@ export const CATEGORY_TYPE_GROUPS = [
         code: "887181000000106",
         display: "Clinical summary",
       },
+      {
+        code: "1515851000000101",
+        display: "About me",
+      },
     ],
   },
 ];
