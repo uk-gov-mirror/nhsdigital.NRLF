@@ -63,5 +63,5 @@ variable "vault_lock_max_retention_days" {
 variable "changeable_for_days" {
   description = "How long you want the vault lock to be changeable for, only applies to compliance mode. This value is expressed in days no less than 3 and no greater than 36,500; otherwise, an error will return."
   type        = number
-  default     = 14
+  default     = 30
 }
