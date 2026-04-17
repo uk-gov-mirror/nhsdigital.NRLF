@@ -112,6 +112,7 @@ class Categories(Enum):
     DIAGNOSTIC_PROCEDURE = "http://snomed.info/sct|103693007"
     RECORD_ARTIFACT = "http://snomed.info/sct|419891008"
     RECORD_HEADINGS = "http://snomed.info/sct|716931000000107"
+    CLINICAL_DOCUMENT = "http://snomed.info/sct|423876004"  # NOSONAR (S5332) This is a category code, not an actual URL
 
     @staticmethod
     def list():
@@ -142,6 +143,7 @@ CATEGORY_ATTRIBUTES = {
     },
     Categories.RECORD_ARTIFACT.value: {"display": "Record artifact"},
     Categories.RECORD_HEADINGS.value: {"display": "Record headings"},
+    Categories.CLINICAL_DOCUMENT.value: {"display": "Clinical document"},
 }
 
 TYPE_ATTRIBUTES = {
@@ -223,7 +225,9 @@ TYPE_CATEGORIES = {
     #
     # Shared Care Records
     PointerTypes.SHARED_CARE_RECORD.value: Categories.RECORD_HEADINGS.value,
-    PointerTypes.ABOUT_ME.value: Categories.RECORD_HEADINGS.value,
+    #
+    # Clinical documents
+    PointerTypes.ABOUT_ME.value: Categories.CLINICAL_DOCUMENT.value,
 }
 
 #
