@@ -91,7 +91,7 @@ class PointerTypes(Enum):
     MRI_AXILLA_BOTH = "https://nicip.nhs.uk|MAXIB"
     APPOINTMENT = "http://snomed.info/sct|749001000000101"
     SHARED_CARE_RECORD = "http://snomed.info/sct|887181000000106"
-    ABOUT_ME = "http://snomed.info/sct|1515851000000101"
+    ABOUT_ME = "http://snomed.info/sct|1515851000000101"  # NOSONAR (S5332) This is a type code, not an actual URL
 
     @staticmethod
     def list():
