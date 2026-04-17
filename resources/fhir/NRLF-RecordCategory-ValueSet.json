@@ -49,6 +49,10 @@
           {
             "code": "716931000000107",
             "display": "Record headings"
+          },
+          {
+            "code": "423876004",
+            "display": "Clinical document"
           }
         ]
       }

@@ -121,4 +121,16 @@ export const CATEGORY_TYPE_GROUPS = [
       },
     ],
   },
+  {
+    category: {
+      code: "423876004",
+      display: "Clinical document",
+    },
+    types: [
+      {
+        code: "1515851000000101",
+        display: "About me",
+      },
+    ],
+  },
 ];

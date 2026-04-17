@@ -228,6 +228,10 @@ Feature: Producer - createDocumentReference - Success Scenarios
       | 749001000000101 | 419891008        | APPOINTMENT        |
       | 887181000000106 | 716931000000107  | SHARED_CARE_RECORD |
 
+    Examples: Clinical documents
+      | pointer-type     | pointer-category | type-name |
+      | 1515851000000101 | 423876004        | ABOUT_ME  |
+
   # Create with content and contact details
   # Create with contact details only
   # Create with multiple attachments
