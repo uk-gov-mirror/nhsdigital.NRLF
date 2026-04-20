@@ -26,7 +26,7 @@ jobs:
 
     steps:
       - name: Git clone - ${{ github.ref }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           ref: ${{ github.ref }}
 
@@ -58,7 +58,7 @@ jobs:
           make get-s3-perms ENV=${account} TF_WORKSPACE_NAME=${inactive_stack}
 
       - name: Save Build Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: build-artifacts
           path: |
@@ -67,13 +67,13 @@ jobs:
             !dist/nrlf_permissions.zip
 
       - name: Save NRLF Permissions cache
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           key: ${{ github.run_id }}-nrlf-permissions
           path: dist/nrlf_permissions.zip
 
-  sonar:
-    name: SonarQube scan
+  secret-scan:
+    name: Gitleaks secret scan
     runs-on: ubuntu-latest
     needs: build
     environment: pull-request
@@ -85,8 +85,31 @@ jobs:
         with:
           ref: ${{ github.ref }}
 
+      - name: Gitleaks secret scan
+        uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2.3.9
+        env:
+          GITLEAKS_VERSION: 8.30.1
+          GITLEAKS_CONFIG: .gitleaks.toml
+          GITLEAKS_LICENSE: ${{ secrets.NHSAPP_GITLEAKS_LICENSE }}
+
+        with:
+          args: detect --redact --verbose
+
+  sonar:
+    name: SonarQube scan
+    runs-on: ubuntu-latest
+    needs: build
+    environment: pull-request
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          ref: ${{ github.ref }}
+
       - name: Get build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: build-artifacts
           path: dist

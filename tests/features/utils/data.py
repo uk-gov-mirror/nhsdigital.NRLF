@@ -185,6 +185,9 @@ def create_test_document_reference(items: dict) -> DocumentReference:
             )
         ]
 
+    if items.get("date"):
+        base_doc_ref.date = items["date"]
+
     return base_doc_ref
 
 

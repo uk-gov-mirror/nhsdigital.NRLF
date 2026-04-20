@@ -22,18 +22,30 @@ def get_pointer_permissions_v2(
     ods_code = connection_metadata.ods_code
     app_id = connection_metadata.nrl_app_id
 
-    key = f"{producer_or_consumer}/{app_id}/{ods_code}.json"
-    logger.log(LogReference.V2PERMISSIONS011, key=key)
+    # check for app-wide permissions
+    app_wide_key = f"{producer_or_consumer}/{app_id}.json"
+    if path.isfile(f"/opt/python/nrlf_permissions/{app_wide_key}"):
+        key = app_wide_key
+    else:  # use org level
+        key = f"{producer_or_consumer}/{app_id}/{ods_code}.json"
 
+    logger.log(LogReference.V2PERMISSIONS011, key=key)
     file_path = f"/opt/python/nrlf_permissions/{key}"
 
     pointer_permissions = {}
     try:
         with open(file_path) as file:
             pointer_permissions = json.load(file)
+    except FileNotFoundError as exc:
+        logger.log(
+            LogReference.V2PERMISSIONS013,
+            exc_info=sys.exc_info(),
+            error=str(exc),
+        )
+        raise exc
     except Exception as exc:
         logger.log(
-            LogReference.V2PERMISSIONS014,
+            LogReference.S3PERMISSIONS005,
             exc_info=sys.exc_info(),
             stacklevel=5,
             error=str(exc),

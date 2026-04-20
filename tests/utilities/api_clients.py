@@ -6,7 +6,12 @@ import requests
 from pydantic import BaseModel
 from requests import Response
 
-from nrlf.core.constants import Categories, PointerTypes
+from nrlf.core.constants import (
+    NHSD_CORRELATION_ID_HEADER,
+    Categories,
+    PointerTypes,
+    V2Headers,
+)
 from nrlf.core.model import ConnectionMetadata
 
 logger = logging.getLogger(__name__)
@@ -86,7 +91,9 @@ class ConsumerTestClient:
                 {
                     "NHSD-Connection-Metadata": json.dumps(connection_metadata),
                     "NHSD-Client-RP-Details": json.dumps(client_rp_details),
-                    "NHSD-Correlation-Id": "test-correlation-id",
+                    V2Headers.NHSD_END_USER_ORGANISATION_ODS: self.config.connection_metadata.ods_code,
+                    V2Headers.X_PROXYGEN_APP_NRL_APP_ID: self.config.connection_metadata.nrl_app_id,
+                    NHSD_CORRELATION_ID_HEADER: "test-correlation-id",
                 }
             )
 
@@ -228,7 +235,9 @@ class ProducerTestClient:
                 {
                     "NHSD-Connection-Metadata": json.dumps(connection_metadata),
                     "NHSD-Client-RP-Details": json.dumps(client_rp_details),
-                    "NHSD-Correlation-Id": "test-correlation-id",
+                    V2Headers.NHSD_END_USER_ORGANISATION_ODS: self.config.connection_metadata.ods_code,
+                    V2Headers.X_PROXYGEN_APP_NRL_APP_ID: self.config.connection_metadata.nrl_app_id,
+                    NHSD_CORRELATION_ID_HEADER: "test-correlation-id",
                 }
             )
 

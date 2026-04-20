@@ -4,7 +4,7 @@ import boto3
 import pytest
 
 from scripts.aws_session_assume import get_boto_session
-from tests.smoke.environment import EnvironmentConfig, SmokeTestParameters
+from tests.smoke.environment import ConnectMode, EnvironmentConfig, SmokeTestParameters
 from tests.utilities.api_clients import ConsumerTestClient, ProducerTestClient
 
 
@@ -48,6 +48,46 @@ def consumer_client(
     return ConsumerTestClient(
         config=environment_config.to_client_config(smoke_test_parameters)
     )
+
+
+@pytest.fixture(autouse=True, scope="session")
+def producer_client_v1(
+    environment_config: EnvironmentConfig, smoke_test_parameters: SmokeTestParameters
+) -> ProducerTestClient:
+    config = environment_config.to_client_config(smoke_test_parameters)
+
+    if (
+        environment_config.env_name in ["dev-sandbox", "qa-sandbox", "int-sandbox"]
+        and smoke_test_parameters.ods_code
+    ):
+        client_ods_code = smoke_test_parameters.ods_code
+    else:
+        client_ods_code = smoke_test_parameters.v1_ods_code
+
+    if environment_config.connect_mode == ConnectMode.INTERNAL:
+        config.connection_metadata.ods_code = client_ods_code
+    config.custom_headers["NHSD-End-User-Organisation-ODS"] = client_ods_code
+    return ProducerTestClient(config=config)
+
+
+@pytest.fixture(autouse=True, scope="session")
+def consumer_client_v1(
+    environment_config: EnvironmentConfig, smoke_test_parameters: SmokeTestParameters
+) -> ConsumerTestClient:
+    config = environment_config.to_client_config(smoke_test_parameters)
+
+    if (
+        environment_config.env_name in ["dev-sandbox", "qa-sandbox", "int-sandbox"]
+        and smoke_test_parameters.ods_code
+    ):
+        client_ods_code = smoke_test_parameters.ods_code
+    else:
+        client_ods_code = smoke_test_parameters.v1_ods_code
+
+    if environment_config.connect_mode == ConnectMode.INTERNAL:
+        config.connection_metadata.ods_code = client_ods_code
+    config.custom_headers["NHSD-End-User-Organisation-ODS"] = client_ods_code
+    return ConsumerTestClient(config=config)
 
 
 @pytest.fixture

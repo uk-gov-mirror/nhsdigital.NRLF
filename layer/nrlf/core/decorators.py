@@ -9,7 +9,7 @@ from aws_lambda_powertools.utilities.data_classes import (
     event_source,
 )
 from aws_lambda_powertools.utilities.typing import LambdaContext
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 from nrlf.core.authoriser import (
     get_pointer_permissions_v2,
@@ -19,17 +19,17 @@ from nrlf.core.authoriser import (
 from nrlf.core.codes import SpineErrorConcept
 from nrlf.core.config import Config
 from nrlf.core.constants import (
-    CLIENT_RP_DETAILS,
-    CONNECTION_METADATA,
     NHSD_CORRELATION_ID_HEADER,
     PERMISSION_ALLOW_ALL_POINTER_TYPES,
     X_CORRELATION_ID_HEADER,
     X_REQUEST_ID_HEADER,
+    AccessControls,
     PointerTypes,
 )
 from nrlf.core.dynamodb.repository import DocumentPointerRepository
 from nrlf.core.errors import OperationOutcomeError, ParseError
 from nrlf.core.logger import LogReference, logger
+from nrlf.core.model import ConnectionMetadata, PermissionsPolicy
 from nrlf.core.request import parse_body, parse_headers, parse_params, parse_path
 from nrlf.core.response import Response
 
@@ -72,7 +72,7 @@ def error_handler(
 
 
 def header_handler(
-    wrapped_func: Callable[..., Dict[str, Any]]
+    wrapped_func: Callable[..., Dict[str, Any]],
 ) -> Callable[..., Dict[str, Any]]:
     """
     Wraps the function to set the specific headers in the request and response
@@ -116,7 +116,7 @@ def header_handler(
 
 
 def logger_initialiser(
-    wrapper_func: Callable[..., Dict[str, Any]]
+    wrapper_func: Callable[..., Dict[str, Any]],
 ) -> Callable[..., Dict[str, Any]]:
     """
     Wraps the function and initialises the request logger
@@ -143,39 +143,9 @@ def logger_initialiser(
 RepositoryType = Union[Type[DocumentPointerRepository], None]
 
 
-def _use_v2_permissions_model(headers: Dict[str, str]) -> bool:
-    case_insensitive_headers = {key.lower(): value for key, value in headers.items()}
-    # if either or both headers are missing
-    return (
-        CLIENT_RP_DETAILS not in case_insensitive_headers.keys()
-        or CONNECTION_METADATA not in case_insensitive_headers.keys()
-    )
-
-
-def _load_v2_connection_metadata(headers: Dict[str, str], path: str):
-    logger.log(LogReference.HANDLER004d)
-    metadata = parse_headers(headers, use_v2_permissions=True)
-
-    logger.log(LogReference.HANDLER004e)
-    pointer_permissions = get_pointer_permissions_v2(metadata, path)
-
-    metadata.pointer_types = pointer_permissions.get("types", [])
-
-    logger.log(
-        LogReference.HANDLER004f, pointer_types=metadata.pointer_types
-    )  # TODO: log other permissions as they're added
-
-    return metadata
-
-
-def load_connection_metadata(headers: Dict[str, str], config: Config, path=""):
-
-    if _use_v2_permissions_model(headers):
-        return _load_v2_connection_metadata(headers, path)
-
-    metadata = parse_headers(headers, use_v2_permissions=False)
+def v1_perms_stuff(metadata: ConnectionMetadata, config: Config):
     if PERMISSION_ALLOW_ALL_POINTER_TYPES in metadata.nrl_permissions:
-        logger.log(LogReference.HANDLER004b)
+        logger.log(LogReference.HANDLER004a)
         metadata.pointer_types = PointerTypes.list()
         return metadata
 
@@ -189,6 +159,65 @@ def load_connection_metadata(headers: Dict[str, str], config: Config, path=""):
     logger.log(LogReference.HANDLER004c, pointer_types=pointer_types)
 
     return metadata
+
+
+def v2_perms_stuff(metadata: ConnectionMetadata, path=""):
+    pointer_permissions = get_pointer_permissions_v2(metadata, path)
+
+    try:
+        metadata.nrl_permissions_policy = PermissionsPolicy.model_validate(
+            pointer_permissions
+        )
+    except ValidationError as err:
+        logger.log(
+            LogReference.HANDLER004e,
+            pointer_permissions=pointer_permissions,
+            path=path,
+            validation_errors=err.errors(),
+        )
+        raise OperationOutcomeError(
+            status_code="401",
+            severity="error",
+            code="invalid",
+            details=SpineErrorConcept.from_code("MISSING_OR_INVALID_HEADER"),
+            diagnostics=(
+                "Unable to parse metadata about the requesting application. "
+                "Contact the onboarding team."
+            ),
+        ) from None
+
+    if (
+        AccessControls.ALLOW_ALL_TYPES.value
+        in metadata.nrl_permissions_policy.access_controls
+    ):
+        logger.log(LogReference.HANDLER004a)
+        metadata.nrl_permissions_policy.types = PointerTypes.list()
+
+    logger.log(
+        LogReference.HANDLER004c,
+        permissions_policy=(
+            metadata.nrl_permissions_policy.model_dump()
+            if metadata.nrl_permissions_policy
+            else None
+        ),
+    )
+
+    return metadata
+
+
+def load_connection_metadata(headers: Dict[str, str], config: Config, path=""):
+    logger.log(LogReference.HANDLER002, headers=headers)
+
+    metadata = parse_headers(headers)
+    logger.log(LogReference.HANDLER003, metadata=metadata.model_dump())
+
+    try:
+        return v2_perms_stuff(metadata, path)
+    except FileNotFoundError:
+        # No v2 perms file found, so try v1 instead
+        pass
+
+    return v1_perms_stuff(metadata, config)
 
 
 def filter_kwargs(handler_func: RequestHandler, kwargs: Dict[str, Any]):
@@ -297,11 +326,16 @@ def request_handler(
             logger.log(LogReference.HANDLER001, config=config.model_dump())
             metadata = load_connection_metadata(event.headers, config, event.path)
 
-            if metadata.pointer_types == []:
+            allowed_types = (
+                metadata.nrl_permissions_policy.types
+                if metadata.nrl_permissions_policy
+                else metadata.pointer_types
+            )
+            if allowed_types == []:
                 logger.log(
                     LogReference.HANDLER005,
                     ods_code=metadata.ods_code,
-                    pointer_types=metadata.pointer_types,
+                    pointer_types=allowed_types,
                 )
                 raise OperationOutcomeError(
                     status_code="403",

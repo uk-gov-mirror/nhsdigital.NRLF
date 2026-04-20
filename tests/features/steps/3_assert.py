@@ -240,6 +240,14 @@ def assert_document_reference_matches_value(
             context.response.json(),
         )
 
+    if date := items.get("date"):
+        assert doc_ref.date == date, format_error(
+            "DocumentReference date does not match",
+            date,
+            doc_ref.date,
+            context.response.json(),
+        )
+
 
 @then("the Bundle contains an DocumentReference with values")
 def assert_bundle_contains_documentreference_values_step(context: Context):
@@ -369,8 +377,7 @@ def assert_header_starts_with(context: Context, header_name: str, starts_with: s
     )
 
 
-@then("the resource in the Location header exists with values")
-def assert_resource_in_location_header_exists_with_values(context: Context):
+def _get_resource_from_location_header(context: Context):
     location = context.response.headers.get("Location")
 
     assert location.startswith("/DocumentReference/"), format_error(
@@ -389,6 +396,25 @@ def assert_resource_in_location_header_exists_with_values(context: Context):
         None,
         context.response.text,
     )
+
+    return resource_id, resource
+
+
+@then("the date of the resource in the Location header is not '{expected_date}'")
+def assert_resource_date_not_equal(context: Context, expected_date: str):
+    _, resource = _get_resource_from_location_header(context)
+    doc_ref = DocumentReference.model_validate_json(resource.document)
+    assert doc_ref.date != expected_date, format_error(
+        "DocumentReference date was not overridden - date matches the payload value but should have been overwritten by the server",
+        f"anything except {expected_date}",
+        doc_ref.date,
+        context.response.text,
+    )
+
+
+@then("the resource in the Location header exists with values")
+def assert_resource_in_location_header_exists_with_values(context: Context):
+    resource_id, resource = _get_resource_from_location_header(context)
 
     if not context.table:
         raise ValueError("No DocumentReference table provided")

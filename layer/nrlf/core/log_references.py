@@ -26,15 +26,14 @@ class LogReference(Enum):
         "WARN", "Missing nhsd-end-user-organisation-ods header for v2 permissions"
     )
     HANDLER003b = _Reference(
-        "WARN", "Missing nhsd-nrl-app-id header for v2 permissions"
+        "WARN", "Missing x-proxygen-app-nrl-app-id header for v2 permissions"
     )
     HANDLER004 = _Reference("INFO", "Authorisation lookup enabled")
     HANDLER004a = _Reference("INFO", "Authorisation lookup skipped for sync request")
-    HANDLER004b = _Reference("INFO", "Parsing embedded permissions file from S3")
-    HANDLER004c = _Reference("INFO", "Parsed embedded permissions file from S3")
+    HANDLER004b = _Reference("INFO", "Parsing embedded permissions file")
+    HANDLER004c = _Reference("INFO", "Parsed embedded permissions file")
     HANDLER004d = _Reference("INFO", "Using v2 permissions model")
-    HANDLER004e = _Reference("INFO", "Parsing v2 permissions file from lambda layer")
-    HANDLER004f = _Reference("INFO", "Parsed v2 permissions file from lambda layer")
+    HANDLER004e = _Reference("ERROR", "Unable to validate PermissionsPolicy")
     HANDLER005 = _Reference("WARN", "Rejecting request due to missing pointer types")
     HANDLER006 = _Reference("DEBUG", "Attempting to parse request parameters")
     HANDLER007 = _Reference("INFO", "Parsed request parameters")
@@ -90,11 +89,7 @@ class LogReference(Enum):
         "INFO", "Retrieved v2 pointer permissions from lambda layer"
     )
     V2PERMISSIONS013 = _Reference(
-        "WARN", "No v2 permissions file found in lambda layer"
-    )
-    V2PERMISSIONS014 = _Reference(
-        "EXCEPTION",
-        "An error occurred whilst retrieving v2 pointer permissions",
+        "INFO", "No v2 permissions file found in lambda layer"
     )
 
     # Parse Logs
@@ -155,6 +150,9 @@ class LogReference(Enum):
     REPOSITORY026 = _Reference("EXCEPTION", "Failed to delete resource from DynamoDB")
     REPOSITORY026a = _Reference(
         "EXCEPTION", "Ignoring failure to delete resource from DynamoDB"
+    )
+    REPOSITORY026b = _Reference(
+        "EXCEPTION", "Failed to delete superseded resource from DynamoDB"
     )
     REPOSITORY027 = _Reference("INFO", "Successfully deleted item from DynamoDB")
     REPOSITORY028 = _Reference("INFO", "Received page of search results")

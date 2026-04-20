@@ -20,7 +20,7 @@ jobs:
 
     steps:
       - name: Git clone - ${{ github.ref }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           ref: ${{ github.ref }}
 
@@ -60,7 +60,7 @@ jobs:
         run: |
           DOWNLOAD_URL="https://github.com/anchore/syft/releases/download/v${{ env.SYFT_VERSION }}/syft_${{ env.SYFT_VERSION }}_linux_${{ steps.os-arch.outputs.arch }}.tar.gz"
           echo "Downloading: ${DOWNLOAD_URL}"
-          curl -L -o syft.tar.gz "${DOWNLOAD_URL}"
+          curl --proto '=https' --tlsv1.2 --location --output syft.tar.gz "${DOWNLOAD_URL}"
           tar -xzf syft.tar.gz
           chmod +x syft
           # Add to PATH for subsequent steps
@@ -70,7 +70,7 @@ jobs:
         run: bash scripts/sbom-create.sh
 
       - name: Upload SBOM artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: sbom-${{ github.sha }}
           path: sbom.spdx.json
@@ -111,7 +111,7 @@ jobs:
 
       - name: Upload SBOM to release
         if: ${{ github.event.release.tag_name }}
-        uses: svenstaro/upload-release-action@v2.11.3
+        uses: svenstaro/upload-release-action@b98a3b12e86552593f3e4e577ca8a62aa2f3f22b # v2.11.4
         with:
           file: sbom.spdx.json
           asset_name: sbom-${{ github.event.release.tag_name }}

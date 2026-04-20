@@ -417,7 +417,7 @@ class RequestPathParams(Parent):
 
 class RequestQuerySubject(RootModel[StrictStr]):
     root: Annotated[
-        StrictStr, Field(examples=["https://fhir.nhs.uk/Id/nhs-number|4409815415"])
+        StrictStr, Field(examples=["https://fhir.nhs.uk/Id/nhs-number|9000000017"])
     ]
 
 

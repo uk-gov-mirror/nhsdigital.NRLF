@@ -90,10 +90,10 @@ def create_post_document_reference_step(context: Context, ods_code: str):
 
     if context.response.status_code == 201:
         doc_ref_id = context.response.headers["Location"].split("/")[-1]
-        doc_ref_id.replace(
+        doc_ref_id = doc_ref_id.replace(
             "|", "."
         )  # NRL-766 define and resolve custodian suffix behaviour
-        context.add_cleanup(lambda: context.repository.delete_by_id(doc_ref_id))
+        context.add_cleanup(lambda id=doc_ref_id: context.repository.delete_by_id(id))
 
 
 def _create_or_upsert_body_step(
@@ -114,10 +114,10 @@ def _create_or_upsert_body_step(
 
     if context.response.status_code == 201:
         doc_ref_id = context.response.headers["Location"].split("/")[-1]
-        doc_ref_id.replace(
+        doc_ref_id = doc_ref_id.replace(
             "|", "."
         )  # NRL-766 define and resolve custodian suffix behaviour
-        context.add_cleanup(lambda: context.repository.delete_by_id(doc_ref_id))
+        context.add_cleanup(lambda id=doc_ref_id: context.repository.delete_by_id(id))
 
 
 @when(
@@ -190,7 +190,7 @@ def create_put_document_reference_step(context: Context, ods_code: str):
     context.response = client.upsert(doc_ref.model_dump(exclude_none=True))
 
     if context.response.status_code == 201:
-        context.add_cleanup(lambda: context.repository.delete_by_id(doc_ref_id))
+        context.add_cleanup(lambda id=doc_ref_id: context.repository.delete_by_id(id))
 
 
 @when("producer '{ods_code}' updates a DocumentReference '{doc_ref_id}' with values")
@@ -211,7 +211,7 @@ def update_put_document_reference_step(
     context.response = client.update(doc_ref, doc_ref_id)
 
     if context.response.status_code == 200:
-        context.add_cleanup(lambda: context.repository.delete_by_id(doc_ref_id))
+        context.add_cleanup(lambda id=doc_ref_id: context.repository.delete_by_id(id))
 
 
 @when(

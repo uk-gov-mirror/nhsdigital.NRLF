@@ -1,0 +1,412 @@
+Feature: Consumer v2 permissions by pointer type - Success and Failure Scenarios
+  For the v2 permissions model, permissions are resolved from a JSON file stored in the
+  nrlf_permissions Lambda layer.  Permissions for the feature tests are baked into the layer
+  by `scripts/get_s3_permissions.py` at build time, so no dynamic seeding step is required for
+  success scenarios.
+
+  Background:
+    Given the application 'DataShare' (ID 'v2-z00z-y11y-x22x') is registered to access the API
+
+  Scenario: V2 Permissions with access for pointer type - readDocumentReference
+    Given a DocumentReference resource exists with values:
+      | property    | value                                      |
+      | id          | RX898-9999999999-ReadDocRefV2SameCustodian |
+      | subject     | 9999999999                                 |
+      | status      | current                                    |
+      | type        | 736253002                                  |
+      | category    | 734163000                                  |
+      | contentType | application/pdf                            |
+      | url         | https://example.org/my-doc.pdf             |
+      | custodian   | RX898                                      |
+      | author      | RX898                                      |
+    When consumer 'RX898' reads a DocumentReference with ID 'RX898-9999999999-ReadDocRefV2SameCustodian'
+    Then the response status code is 200
+    And the response is a DocumentReference with JSON value:
+      """
+      {
+        "resourceType": "DocumentReference",
+        "id": "RX898-9999999999-ReadDocRefV2SameCustodian",
+        "status": "current",
+        "type": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "736253002",
+              "display": "Mental health crisis plan"
+            }
+          ]
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "734163000",
+                "display": "Care plan"
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "identifier": {
+            "system": "https://fhir.nhs.uk/Id/nhs-number",
+            "value": "9999999999"
+          }
+        },
+        "custodian": {
+          "identifier": {
+            "system": "https://fhir.nhs.uk/Id/ods-organization-code",
+            "value": "RX898"
+          }
+        },
+        "author": [
+          {
+            "identifier": {
+              "system": "https://fhir.nhs.uk/Id/ods-organization-code",
+              "value": "RX898"
+            }
+          }
+        ],
+        "content": [
+          {
+            "attachment": {
+              "contentType": "application/pdf",
+              "url": "https://example.org/my-doc.pdf"
+            },
+            "format": {
+              "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLFormatCode",
+              "code": "urn:nhs-ic:unstructured",
+              "display": "Unstructured Document"
+            },
+            "extension": [
+              {
+                "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-ContentStability",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability",
+                      "code": "static",
+                      "display": "Static"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-NRLRetrievalMechanism",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLRetrievalMechanism",
+                      "code": "Direct",
+                      "display": "Direct"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "context": {
+          "practiceSetting": {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "788007007",
+                "display": "General practice service"
+              }
+            ]
+          }
+        }
+      }
+      """
+
+  Scenario: V2 permissions with access for pointer type retrieves expected document references - searchPostDocumentReference
+    Given the application 'DataShare' (ID 'v2-z00z-y11y-x22x') is registered to access the API
+    And a DocumentReference resource exists with values:
+      | property    | value                                 |
+      | id          | X26-1111111111-SearchMultipleRefTest1 |
+      | subject     | 9278693472                            |
+      | status      | current                               |
+      | type        | 736253002                             |
+      | category    | 734163000                             |
+      | contentType | application/pdf                       |
+      | url         | https://example.org/my-doc-1.pdf      |
+      | custodian   | X26                                   |
+      | author      | X26                                   |
+    And a DocumentReference resource exists with values:
+      | property    | value                                 |
+      | id          | X26-1111111111-SearchMultipleRefTest2 |
+      | subject     | 9278693472                            |
+      | status      | current                               |
+      | type        | 736253002                             |
+      | category    | 734163000                             |
+      | contentType | application/pdf                       |
+      | url         | https://example.org/my-doc-2.pdf      |
+      | custodian   | X26                                   |
+      | author      | X26                                   |
+    And a DocumentReference resource exists with values:
+      | property    | value                                             |
+      | id          | X26-1111111111-SearchMultipleRefTestDifferentType |
+      | subject     | 9278693472                                        |
+      | status      | current                                           |
+      | type        | 887701000000100                                   |
+      | category    | 734163000                                         |
+      | contentType | application/pdf                                   |
+      | url         | https://example.org/my-doc-3.pdf                  |
+      | custodian   | X26                                               |
+      | author      | X26                                               |
+    When consumer 'RX898' searches for DocumentReferences using POST with request body:
+      | key     | value      |
+      | subject | 9278693472 |
+    Then the response status code is 200
+    And the response is a searchset Bundle
+    And the Bundle has a total of 2
+    And the Bundle has 2 entries
+    And the Bundle contains an DocumentReference with values
+      | property    | value                                 |
+      | id          | X26-1111111111-SearchMultipleRefTest1 |
+      | subject     | 9278693472                            |
+      | status      | current                               |
+      | type        | 736253002                             |
+      | category    | 734163000                             |
+      | contentType | application/pdf                       |
+      | url         | https://example.org/my-doc-1.pdf      |
+      | custodian   | X26                                   |
+      | author      | X26                                   |
+    And the Bundle contains an DocumentReference with values
+      | property    | value                                 |
+      | id          | X26-1111111111-SearchMultipleRefTest2 |
+      | subject     | 9278693472                            |
+      | status      | current                               |
+      | type        | 736253002                             |
+      | category    | 734163000                             |
+      | contentType | application/pdf                       |
+      | url         | https://example.org/my-doc-2.pdf      |
+      | custodian   | X26                                   |
+      | author      | X26                                   |
+    And the Bundle does not contain a DocumentReference with ID 'X26-1111111111-SearchMultipleRefTestDifferentType'
+
+  Scenario: V2 permissions with no access for pointer type - searchDocumentReference
+    Given the application 'DataShare' (ID 'v2-z00z-y11y-x22x') is registered to access the API
+    When consumer 'RX898' searches for DocumentReferences with parameters:
+      | parameter | value                                   |
+      | subject   | 9278693472                              |
+      | type      | http://snomed.info/sct\|887701000000100 |
+    Then the response status code is 400
+    And the response is an OperationOutcome with 1 issue
+    And the OperationOutcome contains the issue:
+      """
+      {
+        "severity": "error",
+        "code": "code-invalid",
+        "details": {
+          "coding": [{
+            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
+            "code": "INVALID_CODE_SYSTEM",
+            "display": "Invalid code system"
+          }]
+        },
+        "diagnostics": "Invalid query parameter (The provided type does not match the allowed types for this organisation)",
+        "expression": ["type"]
+      }
+      """
+
+  Scenario: No V2 Permissions for org gets v1 permissions - readDocumentReference
+    Given a DocumentReference resource exists with values:
+      | property    | value                                     |
+      | id          | V1ONLY0D5-9999999999-ReadDocRefNoV2FindV1 |
+      | subject     | 9999999999                                |
+      | status      | current                                   |
+      | type        | 16521000000101                            |
+      | category    | 419891008                                 |
+      | contentType | application/pdf                           |
+      | url         | https://example.org/my-doc.pdf            |
+      | custodian   | V1ONLY0D5                                 |
+      | author      | V1ONLY0D5                                 |
+    And a DocumentReference resource exists with values:
+      | property    | value                                            |
+      | id          | RX898-9999999999-ReadDocRefNoV2PermsSoDontFindMe |
+      | subject     | 9999999999                                       |
+      | status      | current                                          |
+      | type        | 736253002                                        |
+      | category    | 734163000                                        |
+      | contentType | application/pdf                                  |
+      | url         | https://example.org/my-doc.pdf                   |
+      | custodian   | RX898                                            |
+      | author      | RX898                                            |
+    When consumer 'V1ONLY0D5' reads a DocumentReference with ID 'V1ONLY0D5-9999999999-ReadDocRefNoV2FindV1'
+    Then the response status code is 200
+    And the response is a DocumentReference with JSON value:
+      """
+      {
+        "resourceType": "DocumentReference",
+        "id": "V1ONLY0D5-9999999999-ReadDocRefNoV2FindV1",
+        "status": "current",
+        "type": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "16521000000101",
+              "display": "Lloyd George record folder"
+            }
+          ]
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "419891008",
+                "display": "Record artifact"
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "identifier": {
+            "system": "https://fhir.nhs.uk/Id/nhs-number",
+            "value": "9999999999"
+          }
+        },
+        "custodian": {
+          "identifier": {
+            "system": "https://fhir.nhs.uk/Id/ods-organization-code",
+            "value": "V1ONLY0D5"
+          }
+        },
+        "author": [
+          {
+            "identifier": {
+              "system": "https://fhir.nhs.uk/Id/ods-organization-code",
+              "value": "V1ONLY0D5"
+            }
+          }
+        ],
+        "content": [
+          {
+            "attachment": {
+              "contentType": "application/pdf",
+              "url": "https://example.org/my-doc.pdf"
+            },
+            "format": {
+              "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLFormatCode",
+              "code": "urn:nhs-ic:unstructured",
+              "display": "Unstructured Document"
+            },
+            "extension": [
+              {
+                "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-ContentStability",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLContentStability",
+                      "code": "static",
+                      "display": "Static"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-NRLRetrievalMechanism",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLRetrievalMechanism",
+                      "code": "Direct",
+                      "display": "Direct"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "context": {
+          "practiceSetting": {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "788007007",
+                "display": "General practice service"
+              }
+            ]
+          }
+        }
+      }
+      """
+
+  Scenario: V2 permissions with access all pointer types retrieves expected document references - searchPostDocumentReference
+    Given the application 'DataShare' (ID 'v2-z00z-y11y-x22x') is registered to access the API
+    And a DocumentReference resource exists with values:
+      | property    | value                              |
+      | id          | X26-5900056201-SearchMultipleType1 |
+      | subject     | 9000000378                         |
+      | status      | current                            |
+      | type        | 736253002                          |
+      | category    | 734163000                          |
+      | contentType | application/pdf                    |
+      | url         | https://example.org/my-doc-1.pdf   |
+      | custodian   | X26                                |
+      | author      | X26                                |
+    And a DocumentReference resource exists with values:
+      | property    | value                              |
+      | id          | X26-5900056201-SearchMultipleType2 |
+      | subject     | 9000000378                         |
+      | status      | current                            |
+      | type        | 1382601000000107                   |
+      | category    | 734163000                          |
+      | contentType | application/pdf                    |
+      | url         | https://example.org/my-doc-2.pdf   |
+      | custodian   | X26                                |
+      | author      | X26                                |
+    And a DocumentReference resource exists with values:
+      | property    | value                              |
+      | id          | X26-5900056201-SearchMultipleType3 |
+      | subject     | 9000000378                         |
+      | status      | current                            |
+      | type        | 736373009                          |
+      | category    | 734163000                          |
+      | contentType | application/pdf                    |
+      | url         | https://example.org/my-doc-3.pdf   |
+      | custodian   | X26                                |
+      | author      | X26                                |
+    When consumer '4LLTYP35C' searches for DocumentReferences using POST with request body:
+      | key     | value      |
+      | subject | 9000000378 |
+    Then the response status code is 200
+    And the response is a searchset Bundle
+    And the Bundle has a total of 3
+    And the Bundle has 3 entries
+    And the Bundle contains an DocumentReference with values
+      | property    | value                              |
+      | id          | X26-5900056201-SearchMultipleType1 |
+      | subject     | 9000000378                         |
+      | status      | current                            |
+      | type        | 736253002                          |
+      | category    | 734163000                          |
+      | contentType | application/pdf                    |
+      | url         | https://example.org/my-doc-1.pdf   |
+      | custodian   | X26                                |
+      | author      | X26                                |
+    And the Bundle contains an DocumentReference with values
+      | property    | value                              |
+      | id          | X26-5900056201-SearchMultipleType2 |
+      | subject     | 9000000378                         |
+      | status      | current                            |
+      | type        | 1382601000000107                   |
+      | category    | 734163000                          |
+      | contentType | application/pdf                    |
+      | url         | https://example.org/my-doc-2.pdf   |
+      | custodian   | X26                                |
+      | author      | X26                                |
+    And the Bundle contains an DocumentReference with values
+      | property    | value                              |
+      | id          | X26-5900056201-SearchMultipleType3 |
+      | subject     | 9000000378                         |
+      | status      | current                            |
+      | type        | 736373009                          |
+      | category    | 734163000                          |
+      | contentType | application/pdf                    |
+      | url         | https://example.org/my-doc-3.pdf   |
+      | custodian   | X26                                |
+      | author      | X26                                |

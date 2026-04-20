@@ -39,9 +39,30 @@ ALLOWED_RELATES_TO_CODES = {
 }
 CLIENT_RP_DETAILS = "nhsd-client-rp-details"
 CONNECTION_METADATA = "nhsd-connection-metadata"
+
+
+class V2Headers(str, Enum):
+    NHSD_END_USER_ORGANISATION_ODS = "nhsd-end-user-organisation-ods"
+    X_PROXYGEN_APP_NRL_APP_ID = "x-proxygen-app-nrl-app-id"
+
+
 PERMISSION_AUDIT_DATES_FROM_PAYLOAD = "audit-dates-from-payload"
 PERMISSION_SUPERSEDE_IGNORE_DELETE_FAIL = "supersede-ignore-delete-fail"
 PERMISSION_ALLOW_ALL_POINTER_TYPES = "allow-all-pointer-types"
+
+
+class AccessControls(Enum):
+    ALLOW_FULL_ACCESS = "allow_full_access"
+    ALLOW_ALL_TYPES = "allow_all_types"
+    ALLOW_ALL_SUPPLIER_INTERACTIONS = "allow_all_supplier_interactions"
+    ALLOW_PRODUCE_FOR_ANY_AUTHOR = "allow_produce_for_any_author"
+    ALLOW_PRODUCE_FOR_ANY_CUSTODIAN = "allow_produce_for_any_custodian"
+    ALLOW_OVERRIDE_CREATION_DATETIME = "allow_override_creation_datetime"
+    ALLOW_SUPERSEDE_WITH_DELETE_FAILURE = "allow_supersede_with_delete_failure"
+
+    @staticmethod
+    def list():
+        return [control.value for control in AccessControls]
 
 
 NHSD_REQUEST_ID_HEADER = "NHSD-Request-Id"
@@ -70,6 +91,7 @@ class PointerTypes(Enum):
     MRI_AXILLA_BOTH = "https://nicip.nhs.uk|MAXIB"
     APPOINTMENT = "http://snomed.info/sct|749001000000101"
     SHARED_CARE_RECORD = "http://snomed.info/sct|887181000000106"
+    ABOUT_ME = "http://snomed.info/sct|1515851000000101"  # NOSONAR (S5332) This is a type code, not an actual URL
 
     @staticmethod
     def list():
@@ -90,6 +112,7 @@ class Categories(Enum):
     DIAGNOSTIC_PROCEDURE = "http://snomed.info/sct|103693007"
     RECORD_ARTIFACT = "http://snomed.info/sct|419891008"
     RECORD_HEADINGS = "http://snomed.info/sct|716931000000107"
+    CLINICAL_DOCUMENT = "http://snomed.info/sct|423876004"  # NOSONAR (S5332) This is a category code, not an actual URL
 
     @staticmethod
     def list():
@@ -120,6 +143,7 @@ CATEGORY_ATTRIBUTES = {
     },
     Categories.RECORD_ARTIFACT.value: {"display": "Record artifact"},
     Categories.RECORD_HEADINGS.value: {"display": "Record headings"},
+    Categories.CLINICAL_DOCUMENT.value: {"display": "Clinical document"},
 }
 
 TYPE_ATTRIBUTES = {
@@ -169,6 +193,7 @@ TYPE_ATTRIBUTES = {
         "display": "Appointment",
     },
     PointerTypes.SHARED_CARE_RECORD.value: {"display": "Clinical summary"},
+    PointerTypes.ABOUT_ME.value: {"display": "About me"},
 }
 
 TYPE_CATEGORIES = {
@@ -200,6 +225,9 @@ TYPE_CATEGORIES = {
     #
     # Shared Care Records
     PointerTypes.SHARED_CARE_RECORD.value: Categories.RECORD_HEADINGS.value,
+    #
+    # Clinical documents
+    PointerTypes.ABOUT_ME.value: Categories.CLINICAL_DOCUMENT.value,
 }
 
 #
@@ -713,4 +741,57 @@ ATTACHMENT_CONTENT_TYPES = {
     "application/json",
     "application/fhir+json",
     "application/json+fhir",
+}
+
+
+class V2PermissionKey(Enum):
+    ACCESS_CONTROLS = "access_controls"
+    TYPES = "types"
+    CATEGORIES = "categories"
+    INTERACTIONS = "interactions"
+    PRODUCE_FOR_AUTHORS = "produce_for_authors"
+    PRODUCE_FOR_CUSTODIANS = "produce_for_custodians"
+
+    @staticmethod
+    def list():
+        return [permission_key.value for permission_key in V2PermissionKey]
+
+
+PERMISSION_KEY_ATTRIBUTES = {
+    V2PermissionKey.ACCESS_CONTROLS.value: {
+        "display": "access controls",
+        "display_singular": "access control",
+        "attribute_lookup": None,
+        "all_assignable_permission_items": AccessControls.list(),
+    },
+    V2PermissionKey.TYPES.value: {
+        "display": "pointer types",
+        "display_singular": "pointer type",
+        "attribute_lookup": TYPE_ATTRIBUTES,
+        "all_assignable_permission_items": PointerTypes.list(),
+    },
+    V2PermissionKey.CATEGORIES.value: {
+        "display": "categories",
+        "display_singular": "category",
+        "attribute_lookup": CATEGORY_ATTRIBUTES,
+        "all_assignable_permission_items": Categories.list(),
+    },
+    V2PermissionKey.INTERACTIONS.value: {
+        "display": "interactions",
+        "display_singular": "interaction",
+        "attribute_lookup": "",
+        "all_assignable_permission_items": "",
+    },
+    V2PermissionKey.PRODUCE_FOR_AUTHORS.value: {
+        "display": "produce for authors",
+        "display_singular": "produce for author",
+        "attribute_lookup": "",
+        "all_assignable_permission_items": "",
+    },
+    V2PermissionKey.PRODUCE_FOR_CUSTODIANS.value: {
+        "display": "produce for custodians",
+        "display_singular": "produce for custodian",
+        "attribute_lookup": "",
+        "all_assignable_permission_items": "",
+    },
 }

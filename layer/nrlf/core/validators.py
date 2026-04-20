@@ -41,7 +41,6 @@ def validate_type(type_: Optional[RequestQueryType], pointer_types: List[str]) -
     return type_.root in pointer_types
 
 
-# TODO - Validate category is in set permissions once permissioning by category is done.
 def validate_category(categories: Optional[RequestQueryCategory]) -> bool:
     """
     Validates if the given category is valid.

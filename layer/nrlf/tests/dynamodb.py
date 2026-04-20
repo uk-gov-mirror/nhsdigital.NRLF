@@ -1,3 +1,6 @@
+import functools
+import inspect
+
 from nrlf.core.boto import get_dynamodb_resource
 from nrlf.core.config import Config
 from nrlf.core.dynamodb.repository import DocumentPointerRepository
@@ -40,6 +43,7 @@ def create_document_pointer_table(config: Config, dynamodb: DynamoDBServiceResou
 
 
 def mock_repository(func):
+    @functools.wraps(func)
     def wrapped_function(*args, **kwargs):
         config = Config()
         dynamodb = get_dynamodb_resource()
@@ -48,5 +52,13 @@ def mock_repository(func):
         repository = DocumentPointerRepository(table_name=config.TABLE_NAME)
 
         return func(*args, **kwargs, repository=repository)
+
+    # Remove 'repository' from the visible signature so pytest doesn't try
+    # to inject it as a test parameter (it's already injected by this decorator).
+    sig = inspect.signature(func)
+    params_minus_repository = [
+        p for name, p in sig.parameters.items() if name != "repository"
+    ]
+    wrapped_function.__signature__ = sig.replace(parameters=params_minus_repository)
 
     return wrapped_function

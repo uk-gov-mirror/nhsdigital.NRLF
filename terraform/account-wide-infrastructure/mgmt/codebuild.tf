@@ -90,7 +90,7 @@ resource "aws_codebuild_project" "project" {
 
   environment {
     compute_type                = "BUILD_GENERAL1_SMALL"
-    image                       = "${aws_ecr_repository.repository.repository_url}:latest"
+    image                       = "${aws_ecr_repository.repository.repository_url}:${var.ci_image_tag}"
     type                        = "LINUX_CONTAINER"
     image_pull_credentials_type = "CODEBUILD"
   }

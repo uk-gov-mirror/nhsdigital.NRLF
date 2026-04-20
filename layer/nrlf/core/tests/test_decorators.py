@@ -12,7 +12,9 @@ from nrlf.core.config import Config
 from nrlf.core.constants import (
     PERMISSION_ALLOW_ALL_POINTER_TYPES,
     X_REQUEST_ID_HEADER,
+    AccessControls,
     PointerTypes,
+    V2Headers,
 )
 from nrlf.core.decorators import (
     deprecated,
@@ -792,6 +794,7 @@ def test_request_load_connection_metadata_with_permission_headers():
     expected_metadata = load_connection_metadata(
         headers=create_headers(nrl_permissions=[PERMISSION_ALLOW_ALL_POINTER_TYPES]),
         config=Config(),
+        path="/consumer/something",
     )
 
     assert expected_metadata.pointer_types == PointerTypes.list()
@@ -799,39 +802,229 @@ def test_request_load_connection_metadata_with_permission_headers():
 
 def test_request_load_connection_metadata_with_no_permission_lookup_or_file():
     expected_metadata = load_connection_metadata(
-        headers=create_headers(nrl_app_id="someId"), config=Config()
+        headers=create_headers(nrl_app_id="someId"),
+        config=Config(),
+        path="/producer/something",
     )
 
     assert expected_metadata.pointer_types == []
 
 
-missing_headers = [
-    ["nhsd-connection-metadata"],
-    ["nhsd-connection-metadata", "nhsd-client-rp-details"],
-    ["nhsd-client-rp-details"],
-]
-
-
-@pytest.mark.parametrize("headers_missing_from_request", missing_headers)
-def test_request_load_connection_with_missing_headers_gets_v2_permissions(
-    headers_missing_from_request,
-):
+def _create_v2_headers() -> dict:
+    """Create headers that trigger the v2 permissions model (missing nhsd-client-rp-details)."""
     headers = create_headers(
         additional_headers={
-            "nhsd-end-user-organisation-ods": "Y05868",
-            "nhsd-nrl-app-id": "Y05868-TestApp-12345678",
+            V2Headers.NHSD_END_USER_ORGANISATION_ODS: "Y05868",
+            V2Headers.X_PROXYGEN_APP_NRL_APP_ID: "Y05868-TestApp-12345678",
         }
     )
-    for header_name in headers_missing_from_request:
-        headers.pop(header_name)
+    headers.pop("nhsd-client-rp-details")
+    return headers
 
-    expected_metadata = load_connection_metadata(
-        headers=headers, config=Config(), path="/producer/DocumentReference"
+
+def test_load_connection_metadata_v2_happy_path(
+    mocker,
+):
+    mocker.patch(
+        "nrlf.core.decorators.get_pointer_permissions_v2",
+        return_value={
+            "types": [
+                "http://snomed.info/sct|749001000000101",
+                "https://nicip.nhs.uk|MAULR",
+            ]
+        },
     )
 
-    assert expected_metadata.pointer_types == []
-    assert expected_metadata.ods_code == "Y05868"
-    assert expected_metadata.nrl_app_id == "Y05868-TestApp-12345678"
+    metadata = load_connection_metadata(
+        headers=_create_v2_headers(),
+        config=Config(),
+        path="/producer/DocumentReference",
+    )
+
+    assert metadata.nrl_permissions_policy.types == [
+        "http://snomed.info/sct|749001000000101",
+        "https://nicip.nhs.uk|MAULR",
+    ]
+    assert metadata.pointer_types == []  # no v1 permissions
+    assert metadata.ods_code == "Y05868"
+    assert metadata.nrl_app_id == "Y05868-TestApp-12345678"
+
+
+def test_load_connection_metadata_gets_v2_permissions_when_v1_headers_also_provided(
+    mocker,
+):
+    v1_permissions = [
+        "http://snomed.info/sct|749001000000101",
+        "https://nicip.nhs.uk|MAULR",
+    ]
+    mocker.patch(
+        "nrlf.core.decorators.parse_permissions_file",
+        return_value=v1_permissions,
+    )
+    v2_permissions = {"access_controls": [AccessControls.ALLOW_ALL_TYPES.value]}
+    mocker.patch(
+        "nrlf.core.decorators.get_pointer_permissions_v2",
+        return_value=v2_permissions,
+    )
+
+    v1_plus_v2_headers = create_headers(
+        additional_headers={
+            V2Headers.NHSD_END_USER_ORGANISATION_ODS: "Y05868",
+            V2Headers.X_PROXYGEN_APP_NRL_APP_ID: "Y05868-TestApp-12345678",
+        }
+    )
+
+    metadata = load_connection_metadata(
+        headers=v1_plus_v2_headers, config=Config(), path="/producer/DocumentReference"
+    )
+
+    assert metadata.nrl_permissions_policy.types == PointerTypes.list()
+    assert metadata.pointer_types == []  # no v1 permissions
+
+
+def test_load_connection_metadata_gets_v1_permissions_when_v2_permission_file_missing(
+    mocker,
+):
+    v1_permissions = [
+        "http://snomed.info/sct|749001000000101",
+        "https://nicip.nhs.uk|MAULR",
+    ]
+    mocker.patch(
+        "nrlf.core.decorators.parse_permissions_file",
+        return_value=v1_permissions,
+    )
+    mocker.patch(
+        "nrlf.core.decorators.get_pointer_permissions_v2",
+        side_effect=FileNotFoundError("nope no v2 file here"),
+    )
+
+    v1_plus_v2_headers = create_headers(
+        additional_headers={
+            V2Headers.NHSD_END_USER_ORGANISATION_ODS: "Y05868",
+            V2Headers.X_PROXYGEN_APP_NRL_APP_ID: "Y05868-TestApp-12345678",
+        }
+    )
+
+    metadata = load_connection_metadata(
+        headers=v1_plus_v2_headers, config=Config(), path="/producer/DocumentReference"
+    )
+
+    assert metadata.nrl_permissions_policy == None  # no v2 permissions
+    assert metadata.pointer_types == v1_permissions
+
+
+def test_load_connection_metadata_throws_error_when_v2_permissions_lookup_encounters_genuine_error(
+    mocker,
+):
+    v1_permissions = [
+        "http://snomed.info/sct|749001000000101",
+        "https://nicip.nhs.uk|MAULR",
+    ]
+    mocker.patch(
+        "nrlf.core.decorators.parse_permissions_file",
+        return_value=v1_permissions,
+    )
+    mocker.patch(
+        "nrlf.core.decorators.get_pointer_permissions_v2",
+        side_effect=Exception("AAAH THIS IS A BIG PROBLEM"),
+    )
+
+    v1_plus_v2_headers = create_headers(
+        additional_headers={
+            V2Headers.NHSD_END_USER_ORGANISATION_ODS: "Y05868",
+            V2Headers.X_PROXYGEN_APP_NRL_APP_ID: "Y05868-TestApp-12345678",
+        }
+    )
+
+    with pytest.raises(Exception) as err:
+        load_connection_metadata(
+            headers=v1_plus_v2_headers,
+            config=Config(),
+            path="/producer/DocumentReference",
+        )
+
+    assert "AAAH THIS IS A BIG PROBLEM" in str(err.value)
+
+
+def test_load_v2_connection_metadata_allow_all_types(mocker: MockerFixture):
+    mocker.patch(
+        "nrlf.core.decorators.get_pointer_permissions_v2",
+        return_value={
+            "access_controls": [AccessControls.ALLOW_ALL_TYPES.value],
+            "types": [],
+        },
+    )
+
+    metadata = load_connection_metadata(
+        headers=_create_v2_headers(),
+        config=Config(),
+        path="/producer/DocumentReference",
+    )
+
+    assert metadata.nrl_permissions_policy.types == PointerTypes.list()
+
+
+def test_load_v2_connection_metadata_specific_types(mocker: MockerFixture):
+    specific_types = [
+        "http://snomed.info/sct|736253002",
+        "http://snomed.info/sct|735324008",
+    ]
+    mocker.patch(
+        "nrlf.core.decorators.get_pointer_permissions_v2",
+        return_value={
+            "access_controls": [],
+            "types": specific_types,
+        },
+    )
+
+    metadata = load_connection_metadata(
+        headers=_create_v2_headers(),
+        config=Config(),
+        path="/producer/DocumentReference",
+    )
+
+    assert metadata.nrl_permissions_policy.types == specific_types
+
+
+def test_load_v2_connection_metadata_missing_access_controls(mocker: MockerFixture):
+    specific_types = ["http://snomed.info/sct|736253002"]
+    mocker.patch(
+        "nrlf.core.decorators.get_pointer_permissions_v2",
+        return_value={
+            "types": specific_types,
+        },
+    )
+
+    metadata = load_connection_metadata(
+        headers=_create_v2_headers(),
+        config=Config(),
+        path="/producer/DocumentReference",
+    )
+
+    assert metadata.nrl_permissions_policy.types == specific_types
+
+
+def test_load_v2_connection_metadata_invalid_permissions_file(mocker: MockerFixture):
+    mocker.patch("nrlf.core.decorators.get_pointer_permissions_v2", return_value=[])
+
+    with pytest.raises(OperationOutcomeError) as err:
+        load_connection_metadata(
+            headers=_create_v2_headers(),
+            config=Config(),
+            path="/producer/DocumentReference",
+        )
+
+    assert err.value.status_code == "401"
+    assert err.value.operation_outcome.resourceType == "OperationOutcome"
+    assert err.value.operation_outcome.issue[0].severity == "error"
+    assert err.value.operation_outcome.issue[0].code == "invalid"
+    assert err.value.operation_outcome.issue[0].details == SpineErrorConcept.from_code(
+        "MISSING_OR_INVALID_HEADER"
+    )
+    assert (
+        err.value.operation_outcome.issue[0].diagnostics
+        == "Unable to parse metadata about the requesting application. Contact the onboarding team."
+    )
 
 
 def test_request_handler_with_custom_repository(mocker: MockerFixture):

@@ -31,7 +31,7 @@ jobs:
 
     steps:
       - name: Git clone - ${{ github.ref }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           ref: ${{ github.ref }}
 
@@ -87,7 +87,7 @@ jobs:
 
     steps:
       - name: Git clone - ${{ github.ref }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           ref: ${{ github.ref }}
 
@@ -112,7 +112,7 @@ jobs:
           make get-s3-perms ENV=${account} TF_WORKSPACE_NAME=$STACK_NAME
 
       - name: Save NRLF permissions in cache
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           key: ${{ github.run_id }}-nrlf-permissions
           path: dist/nrlf_permissions.zip
@@ -129,7 +129,7 @@ jobs:
 
     steps:
       - name: Git clone - ${{ github.ref }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           ref: ${{ github.ref }}
 
@@ -157,7 +157,7 @@ jobs:
           ./scripts/pull-lambda-code-for-stack.sh $STACK_NAME
 
       - name: Save lambda artifacts in cache
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           key: ${{ github.run_id }}-pulled-lambda-artifacts
           path: dist/*.zip
@@ -174,7 +174,7 @@ jobs:
 
     steps:
       - name: Git clone - ${{ github.ref }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           ref: ${{ github.ref }}
 
@@ -184,14 +184,14 @@ jobs:
           poetry install --no-root
 
       - name: Restore pulled lambda artifacts
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           key: ${{ github.run_id }}-pulled-lambda-artifacts
           path: dist/*.zip
           fail-on-cache-miss: true
 
       - name: Restore NRLF permissions cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           key: ${{ github.run_id }}-nrlf-permissions
           path: dist/nrlf_permissions.zip
@@ -243,7 +243,7 @@ jobs:
 
     steps:
       - name: Git clone - ${{ github.ref }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           ref: ${{ github.ref }}
 
@@ -253,14 +253,14 @@ jobs:
           poetry install --no-root
 
       - name: Restore pulled lambda artifacts
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           key: ${{ github.run_id }}-pulled-lambda-artifacts
           path: dist/*.zip
           fail-on-cache-miss: true
 
       - name: Restore NRLF permissions cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           key: ${{ github.run_id }}-nrlf-permissions
           path: dist/nrlf_permissions.zip

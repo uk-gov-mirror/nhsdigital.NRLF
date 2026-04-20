@@ -7,8 +7,8 @@ SHELL := /bin/bash
 
 DIST_PATH ?= ./dist
 TEST_ARGS ?= --cov --cov-report=term-missing --cov-report=xml:$(DIST_PATH)/test-coverage.xml
-SMOKE_TEST_ARGS ?=
-FEATURE_TEST_ARGS ?= ./tests/features --format progress2
+SMOKE_TEST_ARGS ?= -s ./tests/smoke/scenarios/*
+FEATURE_TEST_ARGS ?= ./tests/features
 TF_WORKSPACE_NAME ?= $(shell terraform -chdir=terraform/infrastructure workspace show)
 ENV ?= dev
 ACCOUNT ?= dev
@@ -22,6 +22,9 @@ PERFTEST_POINTERS_PER_PATIENT ?= 0
 PERFTEST_TYPE_DIST_PROFILE ?= default
 PERFTEST_CUSTODIAN_DIST_PROFILE ?= default
 PERFTEST_TOKEN_REFRESH_PORT ?= 8765
+
+CI_BUILD_ARGS ?=
+CI_IMAGE_TAG ?= $(shell date +%Y-%m-%d)
 
 export PATH := $(PATH):$(PWD)/.venv/bin
 export USE_SHARED_RESOURCES := $(shell poetry run python scripts/are_resources_shared_for_stack.py $(TF_WORKSPACE_NAME))
@@ -88,8 +91,9 @@ build-api-packages: ./api/consumer/* ./api/producer/*
 build-ci-image: ## Build the CI image
 	@echo "Building the CI image"
 	docker build \
-		-t nhsd-nrlf-ci-build:latest \
-		-f Dockerfile.ci-build
+		-t localhost/nhsd-nrlf-ci-build:${CI_IMAGE_TAG} \
+		-f Dockerfile.ci-build \
+		${CI_BUILD_ARGS}
 
 ecr-login: ## Login to NRLF ECR repo
 	@echo "Logging into ECR"
@@ -103,9 +107,9 @@ publish-ci-image: ## Publish the CI image
 	@echo "Publishing the CI image"
 	$(eval AWS_REGION := $(shell aws configure get region))
 	$(eval AWS_ACCOUNT_ID := $(shell aws sts get-caller-identity | jq -r .Account))
-	@docker tag nhsd-nrlf-ci-build:latest \
-		$(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com/nhsd-nrlf-ci-build:latest
-	@docker push $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com/nhsd-nrlf-ci-build:latest
+	@docker tag localhost/nhsd-nrlf-ci-build:${CI_IMAGE_TAG} \
+		$(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com/nhsd-nrlf-ci-build:${CI_IMAGE_TAG}
+	@docker push $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com/nhsd-nrlf-ci-build:${CI_IMAGE_TAG}
 
 test: check-warn ## Run the unit tests
 	@echo "Running unit tests"
@@ -117,6 +121,7 @@ test-features-integration: check-warn ## Run the BDD feature tests in the integr
 		--define="env=$(TF_WORKSPACE_NAME)" \
 		--define="account_name=$(ENV)" \
 		--define="use_shared_resources=${USE_SHARED_RESOURCES}" \
+		-v --format progress2 \
 		$(FEATURE_TEST_ARGS)
 
 integration-test-with-custom_tag:
@@ -148,14 +153,14 @@ test-smoke-internal: check-warn ## Run the smoke tests against the internal envi
 	TEST_STACK_NAME=$(TF_WORKSPACE_NAME) \
 	TEST_STACK_DOMAIN=$(shell terraform -chdir=terraform/infrastructure output -raw domain 2>/dev/null) \
 	TEST_CONNECT_MODE="internal" \
-		pytest ./tests/smoke/scenarios/* $(SMOKE_TEST_ARGS)
+		pytest $(SMOKE_TEST_ARGS)
 
 test-smoke-public: check-warn ## Run the smoke tests for the external access points
 	@echo "Running smoke tests for the public endpoints ${ENV}"
 	TEST_ENVIRONMENT_NAME=$(ENV) \
 	TEST_STACK_NAME=$(TF_WORKSPACE_NAME) \
 	TEST_CONNECT_MODE="public" \
-		pytest ./tests/smoke/scenarios/* $(SMOKE_TEST_ARGS)
+		pytest $(SMOKE_TEST_ARGS)
 
 test-performance-prepare:
 	mkdir -p $(DIST_PATH)

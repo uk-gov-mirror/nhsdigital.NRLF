@@ -10,8 +10,14 @@ from api.producer.createDocumentReference.create_document_reference import (
     _set_create_time_fields,
     handler,
 )
-from nrlf.core.constants import SNOMED_SYSTEM_URL
+from nrlf.core.constants import (
+    CLIENT_RP_DETAILS,
+    SNOMED_SYSTEM_URL,
+    AccessControls,
+    V2Headers,
+)
 from nrlf.core.dynamodb.repository import DocumentPointer, DocumentPointerRepository
+from nrlf.core.model import ConnectionMetadata
 from nrlf.producer.fhir.r4.model import (
     DocumentReferenceRelatesTo,
     Identifier,
@@ -731,6 +737,128 @@ def test_create_document_reference_pointer_type_not_allowed(
     }
 
 
+@mock_aws
+@mock_repository
+@freeze_time("2024-03-21T12:34:56.789")
+@freeze_uuid("00000000-0000-0000-0000-000000000001")
+@patch("nrlf.core.decorators.get_pointer_permissions_v2")
+def test_create_document_reference_happy_path_v2(
+    get_pointer_permissions_mock, repository: DocumentPointerRepository
+):
+    doc_ref_data = load_document_reference_data("Y05868-736253002-Valid")
+
+    v2_headers = create_headers(
+        additional_headers={
+            V2Headers.NHSD_END_USER_ORGANISATION_ODS: "Y05868",
+            V2Headers.X_PROXYGEN_APP_NRL_APP_ID: "Y05868-TestApp-12345678",
+        }
+    )
+    v2_headers.pop(CLIENT_RP_DETAILS)
+
+    get_pointer_permissions_mock.return_value = {
+        "access_controls": [],
+        "types": ["http://snomed.info/sct|736253002"],
+    }
+
+    event = create_test_api_gateway_event(
+        headers=v2_headers,
+        body=doc_ref_data,
+    )
+
+    result = handler(event, create_mock_context())
+    body = result.pop("body")
+
+    assert result == {
+        "statusCode": "201",
+        "headers": {
+            "Location": "/DocumentReference/Y05868-00000000-0000-0000-0000-000000000001",
+            **default_response_headers(),
+        },
+        "isBase64Encoded": False,
+    }
+
+    parsed_body = json.loads(body)
+    assert parsed_body == {
+        "resourceType": "OperationOutcome",
+        "issue": [
+            {
+                "severity": "information",
+                "code": "informational",
+                "details": {
+                    "coding": [
+                        {
+                            "code": "RESOURCE_CREATED",
+                            "display": "Resource created",
+                            "system": "https://fhir.nhs.uk/ValueSet/NRL-ResponseCode",
+                        }
+                    ],
+                },
+                "diagnostics": "The document has been created",
+            }
+        ],
+    }
+
+
+@mock_aws
+@mock_repository
+@patch("nrlf.core.decorators.get_pointer_permissions_v2")
+def test_create_document_reference_pointer_type_not_allowed_v2(
+    get_pointer_permissions_mock, repository: DocumentPointerRepository
+):
+    doc_ref = load_document_reference("Y05868-736253002-Valid")
+
+    headers = create_headers(
+        additional_headers={
+            V2Headers.NHSD_END_USER_ORGANISATION_ODS: "Y05868",
+            V2Headers.X_PROXYGEN_APP_NRL_APP_ID: "Y05868-TestApp-12345678",
+        }
+    )
+    headers.pop("nhsd-client-rp-details")
+
+    # Return a type that does not match the document's type
+    get_pointer_permissions_mock.return_value = {
+        "access_controls": [],
+        "types": ["http://snomed.info/sct|736373009"],
+    }
+
+    event = create_test_api_gateway_event(
+        headers=headers,
+        body=doc_ref.model_dump_json(exclude_none=True),
+    )
+
+    result = handler(event, create_mock_context())
+    body = result.pop("body")
+
+    assert result == {
+        "statusCode": "403",
+        "headers": default_response_headers(),
+        "isBase64Encoded": False,
+    }
+
+    parsed_body = json.loads(body)
+
+    assert parsed_body == {
+        "resourceType": "OperationOutcome",
+        "issue": [
+            {
+                "severity": "error",
+                "code": "forbidden",
+                "details": {
+                    "coding": [
+                        {
+                            "code": "AUTHOR_CREDENTIALS_ERROR",
+                            "display": "Author credentials error",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
+                        }
+                    ]
+                },
+                "diagnostics": "The type of the provided DocumentReference is not in the list of allowed types for this organisation",
+                "expression": ["type.coding[0].code"],
+            }
+        ],
+    }
+
+
 def test_create_document_reference_invalid_category_type():
     doc_ref = load_document_reference("Y05868-736253002-Valid")
 
@@ -1307,7 +1435,7 @@ def test_create_document_reference_supersede_deletes_old_pointers_replace(
 @mock_aws
 @mock_repository
 @freeze_uuid("00000000-0000-0000-0000-000000000001")
-def test_create_document_reference_supersede_succeeds_with_toggle(
+def test_supersede_non_existent_pointer_succeeds_with_v1_ignore_delete_fail(
     repository: DocumentPointerRepository,
 ):
     doc_ref = load_document_reference("Y05868-736253002-Valid")
@@ -1365,7 +1493,7 @@ def test_create_document_reference_supersede_succeeds_with_toggle(
 
 @mock_aws
 @mock_repository
-def test_create_document_reference_supersede_fails_without_toggle(
+def test_supersede_non_existent_pointer_fails_without_v1_ignore_delete_fail(
     repository: DocumentPointerRepository,
 ):
     doc_ref = load_document_reference("Y05868-736253002-Valid")
@@ -1380,6 +1508,143 @@ def test_create_document_reference_supersede_fails_without_toggle(
 
     event = create_test_api_gateway_event(
         headers=create_headers(),
+        body=doc_ref.model_dump_json(exclude_none=True),
+    )
+
+    result = handler(event, create_mock_context())
+    body = result.pop("body")
+
+    assert result == {
+        "statusCode": "422",
+        "headers": default_response_headers(),
+        "isBase64Encoded": False,
+    }
+
+    parsed_body = json.loads(body)
+
+    assert parsed_body == {
+        "resourceType": "OperationOutcome",
+        "issue": [
+            {
+                "severity": "error",
+                "code": "business-rule",
+                "details": {
+                    "coding": [
+                        {
+                            "code": "UNPROCESSABLE_ENTITY",
+                            "display": "Unprocessable Entity",
+                            "system": "https://fhir.nhs.uk/CodeSystem/Spine-ErrorOrWarningCode",
+                        }
+                    ]
+                },
+                "diagnostics": "The relatesTo target document does not exist",
+                "expression": ["relatesTo[0].target.identifier.value"],
+            }
+        ],
+    }
+
+
+@mock_aws
+@mock_repository
+@freeze_uuid("00000000-0000-0000-0000-000000000001")
+@patch("nrlf.core.decorators.get_pointer_permissions_v2")
+def test_supersede_non_existent_pointer_succeeds_with_v2_access_control(
+    get_pointer_permissions_mock, repository: DocumentPointerRepository
+):
+    doc_ref = load_document_reference("Y05868-736253002-Valid")
+
+    # Add reference to a non-existing pointer
+    doc_ref.relatesTo = [
+        DocumentReferenceRelatesTo(
+            code="replaces",
+            target=Reference(identifier=Identifier(value="Y05868-99999-99999-000000")),
+        )
+    ]
+
+    v2_headers = create_headers(
+        additional_headers={
+            V2Headers.NHSD_END_USER_ORGANISATION_ODS: "Y05868",
+            V2Headers.X_PROXYGEN_APP_NRL_APP_ID: "Y05868-TestApp-12345678",
+        }
+    )
+    v2_headers.pop(CLIENT_RP_DETAILS)
+
+    get_pointer_permissions_mock.return_value = {
+        "access_controls": [AccessControls.ALLOW_SUPERSEDE_WITH_DELETE_FAILURE.value],
+        "types": ["http://snomed.info/sct|736253002"],
+    }
+
+    event = create_test_api_gateway_event(
+        headers=v2_headers,
+        body=doc_ref.model_dump_json(exclude_none=True),
+    )
+
+    result = handler(event, create_mock_context())
+    body = result.pop("body")
+
+    assert result == {
+        "statusCode": "201",
+        "headers": {
+            "Location": "/DocumentReference/Y05868-00000000-0000-0000-0000-000000000001",
+            **default_response_headers(),
+        },
+        "isBase64Encoded": False,
+    }
+
+    parsed_body = json.loads(body)
+
+    assert parsed_body == {
+        "resourceType": "OperationOutcome",
+        "issue": [
+            {
+                "severity": "information",
+                "code": "informational",
+                "details": {
+                    "coding": [
+                        {
+                            "code": "RESOURCE_SUPERSEDED",
+                            "display": "Resource created and resource(s) deleted",
+                            "system": "https://fhir.nhs.uk/ValueSet/NRL-ResponseCode",
+                        }
+                    ]
+                },
+                "diagnostics": "The document has been superseded by a new version",
+            }
+        ],
+    }
+
+
+@mock_aws
+@mock_repository
+@patch("nrlf.core.decorators.get_pointer_permissions_v2")
+def test_supersede_fails_without_v2_access_control(
+    get_pointer_permissions_mock, repository: DocumentPointerRepository
+):
+    doc_ref = load_document_reference("Y05868-736253002-Valid")
+
+    # Add reference to a non-existing pointer
+    doc_ref.relatesTo = [
+        DocumentReferenceRelatesTo(
+            code="replaces",
+            target=Reference(identifier=Identifier(value="Y05868-99999-99999-000000")),
+        )
+    ]
+
+    v2_headers = create_headers(
+        additional_headers={
+            V2Headers.NHSD_END_USER_ORGANISATION_ODS: "Y05868",
+            V2Headers.X_PROXYGEN_APP_NRL_APP_ID: "Y05868-TestApp-12345678",
+        }
+    )
+    v2_headers.pop(CLIENT_RP_DETAILS)
+
+    get_pointer_permissions_mock.return_value = {
+        "access_controls": [],
+        "types": ["http://snomed.info/sct|736253002"],
+    }
+
+    event = create_test_api_gateway_event(
+        headers=v2_headers,
         body=doc_ref.model_dump_json(exclude_none=True),
     )
 
@@ -1684,9 +1949,19 @@ def test_create_document_reference_with_date_overridden(
 def test__set_create_time_fields(doc_ref_name: str):
     test_time = "2024-03-24T12:34:56.789Z"
     test_doc_ref = load_document_reference(doc_ref_name)
-    test_perms = []
+    test_metadata = ConnectionMetadata.model_validate(
+        {
+            "nrl.ods-code": "Y05868",
+            "nrl.permissions": [],
+            "nrl.app-id": "Y05868-TestApp",
+            "client_rp_details": {
+                "developer.app.name": "TestApp",
+                "developer.app.id": "12345",
+            },
+        }
+    )
 
-    response = _set_create_time_fields(test_time, test_doc_ref, test_perms)
+    response = _set_create_time_fields(test_time, test_doc_ref, test_metadata)
 
     assert response.model_dump(exclude_none=True) == {
         **test_doc_ref.model_dump(exclude_none=True),
@@ -1705,12 +1980,22 @@ def test__set_create_time_fields(doc_ref_name: str):
         "Y05868-736253002-Valid-with-date-and-meta-lastupdated",
     ],
 )
-def test__set_create_time_fields_when_doc_has_date_and_perms(doc_ref_name: str):
+def test__set_create_time_fields_when_doc_has_date_and_v1_perms(doc_ref_name: str):
     test_time = "2024-03-24T12:34:56.789Z"
     test_doc_ref = load_document_reference(doc_ref_name)
-    test_perms = ["audit-dates-from-payload"]
+    test_metadata = ConnectionMetadata.model_validate(
+        {
+            "nrl.ods-code": "Y05868",
+            "nrl.permissions": ["audit-dates-from-payload"],
+            "nrl.app-id": "Y05868-TestApp",
+            "client_rp_details": {
+                "developer.app.name": "TestApp",
+                "developer.app.id": "12345",
+            },
+        }
+    )
 
-    response = _set_create_time_fields(test_time, test_doc_ref, test_perms)
+    response = _set_create_time_fields(test_time, test_doc_ref, test_metadata)
 
     assert response.model_dump(exclude_none=True) == {
         **test_doc_ref.model_dump(exclude_none=True),
@@ -1722,12 +2007,95 @@ def test__set_create_time_fields_when_doc_has_date_and_perms(doc_ref_name: str):
 
 
 @freeze_time("2024-03-25")
-def test__set_create_time_fields_when_no_date_but_perms():
+def test__set_create_time_fields_when_no_date_but_v1_perms():
     test_time = "2024-03-24T12:34:56.789Z"
     test_doc_ref = load_document_reference("Y05868-736253002-Valid")
-    test_perms = ["audit-dates-from-payload"]
+    test_metadata = ConnectionMetadata.model_validate(
+        {
+            "nrl.ods-code": "Y05868",
+            "nrl.permissions": ["audit-dates-from-payload"],
+            "nrl.app-id": "Y05868-TestApp",
+            "client_rp_details": {
+                "developer.app.name": "TestApp",
+                "developer.app.id": "12345",
+            },
+        }
+    )
 
-    response = _set_create_time_fields(test_time, test_doc_ref, test_perms)
+    response = _set_create_time_fields(test_time, test_doc_ref, test_metadata)
+
+    assert response.model_dump(exclude_none=True) == {
+        **test_doc_ref.model_dump(exclude_none=True),
+        "meta": {
+            "lastUpdated": test_time,
+        },
+        "date": test_time,
+    }
+
+
+@freeze_time("2024-03-25")
+@mark.parametrize(
+    "doc_ref_name",
+    [
+        "Y05868-736253002-Valid-with-date",
+        "Y05868-736253002-Valid-with-date-and-meta-lastupdated",
+    ],
+)
+def test__set_create_time_fields_v2_when_doc_has_date_and_access_control(
+    doc_ref_name: str,
+):
+    test_time = "2024-03-24T12:34:56.789Z"
+    test_doc_ref = load_document_reference(doc_ref_name)
+    test_metadata = ConnectionMetadata.model_validate(
+        {
+            "nrl.ods-code": "Y05868",
+            "nrl.permissions": [],
+            "nrl.app-id": "Y05868-TestApp",
+            "client_rp_details": {
+                "developer.app.name": "TestApp",
+                "developer.app.id": "12345",
+            },
+            "nrl_permissions_policy": {
+                "access_controls": [
+                    AccessControls.ALLOW_OVERRIDE_CREATION_DATETIME.value
+                ]
+            },
+        }
+    )
+
+    response = _set_create_time_fields(test_time, test_doc_ref, test_metadata)
+
+    assert response.model_dump(exclude_none=True) == {
+        **test_doc_ref.model_dump(exclude_none=True),
+        "meta": {
+            "lastUpdated": test_time,
+        },
+        "date": test_doc_ref.date,
+    }
+
+
+@freeze_time("2024-03-25")
+def test__set_create_time_fields_v2_when_no_date_but_access_control():
+    test_time = "2024-03-24T12:34:56.789Z"
+    test_doc_ref = load_document_reference("Y05868-736253002-Valid")
+    test_metadata = ConnectionMetadata.model_validate(
+        {
+            "nrl.ods-code": "Y05868",
+            "nrl.permissions": [],
+            "nrl.app-id": "Y05868-TestApp",
+            "client_rp_details": {
+                "developer.app.name": "TestApp",
+                "developer.app.id": "12345",
+            },
+            "nrl_permissions_policy": {
+                "access_controls": [
+                    AccessControls.ALLOW_OVERRIDE_CREATION_DATETIME.value
+                ]
+            },
+        }
+    )
+
+    response = _set_create_time_fields(test_time, test_doc_ref, test_metadata)
 
     assert response.model_dump(exclude_none=True) == {
         **test_doc_ref.model_dump(exclude_none=True),
