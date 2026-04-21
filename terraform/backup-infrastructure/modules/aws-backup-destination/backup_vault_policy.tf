@@ -21,7 +21,7 @@ data "aws_iam_policy_document" "vault_policy" {
   }
 
   dynamic "statement" {
-    for_each = [1]
+    for_each = var.enable_vault_protection ? [1] : []
     content {
       sid    = "DenyBackupVaultAccess"
       effect = "Deny"
@@ -32,9 +32,11 @@ data "aws_iam_policy_document" "vault_policy" {
       }
       actions = [
         "backup:DeleteRecoveryPoint",
+        "backup:PutBackupVaultAccessPolicy",
         "backup:UpdateRecoveryPointLifecycle",
         "backup:DeleteBackupVault",
         "backup:StartRestoreJob",
+        "backup:DeleteBackupVaultLockConfiguration",
       ]
       resources = ["*"]
     }
