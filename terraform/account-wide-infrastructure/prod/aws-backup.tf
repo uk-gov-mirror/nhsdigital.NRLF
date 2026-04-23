@@ -180,6 +180,7 @@ module "source" {
         "schedule" : "cron(30 0 ? * 4#1)" # first Thursday each month from 00:30
         "copy_action" : [{
           "cold_storage_after" : 35,
+          # do we want this to be 400 for realsies?
           "delete_after" : 400 # ensures 1 from previous restore test
         }],
         "lifecycle" : {
