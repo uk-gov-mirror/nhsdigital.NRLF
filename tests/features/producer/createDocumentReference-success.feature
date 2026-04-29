@@ -393,7 +393,7 @@ Feature: Producer - createDocumentReference - Success Scenarios
       | status          | current                                                      |
       | type            | HDTAP                                                        |
       | type_system     | https://fhir.nhs.uk/England/CodeSystem/England-NRLRecordType |
-      | category        | 721981007                                                    |
+      | category        | 423876004                                                    |
       | custodian       | ANGY1                                                        |
       | author          | HAR1                                                         |
       | url             | https://example.org/my-doc.pdf                               |
@@ -425,7 +425,7 @@ Feature: Producer - createDocumentReference - Success Scenarios
       | status          | current                                                      |
       | type            | HDTAP                                                        |
       | type_system     | https://fhir.nhs.uk/England/CodeSystem/England-NRLRecordType |
-      | category        | 721981007                                                    |
+      | category        | 423876004                                                    |
       | custodian       | ANGY1                                                        |
       | author          | HAR1                                                         |
       | url             | https://example.org/my-doc.pdf                               |
