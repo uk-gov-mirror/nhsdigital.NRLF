@@ -10,7 +10,7 @@ variable "environment" {
 
 variable "pointer_table_name" {
   type        = string
-  description = "patient_flags_datastore table name"
+  description = "Name of the pointer table to export"
 }
 
 variable "asset_bucket" {

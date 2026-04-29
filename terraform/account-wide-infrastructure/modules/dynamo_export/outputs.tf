@@ -8,5 +8,5 @@ output "dynamo_processed_key_arn" {
 }
 output "dynamo_export_step_function_arn" {
   value       = aws_sfn_state_machine.dynamo_export.arn
-  description = "The ARN of the Step Function for DynamoDB patient history processing."
+  description = "The ARN of the Step Function for DynamoDB pointer history processing."
 }
