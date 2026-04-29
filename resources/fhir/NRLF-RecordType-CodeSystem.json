@@ -1,6 +1,6 @@
 {
   "resourceType": "CodeSystem",
-  "id": "England-NRLRetrievalMechanism",
+  "id": "England-NRLRecordType",
   "url": "https://fhir.nhs.uk/England/CodeSystem/England-NRLRecordType",
   "version": "1.1.0",
   "name": "EnglandNRLRecordType",

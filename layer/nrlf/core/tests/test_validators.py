@@ -580,7 +580,7 @@ def test_validate_type_coding_invalid_system():
                 }
             ]
         },
-        "diagnostics": "Invalid type system: http://snoooooomed/sctfffffg Type system must be either 'http://snomed.info/sct' or 'https://nicip.nhs.uk'",
+        "diagnostics": "Invalid type system: http://snoooooomed/sctfffffg Type system must be either 'http://snomed.info/sct', 'https://nicip.nhs.uk' or ''https://fhir.nhs.uk/England/CodeSystem/England-NRLRecordType'",
         "expression": ["type.coding[0].system"],
     }
 

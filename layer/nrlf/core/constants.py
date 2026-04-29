@@ -92,7 +92,9 @@ class PointerTypes(Enum):
     APPOINTMENT = "http://snomed.info/sct|749001000000101"
     SHARED_CARE_RECORD = "http://snomed.info/sct|887181000000106"
     ABOUT_ME = "http://snomed.info/sct|1515851000000101"  # NOSONAR (S5332) This is a type code, not an actual URL
-    DISCHARGE_PLAN = "https://fhir.nhs.uk/England/CodeSystem/England-NRLTypeCode|HDTAP"
+    DISCHARGE_PLAN = (
+        "https://fhir.nhs.uk/England/CodeSystem/England-NRLRecordType|HDTAP"
+    )
 
     @staticmethod
     def list():
