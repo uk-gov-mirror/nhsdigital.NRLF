@@ -24,11 +24,14 @@ resource "aws_kms_key" "destination_backup_key" {
 module "destination" {
   source = "../modules/aws-backup-destination"
 
-  source_account_name     = "test" # please note that the assigned value would be the prefix in aws_backup_vault.vault.name
-  account_id              = local.destination_account_id
-  source_account_id       = local.source_account_id
-  kms_key                 = aws_kms_key.destination_backup_key.arn
-  enable_vault_protection = false
+  source_account_name           = "test" # please note that the assigned value would be the prefix in aws_backup_vault.vault.name
+  account_id                    = local.destination_account_id
+  source_account_id             = local.source_account_id
+  kms_key                       = aws_kms_key.destination_backup_key.arn
+  enable_vault_protection       = false
+  vault_lock_type               = "governance"
+  vault_lock_min_retention_days = 2
+  vault_lock_max_retention_days = 35
 }
 
 ###
