@@ -61,11 +61,15 @@ check-deploy: ## check the deploy environment is setup correctly
 check-deploy-warn:
 	@SHOULD_WARN_ONLY=true ./scripts/check-deploy-environment.sh
 
-build: check-warn build-api-packages build-layers build-dependency-layer build-seed-sandbox-lambda ## Build the project
+build: check-warn build-api-packages build-layers build-dependency-layer build-seed-sandbox-lambda build-dynamo-export-lambdas ## Build the project
 
 build-seed-sandbox-lambda:
 	@echo "Building seed_sandbox Lambda"
 	@cd lambdas/seed_sandbox && make build
+
+build-dynamo-export-lambdas:
+	@echo "Building dynamo_export Lambdas"
+	@cd lambdas/dynamo_export && make build
 
 build-dependency-layer:
 	@echo "Building Lambda dependency layer"

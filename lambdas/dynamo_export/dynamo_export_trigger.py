@@ -23,7 +23,7 @@ ssm = boto3.client(
 )
 
 
-def lambda_handler(_, __):
+def lambda_handler(_event, _context):
     to_time = datetime.now(timezone.utc).replace(microsecond=0, second=0, minute=0)
     export_arns = []
 

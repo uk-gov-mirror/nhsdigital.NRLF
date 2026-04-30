@@ -7,7 +7,7 @@ ddb = boto3.client(
 )
 
 
-def lambda_handler(event, _):
+def lambda_handler(event, _context):
     completed = []
     for arn in event["export_arns"]:
         response = ddb.describe_export(ExportArn=arn)

@@ -7,7 +7,7 @@ ssm = boto3.client(
 )
 
 
-def lambda_handler(event, _):
+def lambda_handler(event, _context):
     param_name = "/exports/DynamoExportRuntime"
     param_value = event["export_to_time"]
     ssm.put_parameter(Name=param_name, Value=param_value, Type="String", Overwrite=True)
