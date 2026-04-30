@@ -92,6 +92,9 @@ class PointerTypes(Enum):
     APPOINTMENT = "http://snomed.info/sct|749001000000101"
     SHARED_CARE_RECORD = "http://snomed.info/sct|887181000000106"
     ABOUT_ME = "http://snomed.info/sct|1515851000000101"  # NOSONAR (S5332) This is a type code, not an actual URL
+    DISCHARGE_PLAN = (
+        "https://fhir.nhs.uk/England/CodeSystem/England-NRLRecordType|HDTAP"
+    )
 
     @staticmethod
     def list():
@@ -194,6 +197,7 @@ TYPE_ATTRIBUTES = {
     },
     PointerTypes.SHARED_CARE_RECORD.value: {"display": "Clinical summary"},
     PointerTypes.ABOUT_ME.value: {"display": "About me"},
+    PointerTypes.DISCHARGE_PLAN.value: {"display": "Hospital Discharge to Assess Plan"},
 }
 
 TYPE_CATEGORIES = {
@@ -228,6 +232,7 @@ TYPE_CATEGORIES = {
     #
     # Clinical documents
     PointerTypes.ABOUT_ME.value: Categories.CLINICAL_DOCUMENT.value,
+    PointerTypes.DISCHARGE_PLAN.value: Categories.CLINICAL_DOCUMENT.value,
 }
 
 #
@@ -711,7 +716,11 @@ SNOMED_PRACTICE_SETTINGS = {
 }
 
 
-SYSTEM_SHORT_IDS = {"http://snomed.info/sct": "SCT", "https://nicip.nhs.uk": "NICIP"}
+SYSTEM_SHORT_IDS = {
+    "http://snomed.info/sct": "SCT",
+    "https://nicip.nhs.uk": "NICIP",
+    "https://fhir.nhs.uk/England/CodeSystem/England-NRLRecordType": "NRL",
+}
 CONTENT_STABILITY_EXTENSION_URL = (
     "https://fhir.nhs.uk/England/StructureDefinition/Extension-England-ContentStability"
 )

@@ -382,6 +382,55 @@ Feature: Producer - createDocumentReference - Success Scenarios
       | formatCode      | urn:nhs-ic:structured         |
       | formatDisplay   | Structured Document           |
 
+  Scenario: Successfully create a Document Pointer (non-SNOMED type)
+    Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
+    And the organisation 'ANGY1' is authorised to access pointer types:
+      | system                                                       | value |
+      | https://fhir.nhs.uk/England/CodeSystem/England-NRLRecordType | HDTAP |
+    When producer 'ANGY1' creates a DocumentReference with values:
+      | property        | value                                                        |
+      | subject         | 9278693472                                                   |
+      | status          | current                                                      |
+      | type            | HDTAP                                                        |
+      | type_system     | https://fhir.nhs.uk/England/CodeSystem/England-NRLRecordType |
+      | category        | 423876004                                                    |
+      | custodian       | ANGY1                                                        |
+      | author          | HAR1                                                         |
+      | url             | https://example.org/my-doc.pdf                               |
+      | practiceSetting | 224891009                                                    |
+    Then the response status code is 201
+    And the response is an OperationOutcome with 1 issue
+    And the OperationOutcome contains the issue:
+      """
+      {
+        "severity": "information",
+        "code": "informational",
+        "details": {
+          "coding": [
+            {
+              "system": "https://fhir.nhs.uk/ValueSet/NRL-ResponseCode",
+              "code": "RESOURCE_CREATED",
+              "display": "Resource created"
+            }
+          ]
+        },
+        "diagnostics": "The document has been created"
+      }
+      """
+    And the response has a Location header
+    And the Location header starts with '/DocumentReference/ANGY1-'
+    And the resource in the Location header exists with values:
+      | property        | value                                                        |
+      | subject         | 9278693472                                                   |
+      | status          | current                                                      |
+      | type            | HDTAP                                                        |
+      | type_system     | https://fhir.nhs.uk/England/CodeSystem/England-NRLRecordType |
+      | category        | 423876004                                                    |
+      | custodian       | ANGY1                                                        |
+      | author          | HAR1                                                         |
+      | url             | https://example.org/my-doc.pdf                               |
+      | practiceSetting | 224891009                                                    |
+
   Scenario: Successfully create a DocumentReference with two contents and different retrieval mechanisms
     Given the application 'DataShare' (ID 'z00z-y11y-x22x') is registered to access the API
     And the organisation 'TSTCUS' is authorised to access pointer types:

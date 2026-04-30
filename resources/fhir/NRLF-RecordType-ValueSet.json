@@ -2,10 +2,10 @@
   "resourceType": "ValueSet",
   "id": "NRLF-RecordType",
   "url": "https://fhir.nhs.uk/England/ValueSet/England-NRLRecordType",
-  "version": "1.1.4",
+  "version": "1.1.6",
   "name": "NRLF Record Type",
   "status": "draft",
-  "date": "2025-08-14T00:00:00+00:00",
+  "date": "2026-04-27T00:00:00+00:00",
   "publisher": "NHS Digital",
   "contact": {
     "name": "NRL Team at NHS Digital",
@@ -81,6 +81,15 @@
           {
             "code": "1515851000000101",
             "display": "About me"
+          }
+        ]
+      },
+      {
+        "system": "https://fhir.nhs.uk/England/CodeSystem/England-NRLRecordType",
+        "concept": [
+          {
+            "code": "HDTAP",
+            "display": "Hospital Discharge to Assess Plan"
           }
         ]
       },

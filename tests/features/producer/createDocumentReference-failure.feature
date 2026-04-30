@@ -571,7 +571,7 @@ Feature: Producer - createDocumentReference - Failure Scenarios
       }
       ]
       },
-      "diagnostics": "Invalid type system: http://invalidsystem.info/sct Type system must be either 'http://snomed.info/sct' or 'https://nicip.nhs.uk'",
+      "diagnostics": "Invalid type system: http://invalidsystem.info/sct Type system must be either 'http://snomed.info/sct', 'https://nicip.nhs.uk' or 'https://fhir.nhs.uk/England/CodeSystem/England-NRLRecordType'",
       "expression": ["type.coding[0].system"]
       }
       """

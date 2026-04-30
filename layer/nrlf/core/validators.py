@@ -351,11 +351,15 @@ class DocumentReferenceValidator:
             return
 
         coding = model.type.coding[0]
-        if coding.system not in ["http://snomed.info/sct", "https://nicip.nhs.uk"]:
+        if coding.system not in [
+            "http://snomed.info/sct",
+            "https://nicip.nhs.uk",
+            "https://fhir.nhs.uk/England/CodeSystem/England-NRLRecordType",
+        ]:
             self.result.add_error(
                 issue_code="business-rule",
                 error_code="UNPROCESSABLE_ENTITY",
-                diagnostics=f"Invalid type system: {coding.system} Type system must be either 'http://snomed.info/sct' or 'https://nicip.nhs.uk'",
+                diagnostics=f"Invalid type system: {coding.system} Type system must be either 'http://snomed.info/sct', 'https://nicip.nhs.uk' or 'https://fhir.nhs.uk/England/CodeSystem/England-NRLRecordType'",
                 field="type.coding[0].system",
             )
             return
