@@ -2,7 +2,7 @@ allure 2.34.0
 awscli 2.27.20
 jq 1.7.1
 k6 1.0.0
-poetry 2.2.1
+poetry 1.8.5
 python 3.12.10
 terraform 1.9.8
 yq 4.45.4
