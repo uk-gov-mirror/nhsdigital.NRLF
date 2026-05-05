@@ -13,7 +13,9 @@ concurrency:
 jobs:
   set-environment-id:
     name: Set Environment ID
-    runs-on: codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
+    runs-on:
+      - codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
+      - image:custom-linux-${{ vars.CODEBUILD_IMAGE_NAME }}:2026-05-05
     steps:
       - name: Set a ID based on the branch name
         env:
@@ -42,7 +44,9 @@ jobs:
     name: Destroy PR Environment
     needs: [set-environment-id]
     environment: pull-request
-    runs-on: codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
+    runs-on:
+      - codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
+      - image:custom-linux-${{ vars.CODEBUILD_IMAGE_NAME }}:2026-05-05
     permissions:
       id-token: write
       contents: read

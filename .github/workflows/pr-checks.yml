@@ -8,7 +8,9 @@ on:
 jobs:
   build:
     name: Build and test
-    runs-on: codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
+    runs-on:
+      - codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
+      - image:custom-linux-${{ vars.CODEBUILD_IMAGE_NAME }}:2026-05-05
     environment: pull-request
     permissions:
       contents: read

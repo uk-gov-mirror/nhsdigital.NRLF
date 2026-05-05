@@ -12,7 +12,9 @@ concurrency:
 jobs:
   set-environment-id:
     name: Set Environment ID
-    runs-on: codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
+    runs-on:
+      - codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
+      - image:custom-linux-${{ vars.CODEBUILD_IMAGE_NAME }}:2026-05-05
     environment: pull-request
     steps:
       - name: Set a ID based on the branch name
@@ -39,7 +41,9 @@ jobs:
 
   build:
     name: Build Application
-    runs-on: codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
+    runs-on:
+      - codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
+      - image:custom-linux-${{ vars.CODEBUILD_IMAGE_NAME }}:2026-05-05
     environment: pull-request
     permissions:
       id-token: write
@@ -107,7 +111,9 @@ jobs:
 
   deploy:
     name: Deploy PR Environment
-    runs-on: codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
+    runs-on:
+      - codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
+      - image:custom-linux-${{ vars.CODEBUILD_IMAGE_NAME }}:2026-05-05
     environment: pull-request
     needs: [set-environment-id, build]
     permissions:
@@ -199,7 +205,9 @@ jobs:
     name: Run Integration Tests
     needs: [set-environment-id, deploy]
     environment: pull-request
-    runs-on: codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
+    runs-on:
+      - codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
+      - image:custom-linux-${{ vars.CODEBUILD_IMAGE_NAME }}:2026-05-05
     permissions:
       id-token: write
       contents: read
@@ -278,7 +286,9 @@ jobs:
     name: Run Performance Tests
     needs: [set-environment-id, integration-test]
     environment: pull-request
-    runs-on: codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
+    runs-on:
+      - codebuild-nhsd-nrlf-ci-build-project-${{ github.run_id }}-${{ github.run_attempt }}
+      - image:custom-linux-${{ vars.CODEBUILD_IMAGE_NAME }}:2026-05-05
     permissions:
       id-token: write
       contents: read
