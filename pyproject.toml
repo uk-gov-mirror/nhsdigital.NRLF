@@ -19,7 +19,6 @@ pydantic-settings = "^2.5.2"
 
 [tool.poetry.group.dev.dependencies]
 layers = {path = "layer", develop = true}
-nrlf-converter = {url = "https://github.com/NHSDigital/nrlf-converter/releases/download/0.0.9/nrlf_converter-0.0.9-py3-none-any.whl"}
 pytest = "^8.4.1"
 pytest-mock = "^3.12.0"
 pytest-cov = "^5.0.0"
